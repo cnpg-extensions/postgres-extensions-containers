@@ -1,6 +1,6 @@
 [![CNPG Extensions](./logo/cnpg-extensions.png)](https://github.com/cnpg-extensions/)
 
-# CNPG Extensions PostgreSQL Extension Container Images
+# CNPG Extensions - PostgreSQL Extension Container Images
 
 This repository provides **maintenance scripts** for building **immutable
 container images** containing PostgreSQL extensions that cannot be accepted
