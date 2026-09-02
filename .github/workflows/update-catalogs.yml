@@ -26,11 +26,19 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Checkout upstream artifacts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: upstream-artifacts
+          repository: cloudnative-pg/artifacts
+          token: ${{ secrets.REPO_GHA_PAT }}
+          ref: main
+
       - name: Checkout artifacts
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: artifacts
-          repository: cloudnative-pg/artifacts
+          repository: cnpg-extensions/artifacts
           token: ${{ secrets.REPO_GHA_PAT }}
           ref: main
 
@@ -44,7 +52,7 @@ jobs:
           version: ${{ env.DAGGER_VERSION }}
           verb: call
           module: ./dagger/maintenance/
-          args: generate-catalogs --catalogs-dir artifacts/image-catalogs/ export --path artifacts/image-catalogs-extensions/
+          args: generate-catalogs --catalogs-dir upstream-artifacts/image-catalogs-extensions/ export --path artifacts/image-catalogs-extensions/
 
       - name: Install cosign
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2

@@ -506,6 +506,9 @@ func (m *Maintenance) GenerateCatalogs(
 
 		for dir, extension := range targetExtensions {
 			metadata := metadataByDir[dir]
+			if slices.Contains([]string{"postgis"}, metadata.Name) {
+				continue
+			}
 			matrix := buildMatrixFromMetadata(metadata)
 			if !matrix.hasDistribution(catalogOS) {
 				continue

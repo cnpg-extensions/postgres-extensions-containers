@@ -213,10 +213,23 @@ skopeo inspect docker://<image> | jq '.Labels'
 
 To simplify the deployment of PostgreSQL extensions, this project automatically
 generates `ClusterImageCatalog` resources. These catalogs provide a curated
-list of compatible extension images for PostgreSQL 18+ versions.
+list of compatible extension images for PostgreSQL 18+ versions. The generated
+catalog starts from CNPG's [upstream extension catalog](https://github.com/cloudnative-pg/artifacts/tree/main/image-catalogs-extensions),
+then adds the images maintained in this repository. The local metadata-only
+`postgis` stub is excluded so the upstream PostGIS definition is retained.
 
 - **Frequency:** Built once a week.
 - **Location:** Published in the [`artifacts`
-  project](https://github.com/cloudnative-pg/artifacts/tree/main/image-catalogs-extensions).
+  repository](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions).
 - **Naming Convention:** These are based on the `minimal` catalog and use the
   `catalog-minimal` prefix (e.g., `catalog-minimal-trixie.yaml`)
+
+For example, apply the PostgreSQL 18 catalog for Debian trixie with:
+
+```bash
+kubectl apply -f \
+  https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
+```
+
+Clusters using this catalog should reference it instead of the corresponding
+upstream base catalog; it already includes the upstream extension definitions.
