@@ -54,6 +54,19 @@ Extensions in this repository are not accepted upstream solely due to licensing
 — they are otherwise fully functional and meet all other upstream quality
 requirements.
 
+### Dependency-only stubs
+
+The repository includes the following metadata-only stub for dependency
+resolution and CI:
+
+| Stub | Required by | Production image |
+| :--- | :--- | :--- |
+| **[postgis](postgis)** | [mobilitydb](mobilitydb) | `ghcr.io/cloudnative-pg/postgis-extension` |
+
+The `postgis` stub has `create_extension = false` and exists so the build and
+test tooling can resolve MobilityDB's `required_extensions` entry. For
+production use, configure the upstream PostGIS extension image instead.
+
 ---
 
 ## Relationship to Upstream
