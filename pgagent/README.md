@@ -29,7 +29,7 @@ spec:
     extensions:
     - name: pgagent
       image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pgagent
+        # renovate: suite=trixie-pgdg depName=pgagent
         reference: ghcr.io/cnpg-extensions/pgagent:4.2.3-18-trixie
 ```
 
@@ -50,7 +50,7 @@ spec:
     name: cluster-pgagent
   extensions:
   - name: pgagent
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pgagent extractVersion=^(?<version>\d+\.\d+)
+    # renovate: suite=trixie-pgdg depName=pgagent extractVersion=^(?<version>\d+\.\d+)
     version: '4.2'
 ```
 Alternatively, you can enable the extension directly with SQL:
