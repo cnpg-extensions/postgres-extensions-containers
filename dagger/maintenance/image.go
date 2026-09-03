@@ -124,7 +124,7 @@ func getExtensionImage(metadata *extensionMetadata, distribution string, pgMajor
 // getExtensionImageWithTimestamp returns the extension image with the latest timestamp
 // for a given distribution and pgMajor.
 func getExtensionImageWithTimestamp(metadata *extensionMetadata, distribution string, pgMajor int) (string, error) {
-	imageName := fmt.Sprintf("ghcr.io/cloudnative-pg/%s", metadata.ImageName)
+	imageName := fmt.Sprintf("ghcr.io/cnpg-extensions/%s", metadata.ImageName)
 	tags, err := crane.ListTags(imageName)
 	if err != nil {
 		return "", fmt.Errorf("while listing tags for image %s: %w", imageName, err)
