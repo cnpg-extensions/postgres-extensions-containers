@@ -157,7 +157,8 @@ func generateDatabaseConfig(extensionInfos []*testingExtensionInfo) *DatabaseCon
 
 func generateDatabaseAssertStatus(extensionInfos []*testingExtensionInfo) map[string]any {
 	status := map[string]any{
-		"applied": true,
+		"applied":            true,
+		"observedGeneration": 1,
 	}
 
 	var extensions []map[string]any
