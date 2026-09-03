@@ -57,6 +57,12 @@ func generateTestingValuesExtensions(
 	if err != nil {
 		return nil, err
 	}
+	out = append(out, &testingExtensionInfo{
+		Configuration:   configuration,
+		SQLName:         metadata.SQLName,
+		Version:         locator.SQLVersion,
+		CreateExtension: metadata.CreateExtension,
+	})
 	for _, dep := range metadata.RequiredExtensions {
 		depExists, err := source.Exists(ctx, dep)
 		if err != nil {
@@ -101,13 +107,6 @@ func generateTestingValuesExtensions(
 			CreateExtension: depMetadata.CreateExtension,
 		})
 	}
-	out = append(out, &testingExtensionInfo{
-		Configuration:   configuration,
-		SQLName:         metadata.SQLName,
-		Version:         locator.SQLVersion,
-		CreateExtension: metadata.CreateExtension,
-	})
-
 	return out, nil
 }
 
