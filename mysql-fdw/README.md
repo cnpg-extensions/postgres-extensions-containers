@@ -50,7 +50,7 @@ spec:
     name: cluster-mysql-fdw
   extensions:
   - name: mysql-fdw
-    # renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw extractVersion=^(?<version>\d+\.\d+)
+    # SQL version cannot be updated by Renovate; update manually.
     version: '1.2'
 ```
 Alternatively, you can enable the extension directly with SQL:

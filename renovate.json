@@ -21,7 +21,7 @@
         "**/*.hcl"
       ],
       "matchStrings": [
-        "\\/\\/\\s*renovate:\\s*?(suite=(?<suite>.*?))?\\s*depName=(?<depName>.*?)?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*(?<depType>sql|package)\\s*=\\s*\"(?<currentValue>.*)\""
+        "\\/\\/\\s*renovate:\\s*?(suite=(?<suite>.*?))?\\s*depName=(?<depName>.*?)?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*(sql|package)\\s*=\\s*\"(?<currentValue>.*)\""
       ],
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{#if suite}}{{suite}}{{else}}stable{{/if}}&components=main&binaryArch=amd64",
       "datasourceTemplate": "deb"
@@ -37,8 +37,7 @@
       ],
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{#if suite}}{{suite}}{{else}}stable{{/if}}&components=main&binaryArch=amd64",
       "datasourceTemplate": "deb",
-      "extractVersionTemplate": "^(?<version>[^-+]+)",
-      "depTypeTemplate": "package"
+      "extractVersionTemplate": "^(?<version>[^-+]+)"
     },
     {
       "description": "updates the container image SQL version in the README.md files",
@@ -50,8 +49,7 @@
         "#\\s*renovate:\\s*?(suite=(?<suite>.*?))?\\s*depName=(?<depName>.*?)?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*version: '(?<currentValue>([0-9]\\.?)+)'"
       ],
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{#if suite}}{{suite}}{{else}}stable{{/if}}&components=main&binaryArch=amd64",
-      "datasourceTemplate": "deb",
-      "depTypeTemplate": "sql"
+      "datasourceTemplate": "deb"
     },
     {
       "description": "updates the Taskfile, test files and GitHub Actions workflow dependencies",
@@ -78,22 +76,6 @@
     }
   ],
   "packageRules": [
-    {
-      "description": "mysql-fdw SQL version is independent from its Debian package version",
-      "matchManagers": [
-        "custom.regex"
-      ],
-      "matchDatasources": [
-        "deb"
-      ],
-      "matchDepNames": [
-        "postgresql-18-mysql-fdw"
-      ],
-      "matchDepTypes": [
-        "sql"
-      ],
-      "enabled": false
-    },
     {
       "matchDatasources": [
         "github-tags"
