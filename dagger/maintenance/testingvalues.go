@@ -63,6 +63,7 @@ func generateTestingValuesExtensions(
 		Version:         locator.SQLVersion,
 		CreateExtension: metadata.CreateExtension,
 	})
+
 	for _, dep := range metadata.RequiredExtensions {
 		depExists, err := source.Exists(ctx, dep)
 		if err != nil {
@@ -100,6 +101,7 @@ func generateTestingValuesExtensions(
 				"extension image %s doesn't have an %q annotation or its value is empty",
 				depConfiguration.ImageVolumeSource.Reference, AnnotationImageSQLVersion)
 		}
+
 		out = append(out, &testingExtensionInfo{
 			Configuration:   depConfiguration,
 			SQLName:         depMetadata.SQLName,
@@ -107,6 +109,7 @@ func generateTestingValuesExtensions(
 			CreateExtension: depMetadata.CreateExtension,
 		})
 	}
+
 	return out, nil
 }
 
