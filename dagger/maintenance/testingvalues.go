@@ -94,16 +94,11 @@ func generateTestingValuesExtensions(
 				"extension image %s doesn't have an %q annotation or its value is empty",
 				depConfiguration.ImageVolumeSource.Reference, AnnotationImageSQLVersion)
 		}
-		if !depMetadata.CreateExtension {
-			depConfiguration.ImageVolumeSource.Reference = ""
-			depVersion = ""
-		}
-
 		out = append(out, &testingExtensionInfo{
 			Configuration:   depConfiguration,
 			SQLName:         depMetadata.SQLName,
 			Version:         depVersion,
-			CreateExtension: true,
+			CreateExtension: depMetadata.CreateExtension,
 		})
 	}
 	out = append(out, &testingExtensionInfo{
