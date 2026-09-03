@@ -125,6 +125,11 @@ func (m *Maintenance) GetTargets(
 	if err != nil {
 		return "", err
 	}
+	for dir, extension := range targetExtensions {
+		if slices.Contains([]string{"postgis"}, extension) {
+			delete(targetExtensions, dir)
+		}
+	}
 	jsonTargets, err := json.Marshal(slices.Sorted(maps.Keys(targetExtensions)))
 	if err != nil {
 		return "", err
