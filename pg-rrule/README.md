@@ -1,6 +1,6 @@
 # pg_rrule
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: pg-rrule
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pg-rrule
-        reference: ghcr.io/not-cloudnative-pg/pg-rrule:0.3.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-rrule:0.3.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -75,7 +75,7 @@ You should see `pg_rrule` listed among the installed extensions.
   The library is bundled in the image under `/system/`.
 - **License**: `pg_rrule` itself is MIT, but its runtime dependency `libical3`
   is dual-licensed under LGPL-2.1 or MPL-2.0, which is why this extension is
-  hosted in the not-cloudnative-pg fork rather than upstream.
+  hosted in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

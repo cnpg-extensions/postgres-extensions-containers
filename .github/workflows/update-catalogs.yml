@@ -76,6 +76,6 @@ jobs:
         with:
           cwd: 'artifacts'
           add: 'image-catalogs-extensions'
-          author_name: CloudNativePG Automated Updates
-          author_email: noreply@cnpg.com
+          author_name: CNPG Extensions Automated Updates
+          author_email: noreply@github.com
           message: 'chore: update extensions imageCatalogs'

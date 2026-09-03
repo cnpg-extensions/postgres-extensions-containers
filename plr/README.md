@@ -1,6 +1,6 @@
 # PL/R
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: plr
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-plr
-        reference: ghcr.io/not-cloudnative-pg/plr:8.4.8.6-18-trixie
+        reference: ghcr.io/cnpg-extensions/plr:8.4.8.6-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -88,7 +88,7 @@ SELECT plr_version();
   (`CREATE EXTENSION plr`) and that the `plr_version()` function returns a
   result. Full R statistical function tests were not exercised.
 - **License**: PL/R is GPL-2+, which is why it is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

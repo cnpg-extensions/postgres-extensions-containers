@@ -1,6 +1,6 @@
 # pg_uuidv7
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: pg-uuidv7
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7
-        reference: ghcr.io/not-cloudnative-pg/pg-uuidv7:1.7.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-uuidv7:1.7.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -77,7 +77,7 @@ SELECT uuid_generate_v7();
 ## Known Caveats
 
 - **License**: `pg_uuidv7` is licensed under MPL-2.0 (Mozilla Public License),
-  which is why it is hosted in the not-cloudnative-pg fork rather than upstream.
+  which is why it is hosted in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

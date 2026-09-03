@@ -1,6 +1,6 @@
 # q3c
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: q3c
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-q3c
-        reference: ghcr.io/not-cloudnative-pg/q3c:2.0.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/q3c:2.0.2-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -72,7 +72,7 @@ You should see `q3c` listed among the installed extensions.
 ## Known Caveats
 
 - **License**: `q3c` is GPL-2+, which is why it is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

@@ -1,6 +1,6 @@
 # mysql_fdw
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: mysql-fdw
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw
-        reference: ghcr.io/not-cloudnative-pg/mysql-fdw:2.9.3-18-trixie
+        reference: ghcr.io/cnpg-extensions/mysql-fdw:2.9.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -82,7 +82,7 @@ You should see `mysql_fdw` listed among the installed extensions.
   configuration.
 - **License**: The `mysql_fdw` extension is BSD-3-Clause, but its runtime
   dependency `libmariadb3` is LGPL-2.1, which is why this extension is hosted
-  in the not-cloudnative-pg fork rather than upstream.
+  in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

@@ -1,6 +1,6 @@
 # plprofiler
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: plprofiler
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-plprofiler
-        reference: ghcr.io/not-cloudnative-pg/plprofiler:4.2.5-18-trixie
+        reference: ghcr.io/cnpg-extensions/plprofiler:4.2.5-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -72,7 +72,7 @@ You should see `plprofiler` listed among the installed extensions.
 ## Known Caveats
 
 - **License**: `plprofiler` is Artistic-2.0, which is why it is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

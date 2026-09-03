@@ -1,6 +1,6 @@
 # pg_cron
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to CloudNativePG, established as CloudNativePG a Series of LF Projects, LLC.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -39,7 +39,7 @@ spec:
     - name: pg_cron
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-cron
-        reference: ghcr.io/cloudnative-pg/pg-cron:1.6.7-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-cron:1.6.7-18-trixie
 ```
 
 ### 2. Enable the extension in a database

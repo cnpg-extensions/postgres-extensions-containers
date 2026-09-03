@@ -1,6 +1,6 @@
 # pgmp
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: pgmp
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgmp
-        reference: ghcr.io/not-cloudnative-pg/pgmp:1.0.5-18-trixie
+        reference: ghcr.io/cnpg-extensions/pgmp:1.0.5-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -77,7 +77,7 @@ You should see `pgmp` listed among the installed extensions.
   subdirectory. The Dockerfile handles this with an additional `COPY` for the
   `pgmp/` directory.
 - **License**: `pgmp` is LGPL-3+, which is why it is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

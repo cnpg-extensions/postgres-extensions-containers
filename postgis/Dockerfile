@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 # SPDX-License-Identifier: Apache-2.0
 
 # This is a metadata-only stub. PostGIS is maintained upstream at
@@ -8,4 +8,3 @@
 # can be tested against the upstream published image.
 FROM scratch
 USER 65532:65532
-

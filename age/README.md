@@ -1,6 +1,6 @@
 # Apache AGE
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -34,7 +34,7 @@ spec:
     - name: age
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-age
-        reference: ghcr.io/not-cloudnative-pg/age:1.7.0~rc0-18-trixie
+        reference: ghcr.io/cnpg-extensions/age:1.7.0~rc0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -80,7 +80,7 @@ You should see `age` listed among the installed extensions.
   with a "must be preloaded" error.
 - **License**: AGE itself is Apache-2.0, but its bundled CSV parser library
   (`libcsv`) is LGPL-2.1, which is why this extension is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 - **Cypher support**: After installation, use `SET search_path = ag_catalog, "$user", public;`
   to access AGE's graph functions and the `cypher()` function for graph queries.
 

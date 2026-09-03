@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 # SPDX-License-Identifier: Apache-2.0
 
 ARG BASE=ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie

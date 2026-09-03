@@ -1,6 +1,6 @@
 # h3
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: h3
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-h3
-        reference: ghcr.io/not-cloudnative-pg/h3:4.2.3-18-trixie
+        reference: ghcr.io/cnpg-extensions/h3:4.2.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -76,7 +76,7 @@ You should see `h3` listed among the installed extensions.
   is configured to include this directory automatically.
 - **License**: The H3 library (`libh3`) itself is Apache-2.0, but the Debian
   package bundles AGPL-3+ licensed components, which is why this extension is
-  hosted in the not-cloudnative-pg fork rather than upstream.
+  hosted in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

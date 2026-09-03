@@ -17,8 +17,8 @@ variable "revision" {
 
 fullname = ( environment == "testing") ? "${registry}/${metadata.image_name}-testing" : "${registry}/${metadata.image_name}"
 now = timestamp()
-authors = "The CloudNativePG Contributors"
-url = "https://github.com/cloudnative-pg/postgres-extensions-containers"
+authors = "The CNPG Extensions Contributors"
+url = "https://github.com/cnpg-extensions/postgres-extensions-containers"
 
 target "default" {
   matrix = {

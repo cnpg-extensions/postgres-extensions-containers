@@ -1,6 +1,6 @@
 # pldebugger
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -34,7 +34,7 @@ spec:
     - name: pldebugger
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pldebugger
-        reference: ghcr.io/not-cloudnative-pg/pldebugger:1.10-18-trixie
+        reference: ghcr.io/cnpg-extensions/pldebugger:1.10-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -82,7 +82,7 @@ You should see `pldbgapi` listed among the installed extensions.
   `pldebugger` but the PostgreSQL extension object is `pldbgapi`. Use
   `CREATE EXTENSION pldbgapi` (not `pldebugger`).
 - **License**: `pldebugger` is Artistic-2.0, which is why it is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

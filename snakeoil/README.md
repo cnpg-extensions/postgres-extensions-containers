@@ -1,6 +1,6 @@
 # pg_snakeoil
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -34,7 +34,7 @@ spec:
     - name: snakeoil
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-snakeoil
-        reference: ghcr.io/not-cloudnative-pg/snakeoil:1.4-18-trixie
+        reference: ghcr.io/cnpg-extensions/snakeoil:1.4-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -128,7 +128,7 @@ the database is more than a few days old.
   `/system/`.
 - **License**: `pg_snakeoil` itself is PostgreSQL-licensed, but its runtime
   dependency `libclamav12` is LGPL-2+, which is why this extension is hosted in
-  the not-cloudnative-pg fork rather than upstream.
+  the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

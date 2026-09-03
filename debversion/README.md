@@ -1,6 +1,6 @@
 # debversion
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: debversion
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-debversion
-        reference: ghcr.io/not-cloudnative-pg/debversion:1.2.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/debversion:1.2.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -72,7 +72,7 @@ You should see `debversion` listed among the installed extensions.
 ## Known Caveats
 
 - **License**: `debversion` is licensed under GPL-3+, which is why it is hosted
-  in the not-cloudnative-pg fork rather than upstream.
+  in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 

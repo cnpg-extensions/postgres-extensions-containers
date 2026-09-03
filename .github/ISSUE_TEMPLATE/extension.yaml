@@ -2,14 +2,14 @@ name: New Extension Proposal
 description: Propose a new PostgreSQL extension to be included in the containers and commit to its maintenance.
 title: "[New Extension]: "
 labels: ["triage", "new-extension"]
-projects: ["cloudnative-pg/postgres-extensions-containers"]
+projects: ["cnpg-extensions/postgres-extensions-containers"]
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for proposing a new extension for the PostgreSQL Extensions Containers project!
 
-        The submission process requires the proposer to commit to becoming the **Component Owner** and taking on the long-term maintenance of the extension image. Please review the [governance document for the submission process](https://github.com/cloudnative-pg/postgres-extensions-containers?tab=readme-ov-file#submission-process).
+        The submission process requires the proposer to commit to becoming the **Component Owner** and taking on the long-term maintenance of the extension image. Please review the [governance document for the submission process](https://github.com/cnpg-extensions/postgres-extensions-containers?tab=readme-ov-file#submission-process).
 
   - type: checkboxes
     id: search

@@ -35,7 +35,7 @@ https://github.com/cloudnative-pg/governance/blob/main/CONTRIBUTING.md
 
 - [ ] My commits are signed off for [DCO](https://developercertificate.org/)
       compliance (`git commit -s`).
-- [ ] This PR targets the `main` branch of the upstream repository.
+- [ ] This PR targets the `main` branch of the CNPG Extensions repository.
 - [ ] `task checks:all` passes locally.
 - [ ] For changes affecting one or more extensions, the relevant build and E2E
       tests pass (e.g. `task bake TARGET=<ext>`, `task e2e:test:full TARGET=<ext>`).

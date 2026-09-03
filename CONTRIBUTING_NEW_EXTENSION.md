@@ -13,7 +13,7 @@ setting up your environment to submitting a Pull Request.
 Before proposing a change, ensure your local machine is compatible with the
 [build stack](BUILD.md).
 
-1. **Fork** the [cloudnative-pg/postgres-extensions-containers](https://github.com/cloudnative-pg/postgres-extensions-containers)
+1. **Fork** the [cnpg-extensions/postgres-extensions-containers](https://github.com/cnpg-extensions/postgres-extensions-containers)
    repository.
 2. **Clone** your fork and enter the directory:
     ```sh
@@ -107,13 +107,13 @@ paths.
 
 > [!IMPORTANT]
 > **Community Commitment:** By opening the issue, you are confirming your
-> intent to help maintain this extension on behalf of the CloudNativePG
-> community.
+> intent to help maintain this extension on behalf of the CNPG Extensions
+> project.
 
 After gathering the package details and verifying the extension's license,
 submit your proposal:
 
-1. Point your browser to ["New Extension Proposal"](https://github.com/cloudnative-pg/postgres-extensions-containers/issues/new/choose).
+1. Point your browser to ["New Extension Proposal"](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose).
 2. Provide the package name, versioning info, and a link to the upstream source.
 3. State the license clearly. Every component in the extension image must be
    covered by a license on the
@@ -296,8 +296,8 @@ Submission Requirements:
 
 - **DCO Compliance**: All commits must be signed (`git commit -s`) to certify
   that you have the right to submit the code under the project's license.
-- **Upstream Target**: Ensure your Pull Request is targeting the `main` branch of
-  the upstream repository.
+- **Repository Target**: Ensure your Pull Request is targeting the `main` branch
+  of the CNPG Extensions repository.
 - **CODEOWNERS**: The PR must add an entry to the [`CODEOWNERS`](./CODEOWNERS)
   file listing the GitHub handles of the component owner(s) for the new
   extension folder.
@@ -311,9 +311,9 @@ Submission Requirements:
 > includes the full contributor checklist for this lifecycle. GitHub does not
 > show a chooser for PR templates, so open the PR with this link to preselect
 > it:
-> [Open a new-extension PR](https://github.com/cloudnative-pg/postgres-extensions-containers/compare?expand=1&template=new_extension.md).
+> [Open a new-extension PR](https://github.com/cnpg-extensions/postgres-extensions-containers/compare?expand=1&template=new_extension.md).
 > For any other change (version bumps, fixes, tooling, docs), the default
 > template is applied automatically, so you can open the PR normally.
 
 By submitting, you confirm your commitment to maintain this extension on behalf
-of the CloudNativePG Community.
+of the CNPG Extensions project.

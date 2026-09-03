@@ -1,6 +1,6 @@
 # MobilityDB
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -34,7 +34,7 @@ spec:
     - name: mobilitydb
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb
-        reference: ghcr.io/not-cloudnative-pg/mobilitydb:1.3.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/mobilitydb:1.3.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -84,7 +84,7 @@ You should see `mobilitydb` listed among the installed extensions.
 - **Runtime library dependency**: This extension requires GEOS and other spatial
   libraries at runtime. These are bundled in the image under `/system/`.
 - **License**: MobilityDB is licensed under GPL-2+ and GPL-3+, which is why it
-  is hosted in the not-cloudnative-pg fork rather than upstream.
+  is hosted in the CNPG Extensions project rather than upstream.
 - **Testing limitation**: The CI tests verify basic extension installation.
   Full spatio-temporal query functionality was not exercised in integration tests.
 

@@ -27,8 +27,8 @@ Closes #<!-- proposal issue id -->
 - [ ] My commits are signed off for [DCO](https://developercertificate.org/)
       compliance (`git commit -s`).
 - [ ] Experimental commits have been squashed into a single, well-formed commit.
-- [ ] This PR targets the `main` branch of the upstream repository.
-- [ ] A [New Extension Proposal](https://github.com/cloudnative-pg/postgres-extensions-containers/issues/new/choose)
+- [ ] This PR targets the `main` branch of the CNPG Extensions repository.
+- [ ] A [New Extension Proposal](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose)
       issue exists and is referenced via `Closes #<id>` above.
 - [ ] The commit message follows the format:
       ``feat: add `<extension-name>` container image``.
@@ -50,13 +50,13 @@ Closes #<!-- proposal issue id -->
 - [ ] `README.md` is complete and includes a working `Cluster` example (plus a
       `Database` example with `CREATE EXTENSION` when `create_extension = true`).
 - [ ] An entry for the new extension folder was added to
-      [`CODEOWNERS`](https://github.com/cloudnative-pg/postgres-extensions-containers/blob/main/CODEOWNERS)
+      [`CODEOWNERS`](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/CODEOWNERS)
       with the component owner's GitHub handle(s).
 - [ ] A `distribution-points` entry for the new image was added under
       `repository.release` in
       [`SECURITY-INSIGHTS.yml`](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/SECURITY-INSIGHTS.yml).
 - [ ] I confirm my commitment to maintain this extension on behalf of the
-      CloudNativePG community.
+      CNPG Extensions project.
 
 ---
 

@@ -1,6 +1,6 @@
 # {{ toTitle .Name }}
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to CloudNativePG, established as CloudNativePG a Series of LF Projects, LLC.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -42,7 +42,7 @@ spec:
     - name: {{ .Name }}
       image:
         # renovate: suite={{ .DefaultDistro }}-pgdg depName={{ replaceAll .Package "%version%" (printf "%d" .DefaultVersion) }}
-        reference: ghcr.io/cloudnative-pg/{{ .Name }}:1.0-{{ .DefaultVersion }}-{{ .DefaultDistro }}
+        reference: ghcr.io/cnpg-extensions/{{ .Name }}:1.0-{{ .DefaultVersion }}-{{ .DefaultDistro }}
 ```
 
 ### 2. Enable the extension in a database

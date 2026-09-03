@@ -1,6 +1,6 @@
 # pgmemcache
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -38,7 +38,7 @@ spec:
     - name: pgmemcache
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgmemcache
-        reference: ghcr.io/not-cloudnative-pg/pgmemcache:2.3.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/pgmemcache:2.3.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -93,7 +93,7 @@ You should see `pgmemcache` listed among the installed extensions.
   connectivity. No Memcached server is provisioned in the test environment.
 - **License**: `pgmemcache` is BSD-3-Clause, but its runtime dependency
   `libmemcached11` is LGPL, which is why this extension is hosted in the
-  not-cloudnative-pg fork rather than upstream.
+  CNPG Extensions project rather than upstream.
 
 ## Contributors
 

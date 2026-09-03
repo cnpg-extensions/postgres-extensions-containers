@@ -1,6 +1,6 @@
 # pgAgent
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: pgagent
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgagent
-        reference: ghcr.io/not-cloudnative-pg/pgagent:4.2.3-18-trixie
+        reference: ghcr.io/cnpg-extensions/pgagent:4.2.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -82,7 +82,7 @@ You should see `pgagent` listed among the installed extensions.
   daemon or job execution.
 - **License**: `pgagent` itself is PostgreSQL-licensed, but its runtime
   dependency on Boost libraries is BSL-1.0 (Business Source License), which is
-  why this extension is hosted in the not-cloudnative-pg fork rather than
+  why this extension is hosted in the CNPG Extensions project rather than
   upstream.
 
 ## Contributors

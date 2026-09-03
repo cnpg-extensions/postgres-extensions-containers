@@ -1,6 +1,6 @@
 # tds_fdw
 <!--
-SPDX-FileCopyrightText: Copyright © contributors to the Not-CloudNativePG project.
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
@@ -30,7 +30,7 @@ spec:
     - name: tds-fdw
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-tds-fdw
-        reference: ghcr.io/not-cloudnative-pg/tds-fdw:2.0.5-18-trixie
+        reference: ghcr.io/cnpg-extensions/tds-fdw:2.0.5-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -80,7 +80,7 @@ You should see `tds_fdw` listed among the installed extensions.
   in the image under `/system/`.
 - **License**: `tds_fdw` itself is PostgreSQL-licensed, but its runtime
   dependency `libsybdb5` (FreeTDS) is LGPL-2+, which is why this extension is
-  hosted in the not-cloudnative-pg fork rather than upstream.
+  hosted in the CNPG Extensions project rather than upstream.
 
 ## Contributors
 
