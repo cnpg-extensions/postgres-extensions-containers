@@ -58,7 +58,7 @@ func generateTestingValuesExtensions(
 		return nil, err
 	}
 	for _, dep := range metadata.RequiredExtensions {
-		depExists, err := source.Exists(ctx, dep+"/"+metadataFile)
+		depExists, err := source.Exists(ctx, dep)
 		if err != nil {
 			return nil, err
 		}
