@@ -156,9 +156,14 @@ func generateDatabaseConfig(extensionInfos []*testingExtensionInfo) *DatabaseCon
 }
 
 func generateDatabaseAssertStatus(extensionInfos []*testingExtensionInfo) map[string]any {
+	// observedGeneration is intentionally omitted. CNPG reports the Database
+	// metadata.generation it reconciled, and this fork's catalog-backed E2E
+	// setup can legitimately produce a value other than 1. Upstream retains
+	// the generation-1 assertion because its E2E setup uses imageName and
+	// local dependency images. Keep this fork-local relaxation when syncing
+	// changes from upstream; it is not an upstream CNPG behavior change.
 	status := map[string]any{
 		"applied":            true,
-		"observedGeneration": 1,
 	}
 
 	var extensions []map[string]any
