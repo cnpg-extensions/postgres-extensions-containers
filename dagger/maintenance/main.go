@@ -125,11 +125,6 @@ func (m *Maintenance) GetTargets(
 	if err != nil {
 		return "", err
 	}
-	for dir, extension := range targetExtensions {
-		if slices.Contains([]string{"postgis"}, extension) {
-			delete(targetExtensions, dir)
-		}
-	}
 	jsonTargets, err := json.Marshal(slices.Sorted(maps.Keys(targetExtensions)))
 	if err != nil {
 		return "", err
@@ -511,9 +506,6 @@ func (m *Maintenance) GenerateCatalogs(
 
 		for dir, extension := range targetExtensions {
 			metadata := metadataByDir[dir]
-			if slices.Contains([]string{"postgis"}, metadata.Name) {
-				continue
-			}
 			matrix := buildMatrixFromMetadata(metadata)
 			if !matrix.hasDistribution(catalogOS) {
 				continue

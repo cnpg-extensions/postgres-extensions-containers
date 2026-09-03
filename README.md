@@ -54,19 +54,6 @@ Extensions in this repository are not accepted upstream solely due to licensing
 — they are otherwise fully functional and meet all other upstream quality
 requirements.
 
-### Dependency-only stubs
-
-The repository includes the following metadata-only stub for dependency
-resolution and CI:
-
-| Stub | Required by | Production image |
-| :--- | :--- | :--- |
-| **[postgis](postgis)** | [mobilitydb](mobilitydb) | `ghcr.io/cloudnative-pg/postgis-extension` |
-
-The `postgis` stub has `create_extension = false` and exists so the build and
-test tooling can resolve MobilityDB's `required_extensions` entry. For
-production use, configure the upstream PostGIS extension image instead.
-
 ---
 
 ## Relationship to Upstream
@@ -215,8 +202,8 @@ To simplify the deployment of PostgreSQL extensions, this project automatically
 generates `ClusterImageCatalog` resources. These catalogs provide a curated
 list of compatible extension images for PostgreSQL 18+ versions. The generated
 catalog starts from CNPG's [upstream extension catalog](https://github.com/cloudnative-pg/artifacts/tree/main/image-catalogs-extensions),
-then adds the images maintained in this repository. The local metadata-only
-`postgis` stub is excluded so the upstream PostGIS definition is retained.
+then adds the images maintained in this repository. Definitions from the
+upstream catalog are retained.
 
 - **Frequency:** Built once a week.
 - **Location:** Published in the [`artifacts`

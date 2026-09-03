@@ -3,7 +3,11 @@ kind: Cluster
 metadata:
   name: ($values.name)
 spec:
-  imageName: ($values.pg_image)
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: (regex_replace_all('^.*minimal-', $values.pg_image, 'postgresql-minimal-'))
+    major: 18
   instances: 1
 
   storage:

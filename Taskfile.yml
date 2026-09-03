@@ -313,6 +313,13 @@ tasks:
         with-exec \
         --args="wait","--for=condition=Available","--timeout=2m","-n","cnpg-system","deployments","cnpg-controller-manager" \
         --use-entrypoint sync
+
+        dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
+        with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
+        with-exec --args="apk","add","--no-cache","git" \
+        with-exec \
+        --args="apply","--server-side","-k","https://github.com/cnpg-extensions/artifacts//image-catalogs-extensions?ref=main" \
+        --use-entrypoint sync
     status:
       - |
         KUBECONFIG=$(dagger call -m github.com/aweris/daggerverse/kind@{{ .DAGGER_KIND_SHA }} \

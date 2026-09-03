@@ -71,8 +71,6 @@ repository:
         comment: GitHub packages for the plprofiler extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/plr
         comment: GitHub packages for the plr extension image
-      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/postgis-extension
-        comment: GitHub packages for the PostGIS extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/q3c
         comment: GitHub packages for the q3c extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/snakeoil

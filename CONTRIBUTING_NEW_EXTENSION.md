@@ -251,8 +251,8 @@ image: registry.pg-extensions:5000/<extension-name>-testing:<tag>
 ### Extending Tests
 
 While the framework provides a generic smoke test, we highly encourage you to
-add **extension-specific tests**. Review the [`postgis`](./postgis) directory
-for an example of additional testing using the Chainsaw framework.
+add **extension-specific tests** using the Chainsaw framework in the `test/`
+directory.
 
 ### Cleaning up
 

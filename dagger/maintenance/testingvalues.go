@@ -57,20 +57,18 @@ func generateTestingValuesExtensions(
 	if err != nil {
 		return nil, err
 	}
-	out = append(out, &testingExtensionInfo{
-		Configuration:   configuration,
-		SQLName:         metadata.SQLName,
-		Version:         locator.SQLVersion,
-		CreateExtension: metadata.CreateExtension,
-	})
-
 	for _, dep := range metadata.RequiredExtensions {
-		depExists, err := source.Exists(ctx, dep)
+		depExists, err := source.Exists(ctx, dep+"/"+metadataFile)
 		if err != nil {
 			return nil, err
 		}
 		if !depExists {
-			return nil, fmt.Errorf("required dependency %q not found", dep)
+			out = append(out, &testingExtensionInfo{
+				Configuration:   &ExtensionConfiguration{Name: dep},
+				SQLName:         dep,
+				CreateExtension: true,
+			})
+			continue
 		}
 
 		depMetadata, err := parseExtensionMetadata(ctx, source.Directory(dep))
@@ -96,14 +94,24 @@ func generateTestingValuesExtensions(
 				"extension image %s doesn't have an %q annotation or its value is empty",
 				depConfiguration.ImageVolumeSource.Reference, AnnotationImageSQLVersion)
 		}
+		if !depMetadata.CreateExtension {
+			depConfiguration.ImageVolumeSource.Reference = ""
+			depVersion = ""
+		}
 
 		out = append(out, &testingExtensionInfo{
 			Configuration:   depConfiguration,
 			SQLName:         depMetadata.SQLName,
 			Version:         depVersion,
-			CreateExtension: depMetadata.CreateExtension,
+			CreateExtension: true,
 		})
 	}
+	out = append(out, &testingExtensionInfo{
+		Configuration:   configuration,
+		SQLName:         metadata.SQLName,
+		Version:         locator.SQLVersion,
+		CreateExtension: metadata.CreateExtension,
+	})
 
 	return out, nil
 }
@@ -152,8 +160,7 @@ func generateDatabaseConfig(extensionInfos []*testingExtensionInfo) *DatabaseCon
 
 func generateDatabaseAssertStatus(extensionInfos []*testingExtensionInfo) map[string]any {
 	status := map[string]any{
-		"applied":            true,
-		"observedGeneration": 1,
+		"applied": true,
 	}
 
 	var extensions []map[string]any

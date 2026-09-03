@@ -7,9 +7,6 @@
 # pg_cron
 /pg-cron/ @ardentperf
 
-# postgis (stub for required_extensions dependency resolution)
-/postgis/ @ardentperf
-
 # pldebugger
 /pldebugger/ @ardentperf
 
