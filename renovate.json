@@ -77,6 +77,13 @@
   ],
   "packageRules": [
     {
+      "description": "require manual review for mysql-fdw updates",
+      "matchPackageNames": [
+        "postgresql-18-mysql-fdw"
+      ],
+      "automerge": false
+    },
+    {
       "matchDatasources": [
         "github-tags"
       ],
