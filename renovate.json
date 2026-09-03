@@ -83,7 +83,7 @@
       ],
       "automerge": false,
       "prBodyNotes": [
-        "⚠️ Manually verify/update the MySQL FDW SQL extension version before merging."
+        "⚠️ Current MySQL FDW SQL extension version is 1.2 (last changed on June 11, 2026). Manually check whether the SQL extension version changed before merging this package update."
       ]
     },
     {
