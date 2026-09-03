@@ -51,7 +51,7 @@ spec:
   extensions:
   - name: pg-uuidv7
     # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7 extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.7'
+    version: '1.7.0'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
