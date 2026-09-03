@@ -30,7 +30,7 @@ spec:
     - name: pgmp
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgmp
-        reference: ghcr.io/cnpg-extensions/pgmp:1.0.5-18-trixie
+        reference: ghcr.io/cnpg-extensions/pgmp:1.0.6-18-trixie
 ```
 
 ### 2. Enable the extension in a database
