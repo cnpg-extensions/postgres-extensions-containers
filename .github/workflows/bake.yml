@@ -116,6 +116,33 @@ jobs:
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+  automerge-gate:
+    name: Automerge gate
+    if: ${{ always() }}
+    needs:
+      - change-triage
+      - Bake
+    runs-on: ubuntu-24.04
+    permissions: {}
+    steps:
+      - name: Verify build and test results
+        if: >-
+          ${{
+            needs.change-triage.result != 'success' ||
+            (
+              needs.Bake.result != 'success' &&
+              needs.Bake.result != 'skipped'
+            )
+          }}
+        run: |
+          echo "CI failed:"
+          echo "change-triage: ${{ needs.change-triage.result }}"
+          echo "Bake: ${{ needs.Bake.result }}"
+          exit 1
+
+      - name: CI passed
+        run: echo "All required CI passed"
+
   Catalogs:
     name: Update Catalogs
     needs: Bake
