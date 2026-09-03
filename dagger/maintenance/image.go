@@ -180,7 +180,10 @@ func extractExtensionVersion(versions versionMap, distribution string, pgMajor i
 			distribution, pgMajor)
 	}
 
-	re := regexp.MustCompile(`^(\d+(?:\.\d+)+)`)
+	// Debian package versions may start with an epoch (for example,
+	// "1:8.4.8.6-1.pgdg12+1"). The epoch is package metadata, not part of
+	// the extension version used in the image tag.
+	re := regexp.MustCompile(`^(?:\d+:)?(\d+(?:\.\d+)+)`)
 	matches := re.FindStringSubmatch(extVersion.Package)
 	if len(matches) < 2 {
 		return "", fmt.Errorf("cannot extract extension version from %q", extVersion.Package)
