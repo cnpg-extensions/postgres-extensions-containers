@@ -22,7 +22,7 @@ metadata = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-mysql-fdw
         package = "2.9.3-2.pgdg12+1"
         // renovate: suite=bookworm-pgdg depName=postgresql-18-mysql-fdw extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "1.2"
+        sql     = "2.9.3"
       }
     }
     trixie = {
@@ -30,7 +30,7 @@ metadata = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw
         package = "2.9.3-2.pgdg13+1"
         // renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "1.2"
+        sql     = "2.9.3"
       }
     }
   }

@@ -51,7 +51,7 @@ spec:
   extensions:
   - name: mysql-fdw
     # renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw extractVersion=^(?<version>\d+\.\d+)
-    version: '1.2'
+    version: '2.9'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
