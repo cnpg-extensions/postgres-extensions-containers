@@ -30,7 +30,7 @@ spec:
     - name: q3c
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-q3c
-        reference: ghcr.io/cnpg-extensions/q3c:2.0.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/q3c:2.0.5-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -51,7 +51,7 @@ spec:
   extensions:
   - name: q3c
     # renovate: suite=trixie-pgdg depName=postgresql-18-q3c extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.0.2'
+    version: '2.0.5'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
