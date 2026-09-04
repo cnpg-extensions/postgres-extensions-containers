@@ -50,7 +50,7 @@ spec:
     name: cluster-mysql-fdw
   extensions:
   - name: mysql-fdw
-    # SQL version cannot be updated by Renovate; update manually.
+    # SQL version cannot be updated by Renovate; if it changes, manually update mysql-fdw/Dockerfile, mysql-fdw/README.md, and mysql-fdw/metadata.hcl.
     version: '1.2'
 ```
 Alternatively, you can enable the extension directly with SQL:
