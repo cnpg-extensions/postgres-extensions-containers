@@ -24,6 +24,9 @@ which primarily include:
 5. **Docker Buildx:** The `docker buildx` plugin must be available.
 6. **Docker Context:** A valid Docker context must be configured.
 
+For E2E tests, Kind must also be installed on the host. CI installs the
+version pinned in `Taskfile.yml`; local users should install the same version.
+
 To verify that all prerequisites are correctly installed and configured:
 
 ```bash

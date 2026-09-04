@@ -149,6 +149,27 @@ jobs:
       - name: Install Task
         uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2.2.0
 
+      - name: Install Kind
+        run: |
+          KIND_VERSION="$(awk '$1 == "KIND_VERSION:" { print $2; exit }' Taskfile.yml)"
+          test -n "${KIND_VERSION}"
+          KIND_ASSET=kind-linux-amd64
+          KIND_DIR="${RUNNER_TEMP}/kind"
+          mkdir -p "${KIND_DIR}" "${HOME}/.local/bin"
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 \
+            --output "${KIND_DIR}/${KIND_ASSET}" \
+            "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/${KIND_ASSET}"
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 5 \
+            --output "${KIND_DIR}/${KIND_ASSET}.sha256sum" \
+            "https://github.com/kubernetes-sigs/kind/releases/download/${KIND_VERSION}/${KIND_ASSET}.sha256sum"
+          (
+            cd "${KIND_DIR}"
+            grep "${KIND_ASSET}" "${KIND_ASSET}.sha256sum" | sha256sum --check
+          )
+          install -m 0755 "${KIND_DIR}/${KIND_ASSET}" "${HOME}/.local/bin/kind"
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+          "${HOME}/.local/bin/kind" version
+
       - name: Install Dagger
         env:
           # renovate: datasource=github-tags depName=dagger/dagger versioning=semver
