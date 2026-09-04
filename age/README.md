@@ -34,7 +34,7 @@ spec:
     - name: age
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-age
-        reference: ghcr.io/cnpg-extensions/age:1.7.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/age:1.8.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -55,7 +55,7 @@ spec:
   extensions:
   - name: age
     # renovate: suite=trixie-pgdg depName=postgresql-18-age extractVersion=^(?<version>[\d.]+)
-    version: '1.7.0'
+    version: '1.8.0'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
