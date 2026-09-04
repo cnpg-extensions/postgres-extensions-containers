@@ -79,6 +79,7 @@ jobs:
           git diff
 
       - name: Create a PR if versions have been updated on main
+        id: create_pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         if: github.ref == 'refs/heads/main'
         with:
@@ -91,3 +92,10 @@ jobs:
             ${{ matrix.extension }}/system-libs/**
           commit-message: "chore: update ${{ matrix.extension }} OS libraries"
           signoff: true
+
+      - name: Enable squash auto-merge
+        if: steps.create_pr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.REPO_GHA_PAT }}
+          PR_NUMBER: ${{ steps.create_pr.outputs.pull-request-number }}
+        run: gh pr merge --auto --squash "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
