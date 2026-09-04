@@ -1,0 +1,12 @@
+libmariadb3_1%3a10.11.18-0+deb12u1_amd64.deb MD5Sum:cf60586fa26c69e7d7f9cc3fac6576a4
+libssl-dev_3.0.20-1~deb12u2_amd64.deb MD5Sum:39896be54b0fadb8aba1eb53b0c0975a
+libc-dev-bin_2.36-9+deb12u14_amd64.deb MD5Sum:bf7479b3c9274ec601c49bf7a91027b1
+libcrypt-dev_1%3a4.4.33-2_amd64.deb MD5Sum:6aff917e5eff8479be04b8cb1ae6b340
+libtirpc-common_1.3.3+ds-1_all.deb MD5Sum:e49aca93814724ed80fa8932a1f7523b
+libtirpc3_1.3.3+ds-1_amd64.deb MD5Sum:b759d3e9dc474c3404da044249e84d2b
+libnsl2_1.3.0-2_amd64.deb MD5Sum:35f670dd707691bfa65ec9ecec32d8a0
+libtirpc-dev_1.3.3+ds-1_amd64.deb MD5Sum:2577c303fb9c6413e6855f03dff40ccf
+libnsl-dev_1.3.0-2_amd64.deb MD5Sum:b419a83742285ff5c1462f8b1d3571d9
+libc6-dev_2.36-9+deb12u14_amd64.deb MD5Sum:7b7c52938e39827b7bfd99ab986b2a32
+libmariadb-dev_1%3a10.11.18-0+deb12u1_amd64.deb MD5Sum:6adf28559dc489c2a1acc18e9914c4b3
+libmariadb-dev-compat_1%3a10.11.18-0+deb12u1_amd64.deb MD5Sum:497920fe5d64162af8e0a72698f87621
