@@ -35,9 +35,10 @@
       "matchStrings": [
         "#\\s*renovate:\\s*?(?:suite=(?<suite>[^\\s]+))?\\s*depName=(?<depName>[^\\s]+)\\s*reference:\\s+ghcr.io\\/cnpg-extensions\\/(?<imageName>[A-Za-z0-9_-]+):(?<currentValue>(?:[0-9]+-)?[0-9]+(?:\\.[0-9]+)*)-(?<pgVersion>[0-9]+)-(?<distro>[A-Za-z0-9_-]+)"
       ],
-      "depNameTemplate": "{{#if (equals imageName 'pgagent')}}pgagent{{else}}postgresql-{{{pgVersion}}}-{{{imageName}}}{{/if}}",
+      "depNameTemplate": "{{#if (equals imageName 'pgagent')}}pgagent{{else if (equals imageName 'pg-cron')}}postgresql-{{{pgVersion}}}-cron{{else}}postgresql-{{{pgVersion}}}-{{{imageName}}}{{/if}}",
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{{distro}}}-pgdg&components=main&binaryArch=amd64",
       "datasourceTemplate": "deb",
+      "currentValueTemplate": "{{{replace '-' ':' currentValue}}}",
       "extractVersionTemplate": "^(?<version>[^~+\\-]+)",
       "autoReplaceStringTemplate": "# renovate: suite={{{suite}}} depName={{{depName}}}\\n        reference: ghcr.io/cnpg-extensions/{{{imageName}}}:{{{replace ':' '-' newValue}}}-{{{pgVersion}}}-{{{distro}}}"
     },
