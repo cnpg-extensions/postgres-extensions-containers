@@ -182,6 +182,18 @@ Your `metadata.hcl` file requires two version fields:
 > Pay close attention to the `// renovate:` comments in the metadata and
 > `README.md` files; these are required for automated version tracking.
 
+### Automated Dependency Updates
+
+CNPG Extensions enables Renovate automerge by default for extension dependency
+updates. This assumes that the upstream project uses semantic versioning:
+minor and patch updates may be automerged after the required checks pass, while
+major version changes are not automerged and require manual review.
+
+If minor updates should not be automerged for a particular extension, automerge
+can be disabled with an extension-specific rule in
+[`renovate.json`](./renovate.json). [`mysql-fdw`](./mysql-fdw) is an example;
+its package updates are configured for manual review.
+
 ---
 
 ## 4. Phase Four: Local Testing & Validation

@@ -104,6 +104,18 @@ When proposing a new extension, the following criteria must be met:
 See [Adding a New Extension](./CONTRIBUTING_NEW_EXTENSION.md) for the full
 workflow on proposing and submitting a new extension.
 
+### Automated Dependency Updates
+
+CNPG Extensions enables Renovate automerge by default for extension dependency
+updates. This policy assumes that upstream versions follow semantic versioning:
+minor and patch updates may be automerged after the required checks pass, but
+major version changes are not automerged and require manual review.
+
+If minor updates should not be automerged for a particular extension, an
+extension-specific rule can disable automerge in [`renovate.json`](renovate.json).
+[`mysql-fdw`](mysql-fdw) is an example; its package updates are configured for
+manual review.
+
 ### Submission Process
 
 1. **Request and commitment:** Open a new issue requesting the extension.
