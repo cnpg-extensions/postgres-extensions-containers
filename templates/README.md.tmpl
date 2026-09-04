@@ -68,6 +68,8 @@ spec:
 
 <!--
 TODO: Adjust the extractVersion regex pattern above based on your extension's versioning scheme
+If the Debian package version uses an epoch (for example, `1:1.2.3`), prefix
+the extractVersion pattern with `^(?:\d+:)?` so Renovate ignores the epoch.
 Examples: \d+\.\d+ for major.minor (e.g., "18.0"), \d+\.\d+\.\d+ for major.minor.patch (e.g., "0.8.2")
 -->
 

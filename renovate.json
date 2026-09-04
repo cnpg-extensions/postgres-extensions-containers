@@ -89,6 +89,16 @@
       ]
     },
     {
+      "description": "require manual review for pldebugger updates",
+      "matchPackageNames": [
+        "postgresql-18-pldebugger"
+      ],
+      "automerge": false,
+      "prBodyNotes": [
+        "⚠️ PL/Debugger package updates do not imply a SQL extension version update. The current SQL extension version is 1.1, while the Debian package version is 1:1.10. Renovate updates the package and image references only. Manually check the upstream repository to see whether the SQL extension version changed before merging this package update. If it changed, manually update pldebugger/README.md, pldebugger/metadata.hcl, and renovate.json."
+      ]
+    },
+    {
       "matchDatasources": [
         "github-tags"
       ],

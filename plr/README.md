@@ -50,7 +50,7 @@ spec:
     name: cluster-plr
   extensions:
   - name: plr
-    # renovate: suite=trixie-pgdg depName=postgresql-18-plr extractVersion=^(?<version>\d+\.\d+\.\d+\.\d+)
+    # renovate: suite=trixie-pgdg depName=postgresql-18-plr extractVersion=^(?:\d+:)?(?<version>\d+\.\d+\.\d+\.\d+)
     version: '8.4.8.6'
 ```
 Alternatively, you can enable the extension directly with SQL:
