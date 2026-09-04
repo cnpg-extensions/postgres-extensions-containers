@@ -1,0 +1,2 @@
+libhashkit2t64_1.1.4-1.1+b2_amd64.deb MD5Sum:be5c1bd1d2e3333001209246936a25ec
+libmemcached11t64_1.1.4-1.1+b2_amd64.deb MD5Sum:3c0b629cc636bfed41b492c365baa8e4
