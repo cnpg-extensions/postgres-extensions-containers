@@ -15,8 +15,6 @@ vars:
   REGISTRY_HOST_PORT: 5000
   # Internal port exposed by the registry container image (always 5000)
   REGISTRY_INTERNAL_PORT: 5000
-  # renovate: datasource=github-tags depName=kubernetes-sigs/kind versioning=semver
-  KIND_VERSION: v0.33.0
   # renovate: datasource=docker depName=kindest/node versioning=docker
   KIND_NODE_VERSION: v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
   K8S_VERSION: '{{ regexReplaceAll "^v([0-9.]+).*" .KIND_NODE_VERSION "$1" }}'
@@ -226,7 +224,7 @@ tasks:
     run: once
     preconditions:
       - sh: command -v kind
-        msg: 'Kind is not installed. Install Kind {{ .KIND_VERSION }} before running E2E tests.'
+        msg: 'Kind is not installed. Install Kind before running E2E tests.'
     vars:
       REGISTRY_DIR: /etc/containerd/certs.d/{{ .REGISTRY_NAME }}:{{ .REGISTRY_INTERNAL_PORT }}
       REGISTRY_HOST: '{{ .REGISTRY_HOST | default "" }}'
