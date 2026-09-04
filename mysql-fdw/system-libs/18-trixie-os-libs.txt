@@ -1,0 +1,7 @@
+libmariadb3_1%3a11.8.6-0+deb13u1_amd64.deb MD5Sum:6b72b2c07af03c7125a2d95c73ad83c4
+libssl-dev_3.5.7-1~deb13u2_amd64.deb
+libc-dev-bin_2.41-12+deb13u3_amd64.deb MD5Sum:141b21da7ff6f9771ca8a950375083de
+libcrypt-dev_1%3a4.4.38-1_amd64.deb MD5Sum:ef4a9106931e8c0994e1881047aa0f12
+libc6-dev_2.41-12+deb13u3_amd64.deb MD5Sum:8216d95a967ba64cc7a45dcb697d1f53
+libmariadb-dev_1%3a11.8.6-0+deb13u1_amd64.deb MD5Sum:fb645d79309976f8bae3a212309a0973
+libmariadb-dev-compat_1%3a11.8.6-0+deb13u1_amd64.deb MD5Sum:114a0ebd69474be6d6607a8f101a48a7
