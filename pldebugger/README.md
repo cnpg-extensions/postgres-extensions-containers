@@ -34,7 +34,7 @@ spec:
     - name: pldebugger
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pldebugger
-        reference: ghcr.io/cnpg-extensions/pldebugger:1.10-18-trixie
+        reference: ghcr.io/cnpg-extensions/pldebugger:1-1.10-18-trixie
 ```
 
 ### 2. Enable the extension in a database
