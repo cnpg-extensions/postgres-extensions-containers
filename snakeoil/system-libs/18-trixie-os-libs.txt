@@ -1,0 +1,10 @@
+libbrotli1_1.1.0-2+b7_amd64.deb MD5Sum:e268acc326140ae9f1731f335335fc8d
+libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb MD5Sum:3650643a734bbd58529afd0493d181b2
+libnghttp3-9_1.8.0-1_amd64.deb MD5Sum:6b1f90e4153530a76878e9fde0244c66
+libpsl5t64_0.21.2-1.1+b1_amd64.deb MD5Sum:09aa06d971ce5ff6d02b452c0e1f15f9
+librtmp1_2.4+20151223.gitfa8646d.1-2+b5_amd64.deb MD5Sum:355aeaaf937d70dcc873a458f6244c6e
+libssh2-1t64_1.11.1-1+deb13u1_amd64.deb MD5Sum:ebbc03c2f321467d2e0ea0097c14f7fd
+libcurl4t64_8.14.1-2+deb13u4_amd64.deb MD5Sum:1ce441ba039d03e1f68100922946691b
+libjson-c5_0.18+ds-1_amd64.deb MD5Sum:2afaa0abf1f11e7f2d5aa1e789148632
+libmspack0t64_0.11-1.1+b1_amd64.deb MD5Sum:dd3d939194443ef2bc2a9f2be0a56f4b
+libclamav12_1.4.3+dfsg-1_amd64.deb MD5Sum:38af01fdea7c09a8d0233873ff6f0518
