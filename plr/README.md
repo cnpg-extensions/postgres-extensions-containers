@@ -30,7 +30,7 @@ spec:
     - name: plr
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-plr
-        reference: ghcr.io/cnpg-extensions/plr:1-8.4.8.6-18-trixie
+        reference: ghcr.io/cnpg-extensions/plr:1-8.4.8.7-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -51,7 +51,7 @@ spec:
   extensions:
   - name: plr
     # renovate: suite=trixie-pgdg depName=postgresql-18-plr extractVersion=^(?:\d+:)?(?<version>\d+\.\d+\.\d+\.\d+)
-    version: '8.4.8.6'
+    version: '8.4.8.7'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
