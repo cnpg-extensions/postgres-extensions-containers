@@ -12,7 +12,9 @@ metadata = {
   ld_library_path          = []
   bin_path                 = []
   env                      = {}
-  auto_update_os_libs      = true
+  # pgmp has no OS library packages to update; enabling this makes the
+  # updater fail when apt emits only the extension package.
+  auto_update_os_libs      = false
   required_extensions      = []
   create_extension         = true
 
