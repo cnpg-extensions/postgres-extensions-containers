@@ -39,7 +39,7 @@
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{{distro}}}-pgdg&components=main&binaryArch=amd64",
       "datasourceTemplate": "deb",
       "extractVersionTemplate": "^(?<version>[^~+\\-]+)",
-      "autoReplaceStringTemplate": "# renovate: suite={{{suite}}} depName={{{depName}}} reference: ghcr.io/cnpg-extensions/{{{imageName}}}:{{{replace ':' '-' newValue}}}-{{{pgVersion}}}-{{{distro}}}"
+      "autoReplaceStringTemplate": "# renovate: suite={{{suite}}} depName={{{depName}}}\\n        reference: ghcr.io/cnpg-extensions/{{{imageName}}}:{{{replace ':' '-' newValue}}}-{{{pgVersion}}}-{{{distro}}}"
     },
     {
       "description": "updates the container image SQL version in the README.md files",
