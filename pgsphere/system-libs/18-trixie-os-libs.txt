@@ -1,0 +1,13 @@
+libbrotli1_1.1.0-2+b7_amd64.deb MD5Sum:e268acc326140ae9f1731f335335fc8d
+libnghttp2-14_1.64.0-1.1+deb13u1_amd64.deb MD5Sum:3650643a734bbd58529afd0493d181b2
+libnghttp3-9_1.8.0-1_amd64.deb MD5Sum:6b1f90e4153530a76878e9fde0244c66
+libngtcp2-16_1.11.0-1+deb13u1_amd64.deb MD5Sum:73c7dc70b69796219facc3d77a092303
+libngtcp2-crypto-gnutls8_1.11.0-1+deb13u1_amd64.deb MD5Sum:085da7b6511e5afdbbd1b33f59054431
+libpsl5t64_0.21.2-1.1+b1_amd64.deb MD5Sum:09aa06d971ce5ff6d02b452c0e1f15f9
+librtmp1_2.4+20151223.gitfa8646d.1-2+b5_amd64.deb MD5Sum:355aeaaf937d70dcc873a458f6244c6e
+libssh2-1t64_1.11.1-1+deb13u1_amd64.deb MD5Sum:ebbc03c2f321467d2e0ea0097c14f7fd
+libcurl3t64-gnutls_8.14.1-2+deb13u4_amd64.deb MD5Sum:9afc089158cea4cbc7cf26c951b600bf
+libcfitsio10t64_4.6.2-2_amd64.deb MD5Sum:856f7ba809c5e389e30d711356d158d9
+libgomp1_14.2.0-19_amd64.deb MD5Sum:802973e7a4112ca440303b5beecfede6
+libsharp0_1.0.0-2+b2_amd64.deb MD5Sum:44486dd975633b23e3ac32a2dd2a031b
+libhealpix-cxx4_3.83.0-2_amd64.deb MD5Sum:ab2e9ab3498dd5d75a27a787a3617eb2
