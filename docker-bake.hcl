@@ -50,7 +50,6 @@ target "default" {
   ]
   attest = [
     "type=provenance,mode=max",
-    "type=sbom"
   ]
   annotations = [
     "index,manifest:org.opencontainers.image.created=${now}",

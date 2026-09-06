@@ -6,9 +6,11 @@ on:
       - main
     paths:
       - 'dagger/maintenance/**'
+      - 'scripts/*compose_sbom.py'
   pull_request:
     paths:
       - 'dagger/maintenance/**'
+      - 'scripts/*compose_sbom.py'
   workflow_dispatch:
 
 defaults:
@@ -26,6 +28,9 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+
+      - name: Run SBOM composer tests
+        run: python3 scripts/test_compose_sbom.py
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7

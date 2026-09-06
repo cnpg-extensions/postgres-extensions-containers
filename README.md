@@ -208,6 +208,140 @@ docker buildx imagetools inspect <image> --raw | jq '.annotations'
 skopeo inspect docker://<image> | jq '.Labels'
 ```
 
+### SBOM scope
+
+> [!WARNING]
+> The published SBOM and all SBOM/provenance annotations are a beta,
+> provisional implementation. They are not a complete or final OpenSSF
+> compliance claim. Their schema and fields may change or be removed as the
+> project moves toward stronger and more complete OpenSSF compliance. A
+> signature binds the exact bytes produced, but does not make provisional
+> contents or fields stable.
+
+Our goal is for this provisional data to be useful in the interim for license
+inventory and consumption by security scanners, while industry standards and
+industry build toolchains continue to mature in this space.
+
+The published SBOM is composed from the SPDX predicate produced for the
+post-install `builder` stage and the final-image file subjects in that
+attestation. It contains packages that own files shipped in the final image,
+plus an extension-specific artifacts package for files without a package owner.
+The file list is limited to files actually shipped in the image, including
+copied system libraries and license files. Relationships are trimmed and
+rewritten to match the resulting package and file lists.
+The workflow adds the provisional composition manifest as a canonical,
+document-level SPDX `OTHER` annotation after `compose_sbom.py` produces the
+aggregate; the composer itself remains focused on SBOM inventory composition.
+
+The final scratch stage is not scanned or read as an SBOM. During CI, the
+builder SBOM and its final-image file subjects are composed into one SPDX
+predicate per image target, aggregating the platform-specific results. The
+single aggregate is signed by GitHub Actions and attached to the
+multi-platform image index. This keeps the SBOM focused on the extension
+payload while still making vulnerabilities in shipped system-library and
+PostgreSQL packages visible. BuildKit's image provenance remains a separate
+attestation because it describes how the image was built rather than what the
+image contains.
+
+## Container authenticity and provenance
+
+The workflow follows the verification pattern described in CloudNativePG's
+[security documentation](https://cloudnative-pg.io/docs/devel/security/),
+adapted for this repository's separate BuildKit and GitHub Actions
+attestations.
+
+The commands below use an immutable multi-platform image index. Replace
+`<IMAGE>` with the full image name without a tag, such as
+`ghcr.io/cnpg-extensions/plr`, and replace `<INDEX_DIGEST>` with the index
+digest (`sha256:...`). Prefer a digest over a tag when verifying or retrieving
+security metadata.
+
+### Verify image authenticity
+
+Images are signed using keyless Cosign signatures issued through GitHub's
+OIDC identity. For a production image built from `main`, verify the signature
+and the signing workflow with:
+
+```bash
+cosign verify "<IMAGE>@<INDEX_DIGEST>" \
+  --certificate-identity-regexp='^https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/bake_targets\.yml@refs/heads/main$' \
+  --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
+```
+
+The workflow identity is the reusable `bake_targets.yml` workflow. Images
+created from another branch have a corresponding branch-scoped identity and
+should be verified with that ref instead.
+
+### Retrieve and verify the aggregate SBOM attestation
+
+The aggregate SBOM is a GitHub Actions artifact attestation attached to the
+multi-platform index. This is one SBOM attestation for the whole index, rather
+than one SBOM attestation per platform. `gh attestation verify` verifies the
+signed in-toto statement and can also extract its SPDX predicate:
+
+```bash
+gh attestation verify "oci://<IMAGE>@<INDEX_DIGEST>" \
+  --repo cnpg-extensions/postgres-extensions-containers \
+  --predicate-type https://spdx.dev/Document/v2.3 \
+  --format json \
+  --jq '.[].verificationResult.statement.predicate' > image-sbom.spdx.json
+```
+
+To retain the complete signed statement, including the SPDX composition
+annotation and its verification metadata, extract the statement instead:
+
+```bash
+gh attestation verify "oci://<IMAGE>@<INDEX_DIGEST>" \
+  --repo cnpg-extensions/postgres-extensions-containers \
+  --predicate-type https://spdx.dev/Document/v2.3 \
+  --format json \
+  --jq '.[].verificationResult.statement' > image-sbom.attestation.json
+```
+
+The annotation records the builder SBOM hash for each platform, the build
+definition hash, source and image digests, composer/tool details, and the
+GitHub workflow/run identity. It is intentionally provisional along with the
+rest of this SBOM implementation; consumers should not treat its field set as
+a stable API. `gh attestation verify` verifies the attestation's signer,
+subject digest, and predicate type; consumers that rely on the composition
+details should additionally inspect the annotation contents.
+
+The extracted SPDX JSON can be processed by standard SBOM tooling. For
+example, scan it with Trivy for vulnerabilities and license findings:
+
+```bash
+trivy sbom --scanners vuln,license image-sbom.spdx.json
+```
+
+### Retrieve and verify BuildKit image provenance
+
+BuildKit's SLSA image provenance is kept as a separate, per-platform image
+attestation. Retrieve a platform's provenance with `buildx`:
+
+```bash
+docker buildx imagetools inspect "<IMAGE>@<INDEX_DIGEST>" \
+  --format '{{ json (index .Provenance "linux/amd64").SLSA }}' \
+  > buildkit-provenance-linux-amd64.json
+
+docker buildx imagetools inspect "<IMAGE>@<INDEX_DIGEST>" \
+  --format '{{ json (index .Provenance "linux/arm64").SLSA }}' \
+  > buildkit-provenance-linux-arm64.json
+```
+
+Where supported by the installed verifier, verify the BuildKit SLSA
+provenance against this repository's source URI:
+
+```bash
+slsa-verifier verify-image \
+  "<IMAGE>@<INDEX_DIGEST>" \
+  --source-uri github.com/cnpg-extensions/postgres-extensions-containers
+```
+
+This verifies the BuildKit provenance separately from the signed GitHub SBOM
+attestation. The two artifacts intentionally answer different questions: the
+BuildKit attestation describes the build, while the GitHub SBOM attestation
+binds the composed inventory and its composition evidence to the image index.
+
 ## Image catalogs
 
 To simplify the deployment of PostgreSQL extensions, this project automatically

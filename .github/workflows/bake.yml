@@ -73,6 +73,7 @@ jobs:
             _shared: &shared
               - 'docker-bake.hcl'
               - 'Taskfile.yml'
+              - 'scripts/**'
               - 'test/**'
               - 'dagger/maintenance/**'
               - '.github/workflows/bake_targets.yml'
@@ -104,6 +105,7 @@ jobs:
       packages: write
       contents: read
       id-token: write
+      attestations: write
       security-events: write
     if: ${{ join(fromJSON(needs.change-triage.outputs.matrix)) != '' }}
     strategy:
