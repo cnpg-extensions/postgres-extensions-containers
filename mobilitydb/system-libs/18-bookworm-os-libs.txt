@@ -1,6 +1,6 @@
 libproj25_9.8.1-1.pgdg12+1_amd64.deb MD5Sum:f8da9be2155f5a922aabee8c3df0e36d
 libaec0_1.0.6-1+b1_amd64.deb MD5Sum:42611bf8032dad2d74c26d8dc084d322
-libaom3_3.6.0-1+deb12u2_amd64.deb MD5Sum:faae50e521d9a6f39d96953961a2b1f9
+libaom3_3.6.0-1+deb12u3_amd64.deb
 libblas3_3.11.0-2_amd64.deb MD5Sum:b39744800600a80ae852251a16c03d09
 libquadmath0_12.2.0-14+deb12u1_amd64.deb MD5Sum:82b5224e36c58f519837f7f4a224d89d
 libgfortran5_12.2.0-14+deb12u1_amd64.deb MD5Sum:8a65db502e5fead6b00b77cb649547a6
