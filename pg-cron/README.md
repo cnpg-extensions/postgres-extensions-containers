@@ -39,7 +39,7 @@ spec:
     - name: pg_cron
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-cron
-        reference: ghcr.io/cnpg-extensions/pg-cron:1.6.7-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-cron:1.6.8-18-trixie
 ```
 
 ### 2. Enable the extension in a database
