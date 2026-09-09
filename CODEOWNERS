@@ -4,6 +4,12 @@
 
 * @ardentperf
 
+# pg_search
+/pg-search/ @philippemnoel
+
+# pgvector (stub for required_extensions dependency resolution)
+/pgvector/ @philippemnoel
+
 # pg_cron
 /pg-cron/ @ardentperf
 
