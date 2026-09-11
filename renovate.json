@@ -97,6 +97,18 @@
       ]
     },
     {
+      "description": "require stable release verification for extension updates",
+      "matchManagers": [
+        "custom.regex"
+      ],
+      "matchDatasources": [
+        "deb"
+      ],
+      "prBodyNotes": [
+        "⚠️ Before approving this PR, confirm that the new extension version is a stable release, not a beta or release candidate."
+      ]
+    },
+    {
       "matchDatasources": [
         "github-tags"
       ],
