@@ -37,6 +37,7 @@ jobs:
       packages: write
       contents: read
       id-token: write
+      attestations: write
       security-events: write
     uses: ./.github/workflows/pgrx_targets.yml
     with:
