@@ -17,6 +17,14 @@ on:
         required: false
         default: ""
         type: string
+      distro:
+        description: "Optional Debian distro for local validation (for example, trixie)"
+        required: false
+        default: ""
+        type: string
+    secrets:
+      SNYK_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       extension_name:
@@ -33,24 +41,48 @@ on:
         required: false
         default: ""
         type: string
+      distro:
+        description: "Requested Debian distro"
+        required: false
+        default: ""
+        type: string
 
 permissions: {}
 
 jobs:
   stub:
-    name: Validate pgrx target inputs
+    name: Build ${{ inputs.extension_name }} (stub)
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     env:
       EXTENSION_NAME: ${{ inputs.extension_name }}
       LOCAL: ${{ inputs.local }}
       PLATFORM: ${{ inputs.platform }}
+      DISTRO: ${{ inputs.distro }}
     steps:
-      - name: Echo workflow inputs
+      - name: Validate and echo workflow inputs
         run: |
           test -n "$EXTENSION_NAME"
+          case "$PLATFORM" in
+            ""|linux/amd64|linux/arm64) ;;
+            *) echo "unsupported platform: $PLATFORM" >&2; exit 1 ;;
+          esac
+          case "$DISTRO" in
+            ""|bookworm|trixie) ;;
+            *) echo "unsupported distro: $DISTRO" >&2; exit 1 ;;
+          esac
+          if [[ ( -n "$PLATFORM" || -n "$DISTRO" ) && "$LOCAL" != true ]]; then
+            echo "platform and distro overrides require local=true" >&2
+            exit 1
+          fi
           echo "pgrx workflow stub"
           echo "extension_name=$EXTENSION_NAME"
           echo "local=$LOCAL"
           echo "platform=$PLATFORM"
+          echo "distro=$DISTRO"
+          echo "event=${GITHUB_EVENT_NAME}"
           echo "ref=${GITHUB_REF}"
           echo "sha=${GITHUB_SHA}"
