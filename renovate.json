@@ -4,9 +4,7 @@
     "config:recommended",
     "docker:pinDigests",
     "customManagers:githubActionsVersions",
-    ":gitSignOff",
-    ":automergeMinor",
-    ":automergeDigest"
+    ":gitSignOff"
   ],
   "ignorePaths": [],
   "enabledManagers": [
