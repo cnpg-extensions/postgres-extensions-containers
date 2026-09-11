@@ -1,0 +1,56 @@
+name: PGRX target workflow stub
+
+on:
+  workflow_call:
+    inputs:
+      extension_name:
+        description: "Extension name to report"
+        required: true
+        type: string
+      local:
+        description: "Whether local mode was requested"
+        required: false
+        default: false
+        type: boolean
+      platform:
+        description: "Requested target platform"
+        required: false
+        default: ""
+        type: string
+  workflow_dispatch:
+    inputs:
+      extension_name:
+        description: "Extension name to report"
+        required: true
+        type: string
+      local:
+        description: "Whether local mode was requested"
+        required: false
+        default: false
+        type: boolean
+      platform:
+        description: "Requested target platform"
+        required: false
+        default: ""
+        type: string
+
+permissions: {}
+
+jobs:
+  stub:
+    name: Validate pgrx target inputs
+    runs-on: ubuntu-24.04
+    env:
+      EXTENSION_NAME: ${{ inputs.extension_name }}
+      LOCAL: ${{ inputs.local }}
+      PLATFORM: ${{ inputs.platform }}
+    steps:
+      - name: Echo workflow inputs
+        run: |
+          test -n "$EXTENSION_NAME"
+          echo "pgrx workflow stub"
+          echo "extension_name=$EXTENSION_NAME"
+          echo "local=$LOCAL"
+          echo "platform=$PLATFORM"
+          echo "ref=${GITHUB_REF}"
+          echo "sha=${GITHUB_SHA}"

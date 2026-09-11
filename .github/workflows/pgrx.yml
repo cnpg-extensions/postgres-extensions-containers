@@ -1,0 +1,30 @@
+name: PGRX workflow stub
+
+on:
+  workflow_dispatch:
+    inputs:
+      extension_name:
+        description: "Extension name to pass to the target workflow"
+        required: true
+        type: string
+      local:
+        description: "Exercise the local-build input path"
+        required: false
+        default: false
+        type: boolean
+      platform:
+        description: "Exercise the platform input path"
+        required: false
+        default: ""
+        type: string
+
+permissions: {}
+
+jobs:
+  pgrx:
+    name: Dispatch pgrx target stub
+    uses: ./.github/workflows/pgrx_targets.yml
+    with:
+      extension_name: ${{ inputs.extension_name }}
+      local: ${{ inputs.local }}
+      platform: ${{ inputs.platform }}
