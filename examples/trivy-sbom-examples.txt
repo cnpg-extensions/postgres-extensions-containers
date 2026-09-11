@@ -1,0 +1,165 @@
+$ gh attestation verify 'oci://ghcr.io/cnpg-extensions/pgagent-testing@sha256:141d4af0a51af92f326944f00487f84d526bfb6d667eff5c87799e1643aaf805' --repo cnpg-extensions/postgres-extensions-containers --bundle-from-oci --predicate-type https://spdx.dev/Document/v2.3 --format json --jq '.[].verificationResult.statement.predicate' > pgagent-bookworm.spdx.json
+$ trivy sbom --scanners vuln,license --no-progress --skip-version-check pgagent-bookworm.spdx.json
+2026-09-06T17:29:40Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-09-06T17:29:40Z	INFO	[license] License scanning is enabled
+2026-09-06T17:29:40Z	INFO	Detected SBOM format	format="spdx-json"
+2026-09-06T17:29:40Z	INFO	Detected OS	family="debian" version="12.15"
+2026-09-06T17:29:40Z	INFO	[debian] Detecting vulnerabilities...	os_version="12" pkg_num=3
+2026-09-06T17:29:40Z	INFO	Number of language-specific files	num=0
+
+Report Summary
+
+┌───────────────────────────────────────────┬────────┬─────────────────┬──────────┐
+│                  Target                   │  Type  │ Vulnerabilities │ Licenses │
+├───────────────────────────────────────────┼────────┼─────────────────┼──────────┤
+│ pgagent-bookworm.spdx.json (debian 12.15) │ debian │        1        │    -     │
+├───────────────────────────────────────────┼────────┼─────────────────┼──────────┤
+│ OS Packages                               │   -    │        -        │    3     │
+└───────────────────────────────────────────┴────────┴─────────────────┴──────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+pgagent-bookworm.spdx.json (debian 12.15)
+=========================================
+Total: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 0)
+
+┌─────────┬───────────────┬──────────┬──────────┬───────────────────┬───────────────┬──────────────────────────────────────────────────────────────┐
+│ Library │ Vulnerability │ Severity │  Status  │ Installed Version │ Fixed Version │                            Title                             │
+├─────────┼───────────────┼──────────┼──────────┼───────────────────┼───────────────┼──────────────────────────────────────────────────────────────┤
+│ pgagent │ CVE-2025-0218 │ HIGH     │ affected │ 4.2.3-5.pgdg12+1  │               │ When batch jobs are executed by pgAgent, a script is created │
+│         │               │          │          │                   │               │ in...                                                        │
+│         │               │          │          │                   │               │ https://avd.aquasec.com/nvd/cve-2025-0218                    │
+└─────────┴───────────────┴──────────┴──────────┴───────────────────┴───────────────┴──────────────────────────────────────────────────────────────┘
+
+OS Packages (license)
+=====================
+Total: 3 (UNKNOWN: 3, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 0)
+
+┌───────────────────────────┬──────────────────────────────────────────────────────────────┬────────────────┬──────────┐
+│          Package          │                           License                            │ Classification │ Severity │
+├───────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libboost-filesystem1.74.0 │ Apache-2.0 AND LicenseRef-BSD2 AND LicenseRef-BSD3-DEShaw    │ unknown        │ UNKNOWN  │
+│                           │ AND LicenseRef-BSD3-Google AND BSL-1.0 AND                   │                │          │
+│                           │ LicenseRef-Caramel AND LicenseRef-CrystalClear AND           │                │          │
+│                           │ LicenseRef-HP AND Jam AND LicenseRef-Kempf AND MIT AND       │                │          │
+│                           │ LicenseRef-NIST AND LicenseRef-OldBoost1 AND                 │                │          │
+│                           │ LicenseRef-OldBoost2 AND LicenseRef-OldBoost3 AND            │                │          │
+│                           │ LicenseRef-Python AND LicenseRef-SGI AND LicenseRef-Spencer  │                │          │
+│                           │ AND Zlib                                                     │                │          │
+├───────────────────────────┤                                                              │                │          │
+│ libboost-thread1.74.0     │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+│                           │                                                              │                │          │
+├───────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ pgagent                   │ LicenseRef-scancode-unknown-license-reference AND PostgreSQL │                │          │
+└───────────────────────────┴──────────────────────────────────────────────────────────────┴────────────────┴──────────┘
+
+$ gh attestation verify 'oci://ghcr.io/cnpg-extensions/mobilitydb-testing@sha256:ab54a22a15959dcc253efd28d3fb0932097460ee72a01b1ba45a6f1e4ed4f493' --repo cnpg-extensions/postgres-extensions-containers --bundle-from-oci --predicate-type https://spdx.dev/Document/v2.3 --format json --jq '.[].verificationResult.statement.predicate' > mobilitydb-trixie.spdx.json
+$ trivy sbom --scanners vuln,license --no-progress --skip-version-check mobilitydb-trixie.spdx.json
+2026-09-06T17:29:39Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-09-06T17:29:39Z	INFO	[license] License scanning is enabled
+2026-09-06T17:29:39Z	INFO	Detected SBOM format	format="spdx-json"
+2026-09-06T17:29:39Z	INFO	Detected OS	family="debian" version="13.6"
+2026-09-06T17:29:39Z	INFO	[debian] Detecting vulnerabilities...	os_version="13" pkg_num=24
+2026-09-06T17:29:39Z	INFO	Number of language-specific files	num=0
+
+Report Summary
+
+┌───────────────────────────────────────────┬────────┬─────────────────┬──────────┐
+│                  Target                   │  Type  │ Vulnerabilities │ Licenses │
+├───────────────────────────────────────────┼────────┼─────────────────┼──────────┤
+│ mobilitydb-trixie.spdx.json (debian 13.6) │ debian │        0        │    -     │
+├───────────────────────────────────────────┼────────┼─────────────────┼──────────┤
+│ OS Packages                               │   -    │        -        │    24    │
+└───────────────────────────────────────────┴────────┴─────────────────┴──────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+OS Packages (license)
+=====================
+Total: 24 (UNKNOWN: 19, LOW: 4, MEDIUM: 0, HIGH: 1, CRITICAL: 0)
+
+┌──────────────────────────┬──────────────────────────────────────────────────────────────┬────────────────┬──────────┐
+│         Package          │                           License                            │ Classification │ Severity │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libbrotli1               │ MIT                                                          │ notice         │ LOW      │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libcurl3t64-gnutls       │ BSD-3-Clause AND BSD-3-Clause AND BSD-4-Clause-UC AND        │ unknown        │ UNKNOWN  │
+│                          │ FSFULLR AND GPL-2.0-only AND GPL-2.0-or-later AND            │                │          │
+│                          │ GPL-3.0-or-later AND ISC AND OLDAP-2.8 AND X11 AND curl      │                │          │
+├──────────────────────────┤                                                              │                │          │
+│ libcurl4t64              │                                                              │                │          │
+│                          │                                                              │                │          │
+│                          │                                                              │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libdeflate0              │ LicenseRef-Expat                                             │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libgeos-c1t64            │ Apache-2.0 AND BSL-1.0 AND LicenseRef-Expat AND              │                │          │
+│                          │ LGPL-2.1-only AND LGPL-2.1-or-later AND Zlib                 │                │          │
+├──────────────────────────┤                                                              │                │          │
+│ libgeos3.14.1            │                                                              │                │          │
+│                          │                                                              │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libgsl28                 │ (GPL-1.0-or-later AND GPL-3.0-only AND GPL-2.0-only AND      │                │          │
+│                          │ GPL-1.0-only) AND (GPL-2.0-only AND LGPL-2.0-only) AND       │                │          │
+│                          │ LicenseRef-scancode-warranty-disclaimer                      │                │          │
+├──────────────────────────┤                                                              │                │          │
+│ libgslcblas0             │                                                              │                │          │
+│                          │                                                              │                │          │
+│                          │                                                              │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libjbig0                 │ GPL-2.0-only AND GPL-2.0-or-later                            │ restricted     │ HIGH     │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libjpeg62-turbo          │ BSD-3-Clause AND LicenseRef-BSD-BY-LC-NE AND                 │                │          │
+│                          │ LicenseRef-Expat AND NTP AND Zlib                            │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libjson-c5               │ LicenseRef-Expat                                             │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ liblerc4                 │ Apache-2.0                                                   │ notice         │ LOW      │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libnghttp2-14            │ BSD-2-Clause AND LicenseRef-Expat AND GPL-3.0-only AND       │ unknown        │ UNKNOWN  │
+│                          │ GPL-3.0-or-later AND MIT AND LicenseRef-all-permissive       │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libnghttp3-9             │ FSFAP AND FSFUL AND FSFULLR AND GPL-2.0-only AND             │                │          │
+│                          │ GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND   │                │          │
+│                          │ MIT                                                          │                │          │
+├──────────────────────────┤                                                              │                │          │
+│ libngtcp2-16             │                                                              │                │          │
+│                          │                                                              │                │          │
+│                          │                                                              │                │          │
+├──────────────────────────┤                                                              │                │          │
+│ libngtcp2-crypto-gnutls8 │                                                              │                │          │
+│                          │                                                              │                │          │
+│                          │                                                              │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libproj25                │ Apache-2.0 AND LicenseRef-Expat AND GPL-2.0-only AND         │                │          │
+│                          │ GPL-2.0-or-later AND GPL-3.0-only AND GPL-3.0-or-later AND   │                │          │
+│                          │ LicenseRef-LRUCache11 AND LicenseRef-public-domain           │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libpsl5t64               │ LicenseRef-Chromium AND MIT AND LicenseRef-gnulib            │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ librtmp1                 │ GPL-2.0-only AND GPL-2.0-or-later AND (LGPL-2.1-or-later AND │                │          │
+│                          │ LicenseRef-scancode-other-copyleft AND LGPL-2.0-or-later)    │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libsharpyuv0             │ Apache-2.0 AND BSD-3-Clause                                  │ notice         │ LOW      │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libssh2-1t64             │ LicenseRef-BSD3 AND ISC                                      │ unknown        │ UNKNOWN  │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┤                │          │
+│ libtiff6                 │ LicenseRef-Hylafax                                           │                │          │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ libwebp7                 │ Apache-2.0 AND BSD-3-Clause                                  │ notice         │ LOW      │
+├──────────────────────────┼──────────────────────────────────────────────────────────────┼────────────────┼──────────┤
+│ postgresql-18-mobilitydb │ LicenseRef-3D-SC-SLA-1 AND Apache-2.0 AND BSD-2-Clause AND   │ unknown        │ UNKNOWN  │
+│                          │ BSD-3-Clause AND BSL-1.0 AND CC-BY-3.0 AND CC-BY-SA-3.0 AND  │                │          │
+│                          │ GPL-2.0-only AND GPL-2.0-or-later AND GPL-3.0-only AND       │                │          │
+│                          │ GPL-3.0-or-later AND PostgreSQL AND LicenseRef-public-domain │                │          │
+└──────────────────────────┴──────────────────────────────────────────────────────────────┴────────────────┴──────────┘

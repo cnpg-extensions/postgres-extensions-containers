@@ -187,7 +187,6 @@ tasks:
     desc: Start a local Docker registry to push the built images for E2E tests
     deps:
       - e2e:create-docker-network
-    internal: true
     run: once
     vars:
       # renovate: datasource=docker depName=registry versioning=docker
