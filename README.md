@@ -114,8 +114,10 @@ workflow on proposing and submitting a new extension.
 
 ### Automated Dependency Updates
 
-Renovate opens dependency update pull requests for manual review and merge.
-Automatic merging is disabled for all extension dependency updates.
+Renovate automatically merges eligible minor, patch, and digest updates once
+required checks pass. Major updates and updates to MySQL FDW or PL/Debugger
+require manual review. The Automerge gate checks extension updates for
+prerelease version markers, with an exception for AGE's release naming.
 
 ### Submission Process
 
