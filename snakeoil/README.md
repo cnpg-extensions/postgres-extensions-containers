@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_snakeoil](https://github.com/credativ/pg_snakeoil) is a PostgreSQL extension that uses the ClamAV antivirus engine to scan data stored in PostgreSQL for malware. It provides SQL functions to scan bytea values against ClamAV virus signature databases.
+[pg_snakeoil](https://github.com/df7cb/pg_snakeoil) is a PostgreSQL extension that uses the ClamAV antivirus engine to scan data stored in PostgreSQL for malware. It provides SQL functions to scan bytea values against ClamAV virus signature databases.
 
 ## Usage
 
