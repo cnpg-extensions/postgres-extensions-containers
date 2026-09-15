@@ -211,6 +211,14 @@ docker buildx imagetools inspect <image> --raw | jq '.annotations'
 skopeo inspect docker://<image> | jq '.Labels'
 ```
 
+## SBOMs and authenticity
+
+Published images carry platform-specific BuildKit SPDX and provenance
+attestations. See the [SBOM and authenticity guide](./sbom-generator/README.md)
+for digest-pinned Cosign verification, Buildx extraction, platform-specific
+Trivy scanning, and the distinction between payload inventory and direct image
+scans.
+
 ## Image catalogs
 
 To simplify the deployment of PostgreSQL extensions, this project automatically

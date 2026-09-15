@@ -5,6 +5,8 @@ on:
     paths-ignore:
       - '.github/workflows/pgrx.yml'
       - '.github/workflows/pgrx_targets.yml'
+      - '.github/workflows/sbom-generator.yml'
+      - 'sbom-generator/**'
   workflow_dispatch:
     inputs:
       extension_name:

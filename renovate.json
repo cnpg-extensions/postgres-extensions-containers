@@ -75,6 +75,39 @@
       "matchStrings": [
         "\\/\\/\\s+renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))\\s+\\/\\/\\s+\\+default=[\\\"']?[^:]+?:(?<currentValue>[^@]+?)(@(?<currentDigest>sha256:[0-9a-f]+))?[\"']?\\s"
       ]
+    },
+    {
+      "description": "updates the SBOM generator base image",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: packageName=(?<packageName>[^\\s]+))?(?: versioning=(?<versioning>[^\\s]+))?\\s+FROM\\s+(?:[a-zA-Z0-9._/-]+:)?(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[0-9a-f]+))?"
+      ]
+    },
+    {
+      "description": "updates the SBOM generator Dockerfile frontend",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "# syntax=docker/dockerfile:(?<currentValue>[^\\s]+)"
+      ],
+      "depNameTemplate": "docker/dockerfile",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "description": "updates the SBOM generator tool versions",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: versioning=(?<versioning>[^\\s]+))?\\s+ARG [A-Z0-9_]+_VERSION=(?<currentValue>[^\\s]+)"
+      ]
     }
   ],
   "packageRules": [

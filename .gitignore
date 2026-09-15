@@ -8,6 +8,10 @@
 *.so
 *.dylib
 
+# Python test and bytecode caches
+__pycache__/
+*.py[cod]
+
 # Mac
 .DS_Store
 
