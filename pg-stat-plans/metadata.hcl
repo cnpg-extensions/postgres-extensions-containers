@@ -21,7 +21,7 @@ metadata = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-stat-plans
         package = "2.1.0-1.pgdg12+1"
-        // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-stat-plans extractVersion=^(?<version>\d+\.\d+\.\d+)
+        // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-stat-plans extractVersion=^(?<version>\d+\.\d+)
         sql     = "2.1"
       }
     }
@@ -29,7 +29,7 @@ metadata = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans
         package = "2.1.0-1.pgdg13+1"
-        // renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans extractVersion=^(?<version>\d+\.\d+\.\d+)
+        // renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans extractVersion=^(?<version>\d+\.\d+)
         sql     = "2.1"
       }
     }
