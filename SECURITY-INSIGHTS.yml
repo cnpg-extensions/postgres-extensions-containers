@@ -67,6 +67,8 @@ repository:
         comment: GitHub packages for the pg_squeeze extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-stat-kcache
         comment: GitHub packages for the pg_stat_kcache extension image
+      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-stat-plans
+        comment: GitHub packages for the pg_stat_plans extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-uuidv7
         comment: GitHub packages for the pg_uuidv7 extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pgagent
@@ -91,6 +93,8 @@ repository:
         comment: GitHub packages for the q3c extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/snakeoil
         comment: GitHub packages for the pg_snakeoil extension image
+      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/show-plans
+        comment: GitHub packages for the pg_show_plans extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/tds-fdw
         comment: GitHub packages for the tds_fdw extension image
 

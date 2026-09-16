@@ -40,6 +40,9 @@
 # snakeoil
 /snakeoil/ @ardentperf
 
+# show-plans
+/show-plans/ @ardentperf
+
 # h3
 /h3/ @ardentperf
 
@@ -63,6 +66,9 @@
 
 # pg-stat-kcache
 /pg-stat-kcache/ @ardentperf
+
+# pg-stat-plans
+/pg-stat-plans/ @ardentperf
 
 # plr
 /plr/ @ardentperf

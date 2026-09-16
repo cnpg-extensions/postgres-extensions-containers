@@ -44,6 +44,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[pg-rrule](pg-rrule)** | iCalendar RRULE recurrence rule type | [github.com/petropavel13/pg_rrule](https://github.com/petropavel13/pg_rrule) | @ardentperf | libical3 (LGPL-2.1/MPL-2.0) |
 | **[pg-squeeze](pg-squeeze)** | Online table bloat cleanup (pg_squeeze) | [github.com/cybertec-postgresql/pg_squeeze](https://github.com/cybertec-postgresql/pg_squeeze) | @ardentperf | PostgreSQL License |
 | **[pg-stat-kcache](pg-stat-kcache)** | Per-query kernel and filesystem statistics | [github.com/powa-team/pg_stat_kcache](https://github.com/powa-team/pg_stat_kcache) | @ardentperf | PostgreSQL License |
+| **[pg-stat-plans](pg-stat-plans)** | Per-plan execution statistics and EXPLAIN texts | [github.com/pganalyze/pg_stat_plans](https://github.com/pganalyze/pg_stat_plans) | @ardentperf | Duboce/PostgreSQL-style license |
 | **[pg-uuidv7](pg-uuidv7)** | UUID version 7 (time-sortable) generator | [github.com/fboulnois/pg_uuidv7](https://github.com/fboulnois/pg_uuidv7) | @ardentperf | MPL-2.0 |
 | **[pgagent](pgagent)** | PostgreSQL job scheduler (pgAdmin component) | [pgadmin.org](https://www.pgadmin.org/docs/pgadmin4/latest/pgagent.html) | @ardentperf | Boost libraries (BSL-1.0) |
 | **[pgmemcache](pgmemcache)** | Memcached client interface for PostgreSQL | [github.com/ohmu/pgmemcache](https://github.com/ohmu/pgmemcache) | @ardentperf | libmemcached11 (LGPL) |
@@ -56,6 +57,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[plr](plr)** | R procedural language for PostgreSQL | [joeconway.com/plr](https://www.joeconway.com/plr/) | @ardentperf | GPL-2+ |
 | **[q3c](q3c)** | Quad Tree Cube sky survey spatial indexing | [github.com/segasai/q3c](https://github.com/segasai/q3c) | @ardentperf | GPL-2+ |
 | **[snakeoil](snakeoil)** | ClamAV antivirus scanning for PostgreSQL | [github.com/credativ/pg_snakeoil](https://github.com/credativ/pg_snakeoil) | @ardentperf | libclamav12 (LGPL-2+) |
+| **[show-plans](show-plans)** | Query plans for currently running statements | [github.com/cybertec-postgresql/pg_show_plans](https://github.com/cybertec-postgresql/pg_show_plans) | @ardentperf | Cybertec PostgreSQL-style license |
 | **[tds-fdw](tds-fdw)** | Microsoft SQL Server / Sybase foreign data wrapper | [github.com/tds-fdw/tds_fdw](https://github.com/tds-fdw/tds_fdw) | @ardentperf | libsybdb5/FreeTDS (LGPL-2+) |
 
 Extensions in this repository are not accepted upstream solely due to licensing
