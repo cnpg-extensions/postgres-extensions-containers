@@ -18,7 +18,7 @@ postgresql:
   - name: plpgsql-check
     image:
       # renovate: suite=trixie-pgdg depName=postgresql-18-plpgsql-check
-      reference: ghcr.io/cnpg-extensions/plpgsql-check:2.10.9-18-trixie
+      reference: ghcr.io/cnpg-extensions/plpgsql-check:2.10.10-18-trixie
 ~~~
 
 Enable the SQL extension in a Database:
