@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-qualstats
-        package = "2.1.4-1.pgdg12+1"
+        package = "2.1.4-1.pgdg12+2"
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-qualstats extractVersion=^(?<version>\d+\.\d+\.\d+)
         sql     = "2.1.4"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats
-        package = "2.1.4-1.pgdg13+1"
+        package = "2.1.4-1.pgdg13+2"
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats extractVersion=^(?<version>\d+\.\d+\.\d+)
         sql     = "2.1.4"
       }
