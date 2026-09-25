@@ -21,7 +21,7 @@ postgresql:
   - name: pg-stat-plans
     image:
       # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans
-      reference: ghcr.io/cnpg-extensions/pg-stat-plans:2.1.0-18-trixie
+      reference: ghcr.io/cnpg-extensions/pg-stat-plans:2.1.1-18-trixie
 ~~~
 
 Enable the SQL extension in a Database:
