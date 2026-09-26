@@ -1,5 +1,6 @@
+libssl3_3.0.22-1~deb12u1_amd64.deb
 libmariadb3_1%3a10.11.18-0+deb12u1_amd64.deb MD5Sum:cf60586fa26c69e7d7f9cc3fac6576a4
-libssl-dev_3.0.20-1~deb12u2_amd64.deb MD5Sum:39896be54b0fadb8aba1eb53b0c0975a
+libssl-dev_3.0.22-1~deb12u1_amd64.deb
 libc-dev-bin_2.36-9+deb12u14_amd64.deb MD5Sum:bf7479b3c9274ec601c49bf7a91027b1
 libcrypt-dev_1%3a4.4.33-2_amd64.deb MD5Sum:6aff917e5eff8479be04b8cb1ae6b340
 libtirpc-common_1.3.3+ds-1_all.deb MD5Sum:e49aca93814724ed80fa8932a1f7523b
