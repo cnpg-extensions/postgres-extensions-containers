@@ -1,6 +1,6 @@
 libexpat1_2.8.3-1~deb13u1_amd64.deb MD5Sum:d02bb9c0c137b7c2f5dcc8187afca31a
 libbrotli1_1.1.0-2+b7_amd64.deb MD5Sum:e268acc326140ae9f1731f335335fc8d
-libpng16-16t64_1.6.48-1+deb13u5_amd64.deb MD5Sum:0cd2789cb2b8855e0a0798c0c5ffb213
+libpng16-16t64_1.6.48-1+deb13u6_amd64.deb
 libfreetype6_2.13.3+dfsg-1+deb13u1_amd64.deb MD5Sum:0994fdb58c0168b608cd1e285deda3d2
 libfontconfig1_2.15.0-2.3_amd64.deb MD5Sum:51964bf406139551c59047e6cbdd4940
 libatomic1_14.2.0-19_amd64.deb MD5Sum:ac6daa5a9f8809b24584507f08e54de5
