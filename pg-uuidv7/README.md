@@ -49,7 +49,7 @@ spec:
   cluster:
     name: cluster-pg-uuidv7
   extensions:
-  - name: pg-uuidv7
+  - name: pg_uuidv7
     # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7 extractVersion=^(?<version>\d+\.\d+)
     version: '1.7'
 ```

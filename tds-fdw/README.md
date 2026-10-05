@@ -31,6 +31,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-tds-fdw
         reference: ghcr.io/cnpg-extensions/tds-fdw:2.0.5-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -49,7 +50,7 @@ spec:
   cluster:
     name: cluster-tds-fdw
   extensions:
-  - name: tds-fdw
+  - name: tds_fdw
     # renovate: suite=trixie-pgdg depName=postgresql-18-tds-fdw extractVersion=^(?<version>\d+\.\d+\.\d+)
     version: '2.0.5'
 ```

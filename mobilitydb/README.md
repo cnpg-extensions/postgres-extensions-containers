@@ -30,11 +30,13 @@ spec:
     extensions:
     - name: postgis
       image:
-        reference: ghcr.io/cloudnative-pg/postgis:3.5.3-18-trixie
+        reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.2-18-trixie
+      ld_library_path: [system]
     - name: mobilitydb
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb
         reference: ghcr.io/cnpg-extensions/mobilitydb:1.3.0-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -54,7 +56,7 @@ spec:
     name: cluster-mobilitydb
   extensions:
   - name: postgis
-    version: '3.5'
+    version: '3.6.2'
   - name: mobilitydb
     # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb extractVersion=^(?<version>\d+\.\d+\.\d+)
     version: '1.3.0'

@@ -39,6 +39,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgmemcache
         reference: ghcr.io/cnpg-extensions/pgmemcache:2.3.0-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database

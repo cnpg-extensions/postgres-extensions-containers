@@ -31,6 +31,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pgsphere
         reference: ghcr.io/cnpg-extensions/pgsphere:1.5.2-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -49,7 +50,7 @@ spec:
   cluster:
     name: cluster-pgsphere
   extensions:
-  - name: pgsphere
+  - name: pg_sphere
     # renovate: suite=trixie-pgdg depName=postgresql-18-pgsphere extractVersion=^(?<version>\d+\.\d+\.\d+)
     version: '1.5.2'
 ```

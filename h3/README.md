@@ -31,6 +31,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-h3
         reference: ghcr.io/cnpg-extensions/h3:4.2.3-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database

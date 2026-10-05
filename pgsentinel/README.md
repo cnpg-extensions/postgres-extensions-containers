@@ -46,9 +46,8 @@ After the cluster has run for a few seconds, inspect the active session
 history:
 
 ~~~sql
-CREATE EXTENSION pgsentinel;
+CREATE EXTENSION IF NOT EXISTS pgsentinel;
 SELECT * FROM pg_active_session_history LIMIT 5;
-SELECT * FROM pg_stat_statements_history LIMIT 5;
 ~~~
 
 ## Contributors

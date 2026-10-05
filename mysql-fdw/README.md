@@ -31,6 +31,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw
         reference: ghcr.io/cnpg-extensions/mysql-fdw:2.9.3-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -49,7 +50,7 @@ spec:
   cluster:
     name: cluster-mysql-fdw
   extensions:
-  - name: mysql-fdw
+  - name: mysql_fdw
     # SQL version cannot be updated by Renovate; if it changes, manually update mysql-fdw/README.md, mysql-fdw/metadata.hcl, and renovate.json.
     version: '1.2'
 ```

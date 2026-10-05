@@ -53,7 +53,7 @@ spec:
   cluster:
     name: cluster-pldebugger
   extensions:
-  - name: pldebugger
+  - name: pldbgapi
     # SQL version cannot be updated by Renovate; if it changes, manually update pldebugger/README.md, pldebugger/metadata.hcl, and renovate.json.
     version: '1.1'
 ```

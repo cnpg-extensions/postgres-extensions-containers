@@ -38,6 +38,7 @@ spec:
   cluster:
     name: cluster-pg-stat-kcache
   extensions:
+  - name: pg_stat_statements
   - name: pg_stat_kcache
     # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-kcache extractVersion=^(?<version>\d+\.\d+\.\d+)
     version: '2.3.2'
@@ -46,7 +47,8 @@ spec:
 After running queries, inspect the collected values:
 
 ~~~sql
-CREATE EXTENSION pg_stat_kcache;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+CREATE EXTENSION IF NOT EXISTS pg_stat_kcache;
 SELECT * FROM pg_stat_kcache;
 ~~~
 

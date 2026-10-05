@@ -31,6 +31,7 @@ spec:
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pg-rrule
         reference: ghcr.io/cnpg-extensions/pg-rrule:0.3.0-18-trixie
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -49,7 +50,7 @@ spec:
   cluster:
     name: cluster-pg-rrule
   extensions:
-  - name: pg-rrule
+  - name: pg_rrule
     # renovate: suite=trixie-pgdg depName=postgresql-18-pg-rrule extractVersion=^(?<version>\d+\.\d+\.\d+)
     version: '0.3.0'
 ```
