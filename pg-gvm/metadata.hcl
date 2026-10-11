@@ -20,7 +20,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-gvm
-        package = "22.6.17-1.pgdg13+2"
+        package = "22.6.18-1.pgdg13+1"
         // The PGDG package version is patch-level; SQL control version is 22.6.
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-gvm extractVersion=^(?<version>\d+\.\d+)
         sql     = "22.6"

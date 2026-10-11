@@ -23,7 +23,7 @@ spec:
     - name: pg-gvm
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-pg-gvm
-        reference: ghcr.io/cnpg-extensions/pg-gvm:22.6.17-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-gvm:22.6.18-18-trixie
       ld_library_path: [system]
 ---
 apiVersion: postgresql.cnpg.io/v1
