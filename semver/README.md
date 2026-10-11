@@ -29,7 +29,7 @@ spec:
     - name: semver
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-semver
-        reference: ghcr.io/cnpg-extensions/semver:0.41.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/semver:0.42.0-18-trixie
 ```
 
 Install the SQL extension in a database with a CNPG `Database` resource:
@@ -48,7 +48,7 @@ spec:
   - ensure: present
     name: semver
     # renovate: suite=trixie-pgdg depName=postgresql-18-semver extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '0.41.0'
+    version: '0.42.0'
 ```
 
 A SQL check that exercises the installed extension is:
