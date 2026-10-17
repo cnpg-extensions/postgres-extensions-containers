@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.28
 
 # Python 3.14 is the newest version supported by the pinned ScanCode 32.5.0.
 # Move to a newer Python as soon as ScanCode supports it; keep this aligned with scancode-toolkit in requirements.txt.
