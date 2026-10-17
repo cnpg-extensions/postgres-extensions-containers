@@ -8,7 +8,7 @@ FROM python:3.14-slim-bookworm@sha256:48b13b003dda20b16f9442b8475aa05fe21bf6579a
 
 ARG TARGETARCH
 # renovate: datasource=github-releases depName=anchore/syft versioning=semver
-ARG SYFT_VERSION=1.51.1
+ARG SYFT_VERSION=1.54.1
 
 COPY requirements.txt /tmp/
 COPY dependencies/ /tmp/dependencies/
