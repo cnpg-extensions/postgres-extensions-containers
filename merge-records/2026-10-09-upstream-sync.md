@@ -3,7 +3,7 @@
 Reviewed locally on 2026-10-09.
 
 - Mirror ref: `origin/main` at `50e209e18358255051808e5168c5b4158bdb5a58` (`cnpg-extensions/postgres-extensions-containers`)
-- Working branch: `upstream/sync-2026-10-09`, to be published to `ardentperf-labs/postgres-extensions-containers`
+- Working branch: `upstream/sync-2026-10-09`, to be published to a validation fork
 - Upstream ref: `upstream/main` at `019e7c20e8feb930a61e4799c108462c3b63485b` (`cloudnative-pg/postgres-extensions-containers`)
 - Last upstream commit already merged: `c1c47c21fb6ffa7ff46d19f019e8d6502dc8ffec`
 - Downstream merge commit: `28f0cb2e579baa6c43c8498dff46438c274c1c20` (second parent is the upstream SHA above).

@@ -11,7 +11,8 @@
   "ignorePaths": [],
   "enabledManagers": [
     "github-actions",
-    "custom.regex"
+    "custom.regex",
+    "pip_requirements"
   ],
   "customManagers": [
     {
@@ -75,9 +76,121 @@
       "matchStrings": [
         "\\/\\/\\s+renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))\\s+\\/\\/\\s+\\+default=[\\\"']?[^:]+?:(?<currentValue>[^@]+?)(@(?<currentDigest>sha256:[0-9a-f]+))?[\"']?\\s"
       ]
+    },
+    {
+      "description": "updates the SBOM generator base image",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: packageName=(?<packageName>[^\\s]+))?(?: versioning=(?<versioning>[^\\s]+))?\\s+FROM\\s+(?:[a-zA-Z0-9._/-]+:)?(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[0-9a-f]+))?"
+      ]
+    },
+    {
+      "description": "updates the SBOM generator Dockerfile frontend",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "# syntax=docker/dockerfile:(?<currentValue>[^\\s]+)"
+      ],
+      "depNameTemplate": "docker/dockerfile",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "description": "updates the SBOM generator tool versions",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchStrings": [
+        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: versioning=(?<versioning>[^\\s]+))?\\s+ARG [A-Z0-9_]+_VERSION=(?<currentValue>[^\\s]+)"
+      ]
+    },
+    {
+      "description": "updates generator Debian packages not supplied by the base image",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^sbom-generator/dependencies/debian-(amd64|arm64)\\.txt$/"
+      ],
+      "matchStrings": [
+        "(?<depName>[a-z0-9][a-z0-9+.-]*)=(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "deb"
     }
   ],
   "packageRules": [
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchFileNames": [
+        "sbom-generator/dependencies/debian-amd64.txt"
+      ],
+      "registryUrls": [
+        "https://deb.debian.org/debian?suite=bookworm&components=main&binaryArch=amd64",
+        "https://deb.debian.org/debian?suite=bookworm-updates&components=main&binaryArch=amd64",
+        "https://security.debian.org/debian-security?suite=bookworm-security&components=main&binaryArch=amd64"
+      ],
+      "groupName": "SBOM generator Debian and base image updates",
+      "automerge": false
+    },
+    {
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchFileNames": [
+        "sbom-generator/dependencies/debian-arm64.txt"
+      ],
+      "registryUrls": [
+        "https://deb.debian.org/debian?suite=bookworm&components=main&binaryArch=arm64",
+        "https://deb.debian.org/debian?suite=bookworm-updates&components=main&binaryArch=arm64",
+        "https://security.debian.org/debian-security?suite=bookworm-security&components=main&binaryArch=arm64"
+      ],
+      "groupName": "SBOM generator Debian and base image updates",
+      "automerge": false
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "python",
+        "library/python"
+      ],
+      "matchFileNames": [
+        "sbom-generator/Dockerfile"
+      ],
+      "groupName": "SBOM generator Debian and base image updates",
+      "automerge": false
+    },
+    {
+      "matchDatasources": [
+        "pypi"
+      ],
+      "matchFileNames": [
+        "sbom-generator/requirements.txt"
+      ],
+      "groupName": "SBOM validation dependencies",
+      "automerge": false
+    },
+    {
+      "description": "review SPDX validator upgrades with ScanCode dependency compatibility",
+      "matchPackageNames": [
+        "spdx-tools",
+        "scancode-toolkit",
+        "pluggy"
+      ],
+      "groupName": "SBOM validation dependencies",
+      "automerge": false,
+      "prBodyNotes": [
+        "⚠️ Check that the selected SPDX Tools release is compatible with the ScanCode Toolkit release. The current ScanCode Toolkit pins spdx-tools==0.8.2. Run the Build and publish SBOM generator workflow on the update branch with publish=false; it runs the unit tests inside the built generator image. Both native AMD64/ARM64 BuildKit integration checks must pass; these exercise the installed ScanCode/SPDX Tools combination and validate the final SPDX.",
+        "On every ScanCode update, attempt removing the pluggy pin from requirements.txt, then run the existing native AMD64/ARM64 integration checks. Keep the pin only if the incompatibility persists: https://github.com/aboutcode-org/scancode-toolkit/issues/5363"
+      ]
+    },
     {
       "description": "require stable release verification for all updates",
       "matchPackageNames": [
