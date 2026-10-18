@@ -51,41 +51,44 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   instructions and recapture its reports with that release, checking long
   license expressions and terminal wrapping. Keep the capture provenance accurate.
 
-## ScanCode: Pluggy compatibility pin
+## ScanCode: ARM64 release archive and Debian packaging
 
-- **Upstream:** [ScanCode issue #5363](https://github.com/aboutcode-org/scancode-toolkit/issues/5363),
-  open.
-- **Problem:** Pluggy `1.7.0` breaks ScanCode `32.5.0` plugin registration with
-  `ValueError: did not find any 'pre_scan' hooks`.
-- **Workaround:** `pluggy==1.6.0` in
-  [sbom-generator/requirements.txt](sbom-generator/requirements.txt). Renovate's
-  `allowedVersions` rule holds this version only in the SBOM requirements. The
-  SBOM dependency group includes a reminder to retry without this compatibility
-  hold whenever ScanCode is updated. Retain normal dependency locking after
-  removing the special hold; installation uses `--no-deps` and `pip check`.
-- **Remove when:** a released ScanCode/Pluggy combination fixes registration.
-  Update the resolved Pluggy version and remove the special pin comments and
-  Renovate version constraint and reminder after the native AMD64 and ARM64
-  generator integration checks pass with the newer combination.
+- **Upstream:** [issue #3958: Support arm64/aarch64](https://github.com/aboutcode-org/scancode-toolkit/issues/3958),
+  open. [Fedora packages are available](https://github.com/aboutcode-org/scancode-toolkit/issues/3958#issuecomment-2599746956),
+  but the selected stable ScanCode 32.5.0 release has no Linux ARM64 application
+  archive or Debian package suitable for our Debian-based images.
+- **Workaround:** install ScanCode through pip using the selected release's
+  upstream dependency pins. Pip is currently the available installation path
+  for both architectures in our Debian-based generator image. ScanCode minor and
+  patch updates automerge after the required checks pass; major updates require
+  manual merging.
+- **Remove when:** a stable Linux ARM64 release archive or suitable Debian package
+  is available. Adopt it after both native generator integration checks pass.
+  This is an installation packaging gap; Python remains part of the generator.
 
-## ScanCode: system native libraries on ARM64
+## ScanCode: Linux ARM64 support
 
-- **Upstream:** ScanCode's native dependencies, notably
-  [ExtractCode](https://github.com/aboutcode-org/extractcode) and
-  [TypeCode](https://github.com/aboutcode-org/typecode). No upstream issue or
-  pull request is currently linked for this adaptation.
-- **Problem:** the bundled native libraries are not available on every
-  architecture. Native ARM64 validation also exposed failed libarchive discovery.
-- **Workaround:** [sbom-generator/Dockerfile](sbom-generator/Dockerfile) installs
-  Debian's `libarchive13` and `libmagic1` (with its magic database), creates the
-  libarchive alias, and sets `EXTRACTCODE_LIBARCHIVE_PATH` and
-  `TYPECODE_LIBMAGIC_DB_PATH`. The Python requirements retain architecture-specific
-  versions of the bundled native-library packages where their available releases
-  differ.
-- **Remove when:** released dependencies provide working libraries and discovery
-  on both AMD64 and ARM64. Verify ScanCode startup and the existing native
-  generator integration checks before removing the system-library dependencies,
-  alias, environment overrides, or architecture-specific requirements.
+- **Upstream:** [issue #3958: Support arm64/aarch64](https://github.com/aboutcode-org/scancode-toolkit/issues/3958),
+  open. [Issue #3304](https://github.com/aboutcode-org/scancode-toolkit/issues/3304),
+  also open, reports the same ExtractCode/7z constraint conflict on Apple ARM.
+  [Issue #2271](https://github.com/aboutcode-org/scancode-toolkit/issues/2271),
+  open, tracks finding system binaries when bundled native providers are absent.
+- **Problem:** ScanCode 32.5.0's upstream native dependency pins have no Linux
+  ARM64 wheels. An ARM64 build using the unchanged upstream requirements fails
+  during pip resolution at `extractcode-7z==16.5.210531`. System libarchive
+  discovery also needed an explicit path in our native ARM64 validation.
+- **Workaround:** [sbom-generator/Dockerfile](sbom-generator/Dockerfile) removes
+  the `extractcode-7z`, `extractcode-libarchive`, and `typecode-libmagic` pins from
+  the downloaded constraints on ARM64. Pip selects compatible versions using
+  ScanCode's dependency ranges and available ARM64 distributions. It also
+  installs Debian's `libarchive13` and `libmagic1` with its magic database,
+  creates the libarchive alias, and sets `EXTRACTCODE_LIBARCHIVE_PATH` and
+  `TYPECODE_LIBMAGIC_DB_PATH`.
+- **Remove when:** a stable ScanCode release supplies working Linux ARM64
+  installation and native library discovery. Retry the unchanged upstream
+  constraints, then remove the constraint exclusions and system-library
+  adaptations once ScanCode startup and both native generator integration checks
+  pass.
 
 ## ScanCode: large Debian copyright files
 
@@ -101,35 +104,6 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   supported ScanCode limits without splitting. Compare license evidence and
   original file attribution before removing the chunk preparation and path
   normalization, and rerun the generator integration checks on both architectures.
-
-## ScanCode: Python version compatibility
-
-- **Upstream:** the supported Python versions for
-  [ScanCode Toolkit 32.5.0](https://github.com/aboutcode-org/scancode-toolkit/releases/tag/v32.5.0).
-  This is a release compatibility constraint, not a separately tracked bug.
-- **Workaround:** [sbom-generator/Dockerfile](sbom-generator/Dockerfile) stays on
-  Python `3.14-slim-bookworm`, the newest Python supported by the selected ScanCode
-  release, rather than accepting a newer Python solely because Renovate offers it.
-  Renovate's `allowedVersions` rule applies only to this Dockerfile; Python
-  updates elsewhere remain eligible, and base-image digest updates remain enabled.
-- **Remove when:** the selected ScanCode release supports a newer Python.
-  Update the base-image pin, Renovate version constraint, and compatibility comments
-  together and verify Python dependency installation, ScanCode startup, and native
-  AMD64/ARM64 integration.
-
-## ScanCode: SPDX Tools compatibility pin
-
-- **Upstream:** [ScanCode Toolkit 32.5.0's dependency declaration](https://github.com/aboutcode-org/scancode-toolkit/blob/v32.5.0/requirements.txt)
-  requires `spdx-tools==0.8.2`. This is a release compatibility constraint, not a
-  separately tracked bug.
-- **Workaround:** [sbom-generator/requirements.txt](sbom-generator/requirements.txt)
-  retains `spdx-tools==0.8.2`. A Renovate `allowedVersions` rule holds this version
-  only in the SBOM requirements; other validator updates remain grouped with
-  ScanCode dependencies for compatibility review.
-- **Remove when:** the selected ScanCode release permits a newer SPDX Tools
-  version. Update the resolved requirements and Renovate version constraint
-  together and run `pip check` and the native generator integration checks,
-  including final SPDX validation.
 
 ## unit: mounted data-file paths
 

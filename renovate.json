@@ -11,8 +11,7 @@
   "ignorePaths": [],
   "enabledManagers": [
     "github-actions",
-    "custom.regex",
-    "pip_requirements"
+    "custom.regex"
   ],
   "customManagers": [
     {
@@ -184,43 +183,6 @@
       "allowedVersions": "/^3\\.14(?:\\.\\d+)?-slim-bookworm$/"
     },
     {
-      "matchDatasources": [
-        "pypi"
-      ],
-      "matchFileNames": [
-        "sbom-generator/requirements.txt"
-      ],
-      "groupName": "SBOM validation dependencies"
-    },
-    {
-      "description": "review SPDX validator upgrades with ScanCode dependency compatibility",
-      "matchPackageNames": [
-        "spdx-tools",
-        "scancode-toolkit",
-        "pluggy"
-      ],
-      "groupName": "SBOM validation dependencies",
-      "automerge": false,
-      "prBodyNotes": [
-        "⚠️ Check that the selected SPDX Tools release is compatible with the ScanCode Toolkit release. The current ScanCode Toolkit pins spdx-tools==0.8.2. Run the Build and publish SBOM generator workflow on the update branch with publish=false; it runs the unit tests inside the built generator image. Both native AMD64/ARM64 BuildKit integration checks must pass; these exercise the installed ScanCode/SPDX Tools combination and validate the final SPDX.",
-        "On every ScanCode update, attempt removing the pluggy pin from requirements.txt, then run the existing native AMD64/ARM64 integration checks. Keep the pin only if the incompatibility persists: https://github.com/aboutcode-org/scancode-toolkit/issues/5363"
-      ]
-    },
-    {
-      "description": "Hold SBOM Pluggy until ScanCode issue #5363 is fixed; see WORKAROUNDS.md",
-      "matchDatasources": ["pypi"],
-      "matchFileNames": ["sbom-generator/requirements.txt"],
-      "matchPackageNames": ["pluggy"],
-      "allowedVersions": "/^1\\.6\\.0$/"
-    },
-    {
-      "description": "Honor ScanCode's SPDX Tools compatibility constraint; see WORKAROUNDS.md",
-      "matchDatasources": ["pypi"],
-      "matchFileNames": ["sbom-generator/requirements.txt"],
-      "matchPackageNames": ["spdx-tools"],
-      "allowedVersions": "/^0\\.8\\.2$/"
-    },
-    {
       "description": "automerge checked latest generator digest updates",
       "matchPackageNames": [
         "/^ghcr\\.io\\/[^/]+\\/cnpg-sbom-generator$/"
@@ -302,9 +264,29 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "Require manual merging for major updates across every dependency and manager; keep this rule last",
+      "description": "Require manual merging for major updates",
       "matchUpdateTypes": ["major"],
       "automerge": false
+    },
+    {
+      "description": "Automerge minor and patch ScanCode releases after checks pass",
+      "matchDatasources": [
+        "pypi"
+      ],
+      "matchFileNames": [
+        "sbom-generator/Dockerfile"
+      ],
+      "matchPackageNames": [
+        "scancode-toolkit"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "ScanCode release and dependencies",
+      "automerge": true,
+      "prBodyNotes": [
+        "The image build uses the selected ScanCode release's dependency constraints. On ARM64, pip selects compatible versions of the three native packages excluded from those constraints. Both native AMD64/ARM64 generator integration checks must pass before automerging. See WORKAROUNDS.md for packaging and ARM64 limitations."
+      ],
+      "platformAutomerge": false,
+      "rebaseWhen": "behind-base-branch"
     }
   ],
   "customDatasources": {

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.28
 
 # Python 3.14 is the newest version supported by the pinned ScanCode 32.5.0.
-# Move to a newer Python as soon as ScanCode supports it; keep this aligned with scancode-toolkit in requirements.txt.
+# Move to a newer Python as soon as ScanCode supports it; keep this aligned with SCANCODE_VERSION below.
 # https://github.com/aboutcode-org/scancode-toolkit/releases/tag/v32.5.0
 # renovate: datasource=docker depName=python packageName=library/python versioning=docker
 FROM python:3.14-slim-bookworm@sha256:48b13b003dda20b16f9442b8475aa05fe21bf6579a8c881db92ffb4d8fd20f83
@@ -10,7 +10,8 @@ ARG TARGETARCH
 # renovate: datasource=github-releases depName=anchore/syft versioning=semver
 ARG SYFT_VERSION=1.54.1
 
-COPY requirements.txt /tmp/
+# renovate: datasource=pypi depName=scancode-toolkit versioning=pep440
+ARG SCANCODE_VERSION=32.5.0
 COPY dependencies/ /tmp/dependencies/
 
 # ScanCode's bundled native libraries are not available on every architecture.
@@ -25,8 +26,15 @@ RUN apt-get update \
     && curl --fail --silent --show-error --location \
       "https://github.com/anchore/syft/releases/download/v${SYFT_VERSION}/syft_${SYFT_VERSION}_linux_${TARGETARCH}.tar.gz" \
       | tar -xz -C /usr/local/bin syft \
-    && python -m pip install --no-cache-dir --no-deps \
-      -r /tmp/requirements.txt \
+    && curl --fail --silent --show-error --location \
+      "https://raw.githubusercontent.com/aboutcode-org/scancode-toolkit/v${SCANCODE_VERSION}/requirements.txt" \
+      --output /tmp/scancode-constraints.txt \
+    && test -s /tmp/scancode-constraints.txt \
+    && if [ "$TARGETARCH" = arm64 ]; then \
+      sed -i '/^extractcode-7z==/d; /^extractcode-libarchive==/d; /^typecode-libmagic==/d' /tmp/scancode-constraints.txt; \
+    fi \
+    && python -m pip install --no-cache-dir \
+      "scancode-toolkit==${SCANCODE_VERSION}" -c /tmp/scancode-constraints.txt \
     && python -m pip check \
     && syft version \
     && scancode --version

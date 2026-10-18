@@ -31,7 +31,7 @@ to their original file paths.
 | Scanner lifecycle, final inventory, ScanCode invocation, BuildKit statement | [generator.py](generator.py) |
 | File ownership, package selection, license composition, document identity | [compose.py](compose.py) |
 | Optional hook and its context | [hooks.py](hooks.py) |
-| Final SPDX conformance check | [spdx_validation.py](spdx_validation.py), [validator pin](requirements.txt) |
+| Final SPDX conformance check | [spdx_validation.py](spdx_validation.py), [release constraints](Dockerfile) |
 | Scanner image and dependencies | [Dockerfile](Dockerfile) |
 | Extension integration | [docker-bake.hcl](../docker-bake.hcl), [bake_targets.yml](../.github/workflows/bake_targets.yml) |
 | Generator checks, publication, and digest updates | [sbom-generator.yml](../.github/workflows/sbom-generator.yml), [release.py](release.py), [renovate.json](../renovate.json) |
