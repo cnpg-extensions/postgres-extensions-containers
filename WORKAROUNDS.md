@@ -122,3 +122,19 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   layout changes. Retain the patch until the packaged SQL can load the mounted
   files without it; verify extension creation and affected upgrade paths before
   removing it.
+
+## CI: extension rebuilds (option not adopted)
+
+Shared CI changes trigger the full extension matrix, then repeat on merge to
+`main`. Successful runs show the scale: the 2026-10-14 Bake action update completed
+[834 branch jobs](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/runs/38609995588)
+and [919 more after merge](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/runs/38621555543).
+On 2026-10-17, the shared [kubectl digest update](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/runs/39006667971)
+and [psql digest update](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/runs/39006736993)
+completed 1,915 jobs each. These counts exclude skipped jobs.
+The [ci/extension-build-selection branch](https://github.com/ardentperf-labs/postgres-extensions-containers/tree/ci/extension-build-selection)
+proposes a representative sample on branches and no infrastructure-only rebuilds
+on `main`; directly changed extensions still build. The proposed Debian sample is
+`pgtap`, `pg-cron`, `ogr-fdw`, and `powa`; the separate
+[PGRX branch](https://github.com/ardentperf-labs/postgres-extensions-containers/tree/ci/pgrx-build-selection)
+uses `pg-session-jwt` and `pg-durable`. This option is not adopted.
