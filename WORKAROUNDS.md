@@ -59,13 +59,14 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   `ValueError: did not find any 'pre_scan' hooks`.
 - **Workaround:** `pluggy==1.6.0` in
   [sbom-generator/requirements.txt](sbom-generator/requirements.txt). Renovate's
+  `allowedVersions` rule holds this version only in the SBOM requirements. The
   SBOM dependency group includes a reminder to retry without this compatibility
   hold whenever ScanCode is updated. Retain normal dependency locking after
   removing the special hold; installation uses `--no-deps` and `pip check`.
 - **Remove when:** a released ScanCode/Pluggy combination fixes registration.
   Update the resolved Pluggy version and remove the special pin comments and
-  Renovate reminder after the native AMD64 and ARM64 generator integration
-  checks pass with the newer combination.
+  Renovate version constraint and reminder after the native AMD64 and ARM64
+  generator integration checks pass with the newer combination.
 
 ## ScanCode: system native libraries on ARM64
 
@@ -109,9 +110,12 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
 - **Workaround:** [sbom-generator/Dockerfile](sbom-generator/Dockerfile) stays on
   Python `3.14-slim-bookworm`, the newest Python supported by the selected ScanCode
   release, rather than accepting a newer Python solely because Renovate offers it.
+  Renovate's `allowedVersions` rule applies only to this Dockerfile; Python
+  updates elsewhere remain eligible, and base-image digest updates remain enabled.
 - **Remove when:** the selected ScanCode release supports a newer Python.
-  Update the base-image pin and compatibility comments together and verify Python
-  dependency installation, ScanCode startup, and native AMD64/ARM64 integration.
+  Update the base-image pin, Renovate version constraint, and compatibility comments
+  together and verify Python dependency installation, ScanCode startup, and native
+  AMD64/ARM64 integration.
 
 ## ScanCode: SPDX Tools compatibility pin
 
@@ -119,11 +123,13 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   requires `spdx-tools==0.8.2`. This is a release compatibility constraint, not a
   separately tracked bug.
 - **Workaround:** [sbom-generator/requirements.txt](sbom-generator/requirements.txt)
-  retains `spdx-tools==0.8.2`. Renovate groups validator changes with ScanCode
-  dependencies for compatibility review instead of accepting an independent bump.
+  retains `spdx-tools==0.8.2`. A Renovate `allowedVersions` rule holds this version
+  only in the SBOM requirements; other validator updates remain grouped with
+  ScanCode dependencies for compatibility review.
 - **Remove when:** the selected ScanCode release permits a newer SPDX Tools
-  version. Update the resolved requirements together and run `pip check` and the
-  native generator integration checks, including final SPDX validation.
+  version. Update the resolved requirements and Renovate version constraint
+  together and run `pip check` and the native generator integration checks,
+  including final SPDX validation.
 
 ## unit: mounted data-file paths
 

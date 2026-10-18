@@ -171,6 +171,7 @@
       "versioning": "deb"
     },
     {
+      "description": "Hold SBOM Python to ScanCode-supported 3.14 Bookworm tags; see WORKAROUNDS.md",
       "matchDatasources": [
         "docker"
       ],
@@ -182,6 +183,7 @@
         "sbom-generator/Dockerfile"
       ],
       "groupName": "SBOM generator Debian and base image updates",
+      "allowedVersions": "/^3\\.14(?:\\.\\d+)?-slim-bookworm$/",
       "automerge": false
     },
     {
@@ -207,6 +209,20 @@
         "⚠️ Check that the selected SPDX Tools release is compatible with the ScanCode Toolkit release. The current ScanCode Toolkit pins spdx-tools==0.8.2. Run the Build and publish SBOM generator workflow on the update branch with publish=false; it runs the unit tests inside the built generator image. Both native AMD64/ARM64 BuildKit integration checks must pass; these exercise the installed ScanCode/SPDX Tools combination and validate the final SPDX.",
         "On every ScanCode update, attempt removing the pluggy pin from requirements.txt, then run the existing native AMD64/ARM64 integration checks. Keep the pin only if the incompatibility persists: https://github.com/aboutcode-org/scancode-toolkit/issues/5363"
       ]
+    },
+    {
+      "description": "Hold SBOM Pluggy until ScanCode issue #5363 is fixed; see WORKAROUNDS.md",
+      "matchDatasources": ["pypi"],
+      "matchFileNames": ["sbom-generator/requirements.txt"],
+      "matchPackageNames": ["pluggy"],
+      "allowedVersions": "/^1\\.6\\.0$/"
+    },
+    {
+      "description": "Honor ScanCode's SPDX Tools compatibility constraint; see WORKAROUNDS.md",
+      "matchDatasources": ["pypi"],
+      "matchFileNames": ["sbom-generator/requirements.txt"],
+      "matchPackageNames": ["spdx-tools"],
+      "allowedVersions": "/^0\\.8\\.2$/"
     },
     {
       "description": "automerge checked latest generator digest updates",
