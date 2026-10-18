@@ -1,0 +1,52 @@
+# Independent, path-filtered build workflows share the required "Automerge gate"
+# name so either can satisfy branch protection without a central CI coordinator.
+# Reject PRs that trigger both workflows to avoid ambiguous same-name check results.
+# Require "PR scope" too; it blocks merging independently while builds may proceed.
+name: Check PR scope
+
+on:
+  pull_request:
+
+permissions: {}
+
+jobs:
+  pr-scope:
+    name: PR scope
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Reject mixed SBOM and extension PRs
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          # Allow the PR introducing this policy; enforce it after adoption.
+          if ! git cat-file -e "$BASE_SHA:.github/workflows/pr-scope.yml" 2>/dev/null; then
+            echo "Initial PR scope rollout; mixed changes are allowed."
+            exit 0
+          fi
+          # Include both sides of renames and exclude base-only changes.
+          git diff --name-only --no-renames -z "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/pr-scope-paths"
+          sbom=false
+          extensions=false
+          while IFS= read -r -d '' file; do
+            case "$file" in
+              sbom-generator/*|.github/workflows/sbom-generator.yml) sbom=true ;;
+              renovate.json|.github/workflows/pr-scope.yml) ;;
+              .github/workflows/pgrx.yml|.github/workflows/pgrx_targets.yml) ;;
+              *) extensions=true ;;
+            esac
+          done < "$RUNNER_TEMP/pr-scope-paths"
+          if [[ "$sbom" == true && "$extensions" == true ]]; then
+            echo "::error::Split this PR: SBOM and extension-workflow changes must be submitted separately."
+            exit 1
+          fi
+

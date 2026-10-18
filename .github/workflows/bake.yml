@@ -3,6 +3,8 @@ name: Build, test and publish extensions
 on:
   push:
     paths-ignore:
+      - 'renovate.json'
+      - '.github/workflows/pr-scope.yml'
       - '.github/workflows/pgrx.yml'
       - '.github/workflows/pgrx_targets.yml'
       - '.github/workflows/sbom-generator.yml'

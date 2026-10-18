@@ -110,6 +110,18 @@ jobs:
           path: ${{ runner.temp }}/sbom-check
           if-no-files-found: ignore
 
+  automerge-gate:
+    name: Automerge gate
+    if: ${{ always() }}
+    needs: check
+    runs-on: ubuntu-26.04
+    permissions: {}
+    steps:
+      - name: Verify build and test results
+        env:
+          CHECK_RESULT: ${{ needs.check.result }}
+        run: test "$CHECK_RESULT" = success
+
   publish:
     needs: [check, changes]
     # Workflow-only updates (including Grype/Grant bumps) run checks without publishing.

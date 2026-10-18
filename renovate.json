@@ -191,7 +191,7 @@
       "matchUpdateTypes": ["digest"],
       "matchCurrentValue": "latest",
       "automerge": true,
-      "platformAutomerge": false,
+      "platformAutomerge": true,
       "rebaseWhen": "behind-base-branch"
     },
     {
@@ -260,7 +260,7 @@
       ],
       "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
       "automerge": true,
-      "platformAutomerge": false,
+      "platformAutomerge": true,
       "rebaseWhen": "behind-base-branch"
     },
     {
@@ -285,7 +285,7 @@
       "prBodyNotes": [
         "The image build uses the selected ScanCode release's dependency constraints. On ARM64, pip selects compatible versions of the three native packages excluded from those constraints. Both native AMD64/ARM64 generator integration checks must pass before automerging. See WORKAROUNDS.md for packaging and ARM64 limitations."
       ],
-      "platformAutomerge": false,
+      "platformAutomerge": true,
       "rebaseWhen": "behind-base-branch"
     }
   ],
