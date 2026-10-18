@@ -221,12 +221,19 @@
       "rebaseWhen": "behind-base-branch"
     },
     {
-      "description": "require stable release verification for all updates",
-      "matchPackageNames": [
-        "*"
+      "description": "require stable release verification for extension updates",
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchFileNames": [
+        "*/metadata.hcl",
+        "*/README.md"
+      ],
+      "matchRegistryUrls": [
+        "https://download.postgresql.org/pub/repos/apt*"
       ],
       "prBodyNotes": [
-        "⚠️ Before approving this PR, confirm that the new extension version is a stable release, not a beta or release candidate."
+        "⚠️ Before approving this PR, confirm that the new extension version is a stable release, not a beta or release candidate. The Automerge gate fails on added Renovate-tracked version lines containing `alpha`, `beta`, `rc`, or `~` (case-insensitive), except for the documented AGE naming exception. Manual approval alone does not clear a failed gate."
       ]
     },
     {
