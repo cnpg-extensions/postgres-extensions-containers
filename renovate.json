@@ -42,6 +42,16 @@
       "datasourceTemplate": "deb"
     },
     {
+      "description": "updates versions of extensions built from GitHub release tags in the metadata.hcl files",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "**/*.hcl"
+      ],
+      "matchStrings": [
+        "\\/\\/\\s*renovate:\\s*datasource=(?<datasource>[a-z-.]+?)\\s+depName=(?<depName>[^\\s]+?)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*package\\s*=\\s*\"(?<currentValue>.*)\""
+      ]
+    },
+    {
       "description": "updates the container image versions in the README.md files",
       "customType": "regex",
       "managerFilePatterns": [

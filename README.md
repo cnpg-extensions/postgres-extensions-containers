@@ -59,6 +59,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[pg-cron](pg-cron)** | Cron-based job scheduler for PostgreSQL | [github.com/citusdata/pg_cron](https://github.com/citusdata/pg_cron) | @ardentperf | Vixie-Cron (src/entry.c, src/misc.c) |
 | **[pg-csv](pg-csv)** | Flexible CSV processing functions for PostgreSQL | [github.com/PostgREST/pg_csv](https://github.com/PostgREST/pg_csv/) | @ardentperf | MIT |
 | **[pg-dirtyread](pg-dirtyread)** | Read dead, unvacuumed tuples from a PostgreSQL relation | [github.com/df7cb/pg_dirtyread](https://github.com/df7cb/pg_dirtyread) | @ardentperf | BSD-3-Clause |
+| **[pg-duckdb](pg-duckdb)** | DuckDB analytical engine embedded in PostgreSQL | [github.com/duckdb/pg_duckdb](https://github.com/duckdb/pg_duckdb) | @ibotty | MIT |
 | **[pg-gvm](pg-gvm)** | Greenbone helper functions for host matching, regular expressions, and schedules | [github.com/greenbone/pg-gvm](https://github.com/greenbone/pg-gvm) | @ardentperf | GPL-3.0-or-later, AGPL-3.0-or-later |
 | **[pg-hint-plan](pg-hint-plan)** | Query optimizer hints in SQL comments | [github.com/ossc-db/pg_hint_plan](https://github.com/ossc-db/pg_hint_plan) | @ardentperf | NTT |
 | **[pg-partman](pg-partman)** | Time- and ID-based partition management | [github.com/pgpartman/pg_partman](https://github.com/pgpartman/pg_partman) | @ardentperf | PostgreSQL License |
