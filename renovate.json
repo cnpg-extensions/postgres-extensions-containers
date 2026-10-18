@@ -16,6 +16,21 @@
   ],
   "customManagers": [
     {
+      "description": "Track Ubuntu runners in matrix values and runs-on expressions",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "(?:^|\\r?\\n)[ \\t]*runner:[ \\t]*['\"]?ubuntu-(?<currentValue>\\d+\\.\\d+(?:-arm)?)(?:['\"]|[ \\t\\r\\n]|$)",
+        "(?:^|\\r?\\n)[ \\t]*runs-on:[ \\t]*\\$\\{\\{[^\\r\\n]*?['\"]ubuntu-(?<currentValue>\\d+\\.\\d+(?:-arm)?)['\"]"
+      ],
+      "depNameTemplate": "ubuntu",
+      "depTypeTemplate": "github-runner",
+      "datasourceTemplate": "github-runners",
+      "versioningTemplate": "docker"
+    },
+    {
       "description": "updates the deb package versions in the metadata.hcl files",
       "customType": "regex",
       "managerFilePatterns": [
