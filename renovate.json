@@ -287,6 +287,14 @@
       ],
       "platformAutomerge": true,
       "rebaseWhen": "behind-base-branch"
+    },
+    {
+      "description": "Keep SBOM updates separate from extension updates to satisfy PR scope",
+      "matchFileNames": [
+        "sbom-generator/**",
+        ".github/workflows/sbom-generator.yml"
+      ],
+      "additionalBranchPrefix": "sbom-"
     }
   ],
   "customDatasources": {
