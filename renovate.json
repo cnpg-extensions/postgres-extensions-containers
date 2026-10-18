@@ -131,12 +131,13 @@
         "sbom-generator/dependencies/debian-amd64.txt"
       ],
       "registryUrls": [
-        "https://deb.debian.org/debian?suite=bookworm&components=main&binaryArch=amd64",
-        "https://deb.debian.org/debian?suite=bookworm-updates&components=main&binaryArch=amd64",
-        "https://security.debian.org/debian-security?suite=bookworm-security&components=main&binaryArch=amd64"
+        "https://packages.debian.org/bookworm/amd64/{{packageName}}"
       ],
       "groupName": "SBOM generator Debian and base image updates",
-      "automerge": false
+      "automerge": false,
+      "description": "Work around Renovate #44330 using Debian package pages; see WORKAROUNDS.md",
+      "overrideDatasource": "custom.debian-bookworm",
+      "versioning": "deb"
     },
     {
       "matchDatasources": [
@@ -146,12 +147,13 @@
         "sbom-generator/dependencies/debian-arm64.txt"
       ],
       "registryUrls": [
-        "https://deb.debian.org/debian?suite=bookworm&components=main&binaryArch=arm64",
-        "https://deb.debian.org/debian?suite=bookworm-updates&components=main&binaryArch=arm64",
-        "https://security.debian.org/debian-security?suite=bookworm-security&components=main&binaryArch=arm64"
+        "https://packages.debian.org/bookworm/arm64/{{packageName}}"
       ],
       "groupName": "SBOM generator Debian and base image updates",
-      "automerge": false
+      "automerge": false,
+      "description": "Work around Renovate #44330 using Debian package pages; see WORKAROUNDS.md",
+      "overrideDatasource": "custom.debian-bookworm",
+      "versioning": "deb"
     },
     {
       "matchDatasources": [
@@ -254,5 +256,13 @@
         "⚠️ SQL versions in this image cannot all be updated by a verified package-version extraction rule. Before merging, inspect every shipped extension control file and SQL upgrade script, including independently versioned bundled extensions. Update metadata.hcl, README.md and affected test expectations where needed. Do not infer SQL versions from the package version or approve solely because CI passed."
       ]
     }
-  ]
+  ],
+  "customDatasources": {
+    "debian-bookworm": {
+      "format": "plain",
+      "transformTemplates": [
+        "($prefix := \"<h1>Package: {{{packageName}}} (\"; $headers := releases[$substring(version, 0, $length($prefix)) = $prefix]; $assert($count($headers) = 1, \"Expected one Debian package version heading\"); $archVersions := releases[$contains(version, \"<td class='vcurrent'>\")]; $assert($count($archVersions) <= 1, \"Expected at most one architecture version\"); $version := $count($archVersions) = 1 ? $substringBefore($substringAfter($archVersions[0].version, \">\"), \"<\") : $substringBefore($substringAfter($headers[0].version, $prefix), \")\"); $assert($contains($version, /^[0-9][0-9A-Za-z.+:~-]*$/), \"Invalid Debian package version\"); {\"releases\": [{\"version\": $version}]})"
+      ]
+    }
+  }
 }

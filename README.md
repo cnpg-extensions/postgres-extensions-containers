@@ -14,6 +14,8 @@ project due to licensing constraints, but are otherwise fully compatible with
   guide for contributors.
 - [Building Locally](./BUILD.md): Technical instructions for the build system
   (Dagger/Task).
+- [Upstream Workarounds](./WORKAROUNDS.md): Temporary measures and the upstream
+  fixes needed to retire them.
 - [CloudNativePG Documentation](https://cloudnative-pg.io/documentation/current/imagevolume_extensions/):
   How to use these images in your cluster.
 
