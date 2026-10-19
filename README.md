@@ -61,6 +61,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[pg-dirtyread](pg-dirtyread)** | Read dead, unvacuumed tuples from a PostgreSQL relation | [github.com/df7cb/pg_dirtyread](https://github.com/df7cb/pg_dirtyread) | @ardentperf | BSD-3-Clause |
 | **[pg-gvm](pg-gvm)** | Greenbone helper functions for host matching, regular expressions, and schedules | [github.com/greenbone/pg-gvm](https://github.com/greenbone/pg-gvm) | @ardentperf | GPL-3.0-or-later, AGPL-3.0-or-later |
 | **[pg-hint-plan](pg-hint-plan)** | Query optimizer hints in SQL comments | [github.com/ossc-db/pg_hint_plan](https://github.com/ossc-db/pg_hint_plan) | @ardentperf | NTT |
+| **[pg-parquet](pg-parquet)** | Read and write Parquet files with COPY | [github.com/CrunchyData/pg_parquet](https://github.com/CrunchyData/pg_parquet) | @ibotty | PostgreSQL |
 | **[pg-partman](pg-partman)** | Time- and ID-based partition management | [github.com/pgpartman/pg_partman](https://github.com/pgpartman/pg_partman) | @ardentperf | PostgreSQL License |
 | **[pg-permissions](pg-permissions)** | Inspect permissions in a PostgreSQL database | [github.com/cybertec-postgresql/pg_permissions](https://github.com/cybertec-postgresql/pg_permissions) | @ardentperf | PostgreSQL |
 | **[pg-pwhash](pg-pwhash)** | Adaptive Argon2, scrypt, and yescrypt password-hashing functions | [github.com/cybertec-postgresql/pg_pwhash](https://github.com/cybertec-postgresql/pg_pwhash) | @ardentperf | MIT |
