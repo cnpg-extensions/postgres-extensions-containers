@@ -7,6 +7,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from spdx_tools.spdx.parser.jsonlikedict.json_like_dict_parser import JsonLikeDictParser
+from spdx_tools.spdx.spdx_element_utils import calculate_package_verification_code
+
 sys.path.insert(0, str(Path(__file__).parents[1]))
 
 from compose import compose, set_document_namespace  # noqa: E402
@@ -104,6 +107,41 @@ class ComposeTest(unittest.TestCase):
         ))
         self.assertNotIn("build-only", json.dumps(output))
         self.assertFalse("subject" in output)
+
+    def test_verification_code_covers_shipped_copies_instead_of_builder_package(self):
+        document = builder_document()
+        document["packages"][1]["packageVerificationCode"] = {
+            "packageVerificationCodeValue": "0" * 40,
+            "packageVerificationCodeExcludedFiles": ["builder-only-file"],
+        }
+        document["files"].append({
+            "SPDXID": "SPDXRef-File-other",
+            "fileName": "usr/lib/postgresql/other.so",
+            "checksums": checksum("other"),
+        })
+        document["relationships"].append({
+            "spdxElementId": "SPDXRef-Package-extension",
+            "relationshipType": "CONTAINS",
+            "relatedSpdxElement": "SPDXRef-File-other",
+        })
+        output = compose(
+            document,
+            extension_name="demo",
+            final_inventory=inventory(
+                ("lib/ext.so", "extension"),
+                ("lib/duplicate.so", "extension"),
+                ("lib/other.so", "other"),
+            ),
+            platform="linux/amd64",
+        )
+        # Use SPDX Tools as an independent oracle for sorting and duplicate hashes.
+        parsed = JsonLikeDictParser().parse(output)
+        self.assertEqual(len(parsed.files), 3)
+        expected = calculate_package_verification_code(parsed.files).value
+        self.assertEqual(output["packages"][0]["packageVerificationCode"], {
+            "packageVerificationCodeValue": expected,
+        })
+        self.assertEqual(validate_spdx_document(output), [])
 
     def test_matched_file_uses_final_inventory_sha1_when_builder_only_has_sha256(self):
         document = builder_document()

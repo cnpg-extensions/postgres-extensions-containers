@@ -325,6 +325,29 @@ def compose(builder_document: dict[str, Any], *,
     output["relationships"] = composed_relationships
     package_by_id = {package["SPDXID"]: package for package in output["packages"]}
     file_by_id = {record["SPDXID"]: record for record in composed_files}
+    # SPDX 2.3 section 7.9: SHA1 of sorted, concatenated per-file SHA1 values.
+    # https://github.com/spdx/spdx-spec/blob/v2.3/chapters/package-information.md#7.9
+    # Syft's verification codes cover the complete builder package. Recompute
+    # them for the shipped subset, including files copied to multiple paths.
+    for package in output["packages"]:
+        contained_ids = {
+            relationship["relatedSpdxElement"]
+            for relationship in composed_relationships
+            if relationship["relationshipType"] == "CONTAINS"
+            and relationship["spdxElementId"] == package["SPDXID"]
+            and relationship["relatedSpdxElement"] in file_by_id
+        }
+        sha1s = sorted(
+            checksum["checksumValue"]
+            for contained_id in contained_ids
+            for checksum in file_by_id[contained_id]["checksums"]
+            if checksum["algorithm"] == "SHA1"
+        )
+        package["packageVerificationCode"] = {
+            "packageVerificationCodeValue": hashlib.sha1(
+                "".join(sha1s).encode("ascii"), usedforsecurity=False
+            ).hexdigest(),
+        }
     licenses_by_package: defaultdict[str, set[str]] = defaultdict(set)
     for relationship in composed_relationships:
         package = package_by_id.get(relationship.get("spdxElementId"))
