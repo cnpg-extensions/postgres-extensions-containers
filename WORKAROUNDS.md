@@ -8,7 +8,7 @@ On dependency updates, check the linked issue, pull request, or release contract
 verify the replacement, and remove temporary measures and their entries together
 when they are no longer needed. Some entries describe packaging adaptations
 rather than pending upstream bug fixes. Where no upstream issue is linked, say so
-instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
+instead of implying that a fix is scheduled. Last reviewed: 2026-10-19.
 
 ## Renovate: Debian security package lookups
 
@@ -50,6 +50,42 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
 - **Remove when:** a Grant release includes the fix. Update the example's build
   instructions and recapture its reports with that release, checking long
   license expressions and terminal wrapping. Keep the capture provenance accurate.
+
+## Syft: Debian license coverage
+
+- **Upstream:** [issue #3527: Unable to classify complex licenses](https://github.com/anchore/syft/issues/3527),
+  open, describes missing license results for Debian copyright files containing
+  multiple licenses and other text. [Issue #4133](https://github.com/anchore/syft/issues/4133),
+  also open, concerns a less specific `GPL` result for `base-files` where the
+  notice specifies GPL version 2 or later. These are relevant references; the
+  exact issue consulted when ScanCode was originally adopted was not recorded.
+- **Problem:** Syft's Debian license results can be missing or incomplete.
+  This is not simply an inability to read package metadata: the
+  [pinned Syft 1.54.1 implementation](https://github.com/anchore/syft/blob/v1.54.1/syft/pkg/cataloger/debian/package.go)
+  reads package copyright files, parses license declarations, and falls back to
+  classifying the file's text when parsing produces no license values. That
+  fallback does not supplement a nonempty but incomplete set of declarations.
+  Notices can also place incorporated-code license references in comments or
+  exceptions in the license body rather than in the `License:` label. Whole-file
+  classification of complex notices can miss evidence even when it is present.
+- **Workaround:** keep Syft for package inventory and ownership, and use ScanCode
+  to scan all shipped `/licenses` notices independently of Syft's license results.
+  [The generator](sbom-generator/README.md#reading-license-results) records the
+  evidence on SPDX files and their owning packages, and fills missing or unknown
+  package declarations. This complements existing declarations rather than
+  replacing every declaration with the scanner's interpretation.
+- **Limits:** `NOASSERTION` results in a recent maintainer spot-check of a CNPG
+  PostgreSQL image motivate reassessment, but do not establish the cause of each
+  missing result or a measured advantage for ScanCode. Neither scanner proves
+  which terms govern a shipped binary: shared notices can cover an entire source
+  package, and classification can produce false positives. Preserve the notices
+  and evidence for review.
+- **Revisit when:** compare the current Syft release with the ScanCode path on
+  the same representative images and notices, including complex Debian files,
+  additional license references, and exceptions. Check missing results, incorrect
+  matches, and package/file attribution before removing ScanCode. The section
+  splitting described below is a candidate for discussion on Syft #3527; no
+  upstream proposal or evidence that it fixes Syft's classifier is recorded yet.
 
 ## ScanCode: ARM64 release archive and Debian packaging
 
@@ -96,10 +132,15 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-18.
   No upstream issue or pull request is currently linked for this workaround.
 - **Problem:** Debian copyright files can contain thousands of `License:`
   sections; scanning a combined file can exceed ScanCode's per-file timeout.
+  Splitting was introduced for resource and timeout limits; maintainer validation
+  also found that it substantially improved license recognition on these notices.
 - **Workaround:** `prepare_license_scan_root` in
   [sbom-generator/generator.py](sbom-generator/generator.py) uses `csplit` to scan
   smaller sections, then maps ScanCode results back to the original notice paths.
   Original shipped notices remain intact.
+  This addresses a similar multi-license input problem to
+  [Syft #3527](https://github.com/anchore/syft/issues/3527), but uses a different
+  classifier and has not been validated as a fix for Syft.
 - **Remove when:** representative large notices scan completely within the
   supported ScanCode limits without splitting. Compare license evidence and
   original file attribution before removing the chunk preparation and path
