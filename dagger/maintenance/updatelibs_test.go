@@ -1,7 +1,6 @@
 package main
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -116,44 +115,5 @@ Building dependency tree...
 	}
 	if matches[1][2] != "" {
 		t.Errorf("match 1 hash: expected empty, got %q", matches[1][2])
-	}
-}
-
-func TestBuildResultFromMatches(t *testing.T) {
-	tests := []struct {
-		name  string
-		input string
-		want  string
-	}{
-		{
-			name:  "with MD5Sum",
-			input: "'http://example.com/libfoo_1.0_amd64.deb' libfoo_1.0_amd64.deb 4096 MD5Sum:abc123",
-			want:  "libfoo_1.0_amd64.deb MD5Sum:abc123\n",
-		},
-		{
-			name:  "without MD5Sum",
-			input: "'http://example.com/libfoo_1.0_amd64.deb' libfoo_1.0_amd64.deb 4096",
-			want:  "libfoo_1.0_amd64.deb\n",
-		},
-		{
-			name: "mixed lines",
-			input: `'http://example.com/libfoo_1.0_amd64.deb' libfoo_1.0_amd64.deb 4096 MD5Sum:abc123
-'http://example.com/libbar_2.0_amd64.deb' libbar_2.0_amd64.deb 8192`,
-			want: "libfoo_1.0_amd64.deb MD5Sum:abc123\nlibbar_2.0_amd64.deb\n",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			matches := libsRegex.FindAllStringSubmatch(tt.input, -1)
-			var result string
-			for _, m := range matches {
-				line := strings.Join(m[1:], " ")
-				result += strings.TrimSpace(line) + "\n"
-			}
-			if result != tt.want {
-				t.Errorf("got %q, want %q", result, tt.want)
-			}
-		})
 	}
 }

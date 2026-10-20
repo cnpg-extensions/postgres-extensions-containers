@@ -279,6 +279,9 @@ extract its platform-specific SPDX, and report vulnerabilities and licenses with
 Grype and Grant. See the [example report](./examples/sbom-reports.txt) and
 [generator release workflow](./sbom-generator/README.md#generator-release-and-test-builds).
 
+For downstream images, see the [common verification command](./pgrx/VERIFYING_IMAGES.md).
+
+
 ## Image catalogs
 
 To simplify the deployment of PostgreSQL extensions, this project automatically
@@ -303,3 +306,5 @@ kubectl apply -f \
 
 Clusters using this catalog should reference it instead of the corresponding
 upstream base catalog; it already includes the upstream extension definitions.
+
+PGRX build contributors: see the [build and local validation guide](./pgrx/README.md).

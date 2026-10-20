@@ -6,9 +6,21 @@ on:
       - main
     paths:
       - 'dagger/maintenance/**'
+      - 'pgrx/**'
+      - 'docker-bake-pgrx.hcl'
+      - '.github/workflows/pgrx*.yml'
+      - '*/Dockerfile'
+      - '*/metadata.hcl'
+      - 'sbom-generator/**'
   pull_request:
     paths:
       - 'dagger/maintenance/**'
+      - 'pgrx/**'
+      - 'docker-bake-pgrx.hcl'
+      - '.github/workflows/pgrx*.yml'
+      - '*/Dockerfile'
+      - '*/metadata.hcl'
+      - 'sbom-generator/**'
   workflow_dispatch:
 
 defaults:
@@ -52,3 +64,11 @@ jobs:
           DAGGER_SESSION_PORT: "1"
           DAGGER_SESSION_TOKEN: "test"
         run: go test ./...
+
+      - name: Run PGRX contract tests
+        run: |
+          generator=$(sed -n 's/^ *SBOM_GENERATOR: //p' .github/workflows/pgrx_targets.yml)
+          test -n "$generator"
+          docker run --rm --entrypoint python3 \
+            --volume "$PWD:/workspace:ro" --workdir /workspace \
+            "$generator" pgrx/test.py

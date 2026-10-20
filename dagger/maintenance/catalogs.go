@@ -29,13 +29,13 @@ type ExtensionEnvVar struct {
 }
 
 type ExtensionConfiguration struct {
-	Name                 string            `yaml:"name"`
-	ImageVolumeSource    ImageVolumeSource `yaml:"image"`
-	ExtensionControlPath []string          `yaml:"extension_control_path,omitempty"`
-	DynamicLibraryPath   []string          `yaml:"dynamic_library_path,omitempty"`
-	LdLibraryPath        []string          `yaml:"ld_library_path,omitempty"`
-	BinPath              []string          `yaml:"bin_path,omitempty"`
-	Env                  []ExtensionEnvVar `yaml:"env,omitempty"`
+	Name                 string             `yaml:"name"`
+	ImageVolumeSource    *ImageVolumeSource `yaml:"image,omitempty"`
+	ExtensionControlPath []string           `yaml:"extension_control_path,omitempty"`
+	DynamicLibraryPath   []string           `yaml:"dynamic_library_path,omitempty"`
+	LdLibraryPath        []string           `yaml:"ld_library_path,omitempty"`
+	BinPath              []string           `yaml:"bin_path,omitempty"`
+	Env                  []ExtensionEnvVar  `yaml:"env,omitempty"`
 }
 
 type ImageCatalog struct {

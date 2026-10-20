@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "base_lock_sha256": "6f10872885cf3a2421ad5102a91be24989f086faeb968e2e7461f1c27262c291",
+  "packages": [
+    "build-essential",
+    "ca-certificates",
+    "clang",
+    "cmake",
+    "curl",
+    "git",
+    "jq",
+    "libclang-dev",
+    "libssl-dev",
+    "pkg-config",
+    "python3",
+    "postgresql-server-dev-18",
+    "xz-utils",
+    "patch",
+    "libopenblas-dev"
+  ],
+  "files": {
+    "bookworm-amd64.tsv": "6292201187492df1f200cc810575f3f2af33896c3a25f7914e5596d6dc8a6770",
+    "bookworm-arm64.tsv": "8cc2332e427bd80a3923743dc703d35626873092b2949f7ad327899210a29864",
+    "trixie-amd64.tsv": "f2758fcd561c1bd78eeb9f22343f8ad514006e34b421ebe46d7820d240c8f7de",
+    "trixie-arm64.tsv": "9ca605b4cbbc747a673b0e82c7acaf70382af43366989ea2164737b42aea7639"
+  }
+}

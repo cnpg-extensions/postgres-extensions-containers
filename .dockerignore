@@ -1,0 +1,5 @@
+# Keep generated Python bytecode and Git state out of build inputs.
+.git
+**/__pycache__
+**/*.pyc
+**/*.pyo

@@ -1,0 +1,52 @@
+# cargo-about's accepted list is a tool-level completeness policy for the
+# initial source set. It is not a project-wide abstract license allowlist:
+# package-specific DFSG decisions remain part of the contribution review.
+accepted = [
+    "Apache-2.0",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "ISC",
+    "MIT-0",
+    "OpenSSL",
+    "Unlicense",
+    "Unicode-3.0",
+    "Zlib",
+    "BSL-1.0",
+    "AGPL-3.0",
+    "CDLA-Permissive-2.0",
+    "0BSD",
+    "MPL-2.0",
+    "zlib-acknowledgement",
+    "PostgreSQL",
+    "NCSA",
+]
+
+[pg_parquet.clarify]
+license = "PostgreSQL"
+[[pg_parquet.clarify.files]]
+path = "LICENSE"
+license = "PostgreSQL"
+checksum = "5af2fa8f8bab50d2222a62543b450775187fc095dce36cb44f3a1af4663ab68e"
+
+[pg_graphql.clarify]
+license = "Apache-2.0"
+[[pg_graphql.clarify.files]]
+path = "LICENSE"
+license = "Apache-2.0"
+checksum = "9b78bbb5a12f0e1928691f09604c788f8b8b4db59cdb82f9924679cf9beae5d2"
+
+[pg_jsonschema.clarify]
+license = "Apache-2.0"
+[[pg_jsonschema.clarify.files]]
+path = "LICENSE"
+license = "Apache-2.0"
+checksum = "31088ca1e26bfe86295635d34e82c82cf4ce180646441ddc8f947bc70b94495b"
+
+[pg_session_jwt.clarify]
+license = "Apache-2.0"
+[[pg_session_jwt.clarify.files]]
+path = "LICENSE"
+license = "Apache-2.0"
+checksum = "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"

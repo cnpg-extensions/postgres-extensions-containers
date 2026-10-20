@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+# SPDX-License-Identifier: Apache-2.0
+metadata = {
+  # TODO: Set the catalog name used by the Cluster and Database resources.
+  build_system             = "pgrx"
+  name                     = "{{ .Name }}"
+  sql_name                 = "{{ replaceAll .Name "-" "_" }}"
+
+  # TODO: `image_name` must be unique in ghcr.io/cnpg-extensions.
+  image_name               = "{{ .Name }}"
+
+  # TODO: Use SPDX identifiers for the extension's primary license(s).
+  licenses                 = ["Apache-2.0"]
+
+  # TODO: Add only settings required for the extension to function.
+  shared_preload_libraries = []
+  postgresql_parameters    = {}
+  extension_control_path   = []
+  dynamic_library_path     = []
+  ld_library_path          = []
+  bin_path                 = []
+  env                      = {}
+  auto_update_os_libs      = false
+  required_extensions      = []
+  create_extension         = true
+
+  // TODO: Keep package exactly equal to the upstream Git tag passed as
+  // EXT_VERSION in Dockerfile, including any prefix or suffix. Do not apply
+  // Debian epoch/version normalization to pgrx tags.
+  versions = {
+    {{- range $distro := .Distros}}
+    {{ $distro }} = {
+        {{- range $version := $.Versions}}
+        "{{ $version }}" = {
+          # TODO: Keep one Renovate github-tags comment on the source package
+          # entry and configure its depName to match the upstream repository.
+          # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver
+          package = "<release-tag>"
+
+          # TODO: Set this to the extension's SQL default_version. It usually
+          # omits a leading `v`, even when package is an exact Git tag.
+          sql = "<sql-version>"
+        }
+        {{- end}}
+    }
+    {{- end}}
+  }
+}

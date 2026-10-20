@@ -1,0 +1,108 @@
+# SBOM reports - pg-parquet 0.5.1, PostgreSQL 18, Bookworm, linux/amd64
+# Captured 2026-10-19 using Grype 0.120.1 and an unreleased Grant build.
+#
+# Historical ScanCode-era output, predating the Syft-only generator adoption.
+# Package counts and license results do not represent current builds.
+# Captured from the unmodified SPDX of a 2026-10-02 PGRX validation build.
+# Image build: https://github.com/ardentperf-labs/postgres-extensions-containers/actions/runs/36977617277
+# Image: ghcr.io/ardentperf-labs/pg-parquet-testing@sha256:246059deb2ad5b419b443234d55a7edf9377a8a0f59e05740be10bae710dd5ac
+#
+# Grype database built 2026-10-16. Findings are not proof of exploitability.
+#
+# All report commands below were captured through script/stty/ansi2txt.
+# With command set to the command shown after each "$", the exact capture was:
+# script -qec "stty cols 200; { $command; } 2>/dev/null" | ansi2txt
+# This provides a 200-column terminal, hides diagnostics, and strips terminal
+# formatting. Complete output from that pipeline is preserved without editing.
+# script also creates a typescript file in the capture directory.
+#
+# Build the Grant binary used below (Go required):
+# git clone https://github.com/anchore/grant.git grant-source
+# git -C grant-source checkout --detach 63b3f99949ef9f4a9962b7a9bc74d44f7ecd483d
+# go -C grant-source build -o ../grant ./cmd/grant
+
+$ grype sbom:pg-parquet.spdx.json | grep -E 'NAME|High|Critical' | grep -v "won't fix"
+
+NAME             INSTALLED  FIXED IN  TYPE        VULNERABILITY        SEVERITY  EPSS         RISK  
+lz4_flex         0.11.5     0.11.6    rust-crate  GHSA-vvp9-7p8x-rfvv  High      0.7% (51st)  0.5   
+aws-smithy-json  0.61.5     0.62.7    rust-crate  GHSA-8ffr-xgwf-xj56  High      0.4% (35th)  0.3   
+aws-lc-sys       0.31.0     0.38.0    rust-crate  GHSA-65p9-r9h6-22vj  High      N/A          N/A   
+aws-lc-sys       0.31.0     0.39.0    rust-crate  GHSA-9f94-5g5w-gf6r  High      N/A          N/A   
+aws-lc-sys       0.31.0     0.38.0    rust-crate  GHSA-hfpc-8r3f-gw53  High      N/A          N/A   
+aws-lc-sys       0.31.0     0.38.0    rust-crate  GHSA-vw5v-4f2q-w9xf  High      N/A          N/A   
+rustls-webpki    0.103.6    0.103.13  rust-crate  GHSA-82j2-j2ch-gfr8  High      N/A          N/A   
+
+$ ./grant list pg-parquet.spdx.json
+
+ ⠋ Loading pg-parquet.spdx.json
+ ✔ Loaded pg-parquet.spdx.json                              file
+ ✔ License listing
+ ✔ Cataloged contents
+   ├── ✔ Packages                       [448 packages]
+   ├── ✔ Licenses                       [12 unique]
+   └── ✔ File metadata                  [0 locations]
+ ✔ Aggregated licenses                [grouped by license, desc by count]
+
+ LICENSE                                                           PACKAGES  RISK    
+ MIT                                                                    211  Low     
+ Apache-2.0                                                             192  Low     
+ Unicode-3.0                                                             16  Unknown 
+ ISC                                                                      9  Low     
+ BSD-3-Clause                                                             6  Low     
+ Unlicense                                                                5  Low     
+ Zlib                                                                     3  Low     
+ (no licenses found)                                                      1  Unknown 
+ BSD-2-Clause                                                             1  Low     
+ BSL-1.0                                                                  1  Low     
+ OpenSSL                                                                  1  Unknown 
+ PostgreSQL                                                               1  Low     
+ fd7e4aae7e7b05f217bcf2d02322825c360e66c52c4c2f1b28d784d6297a1c23         1  Unknown 
+
+
+$ ./grant list pg-parquet.spdx.json ISC
+
+ ⠋ Loading pg-parquet.spdx.json
+ ✔ Loaded pg-parquet.spdx.json                              file
+ ✔ License listing
+ ✔ Filter applied                     [license="ISC"]
+ ✔ Cataloged contents
+   ├── ✔ Packages                       [9 packages]
+   ├── ✔ Licenses                       [1 unique]
+   └── ✔ File metadata                  [0 locations]
+ ✔ Matched packages                   [9 packages]
+
+ NAME                 VERSION  LICENSE                    RISK 
+ aws-lc-rs            1.14.0   ISC, Apache-2.0            Low  
+ aws-lc-sys           0.31.0   ISC, Apache-2.0 (+1 more)  Low  
+ hyper-rustls         0.27.7   Apache-2.0, ISC (+1 more)  Low  
+ ring                 0.17.14  ISC, Apache-2.0            Low  
+ rustls               0.23.32  Apache-2.0, ISC (+1 more)  Low  
+ rustls-native-certs  0.8.1    Apache-2.0, ISC (+1 more)  Low  
+ rustls-pemfile       2.2.0    MIT, Apache-2.0 (+1 more)  Low  
+ rustls-webpki        0.103.6  ISC                        Low  
+ untrusted            0.9.0    ISC                        Low  
+
+
+$ ./grant list pg-parquet.spdx.json ISC --pkg aws-lc-sys
+
+ ⠋ Loading pg-parquet.spdx.json
+ ✔ Loaded pg-parquet.spdx.json                              file
+ ✔ License listing
+ ✔ Package details                    [package="aws-lc-sys"]
+ ✔ Found package instances           [1 instance]
+
+Name:     aws-lc-sys
+Version:  0.31.0
+Type:     rust-crate
+ID:       rust-crate:aws-lc-sys@0.31.0
+Licenses (3):
+
+• ISC
+  OSI Approved: true | Deprecated: false
+
+• Apache-2.0
+  OSI Approved: true | Deprecated: false
+
+• OpenSSL
+  ⚠️  OSI Approved: false | Deprecated: false
+

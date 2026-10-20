@@ -2,6 +2,9 @@ version: 3
 
 output: prefixed
 
+includes:
+  pgrx: ./pgrx/Taskfile.yml
+
 vars:
   GREEN: \033[0;32m
   BLUE: \033[0;34m
@@ -237,7 +240,7 @@ tasks:
     cmds:
       - >
         docker run -d -v /var/lib/dagger --name {{ .DAGGER_ENGINE_NAME }} --restart always --network {{ .E2E_NETWORK }}
-        --privileged registry.dagger.io/engine:{{ .DAGGER_ENGINE_VERSION }}
+        --privileged {{ .DAGGER_ENGINE_IMAGE_OVERRIDE | default (printf "registry.dagger.io/engine:%s" .DAGGER_ENGINE_VERSION) }}
     status:
       - test "$(docker inspect -f {{`'{{json .State.Running}}'`}} {{ .DAGGER_ENGINE_NAME }})" == "true"
 
@@ -309,7 +312,9 @@ tasks:
       CNPG_MANIFEST:
         sh: |
           release="{{ .CNPG_RELEASE }}"
-          if [ "${release}" = "main" ]; then
+          if [ -n "{{ .CNPG_MANIFEST_OVERRIDE }}" ]; then
+            echo "{{ .CNPG_MANIFEST_OVERRIDE }}"
+          elif [ "${release}" = "main" ]; then
             echo "https://raw.githubusercontent.com/cloudnative-pg/artifacts/main/manifests/operator-manifest.yaml"
           elif echo "${release}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-${release%.*}/releases/cnpg-${release}.yaml"
@@ -322,7 +327,7 @@ tasks:
     cmds:
       - |
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout)
+          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
 
         dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
         with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
@@ -336,16 +341,23 @@ tasks:
         --args="wait","--for=condition=Available","--timeout=2m","-n","cnpg-system","deployments","cnpg-controller-manager" \
         --use-entrypoint sync
 
-        dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
-        with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
-        with-exec --args="apk","add","--no-cache","git" \
-        with-exec \
-        --args="apply","--server-side","-k","https://github.com/cnpg-extensions/artifacts//image-catalogs-extensions?ref=main" \
-        --use-entrypoint sync
+        if [ -n "{{ .CNPG_CATALOG_BOOKWORM_OVERRIDE }}" ] && [ -n "{{ .CNPG_CATALOG_TRIXIE_OVERRIDE }}" ]; then
+          dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
+          with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
+          with-exec --args="apply","--server-side","-f","{{ .CNPG_CATALOG_BOOKWORM_OVERRIDE }}","-f","{{ .CNPG_CATALOG_TRIXIE_OVERRIDE }}" --use-entrypoint sync
+        else
+          dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
+          with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
+          with-exec --args="apk","add","--no-cache","git" \
+          with-exec \
+          --args="apply","--server-side","-k","https://github.com/cnpg-extensions/artifacts//image-catalogs-extensions?ref=main" \
+          --use-entrypoint sync
+        fi
     status:
       - |
+        test -z "{{ .CNPG_MANIFEST_OVERRIDE }}" || exit 1
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout)
+          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
         dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
         with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
         with-env-variable --name=CACHEBUSTER --value="$(date)" \
@@ -365,7 +377,7 @@ tasks:
     cmds:
       - |
         CONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--name","{{ .KIND_CLUSTER_NAME }}","--internal={{ .INTERNAL }}" stdout)
+          with-exec --args="kind","get","kubeconfig","--name","{{ .KIND_CLUSTER_NAME }}","--internal={{ .INTERNAL }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
         mkdir -p $(dirname {{ .KUBECONFIG_PATH }})
         echo "${CONFIG}" > {{ .KUBECONFIG_PATH }}
 

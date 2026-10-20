@@ -1,88 +1,277 @@
-name: PGRX target workflow stub
-
-on:
+name: PGRX platform builds
+'on':
   workflow_call:
-    inputs:
+    inputs: &id001
       extension_name:
-        description: "Extension name to report"
+        description: PGRX extension directory
+        type: string
         required: true
+      cnpg_version:
+        description: CNPG fixture selector
         type: string
-      local:
-        description: "Whether local mode was requested"
         required: false
-        default: false
-        type: boolean
-      platform:
-        description: "Requested target platform"
-        required: false
-        default: ""
-        type: string
-      distro:
-        description: "Optional Debian distro for local validation (for example, trixie)"
-        required: false
-        default: ""
-        type: string
-    secrets:
-      SNYK_TOKEN:
-        required: false
+        default: ''
   workflow_dispatch:
-    inputs:
-      extension_name:
-        description: "Extension name to report"
-        required: true
-        type: string
-      local:
-        description: "Whether local mode was requested"
-        required: false
-        default: false
-        type: boolean
-      platform:
-        description: "Requested target platform"
-        required: false
-        default: ""
-        type: string
-      distro:
-        description: "Requested Debian distro"
-        required: false
-        default: ""
-        type: string
-
+    inputs: *id001
 permissions: {}
-
+defaults:
+  run:
+    shell: bash -Eeuo pipefail {0}
 jobs:
-  stub:
-    name: Build ${{ inputs.extension_name }} (stub)
+  prepare:
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.prepare.outputs.matrix }}
+      targets: ${{ steps.prepare.outputs.targets }}
+      smoke_targets: ${{ steps.prepare.outputs.smoke_targets }}
+    env:
+      # renovate: datasource=docker depName=ghcr.io/cnpg-extensions/cnpg-sbom-generator versioning=docker
+      SBOM_GENERATOR: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:b68c8b1f2433bc6fd4cae7c9d6e9a44bf80a2f421bf7e62a44c164e862a387e8
+    steps:
+    - &id002
+      name: Use current workspace
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      with:
+        persist-credentials: false
+    - name: Write typed inputs
+      env:
+        INPUTS_JSON: ${{ toJSON(inputs) }}
+      run: printf '%s\n' "$INPUTS_JSON" > "$RUNNER_TEMP/pgrx-inputs.json"
+    - id: prepare
+      name: Freeze targets and inputs
+      run: python3 pgrx/prepare.py --inputs "$RUNNER_TEMP/pgrx-inputs.json" --generator "$SBOM_GENERATOR" --output
+        "$RUNNER_TEMP/prepared"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: prepared-${{ inputs.extension_name }}
+        path: ${{ runner.temp }}/prepared
+        if-no-files-found: error
+  build-platform:
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+    - *id002
+    - &id003
+      name: Install pinned workflow tools
+      run: python3 pgrx/bootstrap_workflow_tools.py --output "$RUNNER_TEMP/pgrx-bin"
+    - &id004
+      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: prepared-${{ inputs.extension_name }}
+        path: ${{ runner.temp }}/prepared
+    - &id005
+      name: GHCR authentication
+      env:
+        GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GHCR_USER: ${{ github.actor }}
+      run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+    - name: Build native platform and validate evidence
+      env:
+        ROW_ID: ${{ matrix.id }}
+        DOCKER_BUILD_RECORD_UPLOAD: 'false'
+      run: python3 pgrx/build.py --preparation "$RUNNER_TEMP/prepared" --row "$ROW_ID" --output "$RUNNER_TEMP/record"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: platform-${{ inputs.extension_name }}-${{ matrix.id }}
+        path: ${{ runner.temp }}/record
+        if-no-files-found: error
+  assemble:
+    needs:
+    - prepare
+    - build-platform
     runs-on: ubuntu-26.04
     permissions:
       contents: read
       packages: write
-      id-token: write
-    env:
-      EXTENSION_NAME: ${{ inputs.extension_name }}
-      LOCAL: ${{ inputs.local }}
-      PLATFORM: ${{ inputs.platform }}
-      DISTRO: ${{ inputs.distro }}
     steps:
-      - name: Validate and echo workflow inputs
-        run: |
-          test -n "$EXTENSION_NAME"
-          case "$PLATFORM" in
-            ""|linux/amd64|linux/arm64) ;;
-            *) echo "unsupported platform: $PLATFORM" >&2; exit 1 ;;
-          esac
-          case "$DISTRO" in
-            ""|bookworm|trixie) ;;
-            *) echo "unsupported distro: $DISTRO" >&2; exit 1 ;;
-          esac
-          if [[ ( -n "$PLATFORM" || -n "$DISTRO" ) && "$LOCAL" != true ]]; then
-            echo "platform and distro overrides require local=true" >&2
-            exit 1
-          fi
-          echo "pgrx workflow stub"
-          echo "extension_name=$EXTENSION_NAME"
-          echo "local=$LOCAL"
-          echo "platform=$PLATFORM"
-          echo "distro=$DISTRO"
-          echo "event=${GITHUB_EVENT_NAME}"
-          echo "ref=${GITHUB_REF}"
-          echo "sha=${GITHUB_SHA}"
+    - *id002
+    - *id003
+    - *id004
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        pattern: platform-${{ inputs.extension_name }}-*
+        path: ${{ runner.temp }}/records
+    - *id005
+    - name: Merge complete platform indexes
+      run: python3 pgrx/assemble.py --preparation "$RUNNER_TEMP/prepared" --records "$RUNNER_TEMP/records" --output
+        "$RUNNER_TEMP/assemblies"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: assemblies-${{ inputs.extension_name }}
+        path: ${{ runner.temp }}/assemblies
+        if-no-files-found: error
+  handoff:
+    needs:
+    - prepare
+    - assemble
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix: ${{ fromJSON(needs.prepare.outputs.targets) }}
+    steps:
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: assemblies-${{ inputs.extension_name }}
+        path: ${{ runner.temp }}/assemblies
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: assembly-${{ matrix.target }}
+        path: ${{ runner.temp }}/assemblies/${{ matrix.target }}
+        if-no-files-found: error
+  sign:
+    needs:
+    - prepare
+    - assemble
+    - handoff
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.targets) }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+    - *id002
+    - *id003
+    - *id004
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: assembly-${{ matrix.target }}
+        path: ${{ runner.temp }}/assembly
+    - *id005
+    - name: Sign assembled target
+      run: python3 pgrx/downstream.py sign --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
+        --output "$RUNNER_TEMP/sign-result"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: sign-${{ matrix.target }}
+        path: ${{ runner.temp }}/sign-result
+        if-no-files-found: error
+  security:
+    needs:
+    - prepare
+    - assemble
+    - sign
+    - handoff
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.targets) }}
+    permissions:
+      contents: read
+      packages: read
+    steps:
+    - *id002
+    - *id003
+    - *id004
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: assembly-${{ matrix.target }}
+        path: ${{ runner.temp }}/assembly
+    - *id005
+    - name: Security assembled target
+      run: python3 pgrx/downstream.py security --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
+        --output "$RUNNER_TEMP/security-result"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: security-${{ matrix.target }}
+        path: ${{ runner.temp }}/security-result
+        if-no-files-found: error
+  smoke:
+    needs:
+    - prepare
+    - assemble
+    - sign
+    - handoff
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.smoke_targets) }}
+    permissions:
+      contents: read
+      packages: read
+    steps:
+    - *id002
+    - *id003
+    - *id004
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: assembly-${{ matrix.target }}
+        path: ${{ runner.temp }}/assembly
+    - *id005
+    - name: Smoke assembled target
+      env:
+        CNPG_VERSION: ${{ matrix.cnpg }}
+      run: python3 pgrx/downstream.py smoke --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
+        --cnpg-version "$CNPG_VERSION" --output "$RUNNER_TEMP/smoke-result"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: smoke-${{ matrix.target }}-${{ matrix.cnpg }}
+        path: ${{ runner.temp }}/smoke-result
+        if-no-files-found: error
+  promote:
+    needs:
+    - prepare
+    - assemble
+    - sign
+    - security
+    - smoke
+    - handoff
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.targets) }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    steps:
+    - *id002
+    - *id003
+    - *id004
+    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+      with:
+        name: assembly-${{ matrix.target }}
+        path: ${{ runner.temp }}/assembly
+    - *id005
+    - name: Promote assembled target
+      run: python3 pgrx/downstream.py promote --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
+        --output "$RUNNER_TEMP/promote-result"
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      with:
+        name: promote-${{ matrix.target }}
+        path: ${{ runner.temp }}/promote-result
+        if-no-files-found: error
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+  gate:
+    if: ${{ always() }}
+    needs:
+    - prepare
+    - build-platform
+    - assemble
+    - handoff
+    - sign
+    - security
+    - smoke
+    - promote
+    runs-on: ubuntu-24.04
+    steps:
+    - env:
+        RESULTS: ${{ toJSON(needs) }}
+        PROMOTION_ALLOWED: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+      run: |-
+        python3 - <<'PY'
+        import json, os
+        results=json.loads(os.environ['RESULTS'])
+        for name,value in results.items():
+            if name=='promote' and os.environ['PROMOTION_ALLOWED']=='false' and value['result']=='skipped': continue
+            if value['result']!='success': raise SystemExit(f"required job {name}: {value['result']}")
+        PY

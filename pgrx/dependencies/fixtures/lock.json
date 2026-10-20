@@ -1,0 +1,46 @@
+{
+  "selector": "1.30",
+  "files": {
+    "operator": {
+      "repository": "cloudnative-pg/cloudnative-pg",
+      "ref": "v1.30.1",
+      "revision": "2a35abb4628f209d149825ef3c38011e0701ff2f",
+      "url": "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/2a35abb4628f209d149825ef3c38011e0701ff2f/releases/cnpg-1.30.1.yaml",
+      "sha256": "37237f145d8138256ea25ae830f87759255665ff08f8d552fdd8224a5ec032fb"
+    },
+    "catalog-bookworm": {
+      "repository": "cnpg-extensions/artifacts",
+      "ref": "main",
+      "revision": "67e823cff7c4a901635d3baac2f752e7490c7bc9",
+      "url": "https://raw.githubusercontent.com/cnpg-extensions/artifacts/67e823cff7c4a901635d3baac2f752e7490c7bc9/image-catalogs-extensions/catalog-minimal-bookworm.yaml",
+      "sha256": "a31442e66be5a6b234ba3462de6b27d31ba7741056b8843c41b16f2eb2ef4f8f"
+    },
+    "catalog-trixie": {
+      "repository": "cnpg-extensions/artifacts",
+      "ref": "main",
+      "revision": "67e823cff7c4a901635d3baac2f752e7490c7bc9",
+      "url": "https://raw.githubusercontent.com/cnpg-extensions/artifacts/67e823cff7c4a901635d3baac2f752e7490c7bc9/image-catalogs-extensions/catalog-minimal-trixie.yaml",
+      "sha256": "7fe629d1fc1e4f40f97a148a4f27fdbd7f44fc8adf972b8bb94b61dc2f345bf3"
+    }
+  },
+  "supported_releases": [
+    "1.29",
+    "1.30"
+  ],
+  "operators": {
+    "1.29": {
+      "repository": "cloudnative-pg/cloudnative-pg",
+      "ref": "v1.29.3",
+      "revision": "6887f9aeb7ec159ed4a7e5fce28441aafd26317c",
+      "url": "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/6887f9aeb7ec159ed4a7e5fce28441aafd26317c/releases/cnpg-1.29.3.yaml",
+      "sha256": "b6c2afe80d6e2103df28be49f6b72de87a27164081c95b8c2c496bab96b700fc"
+    },
+    "1.30": {
+      "repository": "cloudnative-pg/cloudnative-pg",
+      "ref": "v1.30.1",
+      "revision": "2a35abb4628f209d149825ef3c38011e0701ff2f",
+      "url": "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/2a35abb4628f209d149825ef3c38011e0701ff2f/releases/cnpg-1.30.1.yaml",
+      "sha256": "37237f145d8138256ea25ae830f87759255665ff08f8d552fdd8224a5ec032fb"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+# SPDX-License-Identifier: Apache-2.0
+
+# TODO: Copy this file into the target directory and replace every placeholder
+# and TODO comment before using it. The target Dockerfile should remain the
+# source of truth for the upstream source tag, pgrx feature selection, package
+# layout, and runtime files.
+ARG BUILDKIT_SBOM_SCAN_STAGE=builder
+ARG BASE=ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
+FROM ${BASE} AS builder
+
+ARG PG_MAJOR
+ARG EXT_VERSION
+ARG TARGETARCH
+ARG TARGETPLATFORM
+ARG PGRX_EXTENSION
+ARG PGRX_DISTRO
+ARG PGRX_SOURCE_SHA256
+
+USER 0
+
+COPY pgrx/ /pgrx/
+WORKDIR /build
+
+
+# TODO: Set <owner>/<repo>. EXT_VERSION is the exact upstream Git tag; preserve
+# any prefix or suffix because pgrx tags are not Debian package versions.
+ADD https://github.com/<owner>/<repo>/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
+
+
+# Call the shared installer after extracting the source. It derives the
+# matching cargo-pgrx version from Cargo.lock and prepares the pgrx/SBOM tools.
+RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+
+
+# TODO: Replace this command with the upstream commands used to build the
+# package, and include a link to the upstream README or CI code showing the
+# build commands copied here. Replace this placeholder with a real recipe URL:
+# Upstream build recipe: <https://.../blob/<release>/README.md#building>
+RUN cargo pgrx package \
+      --no-default-features \
+      --features pg${PG_MAJOR}
+
+
+# Bind Cargo reports and license evidence to the completed payload.
+ARG PGRX_WORKSPACE_SHA256
+ARG PGRX_BUILD_TIMESTAMP
+RUN /pgrx/finalize-pgrx-evidence.sh
+
+FROM scratch AS pgrx-sbom
+COPY --from=builder /build/pgrx-sbom/ /pgrx-sbom/
+
+FROM scratch
+ARG PG_MAJOR
+
+# Licenses
+# TODO: Copy any required OS shared libraries under /system/ and their
+# corresponding licenses under /licenses/system/.
+COPY --from=builder /build/pgrx-licenses/rust/ /licenses/rust/
+
+# Libraries
+# TODO: Replace the path with the pgrx build target folder.
+# If the extension needs OS shared libraries, copy them under /system/ and copy
+# their corresponding licenses under /licenses/system/.
+COPY --from=builder /build/target/release/{{ replaceAll .Name "-" "_" }}-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/{{ replaceAll .Name "-" "_" }}.so /lib/
+
+# Share
+# TODO: Replace the path with the pgrx build target folder.
+COPY --from=builder /build/target/release/{{ replaceAll .Name "-" "_" }}-pg${PG_MAJOR}/usr/share/postgresql/${PG_MAJOR}/extension/{{ replaceAll .Name "-" "_" }}* /share/extension/
+
+USER 65532:65532

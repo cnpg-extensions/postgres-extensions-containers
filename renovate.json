@@ -148,6 +148,77 @@
         "(?<depName>[a-z0-9][a-z0-9+.-]*)=(?<currentValue>[^\\s]+)"
       ],
       "datasourceTemplate": "deb"
+    },
+    {
+      "description": "PGRX source tags; companion source and Cargo locks are refreshed together",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^(pg-durable|pg-graphql|pg-jsonschema|pg-parquet|pg-search|pg-session-jwt)/metadata\\.hcl$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "description": "PGRX workflow/build tool releases (refresh all platform checksums before merge)",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/pgrx/dependencies/(workflow-tools|tools)\\.json$/"
+      ],
+      "matchStrings": [
+        "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"",
+        "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\""
+      ]
+    },
+    {
+      "description": "PGRX digest-pinned execution images",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/pgrx/dependencies/workflow-tools\\.json$/"
+      ],
+      "matchStrings": [
+        "\"[a-z-]+\":\\s*\"(?<depName>[^\"\\s]+):(?<currentValue>[^\"@\\s]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "description": "PGRX base indexes own both platform children and apt package locks",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/pgrx/dependencies/bases\\.json$/"
+      ],
+      "matchStrings": [
+        "\"(?<depName>[^\"\\s]+):(?<currentValue>[^\"@\\s]+)\":\\s*\\{\\s*\"index_digest\":\\s*\"(?<currentDigest>sha256:[a-f0-9]{64})\""
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    },
+    {
+      "description": "PGRX CNPG operator release tags; keep each fixture on its minor line",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/pgrx/dependencies/fixtures/lock\\.json$/"
+      ],
+      "matchStrings": [
+        "\"repository\":\\s*\"(?<packageName>cloudnative-pg/cloudnative-pg)\",\\s*\"ref\":\\s*\"(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)\",\\s*\"revision\":\\s*\"(?<currentDigest>[a-f0-9]{40})\""
+      ],
+      "depNameTemplate": "https://github.com/{{{packageName}}}",
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "PGRX CNPG catalog fixture commits; refresh URLs and checksums together",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/pgrx/dependencies/fixtures/lock\\.json$/"
+      ],
+      "matchStrings": [
+        "\"repository\":\\s*\"(?<packageName>cnpg-extensions/artifacts)\",\\s*\"ref\":\\s*\"(?<currentValue>main)\",\\s*\"revision\":\\s*\"(?<currentDigest>[a-f0-9]{40})\""
+      ],
+      "depNameTemplate": "https://github.com/{{{packageName}}}",
+      "datasourceTemplate": "git-refs",
+      "versioningTemplate": "git"
     }
   ],
   "packageRules": [
@@ -236,7 +307,16 @@
         "patch"
       ],
       "groupName": "all github action",
-      "pinDigests": true
+      "pinDigests": true,
+      "matchPackageNames": [
+        "!microsoft/pg_durable",
+        "!supabase/pg_graphql",
+        "!supabase/pg_jsonschema",
+        "!CrunchyData/pg_parquet",
+        "!paradedb/paradedb",
+        "!neondatabase/pg_session_jwt",
+        "!cloudnative-pg/cloudnative-pg"
+      ]
     },
     {
       "description": "require SQL version review when no verified package mapping covers all shipped extensions",
@@ -288,6 +368,50 @@
         ".github/workflows/sbom-generator.yml"
       ],
       "additionalBranchPrefix": "sbom-"
+    },
+    {
+      "description": "Keep CNPG 1.29 operator fixtures on the 1.29 release line",
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchPackageNames": [
+        "cloudnative-pg/cloudnative-pg"
+      ],
+      "matchFileNames": [
+        "pgrx/dependencies/fixtures/lock.json"
+      ],
+      "matchCurrentValue": "/^v1\\.29\\.\\d+$/",
+      "allowedVersions": "/^v1\\.29\\.\\d+$/"
+    },
+    {
+      "description": "Keep CNPG 1.30 operator fixtures on the 1.30 release line",
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchPackageNames": [
+        "cloudnative-pg/cloudnative-pg"
+      ],
+      "matchFileNames": [
+        "pgrx/dependencies/fixtures/lock.json"
+      ],
+      "matchCurrentValue": "/^v1\\.30\\.\\d+$/",
+      "allowedVersions": "/^v1\\.30\\.\\d+$/"
+    },
+    {
+      "description": "PGRX release updates require coupled immutable lock refresh",
+      "matchFileNames": [
+        "pgrx/dependencies/**",
+        "pg-durable/metadata.hcl",
+        "pg-graphql/metadata.hcl",
+        "pg-jsonschema/metadata.hcl",
+        "pg-parquet/metadata.hcl",
+        "pg-search/metadata.hcl",
+        "pg-session-jwt/metadata.hcl"
+      ],
+      "automerge": false,
+      "prBodyNotes": [
+        "Run python3 pgrx/refresh_lock.py --check after refreshing the affected checksums. Source tags, resolved commits, archives and upstream Cargo.lock are one update; SQL version changes require review."
+      ]
     }
   ],
   "customDatasources": {

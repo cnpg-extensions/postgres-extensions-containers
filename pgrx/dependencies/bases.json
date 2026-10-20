@@ -1,0 +1,16 @@
+{
+  "ghcr.io/cloudnative-pg/postgresql:18-minimal-bookworm": {
+    "index_digest": "sha256:2f6fc1d4687f3796e0ea211ef2eab412b63d54d7ceb3a2569be4fba13aa0fcea",
+    "platforms": {
+      "linux/amd64": "sha256:0cd3d0482f92eae3c28d3961c0fc7d9bd153da28688ff289ff3b15f8123ff101",
+      "linux/arm64": "sha256:0907eadea86c111a1c6866fb8949862e3d094b4c7185e16fd29a4921fa2470a1"
+    }
+  },
+  "ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie": {
+    "index_digest": "sha256:eb5e64f585627b5356c2a558389c85677f7174451a0b38b616ca96e4bfa666e2",
+    "platforms": {
+      "linux/amd64": "sha256:0aaade7a6fdab2a1da390eebd733083248e7fb4b69951b0792d475cbad9dfd69",
+      "linux/arm64": "sha256:f3e9d71d484450c7391e829414dcffc11156281b2cf1ca4671250cc97bc0aa11"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "pg-durable": {
+    "repository": "microsoft/pg_durable",
+    "version": "v0.2.7",
+    "revision": "f3a8dbb4d6ccd2dd46faf128ff55720cc6ab4f3f",
+    "archive_sha256": "3284665832578ab2dce5809cbb140abff46fcf6dcb7ca4751ba2bfbeb8eec604",
+    "url": "https://github.com/microsoft/pg_durable/archive/v0.2.7.tar.gz",
+    "original_lock_sha256": "c512785e246e606635f23615d5d512c58b149abcacb35cb60795db7bad8d0d1f",
+    "cargo_pgrx": "0.16.1",
+    "cargo_pgrx_sha256": "4d6c15f9fef6a2776c92eb62e3b16b09468c4eb157c4096f84986e230e0d9474"
+  },
+  "pg-graphql": {
+    "repository": "supabase/pg_graphql",
+    "version": "v1.6.2",
+    "revision": "f46687dae404b6e65149f74c6d5a76e8a2f7aef5",
+    "archive_sha256": "9d3bbafd3f6c0404eb0603a058b1e69928a373ce172e80c9b4de4c18e2fd1a87",
+    "url": "https://github.com/supabase/pg_graphql/archive/v1.6.2.tar.gz",
+    "original_lock_sha256": "e908786cb29988ade28a37e4f975c1ceaf6a2fa2f18423d24d863ec0927ce8bf",
+    "cargo_pgrx": "0.19.2",
+    "cargo_pgrx_sha256": "e9f7db844ff3ab045da9f52609dd096c16296a9ee6ec41180da5c99e057848a8"
+  },
+  "pg-jsonschema": {
+    "repository": "supabase/pg_jsonschema",
+    "version": "v0.3.4",
+    "revision": "cbe74b570d38aa0c4d42914e7a118bcb3adaee7a",
+    "archive_sha256": "3bfddb105d71df10078f935a5ac1328660a1a2fe290f2342c2b4a142d4f47d91",
+    "url": "https://github.com/supabase/pg_jsonschema/archive/v0.3.4.tar.gz",
+    "original_lock_sha256": "ab865dc25d9eea4bf7dbfaf8fae13283e5c0bce4bca460fe10464c6716e67028",
+    "cargo_pgrx": "0.16.1",
+    "cargo_pgrx_sha256": "4d6c15f9fef6a2776c92eb62e3b16b09468c4eb157c4096f84986e230e0d9474"
+  },
+  "pg-parquet": {
+    "repository": "CrunchyData/pg_parquet",
+    "version": "v0.5.1",
+    "revision": "253bfa2228a0d5323180455cdc9ae9301db38be5",
+    "archive_sha256": "b84fb966b8bacecbfc7142cb5629c26a72d54b9669076c83137af286732e9f2a",
+    "url": "https://github.com/CrunchyData/pg_parquet/archive/v0.5.1.tar.gz",
+    "original_lock_sha256": "fee4300b7d4f69667288995ef6dbdb1f2db67da10e0b161bd917820fdb2a34f7",
+    "cargo_pgrx": "0.16.0",
+    "cargo_pgrx_sha256": "6562fbfc2b4060c5ca449296ecd8eadf5a40787469cd4bc4db78bda9d0300db3"
+  },
+  "pg-search": {
+    "repository": "paradedb/paradedb",
+    "version": "v0.25.6",
+    "revision": "d06d83ab82383c08e4a0104b0281391d81fba713",
+    "archive_sha256": "1f29a566475236023579dfb19cc761a5dcf56160d556bf6ac103a74edd824d1a",
+    "url": "https://github.com/paradedb/paradedb/archive/v0.25.6.tar.gz",
+    "original_lock_sha256": "0cb518248d7ab290592b738b78cfd1780ab152b844c455613c4b3a978b9b6fc1",
+    "cargo_pgrx": "0.19.0",
+    "cargo_pgrx_sha256": "544b68fcd906eda372f74618e342d7f1082c47708e11c97d7cf8cd69798ffe17"
+  },
+  "pg-session-jwt": {
+    "repository": "neondatabase/pg_session_jwt",
+    "version": "v0.5.0",
+    "revision": "937a79a65e596d916295d078b3a82ab421291665",
+    "archive_sha256": "c2167d31942b8642b4b8cb9bf96575a41f8a58e1804ad64fb03f88dd1a457f3c",
+    "url": "https://github.com/neondatabase/pg_session_jwt/archive/v0.5.0.tar.gz",
+    "original_lock_sha256": "07d0e4d27a45de2fcad92b955b058723e8266050c1ad4eba2497adb8f55c7aa1",
+    "cargo_pgrx": "0.16.1",
+    "cargo_pgrx_sha256": "4d6c15f9fef6a2776c92eb62e3b16b09468c4eb157c4096f84986e230e0d9474"
+  }
+}

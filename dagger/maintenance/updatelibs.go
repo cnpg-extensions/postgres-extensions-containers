@@ -61,6 +61,7 @@ func updateOSLibsOnTarget(
 
 type extensionsOptions struct {
 	filterOSLibs bool
+	buildSystem  string
 }
 
 // ExtensionsOption is a functional option for configuring extension retrieval
@@ -70,6 +71,14 @@ type ExtensionsOption func(*extensionsOptions)
 func WithOSLibsFilter() ExtensionsOption {
 	return func(opts *extensionsOptions) {
 		opts.filterOSLibs = true
+	}
+}
+
+// WithBuildSystemFilter restricts discovery to one build-system family. An
+// omitted build_system in metadata is treated as Debian for compatibility.
+func WithBuildSystemFilter(buildSystem string) ExtensionsOption {
+	return func(opts *extensionsOptions) {
+		opts.buildSystem = buildSystem
 	}
 }
 
@@ -95,6 +104,13 @@ func getExtensions(
 		metadata, err := parseExtensionMetadata(ctx, dir)
 		if err != nil {
 			return nil, err
+		}
+		buildSystem, err := effectiveBuildSystem(metadata)
+		if err != nil {
+			return nil, err
+		}
+		if options.buildSystem != "" && buildSystem != options.buildSystem {
+			continue
 		}
 
 		if options.filterOSLibs && !metadata.AutoUpdateOsLibs {

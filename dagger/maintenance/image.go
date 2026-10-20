@@ -111,7 +111,7 @@ func getDefaultExtensionImage(metadata *extensionMetadata) (string, error) {
 
 // getExtensionImage returns the extension image for a given distribution and pgMajor.
 func getExtensionImage(metadata *extensionMetadata, distribution string, pgMajor int) (string, error) {
-	version, err := extractExtensionVersion(metadata.Versions, distribution, pgMajor)
+	version, err := extensionImageVersion(metadata, distribution, pgMajor)
 	if err != nil {
 		return "", fmt.Errorf("while extracting extension version for %s: %w", metadata.Name, err)
 	}
@@ -131,7 +131,7 @@ func getExtensionImageWithTimestamp(metadata *extensionMetadata, distribution st
 		return "", fmt.Errorf("while listing tags for image %s: %w", imageName, err)
 	}
 
-	version, err := extractExtensionVersion(metadata.Versions, distribution, pgMajor)
+	version, err := extensionImageVersion(metadata, distribution, pgMajor)
 	if err != nil {
 		return "", fmt.Errorf("while extracting extension version for %s: %w", metadata.Name, err)
 	}

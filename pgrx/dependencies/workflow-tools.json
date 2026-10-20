@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "tools": {
+    "cosign": {
+      "version": "v3.0.5",
+      "depName": "sigstore/cosign",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/sigstore/cosign/releases/download/v3.0.5/cosign-linux-amd64",
+          "sha256": "db15cc99e6e4837daabab023742aaddc3841ce57f193d11b7c3e06c8003642b2"
+        },
+        "arm64": {
+          "url": "https://github.com/sigstore/cosign/releases/download/v3.0.5/cosign-linux-arm64",
+          "sha256": "d098f3168ae4b3aa70b4ca78947329b953272b487727d1722cb3cb098a1a20ab"
+        }
+      }
+    },
+    "actionlint": {
+      "version": "v1.7.11",
+      "depName": "rhysd/actionlint",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_linux_amd64.tar.gz",
+          "sha256": "900919a84f2229bac68ca9cd4103ea297abc35e9689ebb842c6e34a3d1b01b0a"
+        },
+        "arm64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_linux_arm64.tar.gz",
+          "sha256": "21bc0dfb57a913fe175298c2a9e906ee630f747cb66d0a934d0d4b69f4ee1235"
+        }
+      }
+    },
+    "task": {
+      "version": "v3.48.0",
+      "depName": "go-task/task",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/go-task/task/releases/download/v3.48.0/task_linux_amd64.tar.gz",
+          "sha256": "f4bfc4eef1b2557b262f3cc0a79976a421885cb7b9e71cfe75568a2ebe4d7ae5"
+        },
+        "arm64": {
+          "url": "https://github.com/go-task/task/releases/download/v3.48.0/task_linux_arm64.tar.gz",
+          "sha256": "15a54fd45f706ce0f4c679c93cf04e02d72ca7223f157209201a1576008056d6"
+        }
+      }
+    },
+    "dagger": {
+      "version": "v0.21.9",
+      "depName": "dagger/dagger",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/dagger/dagger/releases/download/v0.21.9/dagger_v0.21.9_linux_amd64.tar.gz",
+          "sha256": "33eea0b08d6be444bada18e64b2216459100d6070abcb4b5345cee40c9fff982"
+        },
+        "arm64": {
+          "url": "https://github.com/dagger/dagger/releases/download/v0.21.9/dagger_v0.21.9_linux_arm64.tar.gz",
+          "sha256": "3bc8334ccde404f66f0a8e29807e4327c7893990c3211691680c5f07f8273f3a"
+        }
+      }
+    },
+    "kind": {
+      "version": "v0.33.0",
+      "depName": "kubernetes-sigs/kind",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-amd64",
+          "sha256": "aee6151561422756b764a4ae28e7f44cda5af5a9eead3cc9985112b1de8d8e0d"
+        },
+        "arm64": {
+          "url": "https://github.com/kubernetes-sigs/kind/releases/download/v0.33.0/kind-linux-arm64",
+          "sha256": "20022bee6cfcd5086cb7234d218e3454e6090022f2a8f55d1fa7fcf42c3867a2"
+        }
+      }
+    },
+    "grype": {
+      "version": "v0.120.1",
+      "depName": "anchore/grype",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/anchore/grype/releases/download/v0.120.1/grype_0.120.1_linux_amd64.tar.gz",
+          "sha256": "0a9ee97ef5ae2ee953b0a80098105052e846cdbe319a57d808b519c33cd1343d"
+        },
+        "arm64": {
+          "url": "https://github.com/anchore/grype/releases/download/v0.120.1/grype_0.120.1_linux_arm64.tar.gz",
+          "sha256": "29f47391dc283aa79fcc38e65224cd61f64dec0ecfd0db7074128ebf8ff23514"
+        }
+      }
+    },
+    "grant": {
+      "version": "v0.6.8",
+      "depName": "anchore/grant",
+      "datasource": "github-releases",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/anchore/grant/releases/download/v0.6.8/grant_0.6.8_linux_amd64.tar.gz",
+          "sha256": "6500f8bbf0f20fb993de8084686e199f0ba1eb494769ff75454286d5ef63f919"
+        },
+        "arm64": {
+          "url": "https://github.com/anchore/grant/releases/download/v0.6.8/grant_0.6.8_linux_arm64.tar.gz",
+          "sha256": "15ec0b4346a64b5580958dc62c4e7c25ca9e59b7582bab9706679f6b9d2288b8"
+        }
+      }
+    }
+  },
+  "images": {
+    "buildkit": "moby/buildkit:buildx-stable-1@sha256:28a898719c18a33f4e8000685287fa36fd0dd9560c6440227d3a732d79bb41d8",
+    "skopeo": "quay.io/skopeo/stable:v1.22.3-immutable@sha256:c0ee1f4edca5c01cb8d5611124f92f3cc47196ecab68aee5d0f90834e00574d5",
+    "runner": "ghcr.io/catthehacker/ubuntu:act-24.04@sha256:62d572b92f9f32d3427b6d220ad1f9dca9c7b6ffad37d295425037dbff78abaf",
+    "dagger": "registry.dagger.io/engine:v0.21.9@sha256:3c4e0cedaea400d7e30155e050f94910ea5f381b6f5942dd2172382657628cb4",
+    "renovate": "ghcr.io/renovatebot/renovate:44.95.0@sha256:33fd5ccb592fd10226c057c656e2a9aaa3d5c4fb84a616d2cbc2b426ba347ec1"
+  },
+  "actions": {
+    "actions/upload-artifact": {
+      "version": "v4",
+      "revision": "ea165f8d65b6e75b540449e92b4886f43607fa02"
+    },
+    "actions/download-artifact": {
+      "version": "v4",
+      "revision": "d3f86a106a0bac45b974a628896c90dbdf5c8093"
+    }
+  }
+}

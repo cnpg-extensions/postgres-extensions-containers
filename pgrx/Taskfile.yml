@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  test:
+    desc: Run the PGRX contract suite
+    cmds:
+      - python3 pgrx/test.py
+  validate:
+    desc: Run local unit, workflow and dependency checks once
+    cmds:
+      - python3 pgrx/local/validate.py {{.CLI_ARGS}}

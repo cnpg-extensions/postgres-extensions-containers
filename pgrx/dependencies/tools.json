@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "rust": {
+    "version": "1.97.1",
+    "depName": "rust-lang/rust",
+    "datasource": "github-releases",
+    "manifest_sha256": "03569b1886ceb5c05276b50c8431ab111de944cd6140fe1fa7d821dd8e0f29cf"
+  },
+  "tools": {
+    "cargo-about": {
+      "version": "0.9.2",
+      "datasource": "github-releases",
+      "depName": "EmbarkStudios/cargo-about",
+      "platforms": {
+        "amd64": {
+          "url": "https://github.com/EmbarkStudios/cargo-about/releases/download/0.9.2/cargo-about-0.9.2-x86_64-unknown-linux-musl.tar.gz",
+          "sha256": "9099a59e820c38a68b9d65f300662a567d56562f9a10f6aa4c7e86c17c2566af"
+        },
+        "arm64": {
+          "url": "https://github.com/EmbarkStudios/cargo-about/releases/download/0.9.2/cargo-about-0.9.2-aarch64-unknown-linux-musl.tar.gz",
+          "sha256": "af5169282fb6f84e13471493f405437e43ac517744c9ae12fbe2cdf0a6f0e5a8"
+        }
+      }
+    }
+  },
+  "rustup": {
+    "version": "1.28.2",
+    "depName": "rust-lang/rustup",
+    "datasource": "github-releases",
+    "platforms": {
+      "amd64": {
+        "url": "https://static.rust-lang.org/rustup/archive/1.28.2/x86_64-unknown-linux-gnu/rustup-init",
+        "sha256": "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c"
+      },
+      "arm64": {
+        "url": "https://static.rust-lang.org/rustup/archive/1.28.2/aarch64-unknown-linux-gnu/rustup-init",
+        "sha256": "e3853c5a252fca15252d07cb23a1bdd9377a8c6f3efa01531109281ae47f841c"
+      }
+    }
+  }
+}

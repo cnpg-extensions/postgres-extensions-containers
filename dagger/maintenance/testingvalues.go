@@ -87,7 +87,7 @@ func generateTestingValuesExtensions(
 		if !depExists {
 			out = append(out, &testingExtensionInfo{
 				Configuration:   &ExtensionConfiguration{Name: dep},
-				SQLName:         dep,
+				SQLName:         catalogDependencySQLName(dep),
 				CreateExtension: true,
 			})
 			continue
@@ -153,7 +153,7 @@ func generateExtensionConfiguration(metadata *extensionMetadata, extensionImage 
 
 	return &ExtensionConfiguration{
 		Name: metadata.Name,
-		ImageVolumeSource: ImageVolumeSource{
+		ImageVolumeSource: &ImageVolumeSource{
 			Reference: targetExtensionImage,
 		},
 		ExtensionControlPath: metadata.ExtensionControlPath,
@@ -191,7 +191,7 @@ func generateDatabaseAssertStatus(extensionInfos []*testingExtensionInfo) map[st
 	// local dependency images. Keep this fork-local relaxation when syncing
 	// changes from upstream; it is not an upstream CNPG behavior change.
 	status := map[string]any{
-		"applied":            true,
+		"applied": true,
 	}
 
 	var extensions []map[string]any
