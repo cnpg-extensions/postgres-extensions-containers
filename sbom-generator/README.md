@@ -55,11 +55,12 @@ attestation as well as the image index.
 ### Report vulnerabilities and licenses
 
 ```bash
-grype sbom:pgsphere.spdx.json | grep -E 'NAME|High|Critical' | grep -v "won't fix"
+grype sbom:pgsphere.spdx.json --ignore-states wont-fix | grep -E 'NAME|High|Critical'
 grant list pgsphere.spdx.json
 ```
 
-The filters show High and Critical findings except those marked "won't fix".
+The grep filter shows High and Critical findings. `--ignore-states wont-fix`
+excludes findings marked "won't fix".
 Omit the filters for the complete report; add `--only-fixed` to Grype to show only findings
 with a known fix. Grant reports all package licenses.
 To list packages associated with a license or inspect one package:
