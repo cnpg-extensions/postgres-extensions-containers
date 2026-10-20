@@ -38,7 +38,13 @@ jobs:
           sbom=false
           extensions=false
           while IFS= read -r -d '' file; do
+            # Top-level Markdown documentation is outside both build scopes.
+            if [[ "$file" != */* && "$file" == *.md ]]; then
+              continue
+            fi
             case "$file" in
+              # Documentation is outside both build scopes.
+              examples/*|LICENSE) ;;
               sbom-generator/*|.github/workflows/sbom-generator.yml) sbom=true ;;
               renovate.json|.github/workflows/pr-scope.yml) ;;
               .github/workflows/pgrx.yml|.github/workflows/pgrx_targets.yml) ;;

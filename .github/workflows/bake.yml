@@ -3,6 +3,10 @@ name: Build, test and publish extensions
 on:
   push:
     paths-ignore:
+      # Documentation does not require extension builds.
+      - 'examples/**'
+      - '*.md'
+      - 'LICENSE'
       - 'renovate.json'
       - '.github/workflows/pr-scope.yml'
       - '.github/workflows/pgrx.yml'
