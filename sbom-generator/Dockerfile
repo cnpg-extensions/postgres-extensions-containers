@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.28
 
 # renovate: datasource=docker depName=python packageName=library/python versioning=docker
-FROM python:3.15-slim-bookworm@sha256:2a41267d9de9d358f77a1de356e0f16ecba8d39827855be0ce9ef4792edce402
+FROM python:3.15-slim-bookworm@sha256:16b09ac07f09f233e96e10147ed7e2918e53c3dc207ba27c32526ba8f81f1493
 
 ARG TARGETARCH
 # renovate: datasource=github-releases depName=anchore/syft versioning=semver
