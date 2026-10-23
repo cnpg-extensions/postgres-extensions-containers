@@ -1,5 +1,5 @@
 curl=7.88.1-10+deb12u15
-libbrotli1=1.0.9-2+b6
+libbrotli1=1.0.9-2+deb12u1
 libcurl4=7.88.1-10+deb12u15
 libgssapi-krb5-2=1.20.1-2+deb12u5
 libk5crypto3=1.20.1-2+deb12u5
