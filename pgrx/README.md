@@ -14,7 +14,11 @@ extension images.
 The extension Dockerfiles retain their attributed upstream build commands.
 `install-pgrx-build-environment.sh` installs exact apt artifacts, the locked Rust
 distribution, the cargo-pgrx source matching the upstream Cargo lock, and pinned
-reporting tools. It applies the existing JWT patch only to its declared release.
+reporting tools. The JWT Dockerfile corrects v0.5.0's package version with an inline sed command
+guarded by exact original and effective Cargo.lock checksums. Any upstream lock
+change requires reviewing or removing that correction. The installer retains
+both original and effective lock hashes; the legacy `patches` evidence field
+remains empty for schema compatibility.
 Cargo-about uses SHA-256-verified release binaries on both architectures, with
 no source-build fallback. Only cargo-pgrx is built from its
 locked source archive. All locked crate sources are fetched before offline
@@ -82,9 +86,10 @@ CloudNativePG release manifests from the upstream `cloudnative-pg/cloudnative-pg
 repository and production `cloudnative-pg` operator images. CI exercises the locked production releases, currently 1.29 and 1.30.
 The smoke uses pinned catalog fixtures and shared Task/Dagger tests, then checks
 mounted-library hashes, ELF architecture, dynamic-library resolution, SQL version,
-preload settings, and the pg-durable worker's connection to `app`. The shared finalizer additionally
-stages Bookworm/amd64's required quadmath library and copyright for pg-search;
-the existing OpenBLAS and Fortran copies remain in the recipe.
+preload settings, and the pg-durable worker's connection to `app`. The pg-search recipe
+captures base libraries before installing packages, then stages the packaged
+extension's additional runtime closure and copyright notices using the shared
+helpers. This includes quadmath where required.
 
 ## Local validation
 
@@ -131,13 +136,19 @@ requires a trusted `main` event. An optional `cnpg_version` selects one locked
 operator release; by default all supported locked releases are tested.
 
 For an unsigned local build, use the extension's ordinary Bake targets with
-`docker-bake-pgrx.hcl` and its `metadata.hcl`. Diagnostic `pgrx-sbom` output can
+`-f docker-bake.hcl -f docker-bake-pgrx.hcl -f <extension>/metadata.hcl`
+in that order. Supply `build_timestamp` and the digest-qualified `sbom_generator`
+from preparation. Select explicit named Bake targets to build a single local
+distribution. Diagnostic `pgrx-sbom` output can
 be used to inspect Cargo evidence; it does not test hosted signing.
 
 ## Dependency updates
 
-All lock material lives in `dependencies/`. Renovate proposes source tags, tool
-versions, image digests, and CNPG release tags/catalog commits. Operator fixtures
+All lock material lives in `dependencies/`. Large Rust distribution and operator
+manifests are retrieved on use and verified against locked SHA-256 values; the
+offline check validates their pin structure. Smoke validates operator content
+before the shared Task downloads the same immutable URL for Kubernetes apply.
+Renovate proposes source tags, tool versions, image digests, and CNPG release tags/catalog commits. Operator fixtures
 are fetched from the official versioned release manifests, not the unsupported
 `artifacts` development snapshots. Coupled updates are not
 automerged. Before merging, refresh the affected children and run the checks:
@@ -153,7 +164,8 @@ python3 pgrx/refresh_lock.py --check
 Use only the refresh command relevant to the update. A source refresh binds the
 tag, resolved commit, archive, upstream Cargo.lock, cargo-pgrx version, and CLI
 crate checksum together. Review SQL version and upstream recipe changes manually.
-Tool refreshes update both architectures and the full Rust distribution manifest.
+Tool refreshes update both architectures and the Rust distribution manifest
+checksum after downloading and parsing the versioned manifest.
 The reporting-tool lock owns the hook's embedded SPDX identifier list; update that
 list from cargo-about's locked `spdx` crate when upgrading its license parser.
 

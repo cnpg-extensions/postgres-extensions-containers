@@ -13,4 +13,6 @@ class SelectorTest(unittest.TestCase):
     def test_paths(self):
         self.assertEqual(changed_extensions(['sbom-generator/generator.py'],self.inventory),[])
         self.assertEqual(changed_extensions(['pg-durable/Dockerfile'],self.inventory),['pg-durable'])
-        self.assertEqual(changed_extensions(['pgrx/sbom/augment_spdx.py'],self.inventory),sorted(self.inventory))
+        for path in ['pgrx/sbom/augment_spdx.py', 'docker-bake.hcl', 'scripts/stage_system_libs.sh', 'test/pg-search/01-basic.sql']:
+            with self.subTest(path=path):
+                self.assertEqual(changed_extensions([path],self.inventory),sorted(self.inventory))

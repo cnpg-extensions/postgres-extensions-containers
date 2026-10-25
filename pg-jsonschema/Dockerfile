@@ -15,7 +15,19 @@ ARG PGRX_SOURCE_SHA256
 
 USER 0
 
-COPY pgrx/ /pgrx/
+COPY \
+    pgrx/install-pgrx-build-environment.sh \
+    pgrx/verify-source.sh \
+    pgrx/install_tools.py \
+    pgrx/locked_download.py \
+    pgrx/build_config.py \
+    pgrx/evidence.py \
+    pgrx/finalize-pgrx-evidence.sh \
+    pgrx/license-about.toml \
+    /pgrx/
+COPY pgrx/dependencies/apt/ /pgrx/dependencies/apt/
+COPY pgrx/dependencies/tools.json pgrx/dependencies/sources.json /pgrx/dependencies/
+COPY pgrx/sbom/ /pgrx/sbom/
 WORKDIR /build
 ADD https://github.com/supabase/pg_jsonschema/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build

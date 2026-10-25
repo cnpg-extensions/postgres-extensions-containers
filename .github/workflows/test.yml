@@ -7,6 +7,9 @@ on:
     paths:
       - 'dagger/maintenance/**'
       - 'pgrx/**'
+      - 'docker-bake.hcl'
+      - 'scripts/**'
+      - 'test/**'
       - 'docker-bake-pgrx.hcl'
       - '.github/workflows/pgrx*.yml'
       - '*/Dockerfile'
@@ -16,6 +19,9 @@ on:
     paths:
       - 'dagger/maintenance/**'
       - 'pgrx/**'
+      - 'docker-bake.hcl'
+      - 'scripts/**'
+      - 'test/**'
       - 'docker-bake-pgrx.hcl'
       - '.github/workflows/pgrx*.yml'
       - '*/Dockerfile'

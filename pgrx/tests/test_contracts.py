@@ -49,11 +49,7 @@ class LockTest(unittest.TestCase):
         self.assertEqual(set(lock['operators']),set(lock['supported_releases']))
         for selector,pin in lock['operators'].items():
             version=pin['ref'].removeprefix('v')
-            manifest=(root/'fixtures'/('operator-'+selector+'.yaml')).read_text()
             self.assertEqual(pin['url'],operator_manifest_url(pin))
-            self.assertIn('ghcr.io/cloudnative-pg/cloudnative-pg:'+version,manifest)
-            self.assertNotIn('cloudnative-pg-testing',manifest)
-            check_operator_manifest(manifest,pin)
 
     def test_operator_fixture_refresh_rebuilds_release_asset_url(self):
         import refresh_lock
@@ -73,7 +69,7 @@ class LockTest(unittest.TestCase):
             expected=f'https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/{revision}/releases/cnpg-1.30.2.yaml'
             self.assertEqual(refreshed['operators'][selector]['url'],expected)
             self.assertEqual(fetch_call.call_args.args[0],expected)
-            self.assertEqual((fixtures/'operator-1.30.yaml').read_bytes(),payload)
+            self.assertFalse((fixtures/'operator-1.30.yaml').exists())
 
     def test_testing_operator_images_are_rejected(self):
         pin={'repository':'cloudnative-pg/cloudnative-pg','ref':'v1.30.1'}
@@ -171,15 +167,29 @@ class SourceArchiveTest(unittest.TestCase):
                 else:
                     with self.assertRaises(ValueError):extract_source_archive(archive,directory)
 
-class RuntimeClosureTest(unittest.TestCase):
-    def test_quadmath_is_copied_only_when_required_with_its_license(self):
-        from system_libraries import stage_extra_libraries
-        for needed in [True, False]:
-            with self.subTest(needed=needed), tempfile.TemporaryDirectory() as temporary:
-                root=Path(temporary);lib=root/'usr/lib/x86_64-linux-gnu';lib.mkdir(parents=True)
-                (lib/'libgfortran.so.5').write_bytes(b'fortran');(lib/'libquadmath.so.0').write_bytes(b'quadmath')
-                doc=root/'usr/share/doc/libquadmath0';doc.mkdir(parents=True);(doc/'copyright').write_text('copyright evidence')
-                output=' 0x0001 (NEEDED) Shared library: [libquadmath.so.0]\n' if needed else ' 0x0001 (NEEDED) Shared library: [libc.so.6]\n'
-                with patch('system_libraries.subprocess.check_output',return_value=output):stage_extra_libraries('pg-search',root)
-                self.assertEqual((root/'build/pgrx-extra-system/libquadmath.so.0').exists(),needed)
-                self.assertEqual((root/'build/pgrx-extra-system-licenses/libquadmath0/copyright').exists(),needed)
+
+class InlineCorrectionTest(unittest.TestCase):
+    def test_changed_or_fixed_lock_requires_review(self):
+        import subprocess
+        dockerfile = (ROOT / 'pg-session-jwt/Dockerfile').read_text()
+        guard = dockerfile.split("RUN echo '", 1)[1].split('\nRUN cp ', 1)[0]
+        command = "echo '" + guard.replace('\\\n', '')
+        for lock in ['changed upstream lock', '[[package]]\nname = "pg_session_jwt"\nversion = "0.5.0"\n']:
+            with self.subTest(lock=lock), tempfile.TemporaryDirectory() as directory:
+                (Path(directory) / 'Cargo.lock').write_text(lock)
+                result = subprocess.run(['bash', '-c', command], cwd=directory, capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('review/remove', result.stderr)
+
+class LockedDownloadTest(unittest.TestCase):
+    def test_corrupt_and_unavailable_inputs_fail_with_url(self):
+        import io
+        import urllib.error
+        from locked_download import fetch_verified
+        url = 'https://example.invalid/pinned-input'
+        with patch('locked_download.urllib.request.urlopen', return_value=io.BytesIO(b'changed')):
+            with self.assertRaisesRegex(ValueError, 'checksum mismatch: ' + re.escape(url)):
+                fetch_verified(url, hashlib.sha256(b'original').hexdigest())
+        with patch('locked_download.urllib.request.urlopen', side_effect=urllib.error.URLError('unavailable')):
+            with self.assertRaisesRegex(ValueError, 'unavailable: ' + re.escape(url)):
+                fetch_verified(url, '0'*64)

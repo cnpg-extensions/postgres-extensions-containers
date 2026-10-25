@@ -3,6 +3,7 @@
 Cargo relationships describe the configured target source graph, not surviving
 linked symbols. Build/dev dependencies and proc-macro-only crates are excluded.
 """
+
 from copy import deepcopy
 import hashlib
 import json
@@ -11,8 +12,11 @@ import re
 import subprocess
 from urllib.parse import quote
 
-NAMESPACE = 'https://github.com/cnpg-extensions/postgres-extensions-containers/pgrx-enrichment/v1'
-TARGETS = {'linux/amd64': ('x86_64-unknown-linux-gnu', 62), 'linux/arm64': ('aarch64-unknown-linux-gnu', 183)}
+NAMESPACE = "https://github.com/cnpg-extensions/postgres-extensions-containers/pgrx-enrichment/v1"
+TARGETS = {
+    "linux/amd64": ("x86_64-unknown-linux-gnu", 62),
+    "linux/arm64": ("aarch64-unknown-linux-gnu", 183),
+}
 
 
 def require(condition, message):
@@ -27,7 +31,7 @@ def sha256(data):
 def unique_object(pairs):
     result = {}
     for key, value in pairs:
-        require(key not in result, f'duplicate JSON key: {key}')
+        require(key not in result, f"duplicate JSON key: {key}")
         result[key] = value
     return result
 
@@ -36,28 +40,33 @@ def parse_json(data):
     try:
         result = json.loads(data, object_pairs_hook=unique_object)
     except (ValueError, UnicodeError) as error:
-        raise ValueError(f'invalid evidence JSON: {error}') from error
-    require(isinstance(result, dict), 'expected JSON object')
+        raise ValueError(f"invalid evidence JSON: {error}") from error
+    require(isinstance(result, dict), "expected JSON object")
     return result
 
 
 def safe_file(root, relative):
-    require(isinstance(relative, str) and relative, 'missing relative path')
+    require(isinstance(relative, str) and relative, "missing relative path")
     path = PurePosixPath(relative)
-    require(not path.is_absolute() and '..' not in path.parts and str(path) == relative,
-            f'unsafe evidence path: {relative}')
+    require(
+        not path.is_absolute() and ".." not in path.parts and str(path) == relative,
+        f"unsafe evidence path: {relative}",
+    )
     current = Path(root)
     for part in path.parts:
         current = current / part
-        require(not current.is_symlink(), f'symlink in evidence path: {relative}')
-    require(current.is_file(), f'missing regular evidence file: {relative}')
+        require(not current.is_symlink(), f"symlink in evidence path: {relative}")
+    require(current.is_file(), f"missing regular evidence file: {relative}")
     return current
 
 
 def checked_bytes(root, relative, expected):
-    require(isinstance(expected, str) and re.fullmatch('[a-f0-9]{64}', expected), 'invalid SHA256')
+    require(
+        isinstance(expected, str) and re.fullmatch("[a-f0-9]{64}", expected),
+        "invalid SHA256",
+    )
     data = safe_file(root, relative).read_bytes()
-    require(sha256(data) == expected, f'hash mismatch: {relative}')
+    require(sha256(data) == expected, f"hash mismatch: {relative}")
     return data
 
 
@@ -65,7 +74,7 @@ def indexed(items, key):
     result = {}
     for item in items:
         identity = item[key]
-        require(identity not in result, f'duplicate identity: {identity}')
+        require(identity not in result, f"duplicate identity: {identity}")
         result[identity] = item
     return result
 
@@ -73,54 +82,76 @@ def indexed(items, key):
 def target_matches(condition, facts, triple):
     if condition is None:
         return True
-    require(facts is not None and triple, 'target configuration is required')
-    if not condition.startswith('cfg('):
+    require(facts is not None and triple, "target configuration is required")
+    if not condition.startswith("cfg("):
         return condition == triple
     tokens = re.findall(r'"(?:[^"\\]|\\.)*"|[A-Za-z_][A-Za-z_0-9]*|[(),=]', condition)
-    require(''.join(tokens) == re.sub(r'\s+', '', condition), 'invalid target condition')
+    require(
+        "".join(tokens) == re.sub(r"\s+", "", condition), "invalid target condition"
+    )
     position = 0
 
     def expression():
         nonlocal position
-        require(position < len(tokens), 'truncated target condition')
-        name = tokens[position]; position += 1
-        if position < len(tokens) and tokens[position] == '(':
-            require(name in ('cfg', 'all', 'any', 'not'), 'unknown target condition operator')
-            position += 1; children = []
-            while position < len(tokens) and tokens[position] != ')':
+        require(position < len(tokens), "truncated target condition")
+        name = tokens[position]
+        position += 1
+        if position < len(tokens) and tokens[position] == "(":
+            require(
+                name in ("cfg", "all", "any", "not"),
+                "unknown target condition operator",
+            )
+            position += 1
+            children = []
+            while position < len(tokens) and tokens[position] != ")":
                 children.append(expression())
-                if position < len(tokens) and tokens[position] == ',':
+                if position < len(tokens) and tokens[position] == ",":
                     position += 1
                 else:
                     break
-            require(position < len(tokens) and tokens[position] == ')', 'unclosed target condition')
+            require(
+                position < len(tokens) and tokens[position] == ")",
+                "unclosed target condition",
+            )
             position += 1
-            if name in ('cfg', 'not'):
-                require(len(children) == 1, 'invalid unary target condition')
-                return children[0] if name == 'cfg' else not children[0]
-            return all(children) if name == 'all' else any(children)
-        if position < len(tokens) and tokens[position] == '=':
+            if name in ("cfg", "not"):
+                require(len(children) == 1, "invalid unary target condition")
+                return children[0] if name == "cfg" else not children[0]
+            return all(children) if name == "all" else any(children)
+        if position < len(tokens) and tokens[position] == "=":
             position += 1
-            require(position < len(tokens) and tokens[position].startswith('"'), 'invalid target value')
-            name += '=' + tokens[position]; position += 1
+            require(
+                position < len(tokens) and tokens[position].startswith('"'),
+                "invalid target value",
+            )
+            name += "=" + tokens[position]
+            position += 1
         return name in facts
 
     result = expression()
-    require(position == len(tokens), 'trailing target condition tokens')
+    require(position == len(tokens), "trailing target condition tokens")
     return result
 
 
-def selected_graph(metadata, root, requested_features=None, target_cfg=None, rust_target=None):
+def selected_graph(
+    metadata, root, requested_features=None, target_cfg=None, rust_target=None
+):
     """Metadata must have been resolved with --filter-platform and recipe features."""
-    require(metadata.get('version') == 1, 'unsupported cargo metadata schema')
-    packages = indexed(metadata['packages'], 'id')
-    nodes = indexed(metadata['resolve']['nodes'], 'id')
-    require(root in packages and root in nodes, 'missing selected Cargo root')
+    require(metadata.get("version") == 1, "unsupported cargo metadata schema")
+    packages = indexed(metadata["packages"], "id")
+    nodes = indexed(metadata["resolve"]["nodes"], "id")
+    require(root in packages and root in nodes, "missing selected Cargo root")
     # Re-resolve features along runtime edges. Metadata includes weak optional
     # edges and feature unions from inactive/build/dev crates (notably SQLx).
     # Use Cargo's exact package IDs and matching declarations, evaluate retained
     # target conditions, and propagate only features of the runtime graph.
-    features = {root: set(nodes[root]['features'] if requested_features is None else requested_features)}
+    features = {
+        root: set(
+            nodes[root]["features"]
+            if requested_features is None
+            else requested_features
+        )
+    }
     edges = set()
     changed = True
     while changed:
@@ -136,49 +167,87 @@ def selected_graph(metadata, root, requested_features=None, target_cfg=None, rus
                 if feature in seen:
                     continue
                 seen.add(feature)
-                if feature.startswith('dep:'):
+                if feature.startswith("dep:"):
                     activated.add(feature[4:])
-                elif '/' in feature:
-                    name, child_feature = feature.split('/', 1)
-                    weak = name.endswith('?')
-                    name = name.rstrip('?')
+                elif "/" in feature:
+                    name, child_feature = feature.split("/", 1)
+                    weak = name.endswith("?")
+                    name = name.rstrip("?")
                     requested.setdefault(name, set()).add(child_feature)
                     if not weak:
                         activated.add(name)
                 else:
-                    pending.extend(package.get('features', {}).get(feature, []))
-            enabled.update(f for f in seen if not f.startswith('dep:') and '/' not in f)
-            for dependency in nodes[identity]['deps']:
-                target = dependency['pkg']
-                require(target in packages and target in nodes, 'unknown Cargo dependency')
-                active_kinds = [k for k in dependency['dep_kinds']
-                                if k['kind'] is None and target_matches(k['target'], target_cfg, rust_target)]
+                    pending.extend(package.get("features", {}).get(feature, []))
+            enabled.update(f for f in seen if not f.startswith("dep:") and "/" not in f)
+            for dependency in nodes[identity]["deps"]:
+                target = dependency["pkg"]
+                require(
+                    target in packages and target in nodes, "unknown Cargo dependency"
+                )
+                active_kinds = [
+                    k
+                    for k in dependency["dep_kinds"]
+                    if k["kind"] is None
+                    and target_matches(k["target"], target_cfg, rust_target)
+                ]
                 if not active_kinds:
                     continue
-                kinds = {kind for t in packages[target]['targets'] for kind in t['kind']}
-                if 'proc-macro' in kinds and not kinds & {'lib', 'rlib', 'dylib', 'cdylib', 'staticlib'}:
+                kinds = {
+                    kind for t in packages[target]["targets"] for kind in t["kind"]
+                }
+                if "proc-macro" in kinds and not kinds & {
+                    "lib",
+                    "rlib",
+                    "dylib",
+                    "cdylib",
+                    "staticlib",
+                }:
                     continue
                 child_features = set()
-                if 'dependencies' in package:
-                    library_names = {t.get('name', packages[target]['name']).replace('-', '_')
-                                     for t in packages[target]['targets']
-                                     if set(t['kind']) & {'lib', 'rlib', 'dylib', 'cdylib', 'staticlib'}}
-                    declarations = [d for d in package['dependencies']
-                        if d['name'] == packages[target]['name']
-                        and (d['rename'].replace('-', '_') == dependency['name'] if d.get('rename')
-                             else dependency['name'] in library_names)
-                        and any(k['kind'] is None and d['kind'] is None and k['target'] == d['target']
-                                for k in active_kinds)]
-                    require(declarations, 'resolved dependency has no declaration: ' + identity + ' -> ' + dependency['name'])
-                    active = [d for d in declarations if not d['optional'] or (d.get('rename') or d['name']) in activated]
+                if "dependencies" in package:
+                    library_names = {
+                        t.get("name", packages[target]["name"]).replace("-", "_")
+                        for t in packages[target]["targets"]
+                        if set(t["kind"])
+                        & {"lib", "rlib", "dylib", "cdylib", "staticlib"}
+                    }
+                    declarations = [
+                        d
+                        for d in package["dependencies"]
+                        if d["name"] == packages[target]["name"]
+                        and (
+                            d["rename"].replace("-", "_") == dependency["name"]
+                            if d.get("rename")
+                            else dependency["name"] in library_names
+                        )
+                        and any(
+                            k["kind"] is None
+                            and d["kind"] is None
+                            and k["target"] == d["target"]
+                            for k in active_kinds
+                        )
+                    ]
+                    require(
+                        declarations,
+                        "resolved dependency has no declaration: "
+                        + identity
+                        + " -> "
+                        + dependency["name"],
+                    )
+                    active = [
+                        d
+                        for d in declarations
+                        if not d["optional"]
+                        or (d.get("rename") or d["name"]) in activated
+                    ]
                     if not active:
                         continue
                     for declaration in active:
-                        name = declaration.get('rename') or declaration['name']
-                        child_features.update(declaration['features'])
+                        name = declaration.get("rename") or declaration["name"]
+                        child_features.update(declaration["features"])
                         child_features.update(requested.get(name, set()))
-                        if declaration['uses_default_features']:
-                            child_features.add('default')
+                        if declaration["uses_default_features"]:
+                            child_features.add("default")
                 edges.add((identity, target))
                 if target not in features or not child_features <= features[target]:
                     features.setdefault(target, set()).update(child_features)
@@ -187,21 +256,31 @@ def selected_graph(metadata, root, requested_features=None, target_cfg=None, rus
 
 
 def cargo_purl(package, revision):
-    base = 'pkg:cargo/' + quote(package['name'], safe='') + '@' + quote(package['version'], safe='')
-    source = package.get('source')
-    if source in ('registry+https://github.com/rust-lang/crates.io-index', 'registry+https://index.crates.io/'):
+    base = (
+        "pkg:cargo/"
+        + quote(package["name"], safe="")
+        + "@"
+        + quote(package["version"], safe="")
+    )
+    source = package.get("source")
+    if source in (
+        "registry+https://github.com/rust-lang/crates.io-index",
+        "registry+https://index.crates.io/",
+    ):
         return base
     # Preserve registry/git/path identity, without exposing local build paths.
     if source is None:
-        manifest = PurePosixPath(package['manifest_path'])
+        manifest = PurePosixPath(package["manifest_path"])
         try:
-            relative = manifest.relative_to('/build')
+            relative = manifest.relative_to("/build")
         except ValueError as error:
-            raise ValueError('workspace manifest is outside the source tree') from error
-        require('..' not in relative.parts, 'unsafe workspace manifest path')
-        source = 'workspace:' + revision + ':' + str(relative)
-    require('@' not in source.split('://')[-1].split('/')[0], 'credentials in Cargo source')
-    return base + '?repository_url=' + quote(source, safe='')
+            raise ValueError("workspace manifest is outside the source tree") from error
+        require(".." not in relative.parts, "unsafe workspace manifest path")
+        source = "workspace:" + revision + ":" + str(relative)
+    require(
+        "@" not in source.split("://")[-1].split("/")[0], "credentials in Cargo source"
+    )
+    return base + "?repository_url=" + quote(source, safe="")
 
 
 # Conservative SPDX expression parser. Unsupported conclusions stay NOASSERTION;
@@ -336,39 +415,43 @@ vsftpd-openssl-exception x11vnc-openssl-exception
 
 def license_expression(value):
     if not isinstance(value, str) or not value:
-        return 'NOASSERTION'
-    tokens = re.findall(r'[A-Za-z0-9.+-]+|[()]', value)
-    if ''.join(tokens) != re.sub(r'\s', '', value):
-        return 'NOASSERTION'
+        return "NOASSERTION"
+    tokens = re.findall(r"[A-Za-z0-9.+-]+|[()]", value)
+    if "".join(tokens) != re.sub(r"\s", "", value):
+        return "NOASSERTION"
     position = 0
+
     def term():
         nonlocal position
         if position >= len(tokens):
             return False
-        token = tokens[position]; position += 1
-        if token == '(':
-            if not expression() or position >= len(tokens) or tokens[position] != ')':
+        token = tokens[position]
+        position += 1
+        if token == "(":
+            if not expression() or position >= len(tokens) or tokens[position] != ")":
                 return False
             position += 1
             return True
         if token not in LICENSE_IDS:
             return False
-        if position < len(tokens) and tokens[position] == 'WITH':
+        if position < len(tokens) and tokens[position] == "WITH":
             position += 1
             if position >= len(tokens) or tokens[position] not in EXCEPTION_IDS:
                 return False
             position += 1
         return True
+
     def expression():
         nonlocal position
         if not term():
             return False
-        while position < len(tokens) and tokens[position] in ('AND', 'OR'):
+        while position < len(tokens) and tokens[position] in ("AND", "OR"):
             position += 1
             if not term():
                 return False
         return True
-    return value if expression() and position == len(tokens) else 'NOASSERTION'
+
+    return value if expression() and position == len(tokens) else "NOASSERTION"
 
 
 def cargo_about_license_expressions(packages, report):
@@ -379,60 +462,95 @@ def cargo_about_license_expressions(packages, report):
     cannot represent the full expression for alternatives such as `MIT OR
     Apache-2.0`.
     """
-    crate_records = report.get('crates')
-    require(isinstance(crate_records, list), 'malformed cargo-about crate list')
+    crate_records = report.get("crates")
+    require(isinstance(crate_records, list), "malformed cargo-about crate list")
     resolved = {}
     for record in crate_records:
-        require(isinstance(record, dict) and isinstance(record.get('package'), dict),
-                'malformed cargo-about crate record')
-        package = record['package']
-        cargo_id = package.get('id')
+        require(
+            isinstance(record, dict) and isinstance(record.get("package"), dict),
+            "malformed cargo-about crate record",
+        )
+        package = record["package"]
+        cargo_id = package.get("id")
         if cargo_id not in packages:
             continue
-        require(cargo_id not in resolved, 'duplicate cargo-about Cargo identity: ' + str(cargo_id))
+        require(
+            cargo_id not in resolved,
+            "duplicate cargo-about Cargo identity: " + str(cargo_id),
+        )
         component = packages[cargo_id]
-        require(package.get('name') == component.get('name') and
-                package.get('version') == component.get('version'),
-                'cargo-about package identity mismatch: ' + cargo_id)
-        expression = record.get('license')
-        require(isinstance(expression, str) and expression not in ('', 'Unknown', 'Ignore', 'NOASSERTION'),
-                'cargo-about did not resolve a crate license: ' + cargo_id)
+        require(
+            package.get("name") == component.get("name")
+            and package.get("version") == component.get("version"),
+            "cargo-about package identity mismatch: " + cargo_id,
+        )
+        expression = record.get("license")
+        require(
+            isinstance(expression, str)
+            and expression not in ("", "Unknown", "Ignore", "NOASSERTION"),
+            "cargo-about did not resolve a crate license: " + cargo_id,
+        )
+
         # SPDX deprecated the GNU version-only identifiers in favor of explicit
         # -only / -or-later forms. Keep the expression's operators and grouping.
         def canonical_identifier(match):
             token = match.group()
-            if re.fullmatch(r'(?:A?GPL|LGPL|GFDL)-[0-9]+\.[0-9]+\+?', token):
-                current = token.rstrip('+') + ('-or-later' if token.endswith('+') else '-only')
+            if re.fullmatch(r"(?:A?GPL|LGPL|GFDL)-[0-9]+\.[0-9]+\+?", token):
+                current = token.rstrip("+") + (
+                    "-or-later" if token.endswith("+") else "-only"
+                )
                 if current in LICENSE_IDS:
                     return current
             return token
-        expression = re.sub(r'[A-Za-z0-9.+-]+', canonical_identifier, expression)
-        require(license_expression(expression) == expression,
-                'cargo-about returned an unsupported SPDX expression for ' + cargo_id + ': ' + expression)
+
+        expression = re.sub(r"[A-Za-z0-9.+-]+", canonical_identifier, expression)
+        require(
+            license_expression(expression) == expression,
+            "cargo-about returned an unsupported SPDX expression for "
+            + cargo_id
+            + ": "
+            + expression,
+        )
         resolved[cargo_id] = expression
     missing = set(packages) - set(resolved)
-    require(not missing, 'selected Cargo graph lacks resolved cargo-about licenses: ' + ', '.join(sorted(missing)))
+    require(
+        not missing,
+        "selected Cargo graph lacks resolved cargo-about licenses: "
+        + ", ".join(sorted(missing)),
+    )
     return resolved
 
 
 def validate_document(document):
-    elements = [document, *document.get('packages', []), *document.get('files', [])]
-    ids = indexed(elements, 'SPDXID')
-    for relation in document.get('relationships', []):
-        require(relation['spdxElementId'] in ids and relation['relatedSpdxElement'] in ids,
-                'unresolved SPDX relationship')
-    license_ids = indexed(document.get('hasExtractedLicensingInfos', []), 'licenseId')
+    elements = [document, *document.get("packages", []), *document.get("files", [])]
+    ids = indexed(elements, "SPDXID")
+    for relation in document.get("relationships", []):
+        require(
+            relation["spdxElementId"] in ids and relation["relatedSpdxElement"] in ids,
+            "unresolved SPDX relationship",
+        )
+    license_ids = indexed(document.get("hasExtractedLicensingInfos", []), "licenseId")
     for element in elements:
-        for key in ('licenseDeclared', 'licenseConcluded', 'licenseInfoFromFiles', 'licenseInfoInFiles'):
+        for key in (
+            "licenseDeclared",
+            "licenseConcluded",
+            "licenseInfoFromFiles",
+            "licenseInfoInFiles",
+        ):
             values = element.get(key, [])
             if isinstance(values, str):
                 values = [values]
             for value in values:
-                for custom in re.findall(r'LicenseRef-[A-Za-z0-9.-]+', value):
-                    require(custom in license_ids, 'unresolved custom license reference')
-        for checksum in element.get('checksums', []):
-            if checksum['algorithm'] == 'SHA256':
-                require(re.fullmatch('[a-fA-F0-9]{64}', checksum['checksumValue']), 'invalid SPDX checksum')
+                for custom in re.findall(r"LicenseRef-[A-Za-z0-9.-]+", value):
+                    require(
+                        custom in license_ids, "unresolved custom license reference"
+                    )
+        for checksum in element.get("checksums", []):
+            if checksum["algorithm"] == "SHA256":
+                require(
+                    re.fullmatch("[a-fA-F0-9]{64}", checksum["checksumValue"]),
+                    "invalid SPDX checksum",
+                )
 
 
 def scan_cargo_lock(lock_path):
@@ -442,140 +560,310 @@ def scan_cargo_lock(lock_path):
     reporting tools and registry fixtures. A file source preserves Cargo.lock's
     basename while making those unrelated lockfiles inaccessible to this scan.
     """
-    completed = subprocess.run([
-        'syft', 'file:' + str(lock_path), '--quiet',
-        '--override-default-catalogers', 'rust-cargo-lock-cataloger',
-        '--output', 'syft-json',
-    ], check=True, capture_output=True)
+    completed = subprocess.run(
+        [
+            "syft",
+            "file:" + str(lock_path),
+            "--quiet",
+            "--override-default-catalogers",
+            "rust-cargo-lock-cataloger",
+            "--output",
+            "syft-json",
+        ],
+        check=True,
+        capture_output=True,
+    )
     report = parse_json(completed.stdout)
-    descriptor = report['descriptor']
-    require(descriptor['name'] == 'syft' and descriptor.get('version'), 'missing Syft identity')
+    descriptor = report["descriptor"]
+    require(
+        descriptor["name"] == "syft" and descriptor.get("version"),
+        "missing Syft identity",
+    )
     packages = {}
-    for artifact in report['artifacts']:
-        require(artifact.get('type') == 'rust-crate'
-                and artifact.get('foundBy') == 'rust-cargo-lock-cataloger',
-                'unexpected Syft Cargo cataloger output')
-        metadata = artifact['metadata']
-        require(all(artifact[field] == metadata[field] for field in ('name', 'version')),
-                'Syft Cargo metadata identity mismatch')
-        key = (artifact['name'], artifact['version'], metadata.get('source') or '')
-        require(key not in packages, 'duplicate Syft Cargo identity')
+    for artifact in report["artifacts"]:
+        require(
+            artifact.get("type") == "rust-crate"
+            and artifact.get("foundBy") == "rust-cargo-lock-cataloger",
+            "unexpected Syft Cargo cataloger output",
+        )
+        metadata = artifact["metadata"]
+        require(
+            all(artifact[field] == metadata[field] for field in ("name", "version")),
+            "Syft Cargo metadata identity mismatch",
+        )
+        key = (artifact["name"], artifact["version"], metadata.get("source") or "")
+        require(key not in packages, "duplicate Syft Cargo identity")
         packages[key] = artifact
-    require(packages, 'empty Syft Cargo inventory')
-    evidence = {'version': descriptor['version'], 'cataloger': 'rust-cargo-lock-cataloger',
-                'sha256': sha256(completed.stdout), 'package_count': len(packages)}
+    require(packages, "empty Syft Cargo inventory")
+    evidence = {
+        "version": descriptor["version"],
+        "cataloger": "rust-cargo-lock-cataloger",
+        "sha256": sha256(completed.stdout),
+        "package_count": len(packages),
+    }
     return packages, evidence
 
 
 def augment_spdx(document, context):
-    require(context.api_version == 1, 'unsupported hook API')
-    evidence = Path(context.builder_path) / 'build/pgrx-sbom'
-    manifest = parse_json(safe_file(context.builder_path, 'build/pgrx-sbom/manifest.json').read_bytes())
-    require(manifest.get('schema_version') == 2, 'unsupported evidence schema')
-    identity, target, build = manifest['identity'], manifest['target'], manifest['build']
-    for key in ('extension', 'sql_name', 'source_version', 'sql_version', 'repository', 'revision', 'archive_sha256'):
-        require(isinstance(identity.get(key), str) and identity[key], f'missing identity: {key}')
-    require(re.fullmatch('[a-f0-9]{40}', identity['revision']), 'invalid source revision')
-    require(re.fullmatch('[a-f0-9]{64}', identity['archive_sha256']), 'invalid source archive hash')
-    require(context.extension_name in ('extension', identity['extension']), 'extension identity mismatch')
-    require(target['platform'] == context.platform and target['platform'] in TARGETS, 'platform mismatch')
-    triple, machine = TARGETS[target['platform']]
-    require(target['rust_target'] == triple, 'Rust target mismatch')
-    require(str(target['pg_major']).isdigit() and target['distro'] in ('bookworm', 'trixie'), 'invalid target')
-    require(isinstance(build['default_features'], bool) and isinstance(build['features'], list), 'invalid feature policy')
-    require(build['profile'] == 'release', 'unsupported build profile')
-    checked_bytes(context.builder_path, 'build/Cargo.lock', manifest['inputs']['lock_sha256'])
+    require(context.api_version == 1, "unsupported hook API")
+    evidence = Path(context.builder_path) / "build/pgrx-sbom"
+    manifest = parse_json(
+        safe_file(context.builder_path, "build/pgrx-sbom/manifest.json").read_bytes()
+    )
+    require(manifest.get("schema_version") == 2, "unsupported evidence schema")
+    identity, target, build = (
+        manifest["identity"],
+        manifest["target"],
+        manifest["build"],
+    )
+    for key in (
+        "extension",
+        "sql_name",
+        "source_version",
+        "sql_version",
+        "repository",
+        "revision",
+        "archive_sha256",
+    ):
+        require(
+            isinstance(identity.get(key), str) and identity[key],
+            f"missing identity: {key}",
+        )
+    require(
+        re.fullmatch("[a-f0-9]{40}", identity["revision"]), "invalid source revision"
+    )
+    require(
+        re.fullmatch("[a-f0-9]{64}", identity["archive_sha256"]),
+        "invalid source archive hash",
+    )
+    require(
+        context.extension_name in ("extension", identity["extension"]),
+        "extension identity mismatch",
+    )
+    require(
+        target["platform"] == context.platform and target["platform"] in TARGETS,
+        "platform mismatch",
+    )
+    triple, machine = TARGETS[target["platform"]]
+    require(target["rust_target"] == triple, "Rust target mismatch")
+    require(
+        str(target["pg_major"]).isdigit()
+        and target["distro"] in ("bookworm", "trixie"),
+        "invalid target",
+    )
+    require(
+        isinstance(build["default_features"], bool)
+        and isinstance(build["features"], list),
+        "invalid feature policy",
+    )
+    require(build["profile"] == "release", "unsupported build profile")
+    checked_bytes(
+        context.builder_path, "build/Cargo.lock", manifest["inputs"]["lock_sha256"]
+    )
     reports = {}
-    for name in ('cargo-metadata', 'cargo-about'):
-        entry = manifest['reports'][name]
-        reports[name] = parse_json(checked_bytes(evidence, entry['path'], entry['sha256']))
-    require(isinstance(reports['cargo-about'].get('licenses'), list), 'malformed cargo-about report')
-    cfg = build['target_cfg']
-    require(isinstance(cfg, list) and all(isinstance(fact, str) for fact in cfg), 'invalid target configuration')
-    expected_arch = 'x86_64' if target['platform'] == 'linux/amd64' else 'aarch64'
-    for key, value in [('target_arch', expected_arch), ('target_os', 'linux'), ('target_env', 'gnu'), ('target_pointer_width', '64')]:
-        require([fact for fact in cfg if fact.startswith(key + '=')] == [key + '=' + json.dumps(value)], 'target configuration mismatch: ' + key)
-    packages, edges = selected_graph(reports['cargo-metadata'], build['root_id'],
-                                    build['features'] + (['default'] if build['default_features'] else []), cfg, triple)
-    about_licenses = cargo_about_license_expressions(packages, reports['cargo-about'])
-    root_component = packages[build['root_id']]
-    syft_packages, syft_evidence = scan_cargo_lock(safe_file(context.builder_path, 'build/Cargo.lock'))
+    for name in ("cargo-metadata", "cargo-about"):
+        entry = manifest["reports"][name]
+        reports[name] = parse_json(
+            checked_bytes(evidence, entry["path"], entry["sha256"])
+        )
+    require(
+        isinstance(reports["cargo-about"].get("licenses"), list),
+        "malformed cargo-about report",
+    )
+    cfg = build["target_cfg"]
+    require(
+        isinstance(cfg, list) and all(isinstance(fact, str) for fact in cfg),
+        "invalid target configuration",
+    )
+    expected_arch = "x86_64" if target["platform"] == "linux/amd64" else "aarch64"
+    for key, value in [
+        ("target_arch", expected_arch),
+        ("target_os", "linux"),
+        ("target_env", "gnu"),
+        ("target_pointer_width", "64"),
+    ]:
+        require(
+            [fact for fact in cfg if fact.startswith(key + "=")]
+            == [key + "=" + json.dumps(value)],
+            "target configuration mismatch: " + key,
+        )
+    packages, edges = selected_graph(
+        reports["cargo-metadata"],
+        build["root_id"],
+        build["features"] + (["default"] if build["default_features"] else []),
+        cfg,
+        triple,
+    )
+    about_licenses = cargo_about_license_expressions(packages, reports["cargo-about"])
+    root_component = packages[build["root_id"]]
+    syft_packages, syft_evidence = scan_cargo_lock(
+        safe_file(context.builder_path, "build/Cargo.lock")
+    )
     selected_syft = {}
     for key, package in packages.items():
-        locked_identity = (package['name'], package['version'], package.get('source') or '')
-        require(locked_identity in syft_packages, 'selected Cargo identity missing from Syft: ' + key)
+        locked_identity = (
+            package["name"],
+            package["version"],
+            package.get("source") or "",
+        )
+        require(
+            locked_identity in syft_packages,
+            "selected Cargo identity missing from Syft: " + key,
+        )
         selected_syft[key] = syft_packages[locked_identity]
-    require(root_component['name'] == identity['sql_name'] and root_component['version'] == identity['sql_version'], 'Cargo root identity mismatch')
-    nodes = indexed(reports['cargo-metadata']['resolve']['nodes'], 'id')
-    features = nodes[build['root_id']]['features']
-    require('pg'+str(target['pg_major']) in features, 'selected PG feature missing')
-    require(set(build['features']) <= set(features), 'selected feature missing')
-    require(('default' in features) == build['default_features'], 'default feature policy mismatch')
+    require(
+        root_component["name"] == identity["sql_name"]
+        and root_component["version"] == identity["sql_version"],
+        "Cargo root identity mismatch",
+    )
+    nodes = indexed(reports["cargo-metadata"]["resolve"]["nodes"], "id")
+    features = nodes[build["root_id"]]["features"]
+    require("pg" + str(target["pg_major"]) in features, "selected PG feature missing")
+    require(set(build["features"]) <= set(features), "selected feature missing")
+    require(
+        ("default" in features) == build["default_features"],
+        "default feature policy mismatch",
+    )
     result = deepcopy(document)
-    files = indexed(result['files'], 'fileName')
+    files = indexed(result["files"], "fileName")
     mapped, has_library = set(), False
-    for payload in manifest['payload']:
-        name = payload['final']
-        require(name not in mapped, 'duplicate payload mapping'); mapped.add(name)
-        builder_bytes = checked_bytes(context.builder_path, payload['builder'], payload['sha256'])
-        final_bytes = checked_bytes(context.final_path, name, payload['sha256'])
-        require(builder_bytes == final_bytes, 'payload binding mismatch')
-        file = files.get(name) or files.get('./'+name)
-        require(file is not None, 'payload missing from generator inventory')
-        require(any(c['algorithm'] == 'SHA256' and c['checksumValue'].lower() == payload['sha256'] for c in file['checksums']), 'generator checksum mismatch')
-        if payload['kind'] == 'library':
+    for payload in manifest["payload"]:
+        name = payload["final"]
+        require(name not in mapped, "duplicate payload mapping")
+        mapped.add(name)
+        builder_bytes = checked_bytes(
+            context.builder_path, payload["builder"], payload["sha256"]
+        )
+        final_bytes = checked_bytes(context.final_path, name, payload["sha256"])
+        require(builder_bytes == final_bytes, "payload binding mismatch")
+        file = files.get(name) or files.get("./" + name)
+        require(file is not None, "payload missing from generator inventory")
+        require(
+            any(
+                c["algorithm"] == "SHA256"
+                and c["checksumValue"].lower() == payload["sha256"]
+                for c in file["checksums"]
+            ),
+            "generator checksum mismatch",
+        )
+        if payload["kind"] == "library":
             has_library = True
-            require(len(final_bytes) >= 20 and final_bytes[:6] == b'\x7fELF\x02\x01' and int.from_bytes(final_bytes[18:20], 'little') == machine, 'ELF architecture mismatch')
-    require(has_library, 'missing compiled library binding')
+            require(
+                len(final_bytes) >= 20
+                and final_bytes[:6] == b"\x7fELF\x02\x01"
+                and int.from_bytes(final_bytes[18:20], "little") == machine,
+                "ELF architecture mismatch",
+            )
+    require(has_library, "missing compiled library binding")
     ids = {}
     for key, component in packages.items():
-        purl = cargo_purl(component, identity['revision'])
-        package = {'SPDXID': 'SPDXRef-Cargo-'+sha256(purl.encode())[:32], 'filesAnalyzed': False,
-                   'downloadLocation': 'NOASSERTION', 'copyrightText': 'NOASSERTION',
-                   'licenseConcluded': 'NOASSERTION'}
-        result['packages'].append(package)
-        package['name'] = selected_syft[key]['name']; package['versionInfo'] = selected_syft[key]['version']
+        purl = cargo_purl(component, identity["revision"])
+        package = {
+            "SPDXID": "SPDXRef-Cargo-" + sha256(purl.encode())[:32],
+            "filesAnalyzed": False,
+            "downloadLocation": "NOASSERTION",
+            "copyrightText": "NOASSERTION",
+            "licenseConcluded": "NOASSERTION",
+        }
+        result["packages"].append(package)
+        package["name"] = selected_syft[key]["name"]
+        package["versionInfo"] = selected_syft[key]["version"]
         # cargo-about resolves package-specific declarations and configured
         # clarifications. This preserves full AND/OR expressions while filling
         # missing or inaccurate Cargo metadata uniformly for every crate.
-        package['licenseDeclared'] = about_licenses[key]
-        ref = {'referenceCategory': 'PACKAGE-MANAGER', 'referenceType': 'purl', 'referenceLocator': purl}
-        if ref not in package.setdefault('externalRefs', []):
-            package['externalRefs'].append(ref)
-        ids[key] = package['SPDXID']
-    relationships = result.setdefault('relationships', [])
+        package["licenseDeclared"] = about_licenses[key]
+        ref = {
+            "referenceCategory": "PACKAGE-MANAGER",
+            "referenceType": "purl",
+            "referenceLocator": purl,
+        }
+        if ref not in package.setdefault("externalRefs", []):
+            package["externalRefs"].append(ref)
+        ids[key] = package["SPDXID"]
+    relationships = result.setdefault("relationships", [])
     # The root crate represents the shipped extension. Individual file records
     # retain their own checksums and Syft metadata without synthetic ownership.
-    root_id = ids[build['root_id']]
-    describes_root = {'spdxElementId': result['SPDXID'], 'relationshipType': 'DESCRIBES',
-                      'relatedSpdxElement': root_id}
+    root_id = ids[build["root_id"]]
+    describes_root = {
+        "spdxElementId": result["SPDXID"],
+        "relationshipType": "DESCRIBES",
+        "relatedSpdxElement": root_id,
+    }
     if describes_root not in relationships:
         relationships.append(describes_root)
     for source, dest in edges:
-        relationships.append({'spdxElementId': ids[source], 'relationshipType': 'DEPENDS_ON', 'relatedSpdxElement': ids[dest]})
+        relationships.append(
+            {
+                "spdxElementId": ids[source],
+                "relationshipType": "DEPENDS_ON",
+                "relatedSpdxElement": ids[dest],
+            }
+        )
     # License associations are keyed by full Cargo ID, never ambiguous name/version.
     licensed = set()
-    for evidence_license in manifest['licenses']:
-        key = evidence_license['cargo_id']
-        require(key in packages, 'license belongs to unselected dependency')
-        text = checked_bytes(context.final_path, evidence_license['final'], evidence_license['sha256']).decode('utf-8')
-        require(any(record.get('id') == evidence_license['name'] and record.get('text') == text and any(use.get('crate', {}).get('id') == key for use in record.get('used_by', [])) for record in reports['cargo-about']['licenses']), 'license association does not match cargo-about evidence')
+    for evidence_license in manifest["licenses"]:
+        key = evidence_license["cargo_id"]
+        require(key in packages, "license belongs to unselected dependency")
+        text = checked_bytes(
+            context.final_path, evidence_license["final"], evidence_license["sha256"]
+        ).decode("utf-8")
+        require(
+            any(
+                record.get("id") == evidence_license["name"]
+                and record.get("text") == text
+                and any(
+                    use.get("crate", {}).get("id") == key
+                    for use in record.get("used_by", [])
+                )
+                for record in reports["cargo-about"]["licenses"]
+            ),
+            "license association does not match cargo-about evidence",
+        )
         licensed.add(key)
-        license_id = 'LicenseRef-Cargo-'+sha256(text.encode())[:32]
-        extracted = {'licenseId': license_id, 'extractedText': text, 'name': evidence_license['name']}
-        infos = result.setdefault('hasExtractedLicensingInfos', [])
-        if not any(info['licenseId'] == license_id for info in infos):
+        license_id = "LicenseRef-Cargo-" + sha256(text.encode())[:32]
+        extracted = {
+            "licenseId": license_id,
+            "extractedText": text,
+            "name": evidence_license["name"],
+        }
+        infos = result.setdefault("hasExtractedLicensingInfos", [])
+        if not any(info["licenseId"] == license_id for info in infos):
             infos.append(extracted)
-        package = next(p for p in result['packages'] if p['SPDXID'] == ids[key])
-        package.setdefault('attributionTexts', []).append('Cargo license text: '+license_id)
-    require(licensed == set(packages), 'selected dependencies missing shipped license evidence')
-    annotation = {'namespace': NAMESPACE, 'schema_version': 1, 'identity': identity, 'target': target,
-                  'build': {k: v for k, v in build.items() if k != 'root_id'},
-                  'root_purl': cargo_purl(root_component, identity['revision']), 'syft_cargo_lock': syft_evidence,
-                  'reports': {k: v['sha256'] for k, v in manifest['reports'].items()},
-                  'payload': manifest['payload'], 'lock_sha256': manifest['inputs']['lock_sha256']}
-    result.setdefault('annotations', []).append({'annotationType': 'OTHER', 'annotator': 'Tool: cnpg-pgrx-hook-v1',
-        'annotationDate': result['creationInfo']['created'], 'comment': json.dumps(annotation, sort_keys=True, separators=(',', ':'))})
-    result['relationships'] = sorted({json.dumps(r, sort_keys=True): r for r in relationships}.values(), key=lambda r: (r['spdxElementId'], r['relationshipType'], r['relatedSpdxElement']))
-    result['packages'].sort(key=lambda p: p['SPDXID'])
+        package = next(p for p in result["packages"] if p["SPDXID"] == ids[key])
+        package.setdefault("attributionTexts", []).append(
+            "Cargo license text: " + license_id
+        )
+    require(
+        licensed == set(packages),
+        "selected dependencies missing shipped license evidence",
+    )
+    annotation = {
+        "namespace": NAMESPACE,
+        "schema_version": 1,
+        "identity": identity,
+        "target": target,
+        "build": {k: v for k, v in build.items() if k != "root_id"},
+        "root_purl": cargo_purl(root_component, identity["revision"]),
+        "syft_cargo_lock": syft_evidence,
+        "reports": {k: v["sha256"] for k, v in manifest["reports"].items()},
+        "payload": manifest["payload"],
+        "lock_sha256": manifest["inputs"]["lock_sha256"],
+    }
+    result.setdefault("annotations", []).append(
+        {
+            "annotationType": "OTHER",
+            "annotator": "Tool: cnpg-pgrx-hook-v1",
+            "annotationDate": result["creationInfo"]["created"],
+            "comment": json.dumps(annotation, sort_keys=True, separators=(",", ":")),
+        }
+    )
+    result["relationships"] = sorted(
+        {json.dumps(r, sort_keys=True): r for r in relationships}.values(),
+        key=lambda r: (
+            r["spdxElementId"],
+            r["relationshipType"],
+            r["relatedSpdxElement"],
+        ),
+    )
+    result["packages"].sort(key=lambda p: p["SPDXID"])
     return result

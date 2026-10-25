@@ -15,13 +15,31 @@ ARG PGRX_SOURCE_SHA256
 
 USER 0
 
-COPY pgrx/ /pgrx/
+COPY \
+    pgrx/install-pgrx-build-environment.sh \
+    pgrx/verify-source.sh \
+    pgrx/install_tools.py \
+    pgrx/locked_download.py \
+    pgrx/build_config.py \
+    pgrx/evidence.py \
+    pgrx/finalize-pgrx-evidence.sh \
+    pgrx/license-about.toml \
+    /pgrx/
+COPY pgrx/dependencies/apt/ /pgrx/dependencies/apt/
+COPY pgrx/dependencies/tools.json pgrx/dependencies/sources.json /pgrx/dependencies/
+COPY pgrx/sbom/ /pgrx/sbom/
 WORKDIR /build
 ADD https://github.com/neondatabase/pg_session_jwt/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
-COPY pg-session-jwt/patches/Cargo.lock.patch /build/Cargo.lock.patch
-
+# v0.5.0 ships the previous package version. Review/remove this correction
+# whenever upstream changes, even if the source checksum lock was refreshed.
+RUN echo '07d0e4d27a45de2fcad92b955b058723e8266050c1ad4eba2497adb8f55c7aa1  Cargo.lock' | sha256sum --check --strict - \
+    || { echo 'Upstream Cargo.lock changed: review/remove the pg-session-jwt version correction' >&2; exit 1; }
+RUN cp Cargo.lock /tmp/pgrx-original-Cargo.lock && \
+    sed -i '/^name = "pg_session_jwt"$/{n;s/^version = "0.4.0"$/version = "0.5.0"/;}' Cargo.lock && \
+    ! cmp -s /tmp/pgrx-original-Cargo.lock Cargo.lock && \
+    echo '262845e77a113cf8d81fde7517d04df81f5f694d63a0c848fed72ff5b4390434  Cargo.lock' | sha256sum --check --strict -
 
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
