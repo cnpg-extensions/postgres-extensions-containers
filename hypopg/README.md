@@ -18,7 +18,7 @@ postgresql:
   - name: hypopg
     image:
       # renovate: suite=trixie-pgdg depName=postgresql-18-hypopg
-      reference: ghcr.io/cnpg-extensions/hypopg:1.4.3-18-trixie
+      reference: ghcr.io/cnpg-extensions/hypopg:1.4.4-18-trixie
 ~~~
 
 Enable the SQL extension in a Database:
@@ -36,7 +36,7 @@ spec:
   extensions:
   - name: hypopg
     # renovate: suite=trixie-pgdg depName=postgresql-18-hypopg extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.4.3'
+    version: '1.4.4'
 ~~~
 
 Create a hypothetical index and inspect the resulting plan:
