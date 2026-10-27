@@ -31,7 +31,7 @@ spec:
     - name: pg-stat-log
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-stat-log
-        reference: ghcr.io/cnpg-extensions/pg-stat-log:0.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-stat-log:0.3-18-trixie
 ~~~
 
 Install the SQL view and functions in the database:
