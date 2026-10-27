@@ -29,7 +29,7 @@ spec:
     - name: orafce
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-orafce
-        reference: ghcr.io/cnpg-extensions/orafce:4.16.13-18-trixie
+        reference: ghcr.io/cnpg-extensions/orafce:4.17.1-18-trixie
 ```
 
 Install the SQL extension in a database with a CNPG `Database` resource:
@@ -48,7 +48,7 @@ spec:
   - ensure: present
     name: orafce
     # renovate: suite=trixie-pgdg depName=postgresql-18-orafce extractVersion=^(?<version>\d+\.\d+)
-    version: '4.16'
+    version: '4.17'
 ```
 
 A SQL check that exercises the installed extension is:
