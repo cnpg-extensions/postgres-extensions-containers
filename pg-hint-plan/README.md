@@ -20,7 +20,7 @@ postgresql:
   - name: pg-hint-plan
     image:
       # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan
-      reference: ghcr.io/cnpg-extensions/pg-hint-plan:1.8.0-18-trixie
+      reference: ghcr.io/cnpg-extensions/pg-hint-plan:1.8.1-18-trixie
 ~~~
 
 Enable the SQL extension in a Database:
@@ -38,7 +38,7 @@ spec:
   extensions:
   - name: pg_hint_plan
     # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.8.0'
+    version: '1.8.1'
 ~~~
 
 The extension creates its objects in the hint_plan schema. For example:
