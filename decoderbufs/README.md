@@ -26,7 +26,7 @@ spec:
     - name: decoderbufs
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-decoderbufs
-        reference: ghcr.io/cnpg-extensions/decoderbufs:3.6.1-18-trixie
+        reference: ghcr.io/cnpg-extensions/decoderbufs:3.7.0-18-trixie
       ld_library_path: [system]
 ```
 
