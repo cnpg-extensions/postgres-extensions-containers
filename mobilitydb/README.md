@@ -35,7 +35,7 @@ spec:
     - name: mobilitydb
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb
-        reference: ghcr.io/cnpg-extensions/mobilitydb:1.3.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/mobilitydb:1.3.1-18-trixie
       ld_library_path: [system]
 ```
 
@@ -59,7 +59,7 @@ spec:
     version: '3.6.2'
   - name: mobilitydb
     # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.3.0'
+    version: '1.3.1'
 ```
 Alternatively, you can enable the extension directly with SQL:
 
