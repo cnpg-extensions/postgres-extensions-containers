@@ -20,17 +20,17 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pgsentinel
-        package = "1.5.1-1.pgdg12+1"
+        package = "1.5.2-1.pgdg12+1"
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pgsentinel extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "1.5.1"
+        sql     = "1.5.2"
       }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pgsentinel
-        package = "1.5.1-1.pgdg13+1"
+        package = "1.5.2-1.pgdg13+1"
         // renovate: suite=trixie-pgdg depName=postgresql-18-pgsentinel extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "1.5.1"
+        sql     = "1.5.2"
       }
     }
   }
