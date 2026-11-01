@@ -21,7 +21,7 @@ metadata = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-credcheck
         package = "6.0-1.pgdg12+1"
-        // SQL catalog version is read from the packaged control file; review separately from package updates.
+        // renovate: suite=bookworm-pgdg depName=postgresql-18-credcheck depType=sql
         sql = "6.0.0"
       }
     }
@@ -29,7 +29,7 @@ metadata = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-credcheck
         package = "6.0-1.pgdg13+1"
-        // SQL catalog version is read from the packaged control file; review separately from package updates.
+        // renovate: suite=trixie-pgdg depName=postgresql-18-credcheck depType=sql
         sql = "6.0.0"
       }
     }

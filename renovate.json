@@ -36,10 +36,23 @@
         "**/*.hcl"
       ],
       "matchStrings": [
-        "\\/\\/\\s*renovate:\\s*?(suite=(?<suite>.*?))?\\s*depName=(?<depName>.*?)?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*(sql|package)\\s*=\\s*\"(?<currentValue>.*)\""
+        "\\/\\/\\s*renovate:\\s*?(suite=(?<suite>.*?))?\\s*depName=(?<depName>[^\\s]+)(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*(sql|package)\\s*=\\s*\"(?<currentValue>.*)\""
       ],
       "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{#if suite}}{{suite}}{{else}}stable{{/if}}&components=main&binaryArch=amd64",
       "datasourceTemplate": "deb"
+    },
+    {
+      "description": "Map credcheck X.Y package releases to SQL X.Y.0 in metadata and README",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^credcheck\\/(?:metadata\\.hcl|README\\.md)$/"
+      ],
+      "matchStrings": [
+        "(?:\\/\\/|#)\\s*renovate:\\s*suite=(?<suite>[^\\s]+)\\s+depName=(?<depName>postgresql-[0-9]+-credcheck)\\s+depType=(?<depType>sql)\\s+(?:sql\\s*=\\s*|version:\\s*)\"(?<currentValue>[0-9]+\\.[0-9]+)\\.0\""
+      ],
+      "registryUrlTemplate": "https://download.postgresql.org/pub/repos/apt?suite={{suite}}&components=main&binaryArch=amd64",
+      "datasourceTemplate": "deb",
+      "extractVersionTemplate": "^(?<version>[0-9]+\\.[0-9]+)-[0-9]"
     },
     {
       "description": "updates the container image versions in the README.md files",
@@ -227,7 +240,6 @@
     {
       "description": "require SQL version review when no verified package mapping covers all shipped extensions",
       "matchPackageNames": [
-        "postgresql-*-credcheck",
         "postgresql-*-jsquery",
         "postgresql-*-mysql-fdw",
         "postgresql-*-pg-csv",

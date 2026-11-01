@@ -41,6 +41,7 @@ spec:
     name: cluster-credcheck
   extensions:
   - name: credcheck
+    # renovate: suite=trixie-pgdg depName=postgresql-18-credcheck depType=sql
     version: "6.0.0"
 ```
 
