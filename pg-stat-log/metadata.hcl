@@ -22,6 +22,7 @@ metadata = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-stat-log
         package = "0.3-1.pgdg12+1"
         // SQL version is independent of the package version; inspect control files before merging.
+        // Release 0.3 aligned them: https://github.com/fabriziomello/pg_stat_log/pull/7
         sql     = "0.3"
       }
     }
@@ -30,6 +31,7 @@ metadata = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-stat-log
         package = "0.3-1.pgdg13+1"
         // SQL version is independent of the package version; inspect control files before merging.
+        // Release 0.3 aligned them: https://github.com/fabriziomello/pg_stat_log/pull/7
         sql     = "0.3"
       }
     }
