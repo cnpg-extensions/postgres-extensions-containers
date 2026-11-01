@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+# SPDX-License-Identifier: Apache-2.0
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: pg-stat-log-sql-upgrade
+spec:
+  timeouts:
+    assert: 3m
+  description: >-
+    Check default installation and the 0.1 to 0.3 SQL upgrade using the shipped
+    image. Bootstrap must finish its SQL assertions before the Cluster is ready.
+  steps:
+  - name: Check SQL installation and upgrade during bootstrap
+    try:
+    - apply:
+        file: cluster.yaml
+    - assert:
+        file: ../../test/cluster-assert.yaml
