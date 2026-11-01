@@ -52,13 +52,6 @@ Credential checks apply to role creation and password changes. Configure policy 
 
 ## Dependencies and updates
 
-The 6.0 image supports fresh installations with SQL version `6.0.0`.
-Existing 5.x installations should remain on their current image until a corrected
-upstream package is available: the shipped
-[5.1.0 to 6.0.0 upgrade script](https://github.com/HexaCluster/credcheck/blob/v6.0/updates/credcheck--5.1.0--6.0.0.sql)
-contains duplicate object definitions, causing `ALTER EXTENSION credcheck UPDATE`
-to fail. The smoke tests cover fresh installations, not upgrades from older images.
-
 The image contains only the PGDG package server payload and license notices.
 The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
 Renovate tracks the pinned extension package. For an extension or base-runtime
