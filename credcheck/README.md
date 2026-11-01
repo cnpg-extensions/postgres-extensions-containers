@@ -26,7 +26,7 @@ spec:
     - name: credcheck
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-credcheck
-        reference: ghcr.io/cnpg-extensions/credcheck:5.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/credcheck:6.0-18-trixie
 ```
 
 ```yaml
@@ -41,7 +41,8 @@ spec:
     name: cluster-credcheck
   extensions:
   - name: credcheck
-    version: "5.0.0"
+    # renovate: suite=trixie-pgdg depName=postgresql-18-credcheck depType=sql
+    version: "6.0.0"
 ```
 
 ## Operation and privileges

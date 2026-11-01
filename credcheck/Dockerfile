@@ -12,6 +12,11 @@ USER 0
 RUN apt-get update && apt-get install -y --no-install-recommends \
       "postgresql-${PG_MAJOR}-credcheck=${EXT_VERSION}"
 
+# Renovate maps package X.Y to SQL X.Y.0; fail if upstream changes that convention.
+RUN grep -Eq "^default_version[[:space:]]*=[[:space:]]*'[0-9]+\.[0-9]+\.0'[[:space:]]*$" \
+      "/usr/share/postgresql/${PG_MAJOR}/extension/credcheck.control" \
+    || { echo "credcheck SQL version no longer follows X.Y.0; review the Renovate mapping" >&2; exit 1; }
+
 FROM scratch
 ARG PG_MAJOR
 
