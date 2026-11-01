@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[`pg_stat_log`](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by backend, database, role, severity, and SQLSTATE. It uses PostgreSQL 18's Custom Cumulative Stats API and must be preloaded. The PGDG package is `0.2`; its SQL catalog version remains `0.1`.
+[`pg_stat_log`](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by backend, database, role, severity, and SQLSTATE, with optional grouping by query identifier. It uses PostgreSQL 18's Custom Cumulative Stats API and must be preloaded. The PGDG package and SQL catalog versions are both `0.3`.
 
 ## Usage
 
@@ -31,7 +31,7 @@ spec:
     - name: pg-stat-log
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-stat-log
-        reference: ghcr.io/cnpg-extensions/pg-stat-log:0.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-stat-log:0.3-18-trixie
 ~~~
 
 Install the SQL view and functions in the database:
@@ -48,9 +48,9 @@ spec:
     name: cluster-pg-stat-log
   extensions:
   - name: pg_stat_log
-    # The catalog version (0.1) is independent of the Debian package version (0.2).
+    # SQL and Debian package versions are independently versioned.
     # SQL version must be checked in the package control files before merging updates.
-    version: '0.1'
+    version: '0.3'
 ~~~
 
 Inspect recent counts as a role with `pg_read_all_stats`:
