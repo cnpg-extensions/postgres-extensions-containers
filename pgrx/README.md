@@ -84,7 +84,7 @@ Grype reports vulnerabilities and Grant reports licenses; findings are retained 
 while scanner errors fail the job. CNPG smoke installs pinned, published
 CloudNativePG release manifests from the upstream `cloudnative-pg/cloudnative-pg`
 repository and production `cloudnative-pg` operator images. CI exercises the locked production releases, currently 1.29 and 1.30.
-The smoke uses pinned catalog fixtures and shared Task/Dagger tests, then checks
+The smoke uses the shared Task/Dagger setup and its CNPG extension catalogs, then checks
 mounted-library hashes, ELF architecture, dynamic-library resolution, SQL version,
 preload settings, and the pg-durable worker's connection to `app`. The pg-search recipe
 captures base libraries before installing packages, then stages the packaged
@@ -148,7 +148,7 @@ All lock material lives in `dependencies/`. Large Rust distribution and operator
 manifests are retrieved on use and verified against locked SHA-256 values; the
 offline check validates their pin structure. Smoke validates operator content
 before the shared Task downloads the same immutable URL for Kubernetes apply.
-Renovate proposes source tags, tool versions, image digests, and CNPG release tags/catalog commits. Operator fixtures
+Renovate proposes source tags, tool versions, image digests, and CNPG release tags. Operator fixtures
 are fetched from the official versioned release manifests, not the unsupported
 `artifacts` development snapshots. Coupled updates are not
 automerged. Before merging, refresh the affected children and run the checks:
@@ -181,8 +181,9 @@ installation. An unavailable old artifact requires an explicit lock refresh.
 The pinned toolbox image supplies the shared smoke-test environment. The shared
 Taskfile owns the already pinned Kubernetes node and kubectl, and the shared
 Dagger test function owns Chainsaw. PGRX overrides replace the mutable toolbox
-installer with the pinned runner plus the checked Kind binary. No PGRX path
-reinstalls unpinned apt/apk tools during smoke testing.
+installer with the pinned runner plus the checked Kind binary. Catalog
+installation follows the shared Taskfile unchanged: it installs Git with apk
+and applies `cnpg-extensions/artifacts` catalogs from `main`.
 
 Keep upstream recipe URL comments immediately above build commands. Add a source
 lock and recipe configuration for a new extension, refresh required system

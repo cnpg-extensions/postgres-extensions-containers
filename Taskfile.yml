@@ -341,18 +341,12 @@ tasks:
         --args="wait","--for=condition=Available","--timeout=2m","-n","cnpg-system","deployments","cnpg-controller-manager" \
         --use-entrypoint sync
 
-        if [ -n "{{ .CNPG_CATALOG_BOOKWORM_OVERRIDE }}" ] && [ -n "{{ .CNPG_CATALOG_TRIXIE_OVERRIDE }}" ]; then
-          dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
-          with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
-          with-exec --args="apply","--server-side","-f","{{ .CNPG_CATALOG_BOOKWORM_OVERRIDE }}","-f","{{ .CNPG_CATALOG_TRIXIE_OVERRIDE }}" --use-entrypoint sync
-        else
-          dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
-          with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
-          with-exec --args="apk","add","--no-cache","git" \
-          with-exec \
-          --args="apply","--server-side","-k","https://github.com/cnpg-extensions/artifacts//image-catalogs-extensions?ref=main" \
-          --use-entrypoint sync
-        fi
+        dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
+        with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
+        with-exec --args="apk","add","--no-cache","git" \
+        with-exec \
+        --args="apply","--server-side","-k","https://github.com/cnpg-extensions/artifacts//image-catalogs-extensions?ref=main" \
+        --use-entrypoint sync
     status:
       - |
         test -z "{{ .CNPG_MANIFEST_OVERRIDE }}" || exit 1

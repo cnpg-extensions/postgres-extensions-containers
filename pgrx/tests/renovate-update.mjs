@@ -17,7 +17,6 @@ const cases = [
   ['pgrx/dependencies/workflow-tools.json', 'PGRX digest-pinned'],
   ['pgrx/dependencies/bases.json', 'PGRX base indexes'],
   ['pgrx/dependencies/fixtures/lock.json', 'PGRX CNPG operator release tags'],
-  ['pgrx/dependencies/fixtures/lock.json', 'PGRX CNPG catalog fixture commits'],
   ['.github/workflows/pgrx_targets.yml', 'updates the Taskfile'],
 ];
 const cnpgReleaseRules = config.packageRules.filter(value => value.description?.startsWith('Keep CNPG '));
@@ -52,10 +51,6 @@ for (const [packageFile, prefix] of cases) {
       const eligible = filterVersions({ ...ruleConfig, ignoreUnstable: true }, dependency.currentValue, undefined,
       [{ version: change.newValue }, { version: nextMinorTag }], getVersioning(dependency.versioning));
       assert.deepEqual(eligible.map(release => release.version), [change.newValue]);
-    }
-    if (prefix === 'PGRX CNPG catalog fixture commits') {
-      assert.equal(dependency.datasource, 'git-refs');
-      assert.equal(dependency.currentValue, 'main');
     }
     const updated = await doAutoReplace({ ...manager, ...extracted, ...dependency, ...change,
       manager: 'regex', packageFile, depIndex }, content, false);

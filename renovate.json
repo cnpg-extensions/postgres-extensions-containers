@@ -206,19 +206,6 @@
       "depNameTemplate": "https://github.com/{{{packageName}}}",
       "datasourceTemplate": "github-tags",
       "versioningTemplate": "semver"
-    },
-    {
-      "description": "PGRX CNPG catalog fixture commits; refresh URLs and checksums together",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/pgrx/dependencies/fixtures/lock\\.json$/"
-      ],
-      "matchStrings": [
-        "\"repository\":\\s*\"(?<packageName>cnpg-extensions/artifacts)\",\\s*\"ref\":\\s*\"(?<currentValue>main)\",\\s*\"revision\":\\s*\"(?<currentDigest>[a-f0-9]{40})\""
-      ],
-      "depNameTemplate": "https://github.com/{{{packageName}}}",
-      "datasourceTemplate": "git-refs",
-      "versioningTemplate": "git"
     }
   ],
   "packageRules": [

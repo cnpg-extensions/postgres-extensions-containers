@@ -27,14 +27,12 @@ def smoke(preparation, assembly, output, selector=None):
     target = preparation["targets"][assembly["target"]]
     if target["pg_major"] != "18":
         raise ValueError("CNPG fixture currently supports PG18 only")
-    lock["files"]["operator"] = lock["operators"][requested]
+    operator = lock["operators"][requested]
     lock["selector"] = requested
-    for name, entry in lock["files"].items():
-        data = fetch_verified(entry["url"], entry["sha256"])
-        if name == "operator":
-            from refresh_lock import check_operator_manifest
+    data = fetch_verified(operator["url"], operator["sha256"])
+    from refresh_lock import check_operator_manifest
 
-            check_operator_manifest(data.decode(), entry)
+    check_operator_manifest(data.decode(), operator)
     pins = json.loads((ROOT / "pgrx/dependencies/workflow-tools.json").read_text())
     # Reuse the shared tasks with a pinned toolbox and a separate test engine.
     kind = Path(shutil.which("kind")).resolve()
@@ -52,9 +50,7 @@ def smoke(preparation, assembly, output, selector=None):
     )
     overrides = [
         "CNPG_RELEASE=" + requested,
-        "CNPG_MANIFEST_OVERRIDE=" + lock["files"]["operator"]["url"],
-        "CNPG_CATALOG_BOOKWORM_OVERRIDE=" + lock["files"]["catalog-bookworm"]["url"],
-        "CNPG_CATALOG_TRIXIE_OVERRIDE=" + lock["files"]["catalog-trixie"]["url"],
+        "CNPG_MANIFEST_OVERRIDE=" + operator["url"],
         "KIND_TOOLBOX=" + toolbox,
         "KIND_CLUSTER_NAME=pgrx-smoke",
         "KIND_KUBECONFIG_FILTER=python3 "

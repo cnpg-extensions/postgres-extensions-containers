@@ -235,23 +235,6 @@ def fixtures_lock(root, refresh):
         ):
             raise ValueError("operator fixture requires refresh")
     if refresh:
-        lock["files"]["operator"] = lock["operators"][lock["selector"]]
-    elif lock["files"]["operator"] != lock["operators"][lock["selector"]]:
-        raise ValueError("default operator fixture alias is stale")
-    for name, pin in lock["files"].items():
-        if name == "operator":
-            continue
-        file = directory / (name + ".yaml")
-        if refresh:
-            old_revision = pin["revision"]
-            pin["revision"] = api("repos/" + pin["repository"] + "/commits/main")["sha"]
-            pin["url"] = pin["url"].replace(old_revision, pin["revision"])
-            data = fetch(pin["url"])
-            file.write_bytes(data)
-            pin["sha256"] = sha(data)
-        if pin["revision"] not in pin["url"] or sha(file.read_bytes()) != pin["sha256"]:
-            raise ValueError("catalog fixture requires refresh")
-    if refresh:
         write(path, lock)
 
 

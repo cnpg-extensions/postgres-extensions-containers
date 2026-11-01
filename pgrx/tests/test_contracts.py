@@ -60,7 +60,7 @@ class LockTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'dependencies';fixtures=root/'fixtures';fixtures.mkdir(parents=True)
             (fixtures/'lock.json').write_text(json.dumps({'selector':selector,'supported_releases':[selector],
-                'operators':{selector:pin},'files':{'operator':pin}}))
+                'operators':{selector:pin}}))
             with patch.object(refresh_lock,'api',return_value={'sha':revision}) as api_call, \
                  patch.object(refresh_lock,'fetch',return_value=payload) as fetch_call:
                 fixtures_lock(root,True)
