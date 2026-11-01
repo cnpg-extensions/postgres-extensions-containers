@@ -71,7 +71,7 @@ libopenjp2-7_2.5.3-2.1~deb13u2_amd64.deb MD5Sum:07e72f2421f5a7f6692e7ca04b879709
 libgpgme11t64_1.24.2-3_amd64.deb MD5Sum:0e26d3e34af7581bda9fd6086fd29cc7
 libgpgmepp6t64_1.24.2-3_amd64.deb MD5Sum:9b6067de043f9224848364739828216b
 libnspr4_2%3a4.36-1_amd64.deb MD5Sum:dc825d7a7868119890f38608de1b5e21
-libnss3_2%3a3.110-1+deb13u4_amd64.deb MD5Sum:08e74796982fc84bcee7965b8000ff00
+libnss3_2%3a3.110-1+deb13u5_amd64.deb
 libpoppler147_25.03.0-5+deb13u4_amd64.deb MD5Sum:85a124f7fd20122d5eb5f2a30a75a051
 libqhull-r8.0_2020.2-6+b2_amd64.deb MD5Sum:3b0b21663513226a208f039abea3ad47
 librttopo1_1.1.0-4_amd64.deb MD5Sum:b522568252b7ba63b0c4f87300400be9
