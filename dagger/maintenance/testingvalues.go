@@ -153,7 +153,7 @@ func generateExtensionConfiguration(metadata *extensionMetadata, extensionImage 
 
 	return &ExtensionConfiguration{
 		Name: metadata.Name,
-		ImageVolumeSource: &ImageVolumeSource{
+		ImageVolumeSource: ImageVolumeSource{
 			Reference: targetExtensionImage,
 		},
 		ExtensionControlPath: metadata.ExtensionControlPath,

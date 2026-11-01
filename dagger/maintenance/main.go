@@ -547,7 +547,7 @@ func (m *Maintenance) GenerateCatalogs(
 
 				extensionsConfig := ExtensionConfiguration{
 					Name: metadata.Name,
-					ImageVolumeSource: &ImageVolumeSource{
+					ImageVolumeSource: ImageVolumeSource{
 						Reference: targetExtensionImage,
 					},
 					ExtensionControlPath: metadata.ExtensionControlPath,
