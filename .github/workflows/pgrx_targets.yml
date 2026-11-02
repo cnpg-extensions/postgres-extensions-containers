@@ -91,6 +91,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      provenance_matrix: ${{ steps.images.outputs.provenance_matrix }}
+      production_provenance_matrix: ${{ steps.images.outputs.production_provenance_matrix }}
     steps:
     - *id002
     - *id003
@@ -103,11 +106,40 @@ jobs:
     - name: Merge complete platform indexes
       run: python3 pgrx/assemble.py --preparation "$RUNNER_TEMP/prepared" --records "$RUNNER_TEMP/records" --output
         "$RUNNER_TEMP/assemblies"
+    - name: Generate provenance matrices
+      id: images
+      run: |
+        # Attest each assembled multi-platform index, once per repository/digest.
+        matrix=$(jq -cs '[ .[] | .[] | {
+          image: (."image.name" | split(",")[0] | split(":")[0]),
+          digest: ."containerimage.digest"
+        } ] | unique_by([.image, .digest])' "$RUNNER_TEMP"/assemblies/*/metadata.json)
+        echo "provenance_matrix=$matrix" >> "$GITHUB_OUTPUT"
+        echo "production_provenance_matrix=$(jq -c 'map(.image |= sub("-testing$"; ""))' <<< "$matrix")" >> "$GITHUB_OUTPUT"
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       with:
         name: assemblies-${{ inputs.extension_name }}
         path: ${{ runner.temp }}/assemblies
         if-no-files-found: error
+  provenance:
+    name: Provenance for testing images
+    needs: assemble
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.assemble.outputs.provenance_matrix) }}
+    # The SLSA generator requires a full version tag rather than a SHA pin.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
+    with:
+      image: ${{ matrix.image }}
+      digest: ${{ matrix.digest }}
+      registry-username: ${{ github.actor }}
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
   handoff:
     needs:
     - prepare
@@ -225,6 +257,7 @@ jobs:
     - security
     - smoke
     - handoff
+    - provenance
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -251,6 +284,28 @@ jobs:
         path: ${{ runner.temp }}/promote-result
         if-no-files-found: error
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+  production-provenance:
+    name: Provenance for production images
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    needs:
+    - assemble
+    - promote
+    permissions:
+      actions: read
+      id-token: write
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.assemble.outputs.production_provenance_matrix) }}
+    # Generate in the destination repository: image copying does not copy this attestation.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v2.1.0
+    with:
+      image: ${{ matrix.image }}
+      digest: ${{ matrix.digest }}
+      registry-username: ${{ github.actor }}
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}
   gate:
     if: ${{ always() }}
     needs:
@@ -262,6 +317,8 @@ jobs:
     - security
     - smoke
     - promote
+    - provenance
+    - production-provenance
     runs-on: ubuntu-24.04
     steps:
     - env:
@@ -272,6 +329,6 @@ jobs:
         import json, os
         results=json.loads(os.environ['RESULTS'])
         for name,value in results.items():
-            if name=='promote' and os.environ['PROMOTION_ALLOWED']=='false' and value['result']=='skipped': continue
+            if name in ('promote', 'production-provenance') and os.environ['PROMOTION_ALLOWED']=='false' and value['result']=='skipped': continue
             if value['result']!='success': raise SystemExit(f"required job {name}: {value['result']}")
         PY

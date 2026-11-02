@@ -65,6 +65,7 @@ jobs:
       matrix:
         extension: ${{ fromJSON(needs.discover.outputs.matrix) }}
     permissions:
+      actions: read
       contents: read
       packages: write
       id-token: write

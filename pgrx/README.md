@@ -79,7 +79,10 @@ validates their raw graphs, and uses full staging-index references in Buildx's
 dry-run merge. Normal tags are assigned only after reading back a valid candidate.
 
 Sign, security, smoke, and promotion consume per-target assembly artifacts.
-Production promotion is restricted to trusted `main` push/dispatch events.
+The shared reusable SLSA generator attests each assembled testing index; its
+success gates promotion. After promotion, the same generator attests each index
+in its production repository. Production promotion is restricted to trusted
+`main` push/dispatch events.
 Grype reports vulnerabilities and Grant reports licenses; findings are retained for review,
 while scanner errors fail the job. CNPG smoke installs pinned, published
 CloudNativePG release manifests from the upstream `cloudnative-pg/cloudnative-pg`

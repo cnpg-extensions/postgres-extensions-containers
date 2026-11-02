@@ -51,6 +51,11 @@ check the publisher signature or the complete graph. Buildx returns an SPDX
 stub for a single-platform index and a platform map for a multi-platform index;
 the verifier handles both shapes identically for all extensions.
 
+Hosted workflows also publish independent SLSA attestations for testing and
+production indexes using the shared reusable SLSA generator. This verifier
+checks the embedded BuildKit evidence; it does not verify those separate SLSA
+attestations.
+
 Grype and Grant scan the extracted document; they do not authenticate it. Reports cover
 the shipped extension payload and its selected dependencies, not the PostgreSQL
 base image or other extension volumes. Scan those images separately. PGRX Cargo
