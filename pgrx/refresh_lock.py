@@ -188,56 +188,6 @@ def bases_lock(root, refresh):
     return bases
 
 
-def operator_manifest_url(pin):
-    ref = pin["ref"]
-    match = re.fullmatch(r"v(\d+\.\d+\.\d+)", ref)
-    if not match:
-        raise ValueError("operator fixture must pin a published CNPG release tag")
-    if pin["repository"] != "cloudnative-pg/cloudnative-pg":
-        raise ValueError(
-            "operator fixture must use the official CNPG release repository"
-        )
-    return f"https://raw.githubusercontent.com/{pin['repository']}/{pin['revision']}/releases/cnpg-{match.group(1)}.yaml"
-
-
-def check_operator_manifest(data, pin):
-    version = pin["ref"].removeprefix("v")
-    image = f"ghcr.io/cloudnative-pg/cloudnative-pg:{version}"
-    if image not in data or "cloudnative-pg-testing" in data:
-        raise ValueError(
-            "operator fixture must use its published production CNPG image"
-        )
-
-
-def fixtures_lock(root, refresh):
-    directory = root / "fixtures"
-    path = directory / "lock.json"
-    lock = json.loads(path.read_text())
-    if lock["selector"] not in lock["operators"] or not set(
-        lock["supported_releases"]
-    ) <= set(lock["operators"]):
-        raise ValueError("invalid default or supported CNPG fixture selector")
-    for selector, pin in lock["operators"].items():
-        if pin["ref"][1:].rsplit(".", 1)[0] != selector:
-            raise ValueError("operator fixture release does not match its selector")
-        if refresh:
-            pin["revision"] = api(
-                "repos/" + pin["repository"] + "/commits/" + pin["ref"]
-            )["sha"]
-            pin["url"] = operator_manifest_url(pin)
-            data = fetch(pin["url"])
-            check_operator_manifest(data.decode(), pin)
-            pin["sha256"] = sha(data)
-        if (
-            not re.fullmatch("[a-f0-9]{40}", pin["revision"])
-            or pin["url"] != operator_manifest_url(pin)
-            or not re.fullmatch("[a-f0-9]{64}", pin["sha256"])
-        ):
-            raise ValueError("operator fixture requires refresh")
-    if refresh:
-        write(path, lock)
-
-
 def check_apt(root):
     lock = json.loads((root / "apt/lock.json").read_text())
     if lock["base_lock_sha256"] != sha((root / "bases.json").read_bytes()):
@@ -275,7 +225,7 @@ def main():
     mode.add_argument("--refresh", action="store_true")
     parser.add_argument(
         "--only",
-        choices=["all", "sources", "tools", "bases", "fixtures", "apt"],
+        choices=["all", "sources", "tools", "bases", "apt"],
         default="all",
     )
     args = parser.parse_args()
@@ -291,13 +241,12 @@ def main():
     check_sources(inventory, sources)
     tools_lock(root, refresh("tools"))
     bases_lock(root, refresh("bases"))
-    fixtures_lock(root, refresh("fixtures"))
     if refresh("apt") or refresh("bases"):
         from refresh_apt import refresh_apt
 
         refresh_apt()
     check_apt(root)
-    print("PGRX source, tool, base, fixture and package locks are consistent")
+    print("PGRX source, tool, base and package locks are consistent")
 
 
 if __name__ == "__main__":

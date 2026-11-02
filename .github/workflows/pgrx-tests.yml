@@ -1,0 +1,58 @@
+name: PGRX contract tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'pgrx/**'
+      - 'dagger/maintenance/**'
+      - 'docker-bake.hcl'
+      - 'scripts/**'
+      - 'test/**'
+      - 'docker-bake-pgrx.hcl'
+      - '.github/workflows/pgrx*.yml'
+      - '.github/workflows/cnpg-versions.yml'
+      - '*/Dockerfile'
+      - '*/metadata.hcl'
+      - 'sbom-generator/**'
+      - 'Taskfile.yml'
+      - 'renovate.json'
+  pull_request:
+    paths:
+      - 'pgrx/**'
+      - 'dagger/maintenance/**'
+      - 'docker-bake.hcl'
+      - 'scripts/**'
+      - 'test/**'
+      - 'docker-bake-pgrx.hcl'
+      - '.github/workflows/pgrx*.yml'
+      - '.github/workflows/cnpg-versions.yml'
+      - '*/Dockerfile'
+      - '*/metadata.hcl'
+      - 'sbom-generator/**'
+      - 'Taskfile.yml'
+      - 'renovate.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: PGRX contract tests
+    runs-on: ubuntu-26.04
+    env:
+      # renovate: datasource=docker depName=ghcr.io/cnpg-extensions/cnpg-sbom-generator versioning=docker
+      SBOM_GENERATOR: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:b68c8b1f2433bc6fd4cae7c9d6e9a44bf80a2f421bf7e62a44c164e862a387e8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Run PGRX contract tests
+        run: |
+          docker run --rm --entrypoint python3 \
+            --volume "$PWD:/workspace:ro" --workdir /workspace \
+            "$SBOM_GENERATOR" pgrx/test.py

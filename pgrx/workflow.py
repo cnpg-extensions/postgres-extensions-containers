@@ -87,6 +87,7 @@ def changed_extensions(paths, inventory):
         "test/",
         ".github/workflows/pgrx.yml",
         ".github/workflows/pgrx_targets.yml",
+        ".github/workflows/cnpg-versions.yml",
         "dagger/maintenance/",
         "Taskfile.yml",
     )

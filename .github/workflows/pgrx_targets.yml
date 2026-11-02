@@ -7,7 +7,7 @@ name: PGRX platform builds
         type: string
         required: true
       cnpg_version:
-        description: CNPG fixture selector
+        description: Optional CNPG full version or main
         type: string
         required: false
         default: ''
@@ -18,6 +18,10 @@ defaults:
   run:
     shell: bash -Eeuo pipefail {0}
 jobs:
+  generate-smoke-test-matrix:
+    uses: ./.github/workflows/cnpg-versions.yml
+    with:
+      cnpg_version: ${{ inputs.cnpg_version }}
   prepare:
     runs-on: ubuntu-26.04
     permissions:
@@ -25,7 +29,6 @@ jobs:
     outputs:
       matrix: ${{ steps.prepare.outputs.matrix }}
       targets: ${{ steps.prepare.outputs.targets }}
-      smoke_targets: ${{ steps.prepare.outputs.smoke_targets }}
     env:
       # renovate: datasource=docker depName=ghcr.io/cnpg-extensions/cnpg-sbom-generator versioning=docker
       SBOM_GENERATOR: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:b68c8b1f2433bc6fd4cae7c9d6e9a44bf80a2f421bf7e62a44c164e862a387e8
@@ -223,10 +226,13 @@ jobs:
     - assemble
     - sign
     - handoff
+    - generate-smoke-test-matrix
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.smoke_targets) }}
+      matrix:
+        target: ${{ fromJSON(needs.prepare.outputs.targets).include.*.target }}
+        cnpg: ${{ fromJSON(needs.generate-smoke-test-matrix.outputs.versions) }}
     permissions:
       contents: read
       packages: read
@@ -310,6 +316,7 @@ jobs:
     if: ${{ always() }}
     needs:
     - prepare
+    - generate-smoke-test-matrix
     - build-platform
     - assemble
     - handoff

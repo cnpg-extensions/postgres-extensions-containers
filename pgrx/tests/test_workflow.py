@@ -8,11 +8,12 @@ class SelectorTest(unittest.TestCase):
     inventory={'pg-session-jwt':{'versions':{'trixie':{'18':{}},'bookworm':{'18':{}}}},'pg-durable':{'versions':{'trixie':{'18':{}}}}}
     def test_hosted_selects_both_native_architectures(self):
         self.assertEqual(select({'extension_name':'pg-session-jwt'},self.inventory),['linux/amd64','linux/arm64'])
-        self.assertEqual(select({'extension_name':'pg-durable','cnpg_version':'1.30'},self.inventory),['linux/amd64','linux/arm64'])
+        self.assertEqual(select({'extension_name':'pg-durable','cnpg_version':'1.30.1'},self.inventory),['linux/amd64','linux/arm64'])
         with self.assertRaises(ValueError):select({'extension_name':'pg-unknown'},self.inventory)
     def test_paths(self):
         self.assertEqual(changed_extensions(['sbom-generator/generator.py'],self.inventory),[])
+        self.assertEqual(changed_extensions(['.github/workflows/pgrx-tests.yml'],self.inventory),[])
         self.assertEqual(changed_extensions(['pg-durable/Dockerfile'],self.inventory),['pg-durable'])
-        for path in ['pgrx/sbom/augment_spdx.py', 'docker-bake.hcl', 'scripts/stage_system_libs.sh', 'test/pg-search/01-basic.sql']:
+        for path in ['pgrx/sbom/augment_spdx.py', 'docker-bake.hcl', 'scripts/stage_system_libs.sh', 'test/pg-search/01-basic.sql', '.github/workflows/cnpg-versions.yml']:
             with self.subTest(path=path):
                 self.assertEqual(changed_extensions([path],self.inventory),sorted(self.inventory))

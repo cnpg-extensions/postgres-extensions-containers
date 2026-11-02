@@ -12,27 +12,16 @@ import time
 import uuid
 
 from workflow import ROOT, discover
-from locked_download import fetch_verified
 from verify import validate_layout
 
 
 def smoke(preparation, assembly, output, selector=None):
-    fixtures = ROOT / "pgrx/dependencies/fixtures"
-    lock = json.loads((fixtures / "lock.json").read_text())
-    requested = (
-        selector or preparation["inputs"].get("cnpg_version") or lock["selector"]
-    )
-    if requested not in lock["operators"]:
-        raise ValueError("CNPG selector has no matching immutable fixture lock")
+    requested = selector or preparation["inputs"].get("cnpg_version")
+    if not requested or not re.fullmatch(r"main|[0-9]+\.[0-9]+\.[0-9]+", requested):
+        raise ValueError("CNPG version must be main or a full version like 1.30.1")
     target = preparation["targets"][assembly["target"]]
     if target["pg_major"] != "18":
-        raise ValueError("CNPG fixture currently supports PG18 only")
-    operator = lock["operators"][requested]
-    lock["selector"] = requested
-    data = fetch_verified(operator["url"], operator["sha256"])
-    from refresh_lock import check_operator_manifest
-
-    check_operator_manifest(data.decode(), operator)
+        raise ValueError("CNPG smoke currently supports PG18 only")
     pins = json.loads((ROOT / "pgrx/dependencies/workflow-tools.json").read_text())
     # Reuse the shared tasks with a pinned toolbox and a separate test engine.
     kind = Path(shutil.which("kind")).resolve()
@@ -50,7 +39,6 @@ def smoke(preparation, assembly, output, selector=None):
     )
     overrides = [
         "CNPG_RELEASE=" + requested,
-        "CNPG_MANIFEST_OVERRIDE=" + operator["url"],
         "KIND_TOOLBOX=" + toolbox,
         "KIND_CLUSTER_NAME=pgrx-smoke",
         "KIND_KUBECONFIG_FILTER=python3 "
@@ -270,7 +258,7 @@ def smoke(preparation, assembly, output, selector=None):
             )
             + "\n"
         )
-        (output / "fixtures.json").write_text(json.dumps(lock, indent=2) + "\n")
+        (output / "cnpg-version.txt").write_text(requested + "\n")
     finally:
         try:
             kubectl(

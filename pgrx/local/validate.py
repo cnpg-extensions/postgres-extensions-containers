@@ -30,6 +30,7 @@ def main():
                    env={**os.environ, 'DAGGER_SESSION_PORT': '1', 'DAGGER_SESSION_TOKEN': 'test'}, check=True)
     subprocess.run(['actionlint', '.github/workflows/sbom-generator.yml',
                     '.github/workflows/pgrx.yml', '.github/workflows/pgrx_targets.yml',
+                    '.github/workflows/pgrx-tests.yml', '.github/workflows/cnpg-versions.yml',
                     '.github/workflows/test.yml'], cwd=ROOT, check=True)
     subprocess.run([sys.executable, 'pgrx/refresh_lock.py', '--check'], cwd=ROOT, check=True)
     if args.renovate_output:

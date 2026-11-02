@@ -84,9 +84,10 @@ success gates promotion. After promotion, the same generator attests each index
 in its production repository. Production promotion is restricted to trusted
 `main` push/dispatch events.
 Grype reports vulnerabilities and Grant reports licenses; findings are retained for review,
-while scanner errors fail the job. CNPG smoke installs pinned, published
-CloudNativePG release manifests from the upstream `cloudnative-pg/cloudnative-pg`
-repository and production `cloudnative-pg` operator images. CI exercises the locked production releases, currently 1.29 and 1.30.
+while scanner errors fail the job. Both build paths use the shared CNPG support
+policy: `main`, the highest stable patch of the previous minor, and the pinned
+latest release. Smoke uses the shared Taskfile's live operator manifests and
+catalogs, including development images for `main`.
 The smoke uses the shared Task/Dagger setup and its CNPG extension catalogs, then checks
 mounted-library hashes, ELF architecture, dynamic-library resolution, SQL version,
 preload settings, and the pg-durable worker's connection to `app`. The pg-search recipe
@@ -95,6 +96,9 @@ extension's additional runtime closure and copyright notices using the shared
 helpers. This includes quadmath where required.
 
 ## Local validation
+
+The dedicated PGRX contract workflow runs independently of Go tests. It does not
+replace the shared Automerge gate or change branch protection.
 
 Run from the repository root with Docker Buildx, Go, Dagger, actionlint, and
 Python available. The Python tests also run Syft against fixture lockfiles. Signing and full extension acceptance run in GitHub Actions
@@ -135,8 +139,8 @@ For full extension acceptance, dispatch `.github/workflows/pgrx.yml` with an
 `extension_name`. It builds all metadata-declared targets on native AMD64 and
 ARM64, assembles and signs their indexes, checks SPDX/Grype/Grant results, and runs
 CNPG smoke tests. Branch builds publish testing packages; production promotion
-requires a trusted `main` event. An optional `cnpg_version` selects one locked
-operator release; by default all supported locked releases are tested.
+requires a trusted `main` event. An optional `cnpg_version` selects `main` or a full version such as `1.30.1`;
+otherwise the shared support policy selects the smoke versions.
 
 For an unsigned local build, use the extension's ordinary Bake targets with
 `-f docker-bake.hcl -f docker-bake-pgrx.hcl -f <extension>/metadata.hcl`
@@ -147,20 +151,18 @@ be used to inspect Cargo evidence; it does not test hosted signing.
 
 ## Dependency updates
 
-All lock material lives in `dependencies/`. Large Rust distribution and operator
-manifests are retrieved on use and verified against locked SHA-256 values; the
-offline check validates their pin structure. Smoke validates operator content
-before the shared Task downloads the same immutable URL for Kubernetes apply.
-Renovate proposes source tags, tool versions, image digests, and CNPG release tags. Operator fixtures
-are fetched from the official versioned release manifests, not the unsupported
-`artifacts` development snapshots. Coupled updates are not
-automerged. Before merging, refresh the affected children and run the checks:
+All lock material lives in `dependencies/`. The Rust distribution manifest is
+retrieved on use and verified against its locked SHA-256; the offline check
+validates its pin structure. Renovate proposes source tags, tool versions, and
+image digests. CNPG support policy owns its latest release pin in
+`.github/workflows/cnpg-versions.yml`; operator manifests follow the same live
+release-branch or `main` policy as shared smoke tests. Coupled lock updates are
+not automerged. Before merging, refresh the affected children and run the checks:
 
 ```sh
 python3 pgrx/refresh_lock.py --refresh --only sources
 python3 pgrx/refresh_lock.py --refresh --only tools
 python3 pgrx/refresh_lock.py --refresh --only bases
-python3 pgrx/refresh_lock.py --refresh --only fixtures
 python3 pgrx/refresh_lock.py --check
 ```
 

@@ -312,9 +312,7 @@ tasks:
       CNPG_MANIFEST:
         sh: |
           release="{{ .CNPG_RELEASE }}"
-          if [ -n "{{ .CNPG_MANIFEST_OVERRIDE }}" ]; then
-            echo "{{ .CNPG_MANIFEST_OVERRIDE }}"
-          elif [ "${release}" = "main" ]; then
+          if [ "${release}" = "main" ]; then
             echo "https://raw.githubusercontent.com/cloudnative-pg/artifacts/main/manifests/operator-manifest.yaml"
           elif echo "${release}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
             echo "https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/release-${release%.*}/releases/cnpg-${release}.yaml"
@@ -351,7 +349,6 @@ tasks:
     status:
       - |
         set -o pipefail
-        test -z "{{ .CNPG_MANIFEST_OVERRIDE }}" || exit 1
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
           with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
         dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \

@@ -11,7 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from prepare import digest
 from record import assert_provenance, load_preparation
-from refresh_lock import tool_url, check_sources, check_apt, fixtures_lock, operator_manifest_url, check_operator_manifest
+from refresh_lock import tool_url, check_sources, check_apt
 from verify import signature_command, validate_document
 from workflow import ROOT
 
@@ -40,41 +40,6 @@ class LockTest(unittest.TestCase):
             (root/'apt/lock.json').write_text(json.dumps({'base_lock_sha256':'0'*64}))
             with self.assertRaisesRegex(ValueError,'coupled apt'):check_apt(root)
 
-    def test_operator_fixtures_are_published_release_manifests(self):
-        root=ROOT/'pgrx/dependencies'
-        lock=json.loads((root/'fixtures/lock.json').read_text())
-        fixtures_lock(root,False)
-        self.assertEqual(lock['selector'],'1.30')
-        self.assertEqual(lock['supported_releases'],['1.29','1.30'])
-        self.assertEqual(set(lock['operators']),set(lock['supported_releases']))
-        for selector,pin in lock['operators'].items():
-            version=pin['ref'].removeprefix('v')
-            self.assertEqual(pin['url'],operator_manifest_url(pin))
-
-    def test_operator_fixture_refresh_rebuilds_release_asset_url(self):
-        import refresh_lock
-        selector='1.30';ref='v1.30.2';revision='f'*40
-        pin={'repository':'cloudnative-pg/cloudnative-pg','ref':ref,'revision':'0'*40,
-             'url':'old','sha256':'0'*64}
-        payload=('image: ghcr.io/cloudnative-pg/cloudnative-pg:1.30.2\n').encode()
-        with tempfile.TemporaryDirectory() as temporary:
-            root=Path(temporary)/'dependencies';fixtures=root/'fixtures';fixtures.mkdir(parents=True)
-            (fixtures/'lock.json').write_text(json.dumps({'selector':selector,'supported_releases':[selector],
-                'operators':{selector:pin}}))
-            with patch.object(refresh_lock,'api',return_value={'sha':revision}) as api_call, \
-                 patch.object(refresh_lock,'fetch',return_value=payload) as fetch_call:
-                fixtures_lock(root,True)
-            self.assertEqual(api_call.call_args.args[0],'repos/cloudnative-pg/cloudnative-pg/commits/v1.30.2')
-            refreshed=json.loads((fixtures/'lock.json').read_text())
-            expected=f'https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/{revision}/releases/cnpg-1.30.2.yaml'
-            self.assertEqual(refreshed['operators'][selector]['url'],expected)
-            self.assertEqual(fetch_call.call_args.args[0],expected)
-            self.assertFalse((fixtures/'operator-1.30.yaml').exists())
-
-    def test_testing_operator_images_are_rejected(self):
-        pin={'repository':'cloudnative-pg/cloudnative-pg','ref':'v1.30.1'}
-        with self.assertRaisesRegex(ValueError,'production CNPG image'):
-            check_operator_manifest('image: ghcr.io/cloudnative-pg/cloudnative-pg-testing:1.30.1',pin)
 
 
 class ProvenanceTest(unittest.TestCase):

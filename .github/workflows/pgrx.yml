@@ -7,7 +7,7 @@ name: Build, test and publish PGRX extensions
         type: string
         required: true
       cnpg_version:
-        description: CNPG fixture selector
+        description: Optional CNPG full version or main
         type: string
         required: false
         default: ''
@@ -19,6 +19,7 @@ name: Build, test and publish PGRX extensions
     - test/**
     - docker-bake-pgrx.hcl
     - .github/workflows/pgrx*.yml
+    - .github/workflows/cnpg-versions.yml
     - dagger/maintenance/**
     - '*/Dockerfile'
     - '*/metadata.hcl'

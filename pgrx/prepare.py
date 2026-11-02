@@ -38,12 +38,11 @@ def prepare(inputs, generator, output):
     inventory = discover()
     platforms = select(inputs, inventory)
     extension = inputs["extension_name"]
-    from refresh_lock import check_sources, tools_lock, fixtures_lock, check_apt
+    from refresh_lock import check_sources, tools_lock, check_apt
 
     dependencies = ROOT / "pgrx/dependencies"
     check_sources(inventory, json.loads((dependencies / "sources.json").read_text()))
     tools_lock(dependencies, False)
-    fixtures_lock(dependencies, False)
     check_apt(dependencies)
     if output.exists():
         raise ValueError("fresh preparation directory required")
@@ -171,18 +170,6 @@ def main():
             for r in result["rows"]
         ]
     }
-    fixtures = json.loads((ROOT / "pgrx/dependencies/fixtures/lock.json").read_text())
-    selector = result["inputs"].get("cnpg_version")
-    selectors = [selector] if selector else fixtures["supported_releases"]
-    if not set(selectors) <= set(fixtures["operators"]):
-        raise ValueError("unsupported CNPG selector; refresh fixture locks")
-    smoke_matrix = {
-        "include": [
-            {"target": target, "cnpg": selector}
-            for target in result["targets"]
-            for selector in selectors
-        ]
-    }
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as output:
             output.write(
@@ -193,8 +180,6 @@ def main():
                 + json.dumps({"include": [{"target": t} for t in result["targets"]]})
                 + "\n"
             )
-        with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-            output.write("smoke_targets=" + json.dumps(smoke_matrix) + "\n")
     print(json.dumps(matrix))
 
 

@@ -4,8 +4,6 @@ import fs from 'node:fs/promises';
 import { extractPackageFile } from '/usr/local/renovate/dist/modules/manager/custom/regex/index.js';
 import { doAutoReplace } from '/usr/local/renovate/dist/workers/repository/update/branch/auto-replace.js';
 import { applyPackageRules } from '/usr/local/renovate/dist/util/package-rules/index.js';
-import { filterVersions } from '/usr/local/renovate/dist/workers/repository/process/lookup/filter.js';
-import { get as getVersioning } from '/usr/local/renovate/dist/modules/versioning/index.js';
 import { GlobalConfig } from '/usr/local/renovate/dist/config/global.js';
 
 GlobalConfig.set({ localDir: '/tmp/renovate-update-fixture' });
@@ -16,11 +14,10 @@ const cases = [
   ...['tools', 'workflow-tools'].map(name => ['pgrx/dependencies/' + name + '.json', 'PGRX workflow/build tool']),
   ['pgrx/dependencies/workflow-tools.json', 'PGRX digest-pinned'],
   ['pgrx/dependencies/bases.json', 'PGRX base indexes'],
-  ['pgrx/dependencies/fixtures/lock.json', 'PGRX CNPG operator release tags'],
   ['.github/workflows/pgrx_targets.yml', 'updates the Taskfile'],
+  ['.github/workflows/pgrx-tests.yml', 'updates the Taskfile'],
+  ['.github/workflows/cnpg-versions.yml', 'updates the Taskfile'],
 ];
-const cnpgReleaseRules = config.packageRules.filter(value => value.description?.startsWith('Keep CNPG '));
-assert.equal(cnpgReleaseRules.length, 2, 'CNPG release tag line rules');
 let count = 0;
 for (const [packageFile, prefix] of cases) {
   const manager = config.customManagers.find(value => value.description.startsWith(prefix));
@@ -29,29 +26,10 @@ for (const [packageFile, prefix] of cases) {
   const extracted = extractPackageFile(content, packageFile, manager);
   assert(extracted?.deps.length, packageFile);
   for (const [depIndex, dependency] of extracted.deps.entries()) {
-    if (prefix === 'updates the Taskfile' && dependency.depName !== 'ghcr.io/cnpg-extensions/cnpg-sbom-generator') continue;
+    if (prefix === 'updates the Taskfile' && !['ghcr.io/cnpg-extensions/cnpg-sbom-generator', 'cloudnative-pg/cloudnative-pg'].includes(dependency.depName)) continue;
     let change = dependency.currentDigest
       ? { newDigest: (dependency.currentDigest.startsWith('sha256:') ? 'sha256:' : '') + 'a'.repeat(dependency.currentDigest.replace('sha256:', '').length) }
       : { newValue: dependency.currentValue.startsWith('v') ? 'v999.0.0' : '999.0.0' };
-    if (prefix === 'PGRX CNPG operator release tags') {
-      const version = dependency.currentValue.match(/^v(\d+)\.(\d+)\.(\d+)$/);
-      assert(version, dependency.currentValue);
-      assert.equal(dependency.datasource, 'github-tags');
-      assert.equal(dependency.versioning, 'semver');
-      assert.equal(dependency.packageName, 'cloudnative-pg/cloudnative-pg');
-      assert.equal(dependency.depName, 'https://github.com/cloudnative-pg/cloudnative-pg');
-      const lineRule = cnpgReleaseRules.find(rule => new RegExp(rule.matchCurrentValue.slice(1, -1)).test(dependency.currentValue));
-      assert(lineRule, `missing minor line rule for ${dependency.currentValue}`);
-      assert.equal(lineRule.allowedVersions, lineRule.matchCurrentValue);
-      const ruleConfig = await applyPackageRules({ ...dependency, packageRules: config.packageRules,
-        manager: 'regex', packageFile, updateType: 'patch' }, 'pre-lookup');
-      assert.equal(ruleConfig.allowedVersions, lineRule.allowedVersions);
-      change = { newValue: `v${version[1]}.${version[2]}.${Number(version[3]) + 1}`, newDigest: 'b'.repeat(40) };
-      const nextMinorTag = `v${version[1]}.${Number(version[2]) + 1}.0`;
-      const eligible = filterVersions({ ...ruleConfig, ignoreUnstable: true }, dependency.currentValue, undefined,
-      [{ version: change.newValue }, { version: nextMinorTag }], getVersioning(dependency.versioning));
-      assert.deepEqual(eligible.map(release => release.version), [change.newValue]);
-    }
     const updated = await doAutoReplace({ ...manager, ...extracted, ...dependency, ...change,
       manager: 'regex', packageFile, depIndex }, content, false);
     assert.notEqual(updated, content, dependency.depName);
@@ -79,5 +57,21 @@ for (const [packageFile, prefix] of cases) {
     }
     count++;
   }
+}
+// Exercise resolved policy, including a future source repository name. PGRX
+// overrides must not change shared GitHub Action grouping or Docker digest pins.
+for (const [packageFile, depName, datasource, groupName, pinDigests, automerge] of [
+  ['pg-durable/metadata.hcl', 'microsoft/pg_durable', 'github-tags', null, false, false],
+  ['pg-durable/metadata.hcl', 'future-owner/future-source', 'github-tags', null, false, false],
+  ['pgrx/dependencies/tools.json', 'rust-lang/rust', 'github-tags', null, false, false],
+  ['.github/workflows/pgrx.yml', 'actions/checkout', 'github-tags', 'all github action', true, true],
+  ['pgrx/dependencies/bases.json', 'debian', 'docker', undefined, true, false],
+]) {
+  const resolved = await applyPackageRules({ packageFile, depName, datasource,
+    manager: 'regex', updateType: 'patch', pinDigests: true, automerge: true,
+    packageRules: config.packageRules }, 'pre-lookup');
+  assert.equal(resolved.groupName, groupName, packageFile);
+  assert.equal(resolved.pinDigests, pinDigests, packageFile);
+  assert.equal(resolved.automerge, automerge, packageFile);
 }
 console.log(JSON.stringify({ success: true, replacementsChecked: count }));
