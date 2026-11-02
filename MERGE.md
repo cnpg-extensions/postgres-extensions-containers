@@ -33,7 +33,8 @@ record.
 Each record must include the exact mirror ref, upstream ref, last upstream
 commit already merged, every substantive upstream commit reviewed, the
 consolidated dependency note, planned adoptions, intentional exclusions,
-conflict decisions, and validation results.
+conflict decisions, downstream behavioral-impact decisions, and validation
+results.
 
 The directory also contains an inherited historical baseline marker. Future
 records should begin from the upstream commit recorded by the newest record.
@@ -83,6 +84,16 @@ needed, preserve the original text and add a dated correction note.
    must include the full 40-character SHA, date, subject, whether any exact
    changed path exists in the mirror, relevant paths, and a short adoption or
    exclusion comment.
+
+   For each substantive shared-infrastructure change, review whether its
+   intent should also affect the downstream PGRX path, even if Git merges
+   cleanly or the changed file has no PGRX counterpart. Trace relevant callers
+   and parallel implementations, including target discovery and cleanup,
+   build and release gates, security and provenance, catalog publication,
+   smoke-test support policy, and tool updates. Record the affected downstream
+   paths, the decision to adopt, adapt, retain the difference, or defer, the
+   reason, and relevant validation. Different behavior is acceptable when
+   intentional; a clean merge alone does not complete this review.
 
 3. Create a real merge commit with `upstream/main` as its second parent. Do
    not rebase the downstream work onto upstream and do not replace the merge
