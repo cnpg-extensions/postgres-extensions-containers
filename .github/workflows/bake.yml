@@ -51,7 +51,7 @@ jobs:
           version: ${{ env.DAGGER_VERSION }}
           verb: call
           module: ./dagger/maintenance/
-          args: get-targets
+          args: get-targets --build-system debian
 
       - name: Validate extension name
         if: github.event_name == 'workflow_dispatch'

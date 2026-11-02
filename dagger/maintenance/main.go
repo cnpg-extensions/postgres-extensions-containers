@@ -120,28 +120,14 @@ func (m *Maintenance) GetTargets(
 	// +ignore=["dagger", ".github"]
 	// +defaultPath="/"
 	source *dagger.Directory,
+	// Limit targets to a build system (debian or pgrx). Omit to include all extensions.
+	// +optional
+	buildSystem string,
 ) (string, error) {
-	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(debianBuildSystem))
-	if err != nil {
-		return "", err
+	if buildSystem != "" && buildSystem != debianBuildSystem && buildSystem != pgrxBuildSystem {
+		return "", fmt.Errorf("unsupported build system: %q", buildSystem)
 	}
-	jsonTargets, err := json.Marshal(slices.Sorted(maps.Keys(targetExtensions)))
-	if err != nil {
-		return "", err
-	}
-
-	return string(jsonTargets), nil
-}
-
-// GetPgrxTargets discovers only extensions using the dedicated PGRX build path.
-func (m *Maintenance) GetPgrxTargets(
-	ctx context.Context,
-	// The source directory containing the extension folders. Defaults to the current directory
-	// +ignore=["dagger", ".github"]
-	// +defaultPath="/"
-	source *dagger.Directory,
-) (string, error) {
-	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(pgrxBuildSystem))
+	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(buildSystem))
 	if err != nil {
 		return "", err
 	}

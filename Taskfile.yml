@@ -95,7 +95,7 @@ tasks:
     desc: Run checks for all the available targets
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
@@ -135,7 +135,7 @@ tasks:
     desc: Bake all the available targets
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
@@ -326,6 +326,7 @@ tasks:
       _EXPERIMENTAL_DAGGER_RUNNER_HOST: container://{{ .DAGGER_ENGINE_NAME }}
     cmds:
       - |
+        set -o pipefail
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
           with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
 
@@ -349,6 +350,7 @@ tasks:
         --use-entrypoint sync
     status:
       - |
+        set -o pipefail
         test -z "{{ .CNPG_MANIFEST_OVERRIDE }}" || exit 1
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
           with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
@@ -370,6 +372,7 @@ tasks:
       _EXPERIMENTAL_DAGGER_RUNNER_HOST: container://{{ .DAGGER_ENGINE_NAME }}
     cmds:
       - |
+        set -o pipefail
         CONFIG=$({{ .KIND_TOOLBOX }} \
           with-exec --args="kind","get","kubeconfig","--name","{{ .KIND_CLUSTER_NAME }}","--internal={{ .INTERNAL }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
         mkdir -p $(dirname {{ .KUBECONFIG_PATH }})
@@ -441,7 +444,7 @@ tasks:
     desc: Test all the available targets using Chainsaw
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
