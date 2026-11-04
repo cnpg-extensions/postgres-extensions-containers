@@ -24,7 +24,7 @@ spec:
     - name: set-user
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-set-user
-        reference: ghcr.io/cnpg-extensions/set-user:4.2.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/set-user:4.3.0-18-trixie
 ```
 
 ```yaml
@@ -40,7 +40,7 @@ spec:
   extensions:
   - name: set_user
     # renovate: suite=trixie-pgdg depName=postgresql-18-set-user extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+[.][0-9]+)
-    version: '4.2.0'
+    version: '4.3.0'
 ```
 
 ## Operation and privileges
