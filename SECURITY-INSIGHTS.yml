@@ -117,6 +117,8 @@ repository:
         comment: GitHub packages for the pg_csv server image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-dirtyread
         comment: GitHub packages for the pg_dirtyread server image
+      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-parquet
+        comment: GitHub packages for the pg_parquet server image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-permissions
         comment: GitHub packages for the pg_permissions server image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-rewrite
