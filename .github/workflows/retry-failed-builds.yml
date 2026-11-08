@@ -28,8 +28,29 @@ jobs:
             }
 
             core.info(`Retrying failed jobs for run ${run.id}`);
-            await github.rest.actions.reRunWorkflowFailedJobs({
+            const params = {
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: run.id,
+            };
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+              ...params, filter: 'latest', per_page: 100,
             });
+            const failed = jobs.filter(job => !['success', 'skipped'].includes(job.conclusion));
+            const finals = failed.filter(job => /\/ Provenance for (testing|production) images .* \/ final$/.test(job.name));
+            if (finals.length) {
+              // SLSA v2.1.0 reports generator errors through a separate final job.
+              // Restart at detect-env to refresh both SLSA jobs' failure outputs.
+              const roots = jobs.filter(job => finals.length === 1 &&
+                job.name === finals[0].name.replace(/final$/, 'detect-env'));
+              if (roots.length === 1 && failed.every(job => job === finals[0] || job.name === 'Automerge gate')) {
+                await github.rest.actions.reRunJobForWorkflow({
+                  owner: params.owner, repo: params.repo, job_id: roots[0].id,
+                });
+              } else {
+                // One run-level request retries all failures together.
+                await github.rest.actions.reRunWorkflow(params);
+              }
+            } else {
+              await github.rest.actions.reRunWorkflowFailedJobs(params);
+            }
