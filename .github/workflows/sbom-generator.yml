@@ -29,7 +29,7 @@ env:
   # renovate: datasource=docker depName=anchore/grype
   GRYPE_IMAGE: anchore/grype:v0.121.2@sha256:6a36234da13f9faa327306ac0b3dab3405cfa2b4eb20c8f904125a8707863913
   # renovate: datasource=docker depName=anchore/grant
-  GRANT_IMAGE: anchore/grant:v0.7.0@sha256:2f273ee261204d24a4d7e8799c2bcc210374c652000e7c415da2bb5173ec99d3
+  GRANT_IMAGE: anchore/grant:v0.7.1@sha256:9ccd7c26dc48ce87cd9350e29fa8da5eaaedfabb3bc2e56f6b1ce3e9e7adc4b6
 
 jobs:
   changes:
