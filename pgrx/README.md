@@ -90,7 +90,9 @@ indexes. Before assigning normal tags, it checks that the candidate preserves
 the source descriptors and includes every expected architecture and its attached
 attestation.
 
-Sign, security, smoke, and promotion consume per-target assembly artifacts.
+Sign, security, and smoke consume per-target assembly artifacts. Promotion passes
+the combined Bake metadata to the same CloudNativePG `copy-images` action used
+by Debian builds; that action copies the images and signs production digests.
 The shared reusable SLSA generator attests each assembled testing index; its
 success gates promotion. After promotion, the same generator attests each index
 in its production repository. Production promotion is restricted to trusted
@@ -102,8 +104,7 @@ latest release. Smoke uses the shared Taskfile's live operator manifests and
 catalogs, including development images for `main`.
 PGRX follows the Debian release-acceptance level: build-time validation, security
 scanning, signing, shared runtime smoke tests, and required SLSA jobs. Security
-extracts each platform's SPDX document with Buildx for Grype and Grant. Promotion
-preserves the complete index and signs once per destination repository/digest.
+extracts each platform's SPDX document with Buildx for Grype and Grant.
 These stages do not repeat full OCI-graph verification or compare every BuildKit
 provenance field against preparation records. The standalone verifier remains
 available for consumers of either build family.
@@ -120,7 +121,7 @@ replace the shared Automerge gate or change branch protection.
 
 Run from the repository root with actionlint and Python available. The Python
 tests also run Syft against fixture lockfiles and require the SPDX validator.
-Docker is needed for the tool extraction below and optional Renovate checks.
+Docker is needed for the tool extraction below.
 Signing and full extension acceptance run in GitHub Actions
 on native AMD64 and ARM64 runners; no local signing keys are needed.
 
@@ -144,8 +145,6 @@ Run the PGRX tests and relevant workflow lint:
 
 ```sh
 task pgrx:validate
-# Optional: also exercise the pinned Renovate extraction and replacements.
-task pgrx:validate -- --renovate-output /tmp/pgrx-renovate-check
 ```
 
 Shared Go and SBOM-generator suites have their own workflows. Run them separately

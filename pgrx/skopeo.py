@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Narrow pinned Skopeo transport adapter for workflow OCI output transfer."""
+"""Run pinned Skopeo for standalone image verification."""
 
 import json
 import os

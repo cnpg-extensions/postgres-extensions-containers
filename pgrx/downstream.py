@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""Shared signing, scanning and promotion steps for each assembled target."""
+"""Signing, scanning and smoke steps for each assembled target."""
 
 import argparse
 import json
-import os
 from pathlib import Path
 import subprocess
 
 from prepare import save
 from record import load_preparation
-from registry import wait_for_index_digest
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=["sign", "security", "smoke", "promote"])
+    parser.add_argument("stage", choices=["sign", "security", "smoke"])
     parser.add_argument("--preparation", required=True, type=Path)
     parser.add_argument("--assembly", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
@@ -78,37 +76,6 @@ def main():
 
         assembly["_directory"] = str(args.assembly)
         smoke(preparation, assembly, args.output, args.cnpg_version)
-    elif args.stage == "promote":
-        if os.environ.get("GITHUB_REF") != "refs/heads/main" or os.environ.get(
-            "GITHUB_EVENT_NAME"
-        ) not in ("push", "workflow_dispatch"):
-            raise ValueError("production promotion requires a trusted main event")
-        tags = []
-        signed = set()
-        for tag in assembly["tags"]:
-            repo, version = tag.rsplit(":", 1)
-            destination = repo.removesuffix("-testing") + ":" + version
-            subprocess.run(
-                [
-                    "skopeo",
-                    "copy",
-                    "--all",
-                    "--preserve-digests",
-                    "docker://" + image,
-                    "docker://" + destination,
-                ],
-                check=True,
-            )
-            wait_for_index_digest(destination, assembly["index_digest"])
-            copied = destination.rsplit(":", 1)[0] + "@" + assembly["index_digest"]
-            if copied not in signed:
-                sign(copied)
-                signed.add(copied)
-            tags.append(destination)
-        save(
-            args.output / "destination.json",
-            {"tags": tags, "index_digest": assembly["index_digest"]},
-        )
     save(
         args.output / "result.json",
         {

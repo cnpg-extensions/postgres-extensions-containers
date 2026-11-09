@@ -95,6 +95,7 @@ jobs:
       contents: read
       packages: write
     outputs:
+      metadata: ${{ steps.images.outputs.metadata }}
       provenance_matrix: ${{ steps.images.outputs.provenance_matrix }}
       production_provenance_matrix: ${{ steps.images.outputs.production_provenance_matrix }}
     steps:
@@ -109,9 +110,10 @@ jobs:
     - name: Merge complete platform indexes
       run: python3 pgrx/assemble.py --preparation "$RUNNER_TEMP/prepared" --records "$RUNNER_TEMP/records" --output
         "$RUNNER_TEMP/assemblies"
-    - name: Generate provenance matrices
+    - name: Export build metadata and provenance matrices
       id: images
       run: |
+        echo "metadata=$(jq -cs add "$RUNNER_TEMP"/assemblies/*/metadata.json)" >> "$GITHUB_OUTPUT"
         # Attest each assembled multi-platform index, once per repository/digest.
         matrix=$(jq -cs '[ .[] | .[] | {
           image: (."image.name" | split(",")[0] | split(":")[0]),
@@ -257,38 +259,23 @@ jobs:
         if-no-files-found: error
   promote:
     needs:
-    - prepare
     - assemble
     - sign
     - security
     - smoke
-    - handoff
     - provenance
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.prepare.outputs.targets) }}
     permissions:
       contents: read
       id-token: write
       packages: write
     steps:
-    - *id002
-    - *id003
-    - *id004
-    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+    - name: Copy images to production
+      uses: cloudnative-pg/postgres-containers/.github/actions/copy-images@main
       with:
-        name: assembly-${{ matrix.target }}
-        path: ${{ runner.temp }}/assembly
-    - *id005
-    - name: Promote assembled target
-      run: python3 pgrx/downstream.py promote --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
-        --output "$RUNNER_TEMP/promote-result"
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-      with:
-        name: promote-${{ matrix.target }}
-        path: ${{ runner.temp }}/promote-result
-        if-no-files-found: error
+        bake_build_metadata: ${{ needs.assemble.outputs.metadata }}
+        registry_user: ${{ github.actor }}
+        registry_token: ${{ secrets.GITHUB_TOKEN }}
     if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
   production-provenance:
     name: Provenance for production images

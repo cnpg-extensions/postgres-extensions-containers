@@ -6,6 +6,6 @@ tasks:
     cmds:
       - python3 pgrx/test.py
   validate:
-    desc: Run PGRX tests and workflow lint, with optional Renovate checks
+    desc: Run PGRX tests and workflow lint
     cmds:
       - python3 pgrx/local/validate.py {{.CLI_ARGS}}

@@ -64,6 +64,6 @@ claim that every dependency survives linker dead-code elimination.
 
 After copying an image, run the same verification against the destination
 repository and its signature. A successful source verification does not
-authenticate a separate repository. The hosted promotion workflow preserves
-digests and signs the copied index once per destination repository/digest;
-it does not run this consumer verification again for every tag and platform.
+authenticate a separate repository. Hosted promotion uses CloudNativePG's shared
+`copy-images` action to copy all platforms and sign the production digests,
+followed by production SLSA provenance. It does not run this consumer verifier.
