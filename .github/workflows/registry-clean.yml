@@ -32,7 +32,7 @@ jobs:
           version: ${{ env.DAGGER_VERSION }}
           verb: call
           module: ./dagger/maintenance/
-          args: get-targets
+          args: get-targets --build-system all
 
       - name: Compute image-names list
         id: image-names

@@ -120,11 +120,17 @@ func (m *Maintenance) GetTargets(
 	// +ignore=["dagger", ".github"]
 	// +defaultPath="/"
 	source *dagger.Directory,
-	// Limit targets to a build system (debian or pgrx). Omit to include all extensions.
+	// Limit targets to a build system (debian or pgrx). Defaults to debian; use all for every extension.
 	// +optional
 	buildSystem string,
 ) (string, error) {
-	if buildSystem != "" && buildSystem != debianBuildSystem && buildSystem != pgrxBuildSystem {
+	switch buildSystem {
+	case "":
+		buildSystem = debianBuildSystem
+	case "all":
+		buildSystem = ""
+	case debianBuildSystem, pgrxBuildSystem:
+	default:
 		return "", fmt.Errorf("unsupported build system: %q", buildSystem)
 	}
 	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(buildSystem))

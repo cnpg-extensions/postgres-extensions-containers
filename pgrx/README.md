@@ -1,8 +1,9 @@
 # PGRX extension builds
 
 PGRX targets are discovered from `build_system = "pgrx"` in ordinary extension
-metadata. Debian discovery and OS-library maintenance exclude those targets;
-catalog and testing-value generation support both. Source tags remain literal
+metadata. `get-targets` defaults to Debian; use `--build-system pgrx` for PGRX
+or `--build-system all` for both families. OS-library maintenance excludes PGRX
+targets; catalog and testing-value generation support both. Source tags remain literal
 (including `v`), while SQL versions remain separate. Extension READMEs describe
 usage; this directory contains build and validation internals.
 

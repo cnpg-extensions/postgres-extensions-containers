@@ -95,7 +95,7 @@ tasks:
     desc: Run checks for all the available targets
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
@@ -135,7 +135,7 @@ tasks:
     desc: Bake all the available targets
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
@@ -441,7 +441,7 @@ tasks:
     desc: Test all the available targets using Chainsaw
     vars:
       TARGETS:
-        sh: dagger call -sm ./dagger/maintenance/ get-targets --build-system debian | tr -d '[]"' | tr ',' '\n'
+        sh: dagger call -sm ./dagger/maintenance/ get-targets | tr -d '[]"' | tr ',' '\n'
     cmds:
       - for:
           var: TARGETS
