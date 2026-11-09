@@ -8,12 +8,41 @@ import { GlobalConfig } from '/usr/local/renovate/dist/config/global.js';
 
 GlobalConfig.set({ localDir: '/tmp/renovate-update-fixture' });
 const config = JSON.parse(await fs.readFile('/repo/renovate.json', 'utf8'));
-const sourcePins = JSON.parse(await fs.readFile('/repo/pgrx/dependencies/sources.json', 'utf8'));
+const rootEntries = await fs.readdir('/repo', { withFileTypes: true });
+const sourceCases = [];
+for (const entry of rootEntries.filter(item => item.isDirectory())) {
+  const packageFile = entry.name + '/metadata.hcl';
+  let content;
+  try {
+    content = await fs.readFile('/repo/' + packageFile, 'utf8');
+  } catch {
+    continue;
+  }
+  if (!/\bbuild_system\s*=\s*"pgrx"/.test(content)) continue;
+
+  const manager = config.customManagers.find(value => value.description.startsWith('PGRX source tags'));
+  assert(manager, 'PGRX source manager');
+  const extracted = extractPackageFile(content, packageFile, manager);
+  assert(extracted?.deps.length, packageFile);
+  const repository = content.match(/source_repository\s*=\s*"https:\/\/(?:github|gitlab)\.com\/([^"]+)"/);
+  assert(repository, 'canonical source_repository in ' + packageFile);
+  const expectedDepName = repository[1].replace(/\.git$/, '');
+  const expectedVersions = [...new Set([...content.matchAll(/\bpackage\s*=\s*"([^"]+)"/g)]
+    .map(match => match[1]))].sort();
+  const actualVersions = [...new Set(extracted.deps.map(dependency => {
+    assert.equal(dependency.depName, expectedDepName, packageFile);
+    return dependency.currentValue;
+  }))].sort();
+  assert.deepEqual(actualVersions, expectedVersions, packageFile);
+  sourceCases.push([packageFile, 'PGRX source tags']);
+}
+assert(sourceCases.length > 0, 'PGRX metadata files discovered');
+
 const cases = [
-  ...Object.keys(sourcePins).map(name => [name + '/metadata.hcl', 'PGRX source tags']),
-  ...['tools', 'workflow-tools'].map(name => ['pgrx/dependencies/' + name + '.json', 'PGRX workflow/build tool']),
-  ['pgrx/dependencies/workflow-tools.json', 'PGRX digest-pinned'],
-  ['pgrx/dependencies/bases.json', 'PGRX base indexes'],
+  ...sourceCases,
+  ['pgrx/dependencies/tools.json', 'PGRX workflow/build tool releases'],
+  ['pgrx/dependencies/workflow-tools.json', 'PGRX workflow/build tool releases'],
+  ['pgrx/dependencies/workflow-tools.json', 'PGRX digest-pinned execution images'],
   ['.github/workflows/pgrx_targets.yml', 'updates the Taskfile'],
   ['.github/workflows/pgrx-tests.yml', 'updates the Taskfile'],
   ['.github/workflows/cnpg-versions.yml', 'updates the Taskfile'],
@@ -51,21 +80,18 @@ for (const [packageFile, prefix] of cases) {
     if (packageFile.endsWith('/metadata.hcl')) {
       assert.deepEqual(updated.match(/sql\s*=\s*"[^"]+"/g), content.match(/sql\s*=\s*"[^"]+"/g));
     }
-    // A version proposal must leave checksum refresh to its explicit owner.
-    if (change.newValue && packageFile.endsWith('.json')) {
-      assert.deepEqual(updated.match(/"sha256":\s*"[a-f0-9]+"/g), content.match(/"sha256":\s*"[a-f0-9]+"/g));
-    }
     count++;
   }
 }
+
 // Exercise resolved policy, including a future source repository name. PGRX
-// overrides must not change shared GitHub Action grouping or Docker digest pins.
+// overrides must not change shared GitHub Action grouping or image digest pins.
 for (const [packageFile, depName, datasource, groupName, pinDigests, automerge] of [
   ['pg-durable/metadata.hcl', 'microsoft/pg_durable', 'github-tags', null, false, false],
   ['pg-durable/metadata.hcl', 'future-owner/future-source', 'github-tags', null, false, false],
-  ['pgrx/dependencies/tools.json', 'rust-lang/rust', 'github-tags', null, false, false],
+  ['postgresql-anonymizer/metadata.hcl', 'dalibo/postgresql_anonymizer', 'gitlab-tags', null, false, false],
+  ['pgrx/dependencies/tools.json', 'rust-lang/rust', 'github-releases', undefined, true, false],
   ['.github/workflows/pgrx.yml', 'actions/checkout', 'github-tags', 'all github action', true, true],
-  ['pgrx/dependencies/bases.json', 'debian', 'docker', undefined, true, false],
 ]) {
   const resolved = await applyPackageRules({ packageFile, depName, datasource,
     manager: 'regex', updateType: 'patch', pinDigests: true, automerge: true,

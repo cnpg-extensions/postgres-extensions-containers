@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
+  source_repository        = "https://github.com/CrunchyData/pg_parquet"
   name                     = "pg-parquet"
   sql_name                 = "pg_parquet"
   image_name               = "pg-parquet"

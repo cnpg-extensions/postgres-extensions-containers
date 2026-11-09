@@ -50,3 +50,10 @@ license = "Apache-2.0"
 path = "LICENSE"
 license = "Apache-2.0"
 checksum = "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+
+[anon.clarify]
+license = "PostgreSQL"
+[[anon.clarify.files]]
+path = "LICENSE.md"
+license = "PostgreSQL"
+checksum = "2d6b71ffa38916cb927a9ef7f90e9bd8bb672e75990e2acf01ab22c89b7f638d"

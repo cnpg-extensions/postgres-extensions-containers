@@ -8,7 +8,9 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 
+from source import resolve_source
 from workflow import ROOT, discover, execute, select, source_digest
 
 
@@ -24,12 +26,53 @@ def save(path, value):
     path.write_bytes(encoded(value) + b"\n")
 
 
-def platform_base(reference, platform):
-    bases = json.loads((ROOT / "pgrx/dependencies/bases.json").read_text())
-    if reference not in bases or platform not in bases[reference]["platforms"]:
-        raise ValueError("base image requires a platform lock refresh")
-    base = bases[reference]
-    return reference + "@" + base["platforms"][platform], base["index_digest"]
+def inspect_base_index(reference):
+    return json.loads(
+        subprocess.check_output(
+            [
+                "docker",
+                "buildx",
+                "imagetools",
+                "inspect",
+                reference,
+                "--format",
+                "{{json .Manifest}}",
+            ],
+            text=True,
+        )
+    )
+
+
+def platform_base(reference, platform, manifests=None):
+    if platform not in ("linux/amd64", "linux/arm64"):
+        raise ValueError("unsupported base platform: " + platform)
+    if manifests is None:
+        manifest = inspect_base_index(reference)
+    else:
+        manifest = manifests.get(reference)
+        if manifest is None:
+            manifest = inspect_base_index(reference)
+            manifests[reference] = manifest
+    index_digest = manifest.get("digest")
+    if not isinstance(index_digest, str) or not re.fullmatch(
+        r"sha256:[a-f0-9]{64}", index_digest
+    ):
+        raise ValueError("base image index digest is invalid")
+    os_name, architecture = platform.split("/", 1)
+    children = [
+        descriptor
+        for descriptor in manifest.get("manifests", [])
+        if descriptor.get("platform", {}).get("os") == os_name
+        and descriptor.get("platform", {}).get("architecture") == architecture
+    ]
+    if len(children) != 1:
+        raise ValueError("base image index must contain one " + platform + " image")
+    child_digest = children[0].get("digest")
+    if not isinstance(child_digest, str) or not re.fullmatch(
+        r"sha256:[a-f0-9]{64}", child_digest
+    ):
+        raise ValueError("base platform digest is invalid")
+    return reference + "@" + child_digest, index_digest
 
 
 def prepare(inputs, generator, output):
@@ -38,12 +81,11 @@ def prepare(inputs, generator, output):
     inventory = discover()
     platforms = select(inputs, inventory)
     extension = inputs["extension_name"]
-    from refresh_lock import check_sources, tools_lock, check_apt
-
-    dependencies = ROOT / "pgrx/dependencies"
-    check_sources(inventory, json.loads((dependencies / "sources.json").read_text()))
-    tools_lock(dependencies, False)
-    check_apt(dependencies)
+    repository_url = inventory[extension].get("source_repository")
+    if not repository_url:
+        raise ValueError("selected extension has no source_repository metadata")
+    base_manifests = {}
+    sources = {}
     if output.exists():
         raise ValueError("fresh preparation directory required")
     output.mkdir(parents=True)
@@ -79,9 +121,6 @@ def prepare(inputs, generator, output):
     run_id = (
         os.environ["GITHUB_RUN_ID"] + "-" + os.environ.get("GITHUB_RUN_ATTEMPT", "1")
     )
-    source = json.loads((ROOT / "pgrx/dependencies/sources.json").read_text())[
-        extension
-    ]
     result = {
         "schema_version": 1,
         "extension": extension,
@@ -96,8 +135,10 @@ def prepare(inputs, generator, output):
         "rows": [],
     }
     for name, original in sorted(targets.items()):
-        if original["args"]["EXT_VERSION"] != source["version"]:
-            raise ValueError("metadata and source lock disagree")
+        version = original["args"]["EXT_VERSION"]
+        if version not in sources:
+            sources[version] = resolve_source(repository_url, version)
+        source = sources[version]
         distro = next(
             a.split("=", 1)[1]
             for a in original["annotations"]
@@ -120,7 +161,11 @@ def prepare(inputs, generator, output):
                 + "-testing:stage-"
                 + row_id
             )
-            base, base_index = platform_base(original["args"]["BASE"], platform)
+            base, base_index = platform_base(
+                original["args"]["BASE"],
+                platform,
+                manifests=base_manifests,
+            )
             frozen = json.loads(json.dumps(original))
             frozen["platforms"] = [platform]
             frozen["tags"] = [staging]
@@ -128,6 +173,8 @@ def prepare(inputs, generator, output):
                 BASE=base,
                 PGRX_EXTENSION=extension,
                 PGRX_DISTRO=distro,
+                PGRX_SOURCE_REPOSITORY=repository_url,
+                PGRX_SOURCE_REVISION=source["revision"],
                 PGRX_SOURCE_SHA256=source["archive_sha256"],
                 PGRX_WORKSPACE_SHA256=workspace,
                 PGRX_BUILD_TIMESTAMP=timestamp,

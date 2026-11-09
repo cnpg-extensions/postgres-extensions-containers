@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
+  source_repository        = "https://github.com/microsoft/pg_durable"
   name                     = "pg-durable"
   sql_name                 = "pg_durable"
 

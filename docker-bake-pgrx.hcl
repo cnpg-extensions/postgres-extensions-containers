@@ -9,3 +9,15 @@ function getExtensionVersion {
   params = [distro, pgVersion]
   result = getExtensionPackage(distro, pgVersion)
 }
+
+// The upstream source version is owned by metadata; build inputs are resolved
+// per run rather than copied into a second committed source lock.
+target "default" {
+  matrix = {
+    build = getBuildMatrix()
+  }
+  name = getBuildName(metadata.name, build.distro, build.pgVersion)
+  args = {
+    PGRX_SOURCE_REPOSITORY = metadata.source_repository
+  }
+}

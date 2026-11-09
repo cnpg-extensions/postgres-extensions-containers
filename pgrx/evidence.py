@@ -47,6 +47,40 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def discover_extension_payload(extension_dir, sql_name):
+    """Return regular files belonging to an extension's packaged payload.
+
+    PostgreSQL packages runtime data in directories named after the SQL
+    extension, alongside its control and SQL files. Preserve paths below the
+    extension directory so builder files map to the same paths in the final
+    image. Sort both directory traversal and the result for a stable manifest.
+    """
+    extension_dir = Path(extension_dir)
+    if extension_dir.is_symlink():
+        raise ValueError(
+            "payload directory must not be a symlink: " + str(extension_dir)
+        )
+
+    files = []
+
+    def collect(path):
+        if path.is_symlink():
+            raise ValueError("payload must not contain symlinks: " + str(path))
+        if path.is_dir():
+            for child in sorted(path.iterdir()):
+                collect(child)
+        elif path.is_file():
+            relative = path.relative_to(extension_dir).as_posix()
+            files.append((path, "share/extension/" + relative, "extension"))
+        else:
+            raise ValueError("payload must contain only regular files: " + str(path))
+
+    for path in sorted(extension_dir.iterdir()):
+        if path.name.startswith(sql_name):
+            collect(path)
+    return sorted(files, key=lambda entry: entry[1])
+
+
 def main():
     build = Path("/build")
     directory = build / "pgrx-sbom"
@@ -56,7 +90,7 @@ def main():
         raise ValueError("Cargo.lock changed during compilation")
     extension = os.environ["PGRX_EXTENSION"]
     recipe = RECIPES[extension]
-    source = json.loads(Path("/pgrx/dependencies/sources.json").read_text())[extension]
+    source = json.loads((directory / "source.json").read_text())
     major = os.environ["PG_MAJOR"]
     platform = os.environ["TARGETPLATFORM"]
     common = [
@@ -172,14 +206,21 @@ def main():
     )
     library = prefix / f"usr/lib/postgresql/{major}/lib/{sql_name}.so"
     files = [(library, "lib/" + library.name, "library")]
-    files.extend(
-        (p, "share/extension/" + p.name, "extension")
-        for p in sorted(
-            (prefix / f"usr/share/postgresql/{major}/extension").glob(sql_name + "*")
-        )
-    )
-    if len(files) < 3:
-        raise ValueError("missing packaged library/control/SQL files")
+    extension_dir = prefix / f"usr/share/postgresql/{major}/extension"
+    extension_files = discover_extension_payload(extension_dir, sql_name)
+    top_level = {
+        Path(final).name
+        for _, final, _ in extension_files
+        if Path(final).parent == Path("share/extension")
+    }
+    if sql_name + ".control" not in top_level:
+        raise ValueError("missing packaged extension control file")
+    if not any(
+        name.startswith(sql_name + "--") and name.endswith(".sql")
+        for name in top_level
+    ):
+        raise ValueError("missing packaged extension SQL file")
+    files.extend(extension_files)
     payload = []
     for path, final, kind in files:
         if not path.is_file() or path.is_symlink():
@@ -206,6 +247,8 @@ def main():
         "source_version": source["version"],
         "sql_version": sql_version,
         "repository": source["repository"],
+        "source_host": source["host"],
+        "source_url": source["url"],
         "revision": source["revision"],
         "archive_sha256": source["archive_sha256"],
         "workspace_sha256": os.environ["PGRX_WORKSPACE_SHA256"],

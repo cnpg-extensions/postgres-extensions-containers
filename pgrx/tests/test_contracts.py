@@ -1,5 +1,4 @@
 import copy
-import hashlib
 import json
 from pathlib import Path
 import re
@@ -11,45 +10,19 @@ from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from prepare import digest
 from record import assert_provenance, load_preparation
-from refresh_lock import tool_url, check_sources, check_apt
 from verify import signature_command, validate_document
 from workflow import ROOT
 
 
-class LockTest(unittest.TestCase):
-    def test_every_locked_tool_url_is_owned_by_its_version(self):
-        for filename in ['tools.json','workflow-tools.json']:
-            lock=json.loads((ROOT/'pgrx/dependencies'/filename).read_text())
-            tools=dict(lock['tools'])
-            if 'rustup' in lock:tools['rustup']=lock['rustup']
-            for name,tool in tools.items():
-                for architecture,pin in tool['platforms'].items():
-                    self.assertEqual(tool_url(name,tool['version'],architecture),pin['url'])
-                    self.assertNotEqual(tool_url(name,'999.0.0',architecture),pin['url'])
-
-    def test_source_version_update_requires_companion_lock(self):
-        pin=json.loads((ROOT/'pgrx/dependencies/sources.json').read_text())['pg-durable']
-        metadata={'pg-durable':{'versions':{'trixie':{'18':{'package':pin['version']}}}}}
-        check_sources(metadata,{'pg-durable':pin})
-        metadata['pg-durable']['versions']['trixie']['18']['package']='v999.0.0'
-        with self.assertRaisesRegex(ValueError,'disagreement'):check_sources(metadata,{'pg-durable':pin})
-
-    def test_base_update_invalidates_apt_children(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            root=Path(temporary);(root/'apt').mkdir();(root/'bases.json').write_text('{}')
-            (root/'apt/lock.json').write_text(json.dumps({'base_lock_sha256':'0'*64}))
-            with self.assertRaisesRegex(ValueError,'coupled apt'):check_apt(root)
-
-
-
 class ProvenanceTest(unittest.TestCase):
     def setUp(self):
-        self.row={'target':'target','base':'base@sha256:'+'a'*64,'source':{'archive_sha256':'b'*64}}
+        self.row={'target':'target','base':'base@sha256:'+'a'*64,'source':{'archive_sha256':'b'*64,'url':'https://example.test/extension/v1.tar.gz'}}
         self.preparation={'generator':'generator@sha256:'+'c'*64}
         self.definition={'target':{'target':{'args':{'PG_MAJOR':'18','PGRX_WORKSPACE_SHA256':'d'*64},'labels':{'revision':'e'*40}}}}
         self.provenance={'buildDefinition':{'externalParameters':{'request':{'args':{
             'build-arg:PG_MAJOR':'18','build-arg:PGRX_WORKSPACE_SHA256':'d'*64,'label:revision':'e'*40}}},
             'resolvedDependencies':[{'digest':{'sha256':v*64}} for v in 'abc']}}
+        self.provenance['buildDefinition']['resolvedDependencies'][1]['uri']=self.row['source']['url']
 
     def test_independent_expected_arguments_and_materials(self):
         assert_provenance(self.provenance,self.preparation,self.row,self.definition)
@@ -58,6 +31,13 @@ class ProvenanceTest(unittest.TestCase):
             with self.subTest(key=key),self.assertRaises(ValueError):assert_provenance(bad,self.preparation,self.row,self.definition)
         self.provenance['buildDefinition']['resolvedDependencies'].pop()
         with self.assertRaisesRegex(ValueError,'resolved dependency'):assert_provenance(self.provenance,self.preparation,self.row,self.definition)
+
+    def test_source_url_and_checksum_must_match_the_same_dependency(self):
+        materials=self.provenance['buildDefinition']['resolvedDependencies']
+        materials[1]['uri']='https://example.test/other.tar.gz'
+        materials.append({'uri':self.row['source']['url'],'digest':{'sha256':'f'*64}})
+        with self.assertRaisesRegex(ValueError,'source resolved dependency'):
+            assert_provenance(self.provenance,self.preparation,self.row,self.definition)
 
     def test_stale_or_tampered_preparation(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -114,25 +94,6 @@ class SignatureStorageTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'digest'):verify_signature('image@sha256:'+'a'*64,identity='publisher',issuer='issuer')
             self.assertEqual(run.call_count,1)
 
-class SourceArchiveTest(unittest.TestCase):
-    def test_cli_archive_rejects_escaping_paths_and_links(self):
-        import io
-        import tarfile
-        from install_tools import extract_source_archive
-        for name,kind in [('cli/Cargo.toml',tarfile.REGTYPE),('../escape',tarfile.REGTYPE),('cli/link',tarfile.SYMTYPE)]:
-            raw=io.BytesIO()
-            with tarfile.open(fileobj=raw,mode='w') as archive:
-                member=tarfile.TarInfo(name);member.type=kind;member.size=4 if kind==tarfile.REGTYPE else 0
-                archive.addfile(member,io.BytesIO(b'test') if member.size else None)
-            raw.seek(0)
-            with tempfile.TemporaryDirectory() as directory,tarfile.open(fileobj=raw) as archive:
-                if name=='cli/Cargo.toml':
-                    extract_source_archive(archive,directory)
-                    self.assertEqual((Path(directory)/name).read_bytes(),b'test')
-                else:
-                    with self.assertRaises(ValueError):extract_source_archive(archive,directory)
-
-
 class InlineCorrectionTest(unittest.TestCase):
     def test_changed_or_fixed_lock_requires_review(self):
         import subprocess
@@ -145,16 +106,3 @@ class InlineCorrectionTest(unittest.TestCase):
                 result = subprocess.run(['bash', '-c', command], cwd=directory, capture_output=True, text=True)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn('review/remove', result.stderr)
-
-class LockedDownloadTest(unittest.TestCase):
-    def test_corrupt_and_unavailable_inputs_fail_with_url(self):
-        import io
-        import urllib.error
-        from locked_download import fetch_verified
-        url = 'https://example.invalid/pinned-input'
-        with patch('locked_download.urllib.request.urlopen', return_value=io.BytesIO(b'changed')):
-            with self.assertRaisesRegex(ValueError, 'checksum mismatch: ' + re.escape(url)):
-                fetch_verified(url, hashlib.sha256(b'original').hexdigest())
-        with patch('locked_download.urllib.request.urlopen', side_effect=urllib.error.URLError('unavailable')):
-            with self.assertRaisesRegex(ValueError, 'unavailable: ' + re.escape(url)):
-                fetch_verified(url, '0'*64)

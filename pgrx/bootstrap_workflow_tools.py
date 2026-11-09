@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Install checksum-pinned executables into a private workflow directory."""
+"""Install version-selected executables into a private workflow directory."""
 
 import argparse
-import hashlib
 import json
 import os
 from pathlib import Path
 import platform
 import tarfile
 import urllib.request
+
+from tool_urls import tool_url
 
 ROOT = Path(__file__).resolve().parent
 
@@ -21,17 +22,15 @@ def main():
     pins = json.loads((ROOT / "dependencies/workflow-tools.json").read_text())
     args.output.mkdir(parents=True, exist_ok=True)
     for name, tool in pins["tools"].items():
-        entry = tool["platforms"][architecture]
-        data = urllib.request.urlopen(entry["url"]).read()
-        if hashlib.sha256(data).hexdigest() != entry["sha256"]:
-            raise ValueError("tool checksum mismatch: " + name)
+        url = tool_url(name, tool["version"], architecture)
+        data = urllib.request.urlopen(url).read()
         archive = args.output / (name + ".download")
         archive.write_bytes(data)
-        if entry["url"].endswith(".tar.gz"):
+        if url.endswith(".tar.gz"):
             with tarfile.open(archive) as tar:
                 members = [m for m in tar if m.isfile() and Path(m.name).name == name]
                 if len(members) != 1:
-                    raise ValueError("ambiguous tool archive")
+                    raise ValueError("ambiguous tool archive: " + name)
                 data = tar.extractfile(members[0]).read()
         binary = args.output / name
         binary.write_bytes(data)
@@ -42,7 +41,6 @@ def main():
     )
     (args.output / "skopeo").chmod(0o755)
     if os.getenv("GITHUB_PATH"):
-
         with open(os.environ["GITHUB_PATH"], "a") as stream:
             stream.write(str(args.output.resolve()) + "\n")
 

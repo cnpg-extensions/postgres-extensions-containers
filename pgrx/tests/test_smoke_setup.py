@@ -1,5 +1,4 @@
 """Check PGRX routes shared policy versions into the standard smoke setup."""
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -20,9 +19,7 @@ class SmokeSetupTest(unittest.TestCase):
             pins = root / 'pgrx/dependencies'
             pins.mkdir(parents=True)
             kind = root / 'kind'
-            kind.write_bytes(b'locked kind')
             (pins / 'workflow-tools.json').write_text(json.dumps({
-                'tools': {'kind': {'platforms': {'amd64': {'sha256': hashlib.sha256(kind.read_bytes()).hexdigest()}}}},
                 'images': {'runner': 'pinned-runner', 'dagger': 'pinned-dagger'},
             }))
             for selected in ['main', '1.29.3', '1.30.1']:

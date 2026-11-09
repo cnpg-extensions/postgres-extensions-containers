@@ -100,6 +100,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[pltcl](pltcl)** | Tcl procedural language for PostgreSQL | [www.postgresql.org/docs/18/pltcl.html](https://www.postgresql.org/docs/18/pltcl.html) | @ardentperf | PostgreSQL, TCL |
 | **[pointcloud](pointcloud)** | Types and functions for storing and querying LiDAR point-cloud data | [github.com/pgpointcloud/pointcloud](https://github.com/pgpointcloud/pointcloud) | @ardentperf | BSD-3-Clause |
 | **[powa](powa)** | Workload Analyzer history and snapshot schema | [powa.readthedocs.io/en/stable](https://powa.readthedocs.io/en/stable/) | @ardentperf | PostgreSQL |
+| **[postgresql-anonymizer](postgresql-anonymizer)** | Anonymization and data masking (anon) | [gitlab.com/dalibo/postgresql_anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer) | @ardentperf | PostgreSQL |
 | **[prefix](prefix)** | Prefix ranges for text lookup and indexing | [github.com/dimitri/prefix](https://github.com/dimitri/prefix) | @ardentperf | BSD-2-Clause |
 | **[preprepare](preprepare)** | Pre-prepare PostgreSQL statements on the server side | [github.com/dimitri/preprepare](https://github.com/dimitri/preprepare) | @ardentperf | PostgreSQL |
 | **[prioritize](prioritize)** | Get and set the nice priorities of PostgreSQL backends | [pgxn.org/dist/prioritize](http://pgxn.org/dist/prioritize/) | @ardentperf | PostgreSQL |

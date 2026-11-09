@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
+  source_repository        = "https://github.com/paradedb/paradedb"
   name                     = "pg-search"
   sql_name                 = "pg_search"
   image_name               = "pg-search"

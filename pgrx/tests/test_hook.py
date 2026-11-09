@@ -93,6 +93,30 @@ class HookTest(unittest.TestCase):
         (self.evidence / 'manifest.json').write_text(json.dumps(self.manifest))
         return augment_spdx(self.document, self.context)
 
+    def add_runtime_csv_payload(self):
+        contents = b'id,name\n1,Alice\n'
+        builder_path = self.builder / 'build/share/extension/demo/data/fake.csv'
+        final_path = self.final / 'share/extension/demo/data/fake.csv'
+        builder_path.parent.mkdir(parents=True, exist_ok=True)
+        final_path.parent.mkdir(parents=True, exist_ok=True)
+        builder_path.write_bytes(contents)
+        final_path.write_bytes(contents)
+        checksum = digest(contents)
+        self.manifest['payload'].append({
+            'builder': 'build/share/extension/demo/data/fake.csv',
+            'final': 'share/extension/demo/data/fake.csv',
+            'kind': 'extension',
+            'sha256': checksum,
+        })
+        inventory_file = {
+            'SPDXID': 'SPDXRef-runtime-data',
+            'fileName': 'share/extension/demo/data/fake.csv',
+            'checksums': [{'algorithm': 'SHA256', 'checksumValue': checksum}],
+            'licenseInfoInFiles': ['NOASSERTION'],
+        }
+        self.document['files'].append(inventory_file)
+        return final_path, inventory_file
+
     def test_preserves_generator_and_selects_runtime_graph(self):
         before = copy.deepcopy(self.document); builder = copy.deepcopy(self.context.builder_document)
         result = self.run_hook()
@@ -109,6 +133,25 @@ class HookTest(unittest.TestCase):
         self.assertEqual(8, evidence['package_count'])
         self.assertEqual('rust-cargo-lock-cataloger', evidence['cataloger'])
         self.assertTrue(evidence['version'])
+
+    def test_runtime_csv_is_hash_verified_and_inventory_preserved(self):
+        _, inventory_file = self.add_runtime_csv_payload()
+        generator_inventory = copy.deepcopy(self.document['files'])
+
+        result = self.run_hook()
+
+        self.assertIn(inventory_file, result['files'])
+        self.assertEqual(result['files'], generator_inventory)
+
+    def test_runtime_csv_missing_or_tampered_in_final_fails(self):
+        final_path, _ = self.add_runtime_csv_payload()
+        final_path.unlink()
+        with self.assertRaisesRegex(ValueError, 'missing regular evidence file'):
+            self.run_hook()
+
+        final_path.write_bytes(b'id,name\n1,Mallory\n')
+        with self.assertRaisesRegex(ValueError, 'hash mismatch'):
+            self.run_hook()
 
     def test_invalid_evidence_fails_closed(self):
         for group,key,value in [('target','platform','linux/arm64'), ('identity','extension','wrong'), ('inputs','lock_sha256','0'*64)]:

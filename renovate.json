@@ -150,17 +150,17 @@
       "datasourceTemplate": "deb"
     },
     {
-      "description": "PGRX source tags; companion source and Cargo locks are refreshed together",
+      "description": "PGRX source tags from extension metadata",
       "customType": "regex",
       "managerFilePatterns": [
-        "/^(pg-durable|pg-graphql|pg-jsonschema|pg-parquet|pg-search|pg-session-jwt)/metadata\\.hcl$/"
+        "/^[^/]+/metadata\\.hcl$/"
       ],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
       ]
     },
     {
-      "description": "PGRX workflow/build tool releases (refresh all platform checksums before merge)",
+      "description": "PGRX workflow/build tool releases",
       "customType": "regex",
       "managerFilePatterns": [
         "/pgrx/dependencies/(workflow-tools|tools)\\.json$/"
@@ -178,18 +178,6 @@
       ],
       "matchStrings": [
         "\"[a-z-]+\":\\s*\"(?<depName>[^\"\\s]+):(?<currentValue>[^\"@\\s]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
-    },
-    {
-      "description": "PGRX base indexes own both platform children and apt package locks",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/pgrx/dependencies/bases\\.json$/"
-      ],
-      "matchStrings": [
-        "\"(?<depName>[^\"\\s]+):(?<currentValue>[^\"@\\s]+)\":\\s*\\{\\s*\"index_digest\":\\s*\"(?<currentDigest>sha256:[a-f0-9]{64})\""
       ],
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
@@ -316,14 +304,22 @@
         "sbom-generator/**",
         ".github/workflows/sbom-generator.yml"
       ],
-      "matchUpdateTypes": ["minor", "patch", "digest", "pin", "pinDigest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest"
+      ],
       "automerge": true,
       "platformAutomerge": true,
       "rebaseWhen": "behind-base-branch"
     },
     {
       "description": "Require manual merging for major updates",
-      "matchUpdateTypes": ["major"],
+      "matchUpdateTypes": [
+        "major"
+      ],
       "automerge": false
     },
     {
@@ -335,7 +331,7 @@
       "additionalBranchPrefix": "sbom-"
     },
     {
-      "description": "PGRX release updates require coupled immutable lock refresh",
+      "description": "Keep PGRX updates under review while build evidence is checked",
       "matchFileNames": [
         "pgrx/dependencies/**",
         "pg-durable/metadata.hcl",
@@ -343,17 +339,36 @@
         "pg-jsonschema/metadata.hcl",
         "pg-parquet/metadata.hcl",
         "pg-search/metadata.hcl",
-        "pg-session-jwt/metadata.hcl"
+        "pg-session-jwt/metadata.hcl",
+        "postgresql-anonymizer/metadata.hcl"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "require SQL version review for PGRX source updates",
+      "matchDatasources": [
+        "github-tags",
+        "gitlab-tags"
+      ],
+      "matchFileNames": [
+        "pg-durable/metadata.hcl",
+        "pg-graphql/metadata.hcl",
+        "pg-jsonschema/metadata.hcl",
+        "pg-parquet/metadata.hcl",
+        "pg-search/metadata.hcl",
+        "pg-session-jwt/metadata.hcl",
+        "postgresql-anonymizer/metadata.hcl"
       ],
       "automerge": false,
       "prBodyNotes": [
-        "Run python3 pgrx/refresh_lock.py --check after refreshing the affected checksums. Source tags, resolved commits, archives and upstream Cargo.lock are one update; SQL version changes require review."
+        "⚠️ The source package version does not update the separately maintained SQL version. Before merging, inspect the extension control file and SQL upgrade scripts, then update the `sql` values in metadata.hcl and affected test expectations when needed. Do not infer SQL versions from the package version or approve solely because CI passed."
       ]
     },
     {
       "description": "Keep PGRX source and tool tags separate from GitHub Action updates",
       "matchDatasources": [
-        "github-tags"
+        "github-tags",
+        "gitlab-tags"
       ],
       "matchFileNames": [
         "pgrx/dependencies/**",
@@ -362,7 +377,8 @@
         "pg-jsonschema/metadata.hcl",
         "pg-parquet/metadata.hcl",
         "pg-search/metadata.hcl",
-        "pg-session-jwt/metadata.hcl"
+        "pg-session-jwt/metadata.hcl",
+        "postgresql-anonymizer/metadata.hcl"
       ],
       "groupName": null,
       "pinDigests": false

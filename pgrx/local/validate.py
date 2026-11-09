@@ -32,10 +32,9 @@ def main():
                     '.github/workflows/pgrx.yml', '.github/workflows/pgrx_targets.yml',
                     '.github/workflows/pgrx-tests.yml', '.github/workflows/cnpg-versions.yml',
                     '.github/workflows/test.yml'], cwd=ROOT, check=True)
-    subprocess.run([sys.executable, 'pgrx/refresh_lock.py', '--check'], cwd=ROOT, check=True)
     if args.renovate_output:
         pins = json.loads((ROOT / 'pgrx/dependencies/workflow-tools.json').read_text())
-        check_renovate(args.renovate_output, pins)
+        check_renovate(args.renovate_output, pins['images']['renovate'])
 
 
 if __name__ == '__main__':

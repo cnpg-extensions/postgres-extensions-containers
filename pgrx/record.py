@@ -42,6 +42,9 @@ def assert_pgrx(document, preparation, row):
     expected = {
         "extension": preparation["extension"],
         "source_version": row["source"]["version"],
+        "repository": row["source"]["repository"],
+        "source_host": row["source"]["host"],
+        "source_url": row["source"]["url"],
         "revision": row["source"]["revision"],
         "archive_sha256": row["source"]["archive_sha256"],
         "workspace_sha256": preparation["workspace_sha256"],
@@ -70,12 +73,17 @@ def assert_provenance(provenance, preparation, row, definition):
     for expected in [
         row["base"].split("@")[-1][7:],
         preparation["generator"].split("@")[-1][7:],
-        row["source"]["archive_sha256"],
     ]:
         if not any(
             material.get("digest") == {"sha256": expected} for material in materials
         ):
             raise ValueError("provenance resolved dependency missing")
+    if not any(
+        material.get("uri") == row["source"]["url"]
+        and material.get("digest") == {"sha256": row["source"]["archive_sha256"]}
+        for material in materials
+    ):
+        raise ValueError("provenance source resolved dependency missing or mismatched")
 
 
 def capture(preparation_dir, row_id, index_digest, output):

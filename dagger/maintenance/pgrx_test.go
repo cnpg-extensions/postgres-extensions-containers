@@ -125,7 +125,7 @@ func TestPgrxRealMetadataInventory(t *testing.T) {
 		}
 	}
 	slices.Sort(pgrx)
-	if !slices.Equal(pgrx, []string{"pg-durable", "pg-graphql", "pg-jsonschema", "pg-parquet", "pg-search", "pg-session-jwt"}) {
+	if !slices.Equal(pgrx, []string{"pg-durable", "pg-graphql", "pg-jsonschema", "pg-parquet", "pg-search", "pg-session-jwt", "postgresql-anonymizer"}) {
 		t.Fatal(pgrx)
 	}
 }

@@ -108,3 +108,16 @@ trigger production rebuilds on `main`. Direct extension payload changes still
 build automatically. The sample and manual single/all-extension rebuild commands
 are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX is outside this
 selection policy.
+
+## PostgreSQL Anonymizer 3.3.2: stale root Cargo.lock version
+
+- **Upstream:** [3.3.2 Cargo.lock](https://gitlab.com/dalibo/postgresql_anonymizer/-/blob/3.3.2/Cargo.lock)
+  records `anon` as 3.3.1 while Cargo.toml declares 3.3.2. No upstream issue is linked.
+- **Problem:** locked Cargo fetch rejects the inconsistent release before compilation.
+- **Workaround:** [postgresql-anonymizer/Dockerfile](postgresql-anonymizer/Dockerfile)
+  changes only the root package version to 3.3.2, guarded by exact original and
+  effective lock checksums. Both hashes remain in build evidence; dependencies
+  are unchanged.
+- **Remove when:** the next source release has a consistent root version.
+  Review or remove the correction whenever the upstream lock changes, then run
+  the native image build and shared smoke checks.

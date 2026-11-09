@@ -4,6 +4,7 @@ import re
 
 # Settings refer to the visible upstream commands, not a replacement build system.
 RECIPES = {
+    "postgresql-anonymizer": {"manifest": "Cargo.toml", "defaults": True, "installed": False},
     "pg-durable": {"manifest": "Cargo.toml", "defaults": False, "installed": False},
     "pg-graphql": {"manifest": "Cargo.toml", "defaults": True, "installed": True},
     "pg-jsonschema": {"manifest": "Cargo.toml", "defaults": False, "installed": False},

@@ -12,22 +12,12 @@ ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
 ARG PGRX_SOURCE_SHA256
+ARG PGRX_SOURCE_REPOSITORY
+ARG PGRX_SOURCE_REVISION
 
 USER 0
 
-COPY \
-    pgrx/install-pgrx-build-environment.sh \
-    pgrx/verify-source.sh \
-    pgrx/install_tools.py \
-    pgrx/locked_download.py \
-    pgrx/build_config.py \
-    pgrx/evidence.py \
-    pgrx/finalize-pgrx-evidence.sh \
-    pgrx/license-about.toml \
-    /pgrx/
-COPY pgrx/dependencies/apt/ /pgrx/dependencies/apt/
-COPY pgrx/dependencies/tools.json pgrx/dependencies/sources.json /pgrx/dependencies/
-COPY pgrx/sbom/ /pgrx/sbom/
+COPY pgrx/ /pgrx/
 COPY scripts/capture_base_image_libs.sh scripts/stage_system_libs.sh /usr/local/bin/
 RUN capture_base_image_libs.sh
 WORKDIR /build
@@ -36,7 +26,7 @@ RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -
 
 # ParadeDB installs OpenBLAS before packaging pg_search:
 # https://github.com/paradedb/paradedb/blob/v0.25.6/.github/workflows/publish-pg_search-debian.yml#L256-L260
-# OpenBLAS and its pinned dependencies are installed by the shared helper.
+RUN apt-get update && apt-get install -y --no-install-recommends libopenblas-dev
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 # ParadeDB packages from the pg_search workspace directory:
