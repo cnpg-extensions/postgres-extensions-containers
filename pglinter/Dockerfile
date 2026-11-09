@@ -31,11 +31,10 @@ ADD --checksum=sha256:01e53fa8890c497dc1b52cc75ef4ad4ecdadf996c22ad510ec6232f3a7
 
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
-# Upstream uses release on AMD64 and release-lto-off on ARM64 to limit memory:
-# https://github.com/pmpetit/pglinter/blob/2.0.0/.github/actions/reusable-package-action-native/action.yml
+# Keep the upstream release profile (fat LTO) on both architectures; native
+# ARM64 runner validation and the difference from upstream CI are in WORKAROUNDS.md.
 # https://github.com/pmpetit/pglinter/blob/2.0.0/Makefile#L255-L262
-RUN profile=$(python3 -c 'import json; print(json.load(open("/build/pgrx-sbom/build-config.json"))["profile"])') && \
-    cargo pgrx package --pg-config /usr/lib/postgresql/${PG_MAJOR}/bin/pg_config --profile "${profile}"
+RUN cargo pgrx package --pg-config /usr/lib/postgresql/${PG_MAJOR}/bin/pg_config --profile release
 
 ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
@@ -50,8 +49,8 @@ ARG PG_MAJOR
 # Licenses
 COPY --from=builder /build/pgrx-licenses/rust/ /licenses/rust/
 
-# Libraries and SQL (exactly one architecture-selected profile is built).
-COPY --from=builder /build/target/*/pglinter-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/pglinter.so /lib/
-COPY --from=builder /build/target/*/pglinter-pg${PG_MAJOR}/usr/share/postgresql/${PG_MAJOR}/extension/pglinter* /share/extension/
+# Libraries and SQL
+COPY --from=builder /build/target/release/pglinter-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/pglinter.so /lib/
+COPY --from=builder /build/target/release/pglinter-pg${PG_MAJOR}/usr/share/postgresql/${PG_MAJOR}/extension/pglinter* /share/extension/
 
 USER 65532:65532

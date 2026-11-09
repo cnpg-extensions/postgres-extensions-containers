@@ -148,3 +148,28 @@ selection policy.
   lockfile; remove the download and guards after validating locked resolution,
   package inventory, licenses, native builds, and shared smoke checks. Revisit
   the license clarification if upstream ships `package.license`.
+
+## pglinter: ARM64 fat LTO
+
+- **Upstream:** [2.0.0 Cargo.toml](https://github.com/pmpetit/pglinter/blob/2.0.0/Cargo.toml)
+  enables fat LTO and one codegen unit in the standard `release` profile.
+  [Upstream CI](https://github.com/pmpetit/pglinter/blob/2.0.0/.github/actions/reusable-package-action-native/action.yml)
+  selects `release-lto-off` on ARM64 to avoid runner memory exhaustion, as
+  described in [PR #99](https://github.com/pmpetit/pglinter/pull/99).
+- **Downstream decision:** [pglinter/Dockerfile](pglinter/Dockerfile) uses
+  `--profile release` on both AMD64 and ARM64. We leave the upstream Cargo
+  profiles unchanged and do not apply its CI setting that disables LTO.
+- **Evidence:** on 2026-11-09, the [native ARM64 fat-LTO probe](https://github.com/ardentperf-labs/postgres-extensions-containers/actions/runs/42719148797)
+  passed compilation, packaging, and Cargo/license evidence generation for
+  PostgreSQL 18 on both Bookworm and Trixie using `ubuntu-24.04-arm` runners.
+  BuildKit cgroup peak memory was 5,158,858,752 bytes on Bookworm and
+  5,153,439,744 bytes on Trixie (about 4.8 GiB each), with zero OOM events on
+  roughly 16 GB runners. The probe used pglinter 2.0.0, pgrx 0.18.0, Rust 1.97.1,
+  and the borrowed lockfile documented above.
+- **Limits:** the fat-LTO probe checked builds and evidence generation. The
+  [full acceptance run](https://github.com/ardentperf-labs/postgres-extensions-containers/actions/runs/42718983690),
+  including signing, security, provenance, and CNPG 1.30.1 smoke tests, passed
+  with upstream's ARM64 LTO-disable setting.
+- **Review when:** the extension, dependency lock, compiler, or runner resources
+  change. Recheck native ARM64 builds and memory use before adopting any
+  LTO-disable workaround.

@@ -120,7 +120,7 @@ def main():
         "features": features,
         "default_features": False,
         "recipe_default_features": recipe["defaults"],
-        "profile": recipe.get("profiles", {}).get(arch, "release"),
+        "profile": "release",
         "rustflags": os.getenv("RUSTFLAGS", ""),
         "rust_target": triple,
         "target_cfg": run(

@@ -8,12 +8,7 @@ RECIPES = {
     "pg-durable": {"manifest": "Cargo.toml", "defaults": False, "installed": False},
     "pg-graphql": {"manifest": "Cargo.toml", "defaults": True, "installed": True},
     "pg-jsonschema": {"manifest": "Cargo.toml", "defaults": False, "installed": False},
-    "pglinter": {
-        "manifest": "Cargo.toml",
-        "defaults": True,
-        "installed": False,
-        "profiles": {"arm64": "release-lto-off"},
-    },
+    "pglinter": {"manifest": "Cargo.toml", "defaults": True, "installed": False},
     "pg-parquet": {"manifest": "Cargo.toml", "defaults": False, "installed": False},
     "pg-search": {
         "manifest": "pg_search/Cargo.toml",

@@ -20,17 +20,14 @@ from generator import final_inventory
 
 class SPDXConformanceTest(unittest.TestCase):
     def test_composed_pgrx_document_conforms_to_spdx(self):
-        for ship_system_library, profile in (
-            (False, 'release'), (True, 'release'), (False, 'release-lto-off'),
-        ):
-            with self.subTest(ship_system_library=ship_system_library, profile=profile):
-                self.check_composed_document(ship_system_library, profile)
+        for ship_system_library in (False, True):
+            with self.subTest(ship_system_library=ship_system_library):
+                self.check_composed_document(ship_system_library)
 
-    def check_composed_document(self, ship_system_library, profile):
+    def check_composed_document(self, ship_system_library):
         fixture = test_hook.HookTest()
         fixture.setUp()
         self.addCleanup(fixture.doCleanups)
-        fixture.manifest['build']['profile'] = profile
         if ship_system_library:
             library = fixture.final / 'lib/libsystem.so'
             library.write_bytes(b'shipped system library')
@@ -100,10 +97,6 @@ class SPDXConformanceTest(unittest.TestCase):
         generator_files = generator_document['files']
         generator_licenses = generator_document['hasExtractedLicensingInfos']
         output = fixture.run_hook()
-        evidence = next(json.loads(annotation['comment'])
-                        for annotation in output['annotations']
-                        if annotation.get('annotator') == 'Tool: cnpg-pgrx-hook-v1')
-        self.assertEqual(evidence['build']['profile'], profile)
         set_document_namespace(output, 'pg-demo', 'linux/amd64')
         path = fixture.root / 'pgrx.spdx.json'
         path.write_text(json.dumps(output))
