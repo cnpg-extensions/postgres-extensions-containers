@@ -2,9 +2,6 @@ version: 3
 
 output: prefixed
 
-includes:
-  pgrx: ./pgrx/Taskfile.yml
-
 vars:
   GREEN: \033[0;32m
   BLUE: \033[0;34m

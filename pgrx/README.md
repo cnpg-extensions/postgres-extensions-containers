@@ -152,7 +152,7 @@ docker rm "$syft_container"
 Run the PGRX tests and relevant workflow lint:
 
 ```sh
-task pgrx:validate
+python3 pgrx/local/validate.py
 ```
 
 Shared Go and SBOM-generator suites have their own workflows. Run them separately
@@ -164,7 +164,7 @@ incorrect inventory, ownership, dependency graph, or license report. Malformed
 evidence and other inputs that already cause a clear build failure rely on the
 build-time guards rather than separate rejection tests.
 
-For a quick downstream-only check, use `task pgrx:test`. CI runs this suite
+For a quick downstream-only check, use `python3 pgrx/test.py`. CI runs this suite
 inside the pinned generator image so Syft and the SPDX validator match the
 production hook environment. The generator's
 BuildKit/SPDX/Grype/Grant integration fixture is maintained in
