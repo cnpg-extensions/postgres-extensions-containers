@@ -23,13 +23,40 @@ jobs:
 
             // Retry only the original attempt; a failed retry stops here.
             if (run.run_attempt !== 1) {
-              core.info(`Not retrying attempt ${run.run_attempt}`);
+              core.info(`Not retrying run ${run.id}, attempt ${run.run_attempt}`);
               return;
             }
 
             core.info(`Retrying failed jobs for run ${run.id}`);
-            await github.rest.actions.reRunWorkflowFailedJobs({
+            const params = {
               owner: context.repo.owner,
               repo: context.repo.repo,
               run_id: run.id,
+            };
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+              ...params, filter: 'latest', per_page: 100,
             });
+            const failed = jobs.filter(job => !['success', 'skipped'].includes(job.conclusion));
+            core.info(`Inspected ${jobs.length} jobs; ${failed.length} unsuccessful`);
+            failed.forEach(job => core.info(`${job.id}: ${job.conclusion}: ${job.name} (${job.html_url})`));
+            const finals = failed.filter(job => /\/ Provenance for (testing|production) images .* \/ final$/.test(job.name));
+            if (finals.length) {
+              // SLSA v2.1.0 reports generator errors through a separate final job.
+              // Restart at detect-env to refresh both SLSA jobs' failure outputs.
+              const roots = jobs.filter(job => finals.length === 1 &&
+                job.name === finals[0].name.replace(/final$/, 'detect-env'));
+              if (roots.length === 1 && failed.every(job => job === finals[0] || job.name === 'Automerge gate')) {
+                core.info(`Retrying SLSA job ${roots[0].id} and dependents: ${roots[0].name}`);
+                await github.rest.actions.reRunJobForWorkflow({
+                  owner: params.owner, repo: params.repo, job_id: roots[0].id,
+                });
+              } else {
+                // One run-level request retries all failures together.
+                core.info(`Retrying full workflow: ${finals.length} failed SLSA final jobs, ${roots.length} matching roots, ${failed.length} unsuccessful jobs`);
+                await github.rest.actions.reRunWorkflow(params);
+              }
+            } else {
+              core.info('Retrying failed jobs: no failed SLSA final jobs detected');
+              await github.rest.actions.reRunWorkflowFailedJobs(params);
+            }
+            core.info(`GitHub accepted retry request for run ${run.id}`);

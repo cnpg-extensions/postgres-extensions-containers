@@ -80,6 +80,19 @@ instead of implying that a fix is scheduled. Last reviewed: 2026-10-19.
   files without it; verify extension creation and affected upgrade paths before
   removing it.
 
+## CI: SLSA provenance retries
+
+- **Upstream:** [SLSA generator v2.1.0](https://github.com/slsa-framework/slsa-github-generator/blob/v2.1.0/.github/workflows/generator_container_slsa3.yml).
+  No upstream issue or pull request is currently linked.
+- **Problem:** generator errors produce a successful job with a failure output;
+  only the separate `final` job fails. Retrying failed jobs reuses that output.
+- **Workaround:** [the retry workflow](.github/workflows/retry-failed-builds.yml)
+  reruns the matching `detect-env` job and its dependents, including the generator,
+  for an isolated provenance failure. Multiple or mixed failures, or an unmatched
+  job, retry the full workflow once; ordinary failures retain the failed-jobs retry.
+- **Remove when:** the pinned SLSA workflow fails generator jobs directly and
+  GitHub's failed-jobs retry reruns their work.
+
 ## CI: extension rebuilds (option not adopted)
 
 Shared CI changes trigger the full extension matrix, then repeat on merge to
