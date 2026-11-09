@@ -36,10 +36,6 @@ def main():
         binary.write_bytes(data)
         binary.chmod(0o755)
         archive.unlink()
-    (args.output / "skopeo").write_text(
-        "#!/bin/sh\nexec python3 " + str(ROOT / "skopeo.py") + ' "$@"\n'
-    )
-    (args.output / "skopeo").chmod(0o755)
     if os.getenv("GITHUB_PATH"):
         with open(os.environ["GITHUB_PATH"], "a") as stream:
             stream.write(str(args.output.resolve()) + "\n")

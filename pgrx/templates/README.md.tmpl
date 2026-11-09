@@ -18,8 +18,8 @@ PostgreSQL extension that provides [describe the main functionality here].
 <!--
 TODO: Customize the image tag, extension names, SQL version, and Renovate
 instructions below. Use the package version from `metadata.hcl` for the image
-tag. The Database version is the SQL extension version and may omit a leading
-`v`.
+tag. Use metadata.sql_name for the Database extension name and SQL commands.
+The Database version is the SQL extension version and may omit a leading `v`.
 -->
 
 ### 1. Add the {{ .Name }} extension image to your Cluster
@@ -64,7 +64,7 @@ spec:
   cluster:
     name: cluster-{{ .Name }}
   extensions:
-  - name: {{ .Name }}
+  - name: {{ replaceAll .Name "-" "_" }}
     # TODO: Set this to the extension's SQL default_version.
     version: '<sql-version>'
 ```

@@ -29,6 +29,9 @@ spec:
     size: 1Gi
 
   postgresql:
+    shared_preload_libraries:
+    - "pg_search"
+
     extensions:
     - name: pg-search
       image:
@@ -55,7 +58,7 @@ spec:
   cluster:
     name: cluster-pg-search
   extensions:
-  - name: pg-search
+  - name: pg_search
     version: '0.25.6'
 ```
 
@@ -74,8 +77,8 @@ Once the database is ready, connect to it with `psql` and run:
 ```
 
 You should see `pg_search` listed with version `0.25.6`. The extension must be
-included in `shared_preload_libraries`; this image declares that requirement in
-its catalog metadata.
+included in `shared_preload_libraries`; the Cluster example above supplies this
+setting, matching the image's catalog metadata.
 
 ## Known Caveats
 

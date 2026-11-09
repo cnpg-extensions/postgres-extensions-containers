@@ -56,7 +56,7 @@ spec:
   cluster:
     name: cluster-pg-parquet
   extensions:
-  - name: pg-parquet
+  - name: pg_parquet
     version: '0.5.1'
 ```
 

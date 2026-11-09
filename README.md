@@ -280,7 +280,8 @@ extract its platform-specific SPDX, and report vulnerabilities and licenses with
 Grype and Grant. See the [example report](./examples/sbom-reports.txt) and
 [generator release workflow](./sbom-generator/README.md#generator-release-and-test-builds).
 
-For downstream images, see the [common verification command](./pgrx/VERIFYING_IMAGES.md).
+For PGRX images, see the [verification notes](./pgrx/README.md#verify-images)
+for the signing identity and signature format.
 
 
 ## Image catalogs

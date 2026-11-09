@@ -7,8 +7,33 @@ targets; catalog and testing-value generation support both. Source tags remain l
 (including `v`), while SQL versions remain separate. Extension READMEs describe
 usage; this directory contains build and validation internals.
 
-Consumers use the shared [verification procedure](VERIFYING_IMAGES.md) for all
-extension images.
+## Verify images
+
+Follow the SBOM guide to [verify the image and extract its
+SBOM](../sbom-generator/README.md#verify-the-image-and-extract-its-sbom),
+[inspect and verify build provenance](../sbom-generator/README.md#inspect-and-verify-build-provenance),
+and [report vulnerabilities and licenses](../sbom-generator/README.md#report-vulnerabilities-and-licenses).
+Use the tools listed there; installing the PGRX workflow toolchain is unnecessary.
+
+For PGRX images published by `cnpg-extensions` from `main`, use this exact
+`--certificate-identity` in the guide's Cosign command:
+
+```text
+https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/pgrx_targets.yml@refs/heads/main
+```
+
+Keep the guide's GitHub Actions OIDC issuer and add
+`--new-bundle-format=false` for this repository's legacy-format signatures.
+For another publisher, change both the image repository and the exact workflow
+identity to that publisher's repository and trusted branch. After copying an
+image, verify the destination repository's signature as well.
+
+The guide's extraction examples use a multi-platform index. For a
+single-platform index, confirm its platform with `docker buildx imagetools
+inspect`, then use `.SBOM.SPDX` and `.Provenance.SLSA` in the format expressions.
+
+PGRX Cargo relationships describe the configured target dependency graph; they
+do not claim that every dependency survives linker dead-code elimination.
 
 ## Build and evidence contract
 
@@ -114,8 +139,8 @@ PGRX follows the Debian release-acceptance level: build-time validation, securit
 scanning, signing, shared runtime smoke tests, and required SLSA jobs. Security
 extracts each platform's SPDX document with Buildx for Grype and Grant.
 These stages do not repeat full OCI-graph verification or compare every BuildKit
-provenance field against preparation records. Consumers can verify signatures and
-extract embedded evidence with the shared verification procedure.
+provenance field against preparation records. Consumers can [verify images](#verify-images)
+using the shared SBOM guide and the PGRX signing identity above.
 The smoke uses the shared Task/Dagger setup, CNPG extension catalogs, and
 extension installation checks. The pg-search recipe
 captures base libraries before installing packages, then stages the packaged
@@ -152,7 +177,11 @@ docker rm "$syft_container"
 Run the PGRX tests and relevant workflow lint:
 
 ```sh
-python3 pgrx/local/validate.py
+python3 pgrx/test.py && \
+  actionlint .github/workflows/pgrx.yml \
+    .github/workflows/pgrx_targets.yml \
+    .github/workflows/pgrx-tests.yml \
+    .github/workflows/cnpg-versions.yml
 ```
 
 Shared Go and SBOM-generator suites have their own workflows. Run them separately

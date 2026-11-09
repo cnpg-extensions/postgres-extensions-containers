@@ -53,7 +53,7 @@ spec:
   cluster:
     name: cluster-pg-session-jwt
   extensions:
-  - name: pg-session-jwt
+  - name: pg_session_jwt
     version: '0.5.0'
 ```
 

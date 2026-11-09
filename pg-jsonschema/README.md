@@ -54,7 +54,7 @@ spec:
   cluster:
     name: cluster-pg-jsonschema
   extensions:
-  - name: pg-jsonschema
+  - name: pg_jsonschema
     version: '0.3.4'
 ```
 

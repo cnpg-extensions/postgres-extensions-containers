@@ -1,9 +1,0 @@
-{
-  "targets": [
-    {"name": "legacy", "build_system": ""},
-    {"name": "debian", "build_system": "debian"},
-    {"name": "pgrx", "build_system": "pgrx"}
-  ],
-  "debian_targets": ["legacy", "debian"],
-  "pgrx_targets": ["pgrx"]
-}

@@ -53,7 +53,7 @@ spec:
   cluster:
     name: cluster-pg-graphql
   extensions:
-  - name: pg-graphql
+  - name: pg_graphql
     version: '1.6.2'
 ```
 

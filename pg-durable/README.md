@@ -58,7 +58,7 @@ spec:
   cluster:
     name: cluster-pg-durable
   extensions:
-  - name: pg-durable
+  - name: pg_durable
     version: '0.2.7'
 ```
 
