@@ -74,8 +74,7 @@ notices remain in the image for distribution and compliance needs. Cargo package
 license expressions come uniformly from cargo-about, preserving AND/OR semantics. Missing, unknown or invalid expressions for selected crates
 fail the build. License texts remain in the SPDX document and shipped notices
 are attributed to crate entries by full Cargo identity. The generator performs
-full SPDX validation after the hook returns; the standalone artifact verifier
-also checks downloaded document structure.
+full SPDX validation after the hook returns.
 cargo-about 0.9.2's repeated,
 identical Boolean `doctest` field is normalized before report hashing. Other
 duplicate JSON keys and conflicting values are rejected.
@@ -102,12 +101,21 @@ while scanner errors fail the job. Both build paths use the shared CNPG support
 policy: `main`, the highest stable patch of the previous minor, and the pinned
 latest release. Smoke uses the shared Taskfile's live operator manifests and
 catalogs, including development images for `main`.
+
+[`cnpg-versions.yml`](../.github/workflows/cnpg-versions.yml) holds this policy
+so Debian and PGRX test the same supported operator versions, with one
+Renovate-managed latest-release pin. The logic was extracted from Debian's
+`bake_targets.yml` to avoid maintaining a separate PGRX support matrix.
+This adds a small difference from upstream's inline workflow: when upstream
+changes that version-selection logic, apply its intent to the shared workflow,
+even if Git merges cleanly. See the [upstream merge process](../MERGE.md).
+
 PGRX follows the Debian release-acceptance level: build-time validation, security
 scanning, signing, shared runtime smoke tests, and required SLSA jobs. Security
 extracts each platform's SPDX document with Buildx for Grype and Grant.
 These stages do not repeat full OCI-graph verification or compare every BuildKit
-provenance field against preparation records. The standalone verifier remains
-available for consumers of either build family.
+provenance field against preparation records. Consumers can verify signatures and
+extract embedded evidence with the shared verification procedure.
 The smoke uses the shared Task/Dagger setup, CNPG extension catalogs, and
 extension installation checks. The pg-search recipe
 captures base libraries before installing packages, then stages the packaged
