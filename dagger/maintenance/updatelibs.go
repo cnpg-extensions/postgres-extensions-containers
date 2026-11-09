@@ -74,14 +74,6 @@ func WithOSLibsFilter() ExtensionsOption {
 	}
 }
 
-// WithBuildSystemFilter restricts discovery to one build-system family. An
-// omitted build_system in metadata is treated as Debian for compatibility.
-func WithBuildSystemFilter(buildSystem string) ExtensionsOption {
-	return func(opts *extensionsOptions) {
-		opts.buildSystem = buildSystem
-	}
-}
-
 // getExtensions retrieves a map of extensions from the source directory.
 // By default, all extensions are returned, but filters can be applied.
 func getExtensions(

@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/zclconf/go-cty/cty"
 
 	"dagger/maintenance/internal/dagger"
 )
@@ -72,23 +71,6 @@ const (
 	metadataFile = "metadata.hcl"
 )
 
-const (
-	debianBuildSystem = "debian"
-	pgrxBuildSystem   = "pgrx"
-)
-
-// effectiveBuildSystem preserves the repository's historical default while
-// rejecting unknown explicit values at the target-list boundary.
-func effectiveBuildSystem(metadata *extensionMetadata) (string, error) {
-	if metadata.BuildSystem == "" {
-		return debianBuildSystem, nil
-	}
-	if metadata.BuildSystem != debianBuildSystem && metadata.BuildSystem != pgrxBuildSystem {
-		return "", fmt.Errorf("unsupported build_system %q for target %q", metadata.BuildSystem, metadata.Name)
-	}
-	return metadata.BuildSystem, nil
-}
-
 // parseBuildMatrix derives the build matrix for a target extension by reading
 // its metadata.hcl from the source directory.
 func parseBuildMatrix(ctx context.Context, source *dagger.Directory, target string) (*buildMatrix, error) {
@@ -142,7 +124,7 @@ func parseExtensionMetadata(ctx context.Context, extensionDirectory *dagger.Dire
 	return decodeExtensionMetadata([]byte(data))
 }
 
-// Decode separately so discovery compatibility can be tested without a session.
+// decodeExtensionMetadata is shared by discovery and metadata inventory checks.
 func decodeExtensionMetadata(data []byte) (*extensionMetadata, error) {
 	type Config struct {
 		Metadata extensionMetadata `hcl:"metadata"`
@@ -155,27 +137,7 @@ func decodeExtensionMetadata(data []byte) (*extensionMetadata, error) {
 		return nil, err
 	}
 
-	// metadata is an object expression, and go-cty's struct conversion treats
-	// object fields as required even when the HCL field is optional. Decode the
-	// object once as a cty.Value to preserve the historical omitted=Debian
-	// default without making every existing metadata.hcl grow a new field.
-	type rawConfig struct {
-		Metadata cty.Value `hcl:"metadata"`
-		Remain   hcl.Body  `hcl:",remain"`
-	}
-	var raw rawConfig
-	if err := hclsimple.Decode(metadataFile, data, nil, &raw); err != nil {
-		return nil, err
-	}
-	if raw.Metadata.IsKnown() && !raw.Metadata.IsNull() && raw.Metadata.Type().IsObjectType() && raw.Metadata.Type().HasAttribute("build_system") {
-		buildSystem := raw.Metadata.GetAttr("build_system")
-		if !buildSystem.IsKnown() || buildSystem.IsNull() || buildSystem.Type() != cty.String || buildSystem.AsString() == "" {
-			return nil, fmt.Errorf("build_system must be a nonempty string")
-		}
-		rootMeta.Metadata.BuildSystem = buildSystem.AsString()
-	}
-
-	if _, err := effectiveBuildSystem(&rootMeta.Metadata); err != nil {
+	if err := decodeBuildSystem(data, &rootMeta.Metadata); err != nil {
 		return nil, err
 	}
 	return &rootMeta.Metadata, nil
