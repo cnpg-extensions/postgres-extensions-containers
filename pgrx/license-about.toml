@@ -57,3 +57,11 @@ license = "PostgreSQL"
 path = "LICENSE.md"
 license = "PostgreSQL"
 checksum = "2d6b71ffa38916cb927a9ef7f90e9bd8bb672e75990e2acf01ab22c89b7f638d"
+
+# 2.0.0 omits package.license; upstream added it alongside the borrowed lockfile.
+[pglinter.clarify]
+license = "Apache-2.0"
+[[pglinter.clarify.files]]
+path = "LICENSE"
+license = "Apache-2.0"
+checksum = "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"

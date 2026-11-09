@@ -202,7 +202,7 @@ def main():
     prefix = (
         Path("/")
         if recipe["installed"]
-        else build / f"target/release/{sql_name}-pg{major}"
+        else build / f"target/{config['profile']}/{sql_name}-pg{major}"
     )
     library = prefix / f"usr/lib/postgresql/{major}/lib/{sql_name}.so"
     files = [(library, "lib/" + library.name, "library")]

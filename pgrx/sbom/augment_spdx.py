@@ -656,7 +656,7 @@ def augment_spdx(document, context):
         and isinstance(build["features"], list),
         "invalid feature policy",
     )
-    require(build["profile"] == "release", "unsupported build profile")
+    require(build["profile"] in ("release", "release-lto-off"), "unsupported build profile")
     checked_bytes(
         context.builder_path, "build/Cargo.lock", manifest["inputs"]["lock_sha256"]
     )

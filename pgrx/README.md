@@ -49,8 +49,12 @@ guarded by exact original and effective Cargo.lock checksums. Anonymizer 3.3.2
 similarly corrects its stale root Cargo.lock version with exact checksums. Any
 upstream lock change requires reviewing or removing the affected correction.
 The installer records both original and effective lock hashes; the legacy
-`patches` evidence field remains empty for schema compatibility. Cargo-about
-and other release tools use architecture-specific artifacts resolved from their
+`patches` evidence field remains empty for schema compatibility. Pglinter 2.0.0
+omits Cargo.lock, so its Dockerfile downloads the first upstream lockfile from
+a pinned commit with a checksum. Version, manifest, and absence guards require
+manual review on the next release; see the [workaround register](../WORKAROUNDS.md#pglinter-200-missing-cargolock).
+Both lock hashes describe that borrowed file, not a lockfile in the release archive.
+Cargo-about and other release tools use architecture-specific artifacts resolved from their
 Renovate-managed versions. Only cargo-pgrx is built from source. All locked crate
 sources are fetched before offline reporting because cargo-about queries
 metadata before applying its target filter.
@@ -63,6 +67,8 @@ lock; these generated inputs are not maintained in a separate committed lock.
 
 The post-build finalizer resolves target-filtered Cargo metadata using the same
 package, PostgreSQL feature, non-PG defaults, and feature policy as cargo-pgrx.
+Pglinter follows upstream's `release-lto-off` profile on ARM64 and `release`
+on AMD64; build evidence records the selected profile and reads its package directory.
 It emits Cargo metadata and cargo-about reports, checks Cargo.lock for drift, ships
 license texts, and hashes the finished library/control/SQL payload. The manifest
 uses evidence schema v2 and is written last. The diagnostic `pgrx-sbom` target exports these reports; it does

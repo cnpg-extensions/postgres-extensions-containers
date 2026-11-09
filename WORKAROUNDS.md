@@ -121,3 +121,30 @@ selection policy.
 - **Remove when:** the next source release has a consistent root version.
   Review or remove the correction whenever the upstream lock changes, then run
   the native image build and shared smoke checks.
+
+## pglinter 2.0.0: missing Cargo.lock
+
+- **Upstream:** [release 2.0.0](https://github.com/pmpetit/pglinter/tree/2.0.0)
+  omits Cargo.lock. The first upstream lockfile was added in
+  [d76a73d631b5435843917154a86e40c9d3889740](https://github.com/pmpetit/pglinter/commit/d76a73d631b5435843917154a86e40c9d3889740).
+  No upstream issue is linked.
+- **Problem:** our builder derives cargo-pgrx and dependency evidence from an
+  upstream lockfile and requires locked dependency resolution.
+- **Workaround:** [pglinter/Dockerfile](pglinter/Dockerfile) downloads that
+  commit's Cargo.lock with a pinned SHA-256. It requires source version 2.0.0,
+  the exact release Cargo.toml checksum, and an absent source lockfile before
+  downloading. The borrowed lock still identifies pglinter 2.0.0 and pgrx 0.18.0;
+  Cargo accepts it with the unmodified release manifest using `--locked`.
+  Between the release and that commit, Cargo.toml only gains its license field
+  and an exact pgrx-tests pin matching the locked version; Rust and SQL sources
+  are unchanged. The existing cargo-about clarification mechanism supplies the
+  missing Apache-2.0 declaration using the release LICENSE checksum.
+- **Limits:** this is a later upstream dependency resolution, not a recovered
+  lockfile from the original release build. Build evidence hashes the borrowed
+  file as both original and effective lock inputs; the pinned download URL in
+  the Dockerfile identifies its separate origin.
+- **Review on every release:** the version guard deliberately stops the build
+  even if Cargo.toml is otherwise unchanged. Prefer the next release's own
+  lockfile; remove the download and guards after validating locked resolution,
+  package inventory, licenses, native builds, and shared smoke checks. Revisit
+  the license clarification if upstream ships `package.license`.
