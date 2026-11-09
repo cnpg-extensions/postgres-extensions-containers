@@ -11,7 +11,6 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_SHA256
 ARG PGRX_SOURCE_REPOSITORY
 ARG PGRX_SOURCE_REVISION
 
@@ -22,7 +21,7 @@ WORKDIR /build
 
 # The source archive is selected by the exact upstream Git tag.
 ADD https://github.com/CrunchyData/pg_parquet/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
-RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
+RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 

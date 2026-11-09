@@ -11,12 +11,11 @@ from source import resolve_source, source_archive_url
 
 
 class SourceResolutionTest(unittest.TestCase):
-    def test_selected_gitlab_release_resolves_repository_revision_and_archive(self):
+    def test_selected_gitlab_release_resolves_identity_without_downloading_archive(self):
         repository_url = "https://gitlab.com/group/subgroup/extension"
         repository = "group/subgroup/extension"
         version = "3.3.2"
         revision = "0123456789abcdef0123456789abcdef01234567"
-        archive = b"selected release archive"
         archive_url = (
             "https://gitlab.com/group/subgroup/extension/-/archive/3.3.2/"
             "extension-3.3.2.tar.gz"
@@ -27,7 +26,6 @@ class SourceResolutionTest(unittest.TestCase):
         )
         responses = {
             api_url: json.dumps({"id": revision}).encode(),
-            archive_url: archive,
         }
         requested = []
 
@@ -38,7 +36,7 @@ class SourceResolutionTest(unittest.TestCase):
         with patch("source.fetch", side_effect=fetch):
             result = resolve_source(repository_url, version)
 
-        self.assertEqual(requested, [api_url, archive_url])
+        self.assertEqual(requested, [api_url])
         self.assertEqual(
             result,
             {
@@ -46,7 +44,6 @@ class SourceResolutionTest(unittest.TestCase):
                 "host": "gitlab.com",
                 "version": version,
                 "revision": revision,
-                "archive_sha256": hashlib.sha256(archive).hexdigest(),
                 "url": archive_url,
             },
         )

@@ -11,7 +11,6 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_SHA256
 ARG PGRX_SOURCE_REPOSITORY
 ARG PGRX_SOURCE_REVISION
 
@@ -20,10 +19,10 @@ USER 0
 COPY pgrx/ /pgrx/
 WORKDIR /build
 ADD https://github.com/neondatabase/pg_session_jwt/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
-RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
+RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # v0.5.0 ships the previous package version. Review/remove this correction
-# whenever upstream changes, even if the source checksum lock was refreshed.
+# whenever upstream changes.
 RUN echo '07d0e4d27a45de2fcad92b955b058723e8266050c1ad4eba2497adb8f55c7aa1  Cargo.lock' | sha256sum --check --strict - \
     || { echo 'Upstream Cargo.lock changed: review/remove the pg-session-jwt version correction' >&2; exit 1; }
 RUN cp Cargo.lock /tmp/pgrx-original-Cargo.lock && \

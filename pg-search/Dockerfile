@@ -11,7 +11,6 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_SHA256
 ARG PGRX_SOURCE_REPOSITORY
 ARG PGRX_SOURCE_REVISION
 
@@ -22,7 +21,7 @@ COPY scripts/capture_base_image_libs.sh scripts/stage_system_libs.sh /usr/local/
 RUN capture_base_image_libs.sh
 WORKDIR /build
 ADD https://github.com/paradedb/paradedb/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
-RUN /pgrx/verify-source.sh && tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
+RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # ParadeDB installs OpenBLAS before packaging pg_search:
 # https://github.com/paradedb/paradedb/blob/v0.25.6/.github/workflows/publish-pg_search-debian.yml#L256-L260

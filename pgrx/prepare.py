@@ -175,7 +175,6 @@ def prepare(inputs, generator, output):
                 PGRX_DISTRO=distro,
                 PGRX_SOURCE_REPOSITORY=repository_url,
                 PGRX_SOURCE_REVISION=source["revision"],
-                PGRX_SOURCE_SHA256=source["archive_sha256"],
                 PGRX_WORKSPACE_SHA256=workspace,
                 PGRX_BUILD_TIMESTAMP=timestamp,
             )

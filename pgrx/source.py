@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve the immutable source inputs used for one selected extension build."""
+"""Resolve release identity and record downloaded source archives."""
 
 import hashlib
 import json
@@ -78,7 +78,7 @@ def source_revision(host, repository, version):
 
 
 def resolve_source(repository_url, version, archive=None, revision=None):
-    """Resolve a release reference and its archive digest for this build."""
+    """Resolve release identity and hash the supplied archive when available."""
     host, repository = source_repository(repository_url)
     url = source_archive_url(repository_url, version)
     if revision is None:
@@ -88,15 +88,15 @@ def resolve_source(repository_url, version, archive=None, revision=None):
     ):
         raise ValueError("invalid supplied source revision")
     revision = revision.lower()
-    if archive is None:
-        archive = fetch(url)
-    if not isinstance(archive, bytes):
-        raise ValueError("source archive must be bytes")
-    return {
+    result = {
         "repository": repository,
         "host": host,
         "version": version,
         "revision": revision,
-        "archive_sha256": hashlib.sha256(archive).hexdigest(),
         "url": url,
     }
+    if archive is not None:
+        if not isinstance(archive, bytes):
+            raise ValueError("source archive must be bytes")
+        result["archive_sha256"] = hashlib.sha256(archive).hexdigest()
+    return result

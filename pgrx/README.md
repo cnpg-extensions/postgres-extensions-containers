@@ -55,7 +55,9 @@ Renovate-managed versions. Only cargo-pgrx is built from source. All locked crat
 sources are fetched before offline reporting because cargo-about queries
 metadata before applying its target filter.
 Preparation resolves each metadata source tag to a repository revision and
-archive, then freezes the archive hash and source identity for the native jobs.
+archive URL. Each native build downloads the archive from the upstream HTTPS
+source and records its hash in build evidence, without comparing it against a
+prepared checksum.
 The build records the upstream Cargo.lock hash and derives cargo-pgrx from that
 lock; these generated inputs are not maintained in a separate committed lock.
 
@@ -104,8 +106,8 @@ cargo-about 0.9.2's repeated,
 identical Boolean `doctest` field is normalized before report hashing. Other
 duplicate JSON keys and conflicting values are rejected.
 
-Preparation freezes the source snapshot, timestamp, generator, resolved source
-identities and hashes, base indexes, targets, and definitions for a logical
+Preparation freezes the workspace snapshot, timestamp, generator, resolved source
+identities, base indexes, targets, and definitions for a logical
 workflow run. Each base index resolves to its architecture-specific child
 manifest. Every native platform job builds one target on its matching
 architecture and records its staging-index digest, bound to that preparation.
@@ -223,7 +225,7 @@ its latest release pin in
 `.github/workflows/cnpg-versions.yml`; operator manifests follow the same live
 release-branch or `main` policy as shared smoke tests.
 
-Preparation resolves the source revision and archive hash and selects each
+Preparation resolves the source revision and archive URL and selects each
 platform child from the current Debian base tag. Base tags follow the shared
 `getBaseImage` policy; their resolved digests are recorded per run rather than
 maintained in a separate dependency manifest. Builds derive the matching cargo-pgrx
