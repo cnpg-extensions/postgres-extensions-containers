@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Signing, scanning and smoke steps for each assembled target."""
+"""Signing and scanning steps for each assembled target."""
 
 import argparse
 import json
@@ -12,11 +12,10 @@ from record import load_preparation
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("stage", choices=["sign", "security", "smoke"])
+    parser.add_argument("stage", choices=["sign", "security"])
     parser.add_argument("--preparation", required=True, type=Path)
     parser.add_argument("--assembly", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--cnpg-version")
     args = parser.parse_args()
     preparation = load_preparation(args.preparation)
     assembly = json.loads((args.assembly / "assembly.json").read_text())
@@ -71,11 +70,6 @@ def main():
                 )
                 with (output / (tool + ".json")).open("w") as report:
                     subprocess.run(command, stdout=report, check=True)
-    elif args.stage == "smoke":
-        from smoke import smoke
-
-        assembly["_directory"] = str(args.assembly)
-        smoke(preparation, assembly, args.output, args.cnpg_version)
     save(
         args.output / "result.json",
         {

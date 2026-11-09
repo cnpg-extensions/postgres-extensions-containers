@@ -143,8 +143,10 @@ extracts each platform's SPDX document with Buildx for Grype and Grant.
 These stages do not repeat full OCI-graph verification or compare every BuildKit
 provenance field against preparation records. Consumers can [verify images](#verify-images)
 using the shared SBOM guide and the PGRX signing identity above.
-The smoke uses the shared Task/Dagger setup, CNPG extension catalogs, and
-extension installation checks. The pg-search recipe
+Both build families call the shared [smoke workflow](../.github/workflows/smoke.yml),
+which uses the standard Task/Dagger setup, CNPG extension catalogs, and extension
+installation checks. PGRX supplies the assembled image digest and selected CNPG
+release directly to that workflow. The pg-search recipe
 captures base libraries before installing packages, then stages the packaged
 extension's additional runtime closure and copyright notices using the shared
 helpers. This includes quadmath where required.
@@ -183,7 +185,8 @@ python3 pgrx/test.py && \
   actionlint .github/workflows/pgrx.yml \
     .github/workflows/pgrx_targets.yml \
     .github/workflows/pgrx-tests.yml \
-    .github/workflows/cnpg-versions.yml
+    .github/workflows/cnpg-versions.yml \
+    .github/workflows/smoke.yml
 ```
 
 Shared Go and SBOM-generator suites have their own workflows. Run them separately
@@ -242,12 +245,10 @@ through the Debian apt repositories with the ordinary `apt-get update` and
 `apt-get install` flow; individual package artifacts are not pinned in a
 separate lock inventory.
 
-The pinned toolbox image supplies the shared smoke-test environment. The shared
-Taskfile owns the already pinned Kubernetes node and kubectl, and the shared
-Dagger test function owns Chainsaw. PGRX overrides replace the mutable toolbox
-installer with the pinned runner plus the version-selected Kind binary. Catalog
-checks use the shared Task/Dagger tests without additional mounted-payload
-assertions. Catalog installation follows the shared Taskfile unchanged: it installs Git with apk
+The shared smoke workflow installs Task and Dagger for both build families.
+The shared Taskfile owns Kind, the Kubernetes node, kubectl, and the Dagger engine;
+the shared Dagger test function owns Chainsaw. Catalog checks use the shared
+Task/Dagger tests. Catalog installation follows the shared Taskfile unchanged: it installs Git with apk
 and applies `cnpg-extensions/artifacts` catalogs from `main`.
 
 PostgreSQL Anonymizer declares its GitLab `source_repository` in metadata and

@@ -25,18 +25,6 @@ def tool_url(name, version, architecture):
             "https://github.com/rhysd/actionlint/releases/download/v{version}/"
             "actionlint_{numeric}_linux_{architecture}.tar.gz"
         ),
-        "task": (
-            "https://github.com/go-task/task/releases/download/v{version}/"
-            "task_linux_{architecture}.tar.gz"
-        ),
-        "dagger": (
-            "https://github.com/dagger/dagger/releases/download/v{version}/"
-            "dagger_v{version}_linux_{architecture}.tar.gz"
-        ),
-        "kind": (
-            "https://github.com/kubernetes-sigs/kind/releases/download/v{version}/"
-            "kind-linux-{architecture}"
-        ),
         "rustup": (
             "https://static.rust-lang.org/rustup/archive/{numeric}/"
             "{rust_arch}-unknown-linux-gnu/rustup-init"

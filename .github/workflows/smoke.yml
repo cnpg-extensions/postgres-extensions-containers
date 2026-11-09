@@ -1,0 +1,64 @@
+name: Extension smoke test
+
+on:
+  workflow_call:
+    inputs:
+      extension_name:
+        description: Extension directory
+        required: true
+        type: string
+      image:
+        description: Extension image to test
+        required: true
+        type: string
+      cnpg_version:
+        description: CNPG full version or main
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  smoke:
+    name: Smoke test
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install Task
+        uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2.2.0
+
+      - name: Install Dagger
+        env:
+          # renovate: datasource=github-tags depName=dagger/dagger versioning=semver
+          DAGGER_VERSION: 0.21.11
+        run: |
+          curl -L https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
+
+      - name: Set up environment
+        env:
+          CNPG_RELEASE: ${{ inputs.cnpg_version }}
+        run: |
+          task e2e:setup-env CNPG_RELEASE="$CNPG_RELEASE"
+
+      - name: Generate Chainsaw testing values
+        env:
+          MATRIX_IMAGE: ${{ inputs.image }}
+          EXTENSION_NAME: ${{ inputs.extension_name }}
+        run: |
+          task e2e:generate-values EXTENSION_IMAGE="${MATRIX_IMAGE}" TARGET="${EXTENSION_NAME}"
+
+      - name: Run e2e tests
+        env:
+          EXTENSION_NAME: ${{ inputs.extension_name }}
+        run: |
+          # Get Kind cluster internal kubeconfig
+          task e2e:export-kubeconfig KUBECONFIG_PATH=./kubeconfig INTERNAL=true
+
+          task e2e:test TARGET="${EXTENSION_NAME}" KUBECONFIG_PATH="./kubeconfig"

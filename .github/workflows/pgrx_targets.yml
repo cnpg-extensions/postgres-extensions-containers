@@ -224,39 +224,22 @@ jobs:
         if-no-files-found: error
   smoke:
     needs:
-    - prepare
     - assemble
     - sign
-    - handoff
     - generate-smoke-test-matrix
-    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJSON(needs.prepare.outputs.targets).include.*.target }}
+        image: ${{ fromJSON(needs.assemble.outputs.provenance_matrix) }}
         cnpg: ${{ fromJSON(needs.generate-smoke-test-matrix.outputs.versions) }}
     permissions:
       contents: read
       packages: read
-    steps:
-    - *id002
-    - *id003
-    - *id004
-    - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-      with:
-        name: assembly-${{ matrix.target }}
-        path: ${{ runner.temp }}/assembly
-    - *id005
-    - name: Smoke assembled target
-      env:
-        CNPG_VERSION: ${{ matrix.cnpg }}
-      run: python3 pgrx/downstream.py smoke --preparation "$RUNNER_TEMP/prepared" --assembly "$RUNNER_TEMP/assembly"
-        --cnpg-version "$CNPG_VERSION" --output "$RUNNER_TEMP/smoke-result"
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-      with:
-        name: smoke-${{ matrix.target }}-${{ matrix.cnpg }}
-        path: ${{ runner.temp }}/smoke-result
-        if-no-files-found: error
+    uses: ./.github/workflows/smoke.yml
+    with:
+      extension_name: ${{ inputs.extension_name }}
+      image: ${{ format('{0}@{1}', matrix.image.image, matrix.image.digest) }}
+      cnpg_version: ${{ matrix.cnpg }}
   promote:
     needs:
     - assemble

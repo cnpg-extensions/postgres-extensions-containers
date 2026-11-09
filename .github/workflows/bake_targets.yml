@@ -152,7 +152,6 @@ jobs:
 
   smoke-test:
     name: Smoke test
-    runs-on: ubuntu-26.04
     permissions:
       contents: read
       packages: read
@@ -164,43 +163,11 @@ jobs:
       matrix:
         image: ${{fromJson(needs.testbuild.outputs.images)}}
         cnpg: ${{fromJson(needs.generate-smoke-test-matrix.outputs.versions)}}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-
-      - name: Install Task
-        uses: go-task/setup-task@a00fbb05ce67b35648be3c78cbc9fd85354c757e # v2.2.0
-
-      - name: Install Dagger
-        env:
-          # renovate: datasource=github-tags depName=dagger/dagger versioning=semver
-          DAGGER_VERSION: 0.21.11
-        run: |
-          curl -L https://dl.dagger.io/dagger/install.sh | BIN_DIR=$HOME/.local/bin sh
-
-      - name: Set up environment
-        env:
-          CNPG_RELEASE: ${{ matrix.cnpg }}
-        run: |
-          task e2e:setup-env CNPG_RELEASE="$CNPG_RELEASE"
-
-      - name: Generate Chainsaw testing values
-        env:
-          MATRIX_IMAGE: ${{ matrix.image }}
-          EXTENSION_NAME: ${{ inputs.extension_name }}
-        run: |
-          task e2e:generate-values EXTENSION_IMAGE="${MATRIX_IMAGE}" TARGET="${EXTENSION_NAME}"
-
-      - name: Run e2e tests
-        env:
-          EXTENSION_NAME: ${{ inputs.extension_name }}
-        run: |
-          # Get Kind cluster internal kubeconfig
-          task e2e:export-kubeconfig KUBECONFIG_PATH=./kubeconfig INTERNAL=true
-
-          task e2e:test TARGET="${EXTENSION_NAME}" KUBECONFIG_PATH="./kubeconfig"
+    uses: ./.github/workflows/smoke.yml
+    with:
+      extension_name: ${{ inputs.extension_name }}
+      image: ${{ matrix.image }}
+      cnpg_version: ${{ matrix.cnpg }}
 
   copytoproduction:
     name: Copy images to production

@@ -11,21 +11,6 @@
       "depName": "rhysd/actionlint",
       "datasource": "github-releases"
     },
-    "task": {
-      "version": "v3.48.0",
-      "depName": "go-task/task",
-      "datasource": "github-releases"
-    },
-    "dagger": {
-      "version": "v0.21.9",
-      "depName": "dagger/dagger",
-      "datasource": "github-releases"
-    },
-    "kind": {
-      "version": "v0.33.0",
-      "depName": "kubernetes-sigs/kind",
-      "datasource": "github-releases"
-    },
     "grype": {
       "version": "v0.120.1",
       "depName": "anchore/grype",
@@ -38,8 +23,6 @@
     }
   },
   "images": {
-    "buildkit": "moby/buildkit:buildx-stable-1@sha256:28a898719c18a33f4e8000685287fa36fd0dd9560c6440227d3a732d79bb41d8",
-    "runner": "ghcr.io/catthehacker/ubuntu:act-24.04@sha256:62d572b92f9f32d3427b6d220ad1f9dca9c7b6ffad37d295425037dbff78abaf",
-    "dagger": "registry.dagger.io/engine:v0.21.9@sha256:3c4e0cedaea400d7e30155e050f94910ea5f381b6f5942dd2172382657628cb4"
+    "buildkit": "moby/buildkit:buildx-stable-1@sha256:28a898719c18a33f4e8000685287fa36fd0dd9560c6440227d3a732d79bb41d8"
   }
 }

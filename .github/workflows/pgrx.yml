@@ -20,6 +20,7 @@ name: Build, test and publish PGRX extensions
     - docker-bake-pgrx.hcl
     - .github/workflows/pgrx*.yml
     - .github/workflows/cnpg-versions.yml
+    - .github/workflows/smoke.yml
     - dagger/maintenance/**
     - '*/Dockerfile'
     - '*/metadata.hcl'

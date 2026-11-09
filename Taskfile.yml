@@ -237,7 +237,7 @@ tasks:
     cmds:
       - >
         docker run -d -v /var/lib/dagger --name {{ .DAGGER_ENGINE_NAME }} --restart always --network {{ .E2E_NETWORK }}
-        --privileged {{ .DAGGER_ENGINE_IMAGE_OVERRIDE | default (printf "registry.dagger.io/engine:%s" .DAGGER_ENGINE_VERSION) }}
+        --privileged registry.dagger.io/engine:{{ .DAGGER_ENGINE_VERSION }}
     status:
       - test "$(docker inspect -f {{`'{{json .State.Running}}'`}} {{ .DAGGER_ENGINE_NAME }})" == "true"
 
@@ -321,9 +321,8 @@ tasks:
       _EXPERIMENTAL_DAGGER_RUNNER_HOST: container://{{ .DAGGER_ENGINE_NAME }}
     cmds:
       - |
-        set -o pipefail
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
+          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout)
 
         dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
         with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
@@ -345,9 +344,8 @@ tasks:
         --use-entrypoint sync
     status:
       - |
-        set -o pipefail
         KUBECONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
+          with-exec --args="kind","get","kubeconfig","--internal","--name","{{ .KIND_CLUSTER_NAME }}" stdout)
         dagger core container from --address=alpine/kubectl:{{ .KUBECTL_VERSION }} \
         with-new-file --contents "${KUBECONFIG}" --path /root/.kube/config --expand \
         with-env-variable --name=CACHEBUSTER --value="$(date)" \
@@ -366,9 +364,8 @@ tasks:
       _EXPERIMENTAL_DAGGER_RUNNER_HOST: container://{{ .DAGGER_ENGINE_NAME }}
     cmds:
       - |
-        set -o pipefail
         CONFIG=$({{ .KIND_TOOLBOX }} \
-          with-exec --args="kind","get","kubeconfig","--name","{{ .KIND_CLUSTER_NAME }}","--internal={{ .INTERNAL }}" stdout | {{ .KIND_KUBECONFIG_FILTER | default "cat" }})
+          with-exec --args="kind","get","kubeconfig","--name","{{ .KIND_CLUSTER_NAME }}","--internal={{ .INTERNAL }}" stdout)
         mkdir -p $(dirname {{ .KUBECONFIG_PATH }})
         echo "${CONFIG}" > {{ .KUBECONFIG_PATH }}
 
