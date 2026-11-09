@@ -65,4 +65,5 @@ claim that every dependency survives linker dead-code elimination.
 After copying an image, run the same verification against the destination
 repository and its signature. A successful source verification does not
 authenticate a separate repository. The hosted promotion workflow preserves
-digests, signs the copied index, and verifies both platforms again.
+digests and signs the copied index once per destination repository/digest;
+it does not run this consumer verification again for every tag and platform.

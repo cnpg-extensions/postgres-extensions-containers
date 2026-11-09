@@ -6,12 +6,40 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-import tempfile
 
 from prepare import save
 from record import load_preparation, validate_record
-from verify import validate_layout
 from registry import wait_for_index_digest
+
+
+def check_assembly(index, sources, platforms):
+    """Keep every native image and its attached attestations in the merged index."""
+    descriptors = index["manifests"]
+    expected = [d for source in sources for d in source["manifests"]]
+    if sorted(descriptors, key=lambda d: d["digest"]) != sorted(
+        expected, key=lambda d: d["digest"]
+    ):
+        raise ValueError("published merge changed descriptors")
+    children, attestations = {}, []
+    for descriptor in descriptors:
+        platform = descriptor.get("platform", {})
+        if (
+            descriptor.get("annotations", {}).get("vnd.docker.reference.type")
+            == "attestation-manifest"
+        ):
+            attestations.append(descriptor)
+            continue
+        name = platform.get("os", "") + "/" + platform.get("architecture", "")
+        if name not in platforms or name in children:
+            raise ValueError("unexpected or duplicate platform")
+        children[name] = descriptor["digest"]
+    if set(children) != set(platforms):
+        raise ValueError("missing expected platform")
+    subjects = [
+        d["annotations"].get("vnd.docker.reference.digest") for d in attestations
+    ]
+    if sorted(subjects, key=str) != sorted(children.values()):
+        raise ValueError("missing, duplicate or unexpected platform attestation")
 
 
 def main():
@@ -67,39 +95,22 @@ def main():
             candidate,
             *references,
         ]
-        dry = json.loads(subprocess.check_output([*command, "--dry-run"]))
-        expected_descriptors = [
-            d for record in records for d in (record["runnable"], record["attestation"])
+        sources = [
+            json.loads(
+                subprocess.check_output(
+                    ["docker", "buildx", "imagetools", "inspect", reference, "--raw"]
+                )
+            )
+            for reference in references
         ]
-
-        def normalized(descriptors):
-            return sorted(descriptors, key=lambda d: d["digest"])
-
-        if normalized(dry["manifests"]) != normalized(expected_descriptors):
-            raise ValueError("Buildx merge changed descriptors")
         subprocess.run(command, check=True)
         raw = subprocess.check_output(
             ["docker", "buildx", "imagetools", "inspect", candidate, "--raw"]
         )
         index_digest = "sha256:" + hashlib.sha256(raw).hexdigest()
         image = repository + "@" + index_digest
-        subprocess.run(
-            [
-                "skopeo",
-                "copy",
-                "--all",
-                "--preserve-digests",
-                "docker://" + image,
-                "oci:" + str(output / "layout") + ":assembly",
-            ],
-            check=True,
-        )
-        graph = validate_layout(
-            output / "layout", index_digest, preparation["platforms"]
-        )
-        if normalized(graph["index"]["manifests"]) != normalized(expected_descriptors):
-            raise ValueError("published merge changed descriptors")
-        # Publish normal tags only after the candidate graph has been read back.
+        check_assembly(json.loads(raw), sources, preparation["platforms"])
+        # Publish normal tags only after checking the merged platform inventory.
         for tag in settings["tags"]:
             subprocess.run(
                 ["docker", "buildx", "imagetools", "create", "--tag", tag, image],

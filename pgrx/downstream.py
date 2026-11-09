@@ -6,14 +6,10 @@ import json
 import os
 from pathlib import Path
 import subprocess
-import re
 
 from prepare import save
 from record import load_preparation
 from registry import wait_for_index_digest
-from verify import verify_signature as check_signature, verify
-
-ISSUER = "https://token.actions.githubusercontent.com"
 
 
 def main():
@@ -36,17 +32,6 @@ def main():
     if args.output.exists():
         raise ValueError("fresh downstream output required")
     args.output.mkdir(parents=True)
-    policy = (
-        "^https://github\\.com/"
-        + re.escape(
-            os.environ.get(
-                "GITHUB_REPOSITORY", "ardentperf/postgres-extensions-containers"
-            )
-        )
-        + "/\\.github/workflows/(bake_targets|pgrx_targets)\\.yml@"
-        + re.escape(os.environ.get("GITHUB_REF", "refs/heads/main"))
-        + "$"
-    )
 
     def sign(reference):
         subprocess.run(
@@ -61,16 +46,25 @@ def main():
             check=True,
         )
 
-    def verify_signature(reference):
-        return check_signature(reference, identity=policy, issuer=ISSUER)
-
     if args.stage == "sign":
         sign(image)
-        save(args.output / "signature.json", verify_signature(image))
     elif args.stage == "security":
+        sboms = json.loads(
+            subprocess.check_output(
+                ["docker", "buildx", "imagetools", "inspect", image,
+                 "--format", "{{json .SBOM}}"]
+            )
+        )
         for platform in assembly["platforms"]:
             output = args.output / platform.split("/")[1]
-            verify(image, platform, output, identity=policy, issuer=ISSUER)
+            document = sboms.get(platform, {}).get("SPDX")
+            if (
+                not isinstance(document, dict)
+                or document.get("spdxVersion") != "SPDX-2.3"
+            ):
+                raise ValueError("missing SPDX document for " + platform)
+            output.mkdir()
+            save(output / "sbom.spdx.json", document)
             for tool in ("grype", "grant"):
                 command = (
                     ["grype", "sbom:" + str(output / "sbom.spdx.json"), "-o", "json"]
@@ -82,7 +76,6 @@ def main():
     elif args.stage == "smoke":
         from smoke import smoke
 
-        verify_signature(image)
         assembly["_directory"] = str(args.assembly)
         smoke(preparation, assembly, args.output, args.cnpg_version)
     elif args.stage == "promote":
@@ -90,8 +83,8 @@ def main():
             "GITHUB_EVENT_NAME"
         ) not in ("push", "workflow_dispatch"):
             raise ValueError("production promotion requires a trusted main event")
-        verify_signature(image)
         tags = []
+        signed = set()
         for tag in assembly["tags"]:
             repo, version = tag.rsplit(":", 1)
             destination = repo.removesuffix("-testing") + ":" + version
@@ -108,16 +101,9 @@ def main():
             )
             wait_for_index_digest(destination, assembly["index_digest"])
             copied = destination.rsplit(":", 1)[0] + "@" + assembly["index_digest"]
-            sign(copied)
-            for platform in assembly["platforms"]:
-                verify(
-                    copied,
-                    platform,
-                    args.output
-                    / ("copy-" + str(len(tags)) + "-" + platform.split("/")[1]),
-                    identity=policy,
-                    issuer=ISSUER,
-                )
+            if copied not in signed:
+                sign(copied)
+                signed.add(copied)
             tags.append(destination)
         save(
             args.output / "destination.json",

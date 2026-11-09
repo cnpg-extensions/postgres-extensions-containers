@@ -6,6 +6,6 @@ tasks:
     cmds:
       - python3 pgrx/test.py
   validate:
-    desc: Run local unit, workflow and dependency checks once
+    desc: Run PGRX tests and workflow lint, with optional Renovate checks
     cmds:
       - python3 pgrx/local/validate.py {{.CLI_ARGS}}

@@ -83,11 +83,11 @@ Preparation freezes the source snapshot, timestamp, generator, resolved source
 identities and hashes, base indexes, targets, and definitions for a logical
 workflow run. Each base index resolves to its architecture-specific child
 manifest. Every native platform job builds one target on its matching
-architecture and records the actual source, base child, and build evidence. It
-exports a complete OCI layout and a record bound to that preparation. Assembly
-rejects missing or unexpected records,
-validates their raw graphs, and uses full staging-index references in Buildx's
-dry-run merge. Normal tags are assigned only after reading back a valid candidate.
+architecture and records its staging-index digest, bound to that preparation.
+Assembly rejects missing or unexpected records and merges the full staging
+indexes. Before assigning normal tags, it checks that the candidate preserves
+the source descriptors and includes every expected architecture and its attached
+attestation.
 
 Sign, security, smoke, and promotion consume per-target assembly artifacts.
 The shared reusable SLSA generator attests each assembled testing index; its
@@ -99,6 +99,13 @@ while scanner errors fail the job. Both build paths use the shared CNPG support
 policy: `main`, the highest stable patch of the previous minor, and the pinned
 latest release. Smoke uses the shared Taskfile's live operator manifests and
 catalogs, including development images for `main`.
+PGRX follows the Debian release-acceptance level: build-time validation, security
+scanning, signing, shared runtime smoke tests, and required SLSA jobs. Security
+extracts each platform's SPDX document with Buildx for Grype and Grant. Promotion
+preserves the complete index and signs once per destination repository/digest.
+These stages do not repeat full OCI-graph verification or compare every BuildKit
+provenance field against preparation records. The standalone verifier remains
+available for consumers of either build family.
 The smoke uses the shared Task/Dagger setup, CNPG extension catalogs, and
 extension installation checks. The pg-search recipe
 captures base libraries before installing packages, then stages the packaged
@@ -110,8 +117,10 @@ helpers. This includes quadmath where required.
 The dedicated PGRX contract workflow runs independently of Go tests. It does not
 replace the shared Automerge gate or change branch protection.
 
-Run from the repository root with Docker Buildx, Go, Dagger, actionlint, and
-Python available. The Python tests also run Syft against fixture lockfiles. Signing and full extension acceptance run in GitHub Actions
+Run from the repository root with actionlint and Python available. The Python
+tests also run Syft against fixture lockfiles and require the SPDX validator.
+Docker is needed for the tool extraction below and optional Renovate checks.
+Signing and full extension acceptance run in GitHub Actions
 on native AMD64 and ARM64 runners; no local signing keys are needed.
 
 Create and activate a virtual environment for SPDX validation, then copy Syft
@@ -130,13 +139,22 @@ docker cp "$syft_container:/usr/local/bin/syft" "$VIRTUAL_ENV/bin/syft"
 docker rm "$syft_container"
 ```
 
-Run all local unit, workflow, and dependency checks once:
+Run the PGRX tests and relevant workflow lint:
 
 ```sh
 task pgrx:validate
 # Optional: also exercise the pinned Renovate extraction and replacements.
 task pgrx:validate -- --renovate-output /tmp/pgrx-renovate-check
 ```
+
+Shared Go and SBOM-generator suites have their own workflows. Run them separately
+when changing shared code or an integration boundary. PGRX tests retain coverage
+for Rust package selection, licenses, ownership, shipped files, generator/hook
+composition, build selection, and native-platform assembly.
+SBOM tests focus on mistakes that can produce a successful build with an
+incorrect inventory, ownership, dependency graph, or license report. Malformed
+evidence and other inputs that already cause a clear build failure rely on the
+build-time guards rather than separate rejection tests.
 
 For a quick downstream-only check, use `task pgrx:test`. CI runs this suite
 inside the pinned generator image so Syft and the SPDX validator match the
