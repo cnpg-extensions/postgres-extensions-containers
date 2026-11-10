@@ -17,21 +17,18 @@ ARG PGRX_SOURCE_REVISION
 USER 0
 
 COPY pgrx/ /pgrx/
-COPY scripts/capture_base_image_libs.sh scripts/stage_system_libs.sh /usr/local/bin/
-RUN capture_base_image_libs.sh
 WORKDIR /build
 ADD https://github.com/paradedb/paradedb/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
-# ParadeDB installs OpenBLAS before packaging pg_search:
-# https://github.com/paradedb/paradedb/blob/v0.25.6/.github/workflows/publish-pg_search-debian.yml#L256-L260
-RUN apt-get update && apt-get install -y --no-install-recommends libopenblas-dev
+# ParadeDB builds with LLD and OpenBLAS:
+# https://github.com/paradedb/paradedb/blob/v0.26.6/docker/Dockerfile.source#L16-L19
+RUN apt-get update && apt-get install -y --no-install-recommends lld libopenblas-dev
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 # ParadeDB packages from the pg_search workspace directory:
-# https://github.com/paradedb/paradedb/blob/v0.25.6/.github/workflows/publish-pg_search-debian.yml#L289-L294
+# https://github.com/paradedb/paradedb/blob/v0.26.6/.github/workflows/publish-pg_search-debian.yml#L300-L307
 RUN cd pg_search && cargo pgrx package
-RUN stage_system_libs.sh /build/target/release/pg_search-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/pg_search.so
 
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
@@ -45,11 +42,9 @@ ARG PG_MAJOR
 
 # Licenses
 COPY --from=builder /build/pgrx-licenses/rust/ /licenses/rust/
-COPY --from=builder /licenses/ /licenses/system/
 
 # Libraries
 COPY --from=builder /build/target/release/pg_search-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/pg_search.so /lib/
-COPY --from=builder /system/ /system/
 
 # Share
 COPY --from=builder /build/target/release/pg_search-pg${PG_MAJOR}/usr/share/postgresql/${PG_MAJOR}/extension/pg_search* /share/extension/
