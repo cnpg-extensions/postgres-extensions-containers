@@ -54,6 +54,6 @@ https://github.com/cloudnative-pg/governance/blob/main/CONTRIBUTING.md
 - [ ] Change reviewed for correctness and scope; no unintended targets rebuilt.
 - [ ] `// renovate:` annotations preserved so automated version tracking keeps
       working.
-- [ ] If shared infrastructure changed, the `_shared` filter in
-      `.github/workflows/bake.yml` was updated when all extensions must rebuild.
+- [ ] If shared changes require an extension rebuild, manually dispatch
+      `.github/workflows/bake.yml` for the affected extension or `all`.
 - [ ] PR targets `main` and is ready to merge.
