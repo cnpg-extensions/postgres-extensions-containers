@@ -124,14 +124,9 @@ func (m *Maintenance) GetTargets(
 	// +optional
 	buildSystem string,
 ) (string, error) {
-	switch buildSystem {
-	case "":
-		buildSystem = debianBuildSystem
-	case "all":
-		buildSystem = ""
-	case debianBuildSystem, pgrxBuildSystem:
-	default:
-		return "", fmt.Errorf("unsupported build system: %q", buildSystem)
+	buildSystem, err := normalizeBuildSystemFilter(buildSystem)
+	if err != nil {
+		return "", err
 	}
 	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(buildSystem))
 	if err != nil {

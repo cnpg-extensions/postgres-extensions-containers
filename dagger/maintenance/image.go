@@ -116,7 +116,7 @@ func getExtensionImage(metadata *extensionMetadata, distribution string, pgMajor
 		return "", fmt.Errorf("while extracting extension version for %s: %w", metadata.Name, err)
 	}
 
-	image := fmt.Sprintf("ghcr.io/cloudnative-pg/%s:%s-%d-%s",
+	image := fmt.Sprintf("ghcr.io/cnpg-extensions/%s:%s-%d-%s",
 		metadata.ImageName, version, pgMajor, distribution)
 
 	return image, nil

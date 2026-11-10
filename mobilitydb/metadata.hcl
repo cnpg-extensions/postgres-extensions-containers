@@ -13,6 +13,7 @@ metadata = {
   bin_path                 = []
   env                      = {}
   auto_update_os_libs      = true
+  # Resolve the dependency image from the cluster catalog; missing entries fail E2E.
   required_extensions      = ["postgis"]
   create_extension         = true
 

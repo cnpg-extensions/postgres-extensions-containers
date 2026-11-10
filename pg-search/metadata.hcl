@@ -15,6 +15,7 @@ metadata = {
   bin_path                 = []
   env                      = {}
   auto_update_os_libs      = false
+  # Resolve the dependency image from the cluster catalog; missing entries fail E2E.
   required_extensions      = ["pgvector"]
   create_extension         = true
 

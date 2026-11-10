@@ -85,3 +85,17 @@ func WithBuildSystemFilter(buildSystem string) ExtensionsOption {
 		opts.buildSystem = buildSystem
 	}
 }
+
+// normalizeBuildSystemFilter keeps Debian as the default for existing callers.
+func normalizeBuildSystemFilter(buildSystem string) (string, error) {
+	switch buildSystem {
+	case "":
+		buildSystem = debianBuildSystem
+	case "all":
+		buildSystem = ""
+	case debianBuildSystem, pgrxBuildSystem:
+	default:
+		return "", fmt.Errorf("unsupported build system: %q", buildSystem)
+	}
+	return buildSystem, nil
+}
