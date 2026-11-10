@@ -87,6 +87,8 @@ def install_archive_tool(name, url):
 # are generated from upstream Cargo.lock, not a second committed tool lock.
 def main():
     major, lock_file = sys.argv[1:]
+    # Bake supplies the catalog name to select the build recipe. BuildKit
+    # supplies TARGETARCH to select Rust tool downloads and the target triple.
     extension = os.environ["PGRX_EXTENSION"]
     arch = os.environ["TARGETARCH"]
     tools = json.loads((PGRX / "dependencies/tools.json").read_text())
@@ -185,6 +187,9 @@ def main():
     config["patches"] = []
     config["lock_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
     (report / "build-config.json").write_text(json.dumps(config, indent=2) + "\n")
+    # Bake supplies the canonical repository and exact release tag (EXT_VERSION).
+    # Preparation supplies PGRX_SOURCE_REVISION; direct builds may omit it,
+    # in which case resolve_source resolves the tag to a revision here.
     source_record = resolve_source(
         os.environ["PGRX_SOURCE_REPOSITORY"],
         os.environ["EXT_VERSION"],

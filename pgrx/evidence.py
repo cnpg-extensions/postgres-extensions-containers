@@ -97,6 +97,9 @@ def main():
     lock = build / "Cargo.lock"
     if digest(lock) != config["lock_sha256"]:
         raise ValueError("Cargo.lock changed during compilation")
+    # Docker build arguments are exposed as environment variables: the catalog
+    # name selects the recipe and identifies its payload; PG_MAJOR selects its
+    # PostgreSQL layout, and BuildKit TARGETPLATFORM identifies the OCI platform.
     extension = os.environ["PGRX_EXTENSION"]
     recipe = RECIPES[extension]
     source = json.loads((directory / "source.json").read_text())
@@ -268,6 +271,7 @@ def main():
             "platform": platform,
             "rust_target": config["rust_target"],
             "pg_major": major,
+            # Bake supplies the distribution selected for this target.
             "distro": os.environ["PGRX_DISTRO"],
         },
         "build": {
@@ -279,6 +283,7 @@ def main():
             "lock_sha256": config["lock_sha256"],
             "original_lock_sha256": config["original_lock_sha256"],
             "patches": config["patches"],
+            # Preparation supplies the run timestamp for the evidence record.
             "timestamp": os.environ["PGRX_BUILD_TIMESTAMP"],
         },
         "reports": reports,

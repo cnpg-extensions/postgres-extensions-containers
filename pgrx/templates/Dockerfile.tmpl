@@ -5,10 +5,13 @@
 # and TODO comment before using it. The target Dockerfile should remain the
 # source of truth for pgrx feature selection, package layout, and runtime files.
 # metadata.hcl declares the source repository and release tag.
+# BuildKit scans the builder stage to include its generated SBOM evidence.
 ARG BUILDKIT_SBOM_SCAN_STAGE=builder
+# Bake selects the PostgreSQL builder image.
 ARG BASE=ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
 FROM ${BASE} AS builder
 
+# PostgreSQL major for headers, build features, and installed payload paths.
 ARG PG_MAJOR
 ARG EXT_VERSION
 ARG TARGETARCH
@@ -21,6 +24,9 @@ ARG PGRX_SOURCE_REVISION
 USER 0
 
 COPY pgrx/ /pgrx/
+# TODO: If staging OS runtime libraries, follow pg-search/Dockerfile: copy
+# capture_base_image_libs.sh and stage_system_libs.sh into /usr/local/bin/,
+# then run capture_base_image_libs.sh BEFORE installing any build dependencies.
 WORKDIR /build
 
 
@@ -35,6 +41,10 @@ RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 # matching cargo-pgrx version from Cargo.lock and prepares the pgrx/SBOM tools.
 # TODO: Add the extension to RECIPES in pgrx/build_config.py, matching this
 # manifest path, feature selection, and package/install layout.
+# This example matches pg-jsonschema: manifest="Cargo.toml", defaults=False,
+# installed=False. For cargo pgrx install, use installed=True and copy from
+# /usr/lib and /usr/share as in pg-graphql/Dockerfile. For a workspace member,
+# set its manifest path and build from that directory as in pg-search/Dockerfile.
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 
@@ -47,7 +57,10 @@ RUN cargo pgrx package \
       --features pg${PG_MAJOR}
 
 
-# Bind Cargo reports and license evidence to the completed payload.
+# TODO: If staging OS runtime libraries, run stage_system_libs.sh with the
+# compiled .so path here, BEFORE finalizing evidence (see pg-search/Dockerfile).
+# Bind Cargo reports and license evidence to the completed payload. Keep the
+# timestamp argument here so a new timestamp does not invalidate compilation.
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 
@@ -63,13 +76,15 @@ ARG PG_MAJOR
 COPY --from=builder /build/pgrx-licenses/rust/ /licenses/rust/
 
 # Libraries
-# TODO: Replace the path with the pgrx build target folder.
+# TODO: Match the package folder and actual library name; these need not match
+# the catalog name. See pg-durable/Dockerfile for an explicit --out-dir.
 # If the extension needs OS shared libraries, copy them under /system/ and copy
 # their corresponding licenses under /licenses/system/.
 COPY --from=builder /build/target/release/{{ replaceAll .Name "-" "_" }}-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/{{ replaceAll .Name "-" "_" }}.so /lib/
 
 # Share
-# TODO: Replace the path with the pgrx build target folder.
+# TODO: Match the package folder and SQL name. Copy runtime data directories
+# explicitly when needed, as in postgresql-anonymizer/Dockerfile.
 COPY --from=builder /build/target/release/{{ replaceAll .Name "-" "_" }}-pg${PG_MAJOR}/usr/share/postgresql/${PG_MAJOR}/extension/{{ replaceAll .Name "-" "_" }}* /share/extension/
 
 USER 65532:65532
