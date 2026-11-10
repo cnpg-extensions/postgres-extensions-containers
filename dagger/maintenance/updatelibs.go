@@ -61,6 +61,7 @@ func updateOSLibsOnTarget(
 
 type extensionsOptions struct {
 	filterOSLibs bool
+	buildSystem  string
 }
 
 // ExtensionsOption is a functional option for configuring extension retrieval
@@ -95,6 +96,13 @@ func getExtensions(
 		metadata, err := parseExtensionMetadata(ctx, dir)
 		if err != nil {
 			return nil, err
+		}
+		buildSystem, err := effectiveBuildSystem(metadata)
+		if err != nil {
+			return nil, err
+		}
+		if options.buildSystem != "" && buildSystem != options.buildSystem {
+			continue
 		}
 
 		if options.filterOSLibs && !metadata.AutoUpdateOsLibs {

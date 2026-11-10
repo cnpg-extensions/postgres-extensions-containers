@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"dagger/maintenance/internal/dagger"
 )
@@ -38,8 +36,6 @@ type testingExtensionInfo struct {
 	CreateExtension bool
 }
 
-const baseImageDependencyPrefix = "base-image:"
-
 type imageLocator struct {
 	ExtensionImage string
 	PgMajor        int
@@ -67,78 +63,13 @@ func generateTestingValuesExtensions(
 		CreateExtension: metadata.CreateExtension,
 	})
 
-	for _, requiredDependency := range metadata.RequiredExtensions {
-		dep, isBaseImageDependency, err := parseRequiredDependency(requiredDependency)
-		if err != nil {
-			return nil, err
-		}
-		if isBaseImageDependency {
-			out = append(out, &testingExtensionInfo{
-				SQLName:         dep,
-				CreateExtension: true,
-			})
-			continue
-		}
-
-		depExists, err := source.Exists(ctx, dep)
-		if err != nil {
-			return nil, err
-		}
-		if !depExists {
-			out = append(out, &testingExtensionInfo{
-				Configuration:   &ExtensionConfiguration{Name: dep},
-				SQLName:         dep,
-				CreateExtension: true,
-			})
-			continue
-		}
-
-		depMetadata, err := parseExtensionMetadata(ctx, source.Directory(dep))
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse dependency metadata %q: %w", dep, err)
-		}
-		requiredExtensionImage, err := getExtensionImage(depMetadata, locator.Distribution, locator.PgMajor)
-		if err != nil {
-			return nil, err
-		}
-		depConfiguration, err := generateExtensionConfiguration(depMetadata, requiredExtensionImage)
-		if err != nil {
-			return nil, err
-		}
-
-		depAnnotations, err := getImageAnnotations(ctx, depConfiguration.ImageVolumeSource.Reference, registryUsername, registryPassword)
-		if err != nil {
-			return nil, err
-		}
-		depVersion := depAnnotations[AnnotationImageSQLVersion]
-		if depVersion == "" {
-			return nil, fmt.Errorf(
-				"extension image %s doesn't have an %q annotation or its value is empty",
-				depConfiguration.ImageVolumeSource.Reference, AnnotationImageSQLVersion)
-		}
-
-		out = append(out, &testingExtensionInfo{
-			Configuration:   depConfiguration,
-			SQLName:         depMetadata.SQLName,
-			Version:         depVersion,
-			CreateExtension: depMetadata.CreateExtension,
-		})
+	dependencies, err := resolveTestingDependencies(ctx, source, metadata.RequiredExtensions)
+	if err != nil {
+		return nil, err
 	}
+	out = append(out, dependencies...)
 
 	return out, nil
-}
-
-func parseRequiredDependency(dependency string) (string, bool, error) {
-	if !strings.HasPrefix(dependency, baseImageDependencyPrefix) {
-		return dependency, false, nil
-	}
-
-	name := strings.TrimPrefix(dependency, baseImageDependencyPrefix)
-	if name == "" {
-		return "", false, fmt.Errorf("base-image dependency %q has no extension name", dependency)
-	}
-
-	return name, true, nil
 }
 
 func generateExtensionConfiguration(metadata *extensionMetadata, extensionImage string) (*ExtensionConfiguration, error) {
@@ -191,7 +122,7 @@ func generateDatabaseAssertStatus(extensionInfos []*testingExtensionInfo) map[st
 	// local dependency images. Keep this fork-local relaxation when syncing
 	// changes from upstream; it is not an upstream CNPG behavior change.
 	status := map[string]any{
-		"applied":            true,
+		"applied": true,
 	}
 
 	var extensions []map[string]any

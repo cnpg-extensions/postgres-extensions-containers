@@ -52,7 +52,7 @@ func (m *Maintenance) UpdateOSLibs(
 		}
 	}
 
-	targetExtensions, err := getExtensions(ctx, extDir, WithOSLibsFilter())
+	targetExtensions, err := getExtensions(ctx, extDir, WithOSLibsFilter(), WithBuildSystemFilter(debianBuildSystem))
 	if err != nil {
 		return source, err
 	}
@@ -101,7 +101,7 @@ func (m *Maintenance) GetOSLibsTargets(
 	// +defaultPath="/"
 	source *dagger.Directory,
 ) (string, error) {
-	targetExtensions, err := getExtensions(ctx, source, WithOSLibsFilter())
+	targetExtensions, err := getExtensions(ctx, source, WithOSLibsFilter(), WithBuildSystemFilter(debianBuildSystem))
 	if err != nil {
 		return "", err
 	}
@@ -120,8 +120,15 @@ func (m *Maintenance) GetTargets(
 	// +ignore=["dagger", ".github"]
 	// +defaultPath="/"
 	source *dagger.Directory,
+	// Limit targets to a build system (debian or pgrx). Defaults to debian; use all for every extension.
+	// +optional
+	buildSystem string,
 ) (string, error) {
-	targetExtensions, err := getExtensions(ctx, source)
+	buildSystem, err := normalizeBuildSystemFilter(buildSystem)
+	if err != nil {
+		return "", err
+	}
+	targetExtensions, err := getExtensions(ctx, source, WithBuildSystemFilter(buildSystem))
 	if err != nil {
 		return "", err
 	}

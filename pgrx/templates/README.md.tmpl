@@ -1,0 +1,101 @@
+# {{ replaceAll .Name "-" "_" }}
+<!--
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!--
+TODO: Replace this section with a brief introduction of the extension.
+Describe what it does, link to the upstream project, and state the supported
+PostgreSQL versions and Debian distributions.
+-->
+
+[{{ replaceAll .Name "-" "_" }}](https://github.com/<owner>/<repo>) is a
+PostgreSQL extension that provides [describe the main functionality here].
+
+## Usage
+
+<!--
+TODO: Customize the image tag, extension names, SQL version, and Renovate
+instructions below. Use the package version from `metadata.hcl` for the image
+tag. Replace the generated underscore name wherever necessary to match
+metadata.sql_name in the Database resource and SQL commands.
+The Database SQL version matches the source tag without a leading `v`.
+-->
+
+### 1. Add the {{ .Name }} extension image to your Cluster
+
+Define the `{{ .Name }}` extension under the `postgresql.extensions`
+section of your `Cluster` resource. For example:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-{{ .Name }}
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
+  instances: 1
+
+  storage:
+    size: 1Gi
+
+  postgresql:
+    extensions:
+    - name: {{ .Name }}
+      image:
+        # TODO: Keep this image tag synchronized with metadata.hcl.
+        reference: ghcr.io/cnpg-extensions/{{ .Name }}:<package-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
+```
+
+### 2. Enable the extension in a database
+
+You can install `{{ replaceAll .Name "-" "_" }}` in a specific database by creating or
+updating a `Database` resource, or by running `CREATE EXTENSION` directly in
+`psql`. For example, to enable it in the `app` database:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: cluster-{{ .Name }}-app
+spec:
+  name: app
+  owner: app
+  cluster:
+    name: cluster-{{ .Name }}
+  extensions:
+  - name: {{ replaceAll .Name "-" "_" }}
+    # TODO: Set this to the extension's SQL default_version.
+    version: '<sql-version>'
+```
+
+Alternatively, you can enable the extension directly with SQL:
+
+```sql
+CREATE EXTENSION {{ replaceAll .Name "-" "_" }};
+```
+
+### 3. Verify installation
+
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx
+```
+
+You should see `{{ replaceAll .Name "-" "_" }}` listed among the installed extensions.
+
+<!--
+TODO: Add a Known Caveats section if the extension requires shared preload
+libraries, PostgreSQL parameters, runtime libraries, or special SQL setup.
+-->
+
+## Contributors
+
+Maintained by FirstName LastName (@GitHub_Handle).
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

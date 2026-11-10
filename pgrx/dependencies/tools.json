@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "rust": {
+    "version": "1.97.1",
+    "depName": "rust-lang/rust",
+    "datasource": "github-releases"
+  },
+  "tools": {
+    "cargo-about": {
+      "version": "0.9.2",
+      "datasource": "github-releases",
+      "depName": "EmbarkStudios/cargo-about"
+    }
+  },
+  "rustup": {
+    "version": "1.28.2",
+    "depName": "rust-lang/rustup",
+    "datasource": "github-releases"
+  }
+}

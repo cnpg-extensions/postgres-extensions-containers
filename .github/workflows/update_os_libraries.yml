@@ -41,7 +41,7 @@ jobs:
           EXTENSIONS_OUTPUT: ${{ steps.get-extensions-dagger.outputs.output }}
         run: |
           EXTENSIONS="${EXTENSIONS_OUTPUT}"
-          echo "extensions=$(echo "$EXTENSIONS" | jq -c .)" >> $GITHUB_OUTPUT
+          echo "extensions=$(echo "$EXTENSIONS" | jq -c .)" >> "$GITHUB_OUTPUT"
 
   update-extension-os-libs:
     name: Update OS libs for ${{ matrix.extension }}

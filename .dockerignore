@@ -1,0 +1,6 @@
+# Keep generated Python bytecode and Git state out of build inputs.
+.git
+# Exclude local reporting bytecode so caches cannot change copied helper code.
+**/__pycache__
+**/*.pyc
+**/*.pyo

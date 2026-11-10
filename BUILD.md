@@ -89,6 +89,11 @@ sample for the existing build, security, and integration checks:
 - `powa`: extensions supplied by the PostgreSQL base image.
 - `mobilitydb`: upstream PostGIS dependency.
 - `ogr-fdw`: bundled OS libraries, data files, and environment paths.
+- `pg-durable` (PGRX): standard Rust packaging and background-worker extension.
+- `pg-session-jwt` (PGRX): Rust install path and guarded upstream lockfile correction.
+
+The Debian and PGRX workflows select their own members of this sample. Required
+gates report on every PR and merge-queue commit, including empty build selections.
 
 Current extensions have no dependency on another extension present in this
 repository, so the sample does not cover local dependency resolution. No synthetic
@@ -100,6 +105,8 @@ To build, test, and publish every extension using the latest merged inputs:
 
 ```bash
 gh workflow run bake.yml --repo cnpg-extensions/postgres-extensions-containers \
+  --ref main -f extension_name=all
+gh workflow run pgrx.yml --repo cnpg-extensions/postgres-extensions-containers \
   --ref main -f extension_name=all
 ```
 
