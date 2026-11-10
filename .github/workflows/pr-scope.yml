@@ -47,6 +47,8 @@ jobs:
               examples/*|LICENSE) ;;
               sbom-generator/*|.github/workflows/sbom-generator.yml) sbom=true ;;
               renovate.json|.github/workflows/pr-scope.yml) ;;
+              # Match the PGRX-only exclusions in bake.yml.
+              pgrx/*|docker-bake-pgrx.hcl) ;;
               .github/workflows/pgrx.yml|.github/workflows/pgrx_targets.yml) ;;
               *) extensions=true ;;
             esac
