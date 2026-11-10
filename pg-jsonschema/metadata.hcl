@@ -23,6 +23,7 @@ metadata = {
   versions = {
     bookworm = {
       "18" = {
+        # renovate: datasource=github-tags depName=supabase/pg_jsonschema versioning=semver
         package = "v0.3.4"
         sql     = "0.3.4"
       }

@@ -3,7 +3,6 @@
 from copy import deepcopy
 import hashlib
 import json
-from pathlib import Path
 import sys
 import unittest
 
@@ -12,8 +11,8 @@ from spdx_tools.spdx.validation.document_validator import validate_full_spdx_doc
 
 import test_hook
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / 'sbom-generator'))
+# Exercise the composer shipped in the pinned generator image.
+sys.path.insert(0, '/opt/cnpg-sbom-generator')
 from compose import compose, set_document_namespace
 from generator import final_inventory
 

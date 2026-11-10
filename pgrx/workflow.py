@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Hosted workflow selection and source identity."""
+"""Metadata discovery and platform selection for native build preparation."""
 
-import argparse
 import json
 from pathlib import Path
 import subprocess
@@ -51,45 +50,3 @@ def select(inputs, inventory):
     if extension not in inventory:
         raise ValueError(f"not a PGRX extension: {extension}")
     return ["linux/amd64", "linux/arm64"]
-
-
-def changed_extensions(paths, inventory):
-    shared = (
-        "pgrx/",
-        "docker-bake.hcl",
-        "docker-bake-pgrx.hcl",
-        "scripts/",
-        "test/",
-        ".github/workflows/pgrx.yml",
-        ".github/workflows/pgrx_targets.yml",
-        ".github/workflows/cnpg-versions.yml",
-        ".github/workflows/smoke.yml",
-        "dagger/maintenance/",
-        "Taskfile.yml",
-    )
-    if any(any(p.startswith(prefix) for prefix in shared) for p in paths):
-        return sorted(inventory)
-    return sorted({p.split("/")[0] for p in paths} & set(inventory))
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--inputs", type=Path)
-    parser.add_argument("--changed-paths", type=Path)
-    args = parser.parse_args()
-    inventory = discover()
-    if args.inputs:
-        inputs = json.loads(args.inputs.read_text())
-        select(inputs, inventory)
-        result = [inputs["extension_name"]]
-    elif args.changed_paths:
-        result = changed_extensions(
-            args.changed_paths.read_text().splitlines(), inventory
-        )
-    else:
-        result = sorted(inventory)
-    print(json.dumps(result))
-
-
-if __name__ == "__main__":
-    main()

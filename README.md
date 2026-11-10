@@ -275,10 +275,10 @@ skopeo inspect docker://<image> | jq '.Labels'
 
 ## SBOMs and authenticity
 
-Use the [SBOM guide](./sbom-generator/README.md) to verify an extension image,
+Use the [SBOM guide](https://github.com/cnpg-extensions/cnpg-sbom-generator) to verify an extension image,
 extract its platform-specific SPDX, and report vulnerabilities and licenses with
 Grype and Grant. See the [example report](./examples/sbom-reports.txt) and
-[generator release workflow](./sbom-generator/README.md#generator-release-and-test-builds).
+[generator release workflow](https://github.com/cnpg-extensions/cnpg-sbom-generator/blob/main/.github/workflows/sbom-generator.yml).
 
 For PGRX images, see the [verification notes](./pgrx/README.md#verify-images)
 for the signing identity and signature format.

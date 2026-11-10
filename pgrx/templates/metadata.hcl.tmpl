@@ -36,12 +36,11 @@ metadata = {
         "{{ $version }}" = {
           # TODO: Keep one Renovate github-tags comment on the source package
           # entry and configure its depName to match the upstream repository.
+          # Keep package and sql adjacent: Renovate updates them together.
+          # TODO: SQL version is the release tag without a leading v.
           # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver
           package = "<release-tag>"
-
-          # TODO: Set this to the extension's SQL default_version. It usually
-          # omits a leading `v`, even when package is an exact Git tag.
-          sql = "<sql-version>"
+          sql     = "<sql-version>"
         }
         {{- end}}
     }

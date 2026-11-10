@@ -19,9 +19,9 @@ published image. Scan the PostgreSQL base image separately using its own SBOM.
 ### Verify images
 
 Follow the SBOM guide to [verify the image and extract its
-SBOM](../sbom-generator/README.md#verify-the-image-and-extract-its-sbom),
-[inspect and verify build provenance](../sbom-generator/README.md#inspect-and-verify-build-provenance),
-and [report vulnerabilities and licenses](../sbom-generator/README.md#report-vulnerabilities-and-licenses).
+SBOM](https://github.com/cnpg-extensions/cnpg-sbom-generator#verify-the-image-and-extract-its-sbom),
+[inspect and verify build provenance](https://github.com/cnpg-extensions/cnpg-sbom-generator#inspect-and-verify-build-provenance),
+and [report vulnerabilities and licenses](https://github.com/cnpg-extensions/cnpg-sbom-generator#report-vulnerabilities-and-licenses).
 The tools listed in that guide are sufficient; no PGRX build setup is needed.
 
 For PGRX images published by `cnpg-extensions` from `main`, use this exact
@@ -120,7 +120,7 @@ On each native runner, `build.py` checks the architecture before Docker Bake
 starts the build. Inside the build containers, the extension's Dockerfile
 installs tools, runs the upstream Rust build recipe, finalizes Cargo and license
 evidence, and copies runtime files into a minimal `scratch` image. The shared
-[SBOM generator](../sbom-generator/README.md#development) runs in its own container;
+[SBOM generator](https://github.com/cnpg-extensions/cnpg-sbom-generator#consumer-integration) runs in its own container;
 the PGRX hook adds selected Rust packages and license information to its SPDX 2.3
 document. BuildKit attaches the SBOM and build provenance to the platform image.
 
@@ -182,56 +182,73 @@ not replace an image build that produces attestations or test hosted signing.
 
 ### Local validation
 
-The dedicated [PGRX test workflow](../.github/workflows/pgrx-tests.yml) runs
-independently of Go tests. It does not replace the shared Automerge gate or
-change branch protection.
+The [PGRX test workflow](../.github/workflows/pgrx-tests.yml) is called by the
+PGRX build workflow and can also be dispatched separately. Its contract tests
+are required by the `PGRX acceptance` gate; Go tests remain independent.
 
-Run from the repository root with actionlint and Python available. The Python
-tests also run Syft against fixture lockfiles and require the SPDX validator.
-Docker is needed for the tool extraction below.
+Both build workflows report their local gates on every pull request,
+merge-queue commit, and push to `main`. Discovery selects the extensions to
+build; shared changes select the [representative sample](../BUILD.md#usage-and-targets)
+on PRs, while only payload changes rebuild automatically on `main`. An empty
+selection skips builds explicitly. Failed discovery, contract
+tests, or unexpectedly skipped acceptance jobs fail the relevant gate.
+Branch protection should require both `Automerge gate` (Debian) and
+`PGRX acceptance`. Configure these checks after their first runs; changing the
+workflow files does not change repository rules. Mixed Debian/PGRX changes
+run both build families without a separate PR-scope policy.
+For a working branch without a pull request, dispatch the relevant build workflow.
+Use `extension_name=all` to rebuild every extension in that workflow.
+PGRX selection mirrors Debian’s `paths-filter` and `jq` steps; discovery uses
+`get-targets --build-system pgrx`, with PGRX shared paths and its own sample.
 
-Create and activate a virtual environment for SPDX validation, then copy Syft
-from the same pinned generator used by the workflow:
+Renovate PGRX source and build-tool updates inherit the shared minor, patch, and
+digest auto-merge policy, subject to required checks. Major updates remain manual.
+Renovate updates `package` and the adjacent `sql` value together for every PGRX
+extension, stripping only a leading `v` from the source tag for SQL. If upstream
+ships a different SQL version, investigate the release before merging.
+
+The release acceptance jobs publish testing images and require registry write
+and signing permissions. Fork pull requests retain GitHub's read-only token
+restrictions; affected builds cannot pass those stages. A maintainer must move
+the reviewed changes to a trusted branch and PR in the publishing repository.
+Do not bypass the gates or use a privileged pull-request trigger to run fork code.
+
+Run from the repository root with Docker, bash, jq, Python 3, and actionlint available. Run the
+downstream suite inside the pinned generator image, matching CI's Syft,
+SPDX validator, and composer:
 
 ```sh
-python3 -m venv /tmp/cnpg-pgrx-venv
-source /tmp/cnpg-pgrx-venv/bin/activate
-spdx_tools_version=$(sed -n 's/^ARG SPDX_TOOLS_VERSION=//p' sbom-generator/Dockerfile)
-test -n "$spdx_tools_version"
-python -m pip install "spdx-tools==${spdx_tools_version}"
-generator=$(sed -n 's/^ *SBOM_GENERATOR: //p' .github/workflows/pgrx_targets.yml)
+generator=$(sed -n 's/^ *SBOM_GENERATOR: //p' .github/workflows/pgrx-tests.yml)
 test -n "$generator"
-syft_container=$(docker create "$generator")
-docker cp "$syft_container:/usr/local/bin/syft" "$VIRTUAL_ENV/bin/syft"
-docker rm "$syft_container"
+docker run --rm --entrypoint python3 \
+  --volume "$PWD:/workspace:ro" --workdir /workspace \
+  "$generator" pgrx/test.py
+
+# Export YAML using the generator's existing PyYAML, then test the actual shell
+# selection steps with the host's bash and jq (also run by the contract workflow).
+docker run --rm --entrypoint python3 \
+  --volume "$PWD:/workspace:ro" --workdir /workspace \
+  "$generator" -c 'import json, pathlib, yaml; print(json.dumps({name: yaml.safe_load(pathlib.Path(f".github/workflows/{file}.yml").read_text()) for name, file in [("debian", "bake"), ("pgrx", "pgrx")]}))' \
+  > /tmp/pgrx-selection-workflows.json
+python3 pgrx/tests/check_selection.py < /tmp/pgrx-selection-workflows.json
+
+actionlint .github/workflows/bake.yml \
+  .github/workflows/bake_targets.yml \
+  .github/workflows/pgrx.yml \
+  .github/workflows/pgrx_targets.yml \
+  .github/workflows/pgrx-tests.yml \
+  .github/workflows/cnpg-versions.yml \
+  .github/workflows/smoke.yml
 ```
 
-Run the PGRX tests and relevant workflow lint:
+PGRX tests retain coverage for Rust package selection, licenses, ownership,
+shipped files, generator/hook composition, build selection, and native-platform
+assembly. Shared Go tests have their own workflow.
 
-```sh
-python3 pgrx/test.py && \
-  actionlint .github/workflows/pgrx.yml \
-    .github/workflows/pgrx_targets.yml \
-    .github/workflows/pgrx-tests.yml \
-    .github/workflows/cnpg-versions.yml \
-    .github/workflows/smoke.yml
-```
-
-Shared Go and SBOM-generator suites have their own workflows. Run them separately
-when changing shared code or an integration boundary. PGRX tests retain coverage
-for Rust package selection, licenses, ownership, shipped files, generator/hook
-composition, build selection, and native-platform assembly.
-SBOM tests focus on mistakes that can produce a successful build with an
-incorrect inventory, ownership, dependency graph, or license report. Malformed
-evidence and other inputs that already cause a clear build failure rely on the
-build-time guards rather than separate rejection tests.
-
-After setup, `python3 pgrx/test.py` runs just the downstream suite. CI runs it
-inside the pinned generator image so Syft and the SPDX validator match the
-production hook environment. The generator's
-BuildKit/SPDX/Grype/Grant integration fixture is maintained in
-`sbom-generator/tests/integration/`; its workflow runs it on both native
-architectures.
+The generator source, release workflow, and BuildKit/SPDX/Grype/Grant integration
+fixtures are maintained in the [external generator repository](https://github.com/cnpg-extensions/cnpg-sbom-generator).
+Both Debian and PGRX builds consume its published `latest` image with an immutable
+digest; Renovate groups updates to the workflow pins.
 
 ### Add or update an extension recipe
 
@@ -251,7 +268,8 @@ For a new extension:
 1. Copy and complete the Dockerfile, metadata, and README templates, replacing
    every placeholder and TODO. In metadata, add the canonical `source_repository`
    and literal source tag, including a leading `v` when upstream uses one.
-   Keep the SQL version separate.
+   Set `sql` to the tag without a leading `v`, immediately below `package` so
+   Renovate updates both together.
 2. Preserve all Dockerfile `ARG` declarations **in their template locations and
    stages**, including `BUILDKIT_SBOM_SCAN_STAGE`, `BASE`, `PG_MAJOR`, `EXT_VERSION`,
    `TARGETARCH`, `TARGETPLATFORM`, the `PGRX_*` identity arguments, and

@@ -22,6 +22,7 @@ metadata = {
   versions = {
     bookworm = {
       "18" = {
+        # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver
         package = "2.0.0"
         sql     = "2.0.0"
       }

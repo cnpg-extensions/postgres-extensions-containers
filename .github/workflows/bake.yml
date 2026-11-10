@@ -1,20 +1,11 @@
 name: Build, test and publish extensions
 
 on:
+  # Required gates must report even when no extension needs rebuilding.
+  pull_request:
+  merge_group:
   push:
-    paths-ignore:
-      # Documentation does not require extension builds.
-      - 'examples/**'
-      - '*.md'
-      - 'LICENSE'
-      - 'renovate.json'
-      - '.github/workflows/pr-scope.yml'
-      - 'pgrx/**'
-      - 'docker-bake-pgrx.hcl'
-      - '.github/workflows/pgrx.yml'
-      - '.github/workflows/pgrx_targets.yml'
-      - '.github/workflows/sbom-generator.yml'
-      - 'sbom-generator/**'
+    branches: [main]
   workflow_dispatch:
     inputs:
       extension_name:
@@ -32,6 +23,9 @@ jobs:
   # Select changed payloads and representative branch validation targets.
   change-triage:
     name: Check changed files
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix}}
@@ -80,7 +74,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Check for changes
-        if: github.event_name == 'push'
+        if: github.event_name != 'workflow_dispatch'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
@@ -164,31 +158,34 @@ jobs:
       contents: read
     steps:
       - name: Verify build and test results
-        if: >-
-          ${{
-            needs.change-triage.result != 'success' ||
-            (
-              needs.Bake.result != 'success' &&
-              needs.Bake.result != 'skipped'
-            )
-          }}
+        env:
+          DISCOVERY: ${{ needs.change-triage.result }}
+          BUILDS: ${{ needs.Bake.result }}
+          MATRIX: ${{ needs.change-triage.outputs.matrix }}
         run: |
-          echo "CI failed:"
-          echo "change-triage: ${{ needs.change-triage.result }}"
-          echo "Bake: ${{ needs.Bake.result }}"
-          exit 1
+          python3 - <<'PYTHON'
+          import json, os
+          if os.environ['DISCOVERY'] != 'success':
+              raise SystemExit('Extension discovery did not succeed')
+          matrix = json.loads(os.environ['MATRIX'])
+          if not isinstance(matrix, list) or any(not isinstance(x, str) or not x for x in matrix):
+              raise SystemExit('Invalid extension matrix')
+          expected = 'success' if matrix else 'skipped'
+          if os.environ['BUILDS'] != expected:
+              raise SystemExit(f"Expected builds={expected}, got {os.environ['BUILDS']}")
+          PYTHON
 
       - name: Checkout Renovate changes
-        if: startsWith(github.ref, 'refs/heads/renovate/')
+        if: startsWith(github.head_ref || github.ref_name, 'renovate/')
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Check Renovate versions for prereleases
-        if: startsWith(github.ref, 'refs/heads/renovate/')
+        if: startsWith(github.head_ref || github.ref_name, 'renovate/')
         env:
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          DEFAULT_BRANCH: ${{ github.base_ref || github.event.repository.default_branch }}
         run: |
           # Real examples: MobilityDB 1.3.0-alpha, HypoPG 2.0.0beta,
           # pg_partman 5.3.0RC1, MobilityDB 1.3.0~rc1-1.pgdg13+1.
@@ -215,11 +212,11 @@ jobs:
 
   Catalogs:
     name: Update Catalogs
-    needs: Bake
+    needs: [change-triage, automerge-gate]
     runs-on: ubuntu-26.04
     permissions:
       contents: write
-    if: github.ref == 'refs/heads/main'
+    if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main'
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4

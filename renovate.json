@@ -105,60 +105,16 @@
       ]
     },
     {
-      "description": "updates the SBOM generator base image",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "sbom-generator/Dockerfile"
-      ],
-      "matchStrings": [
-        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: packageName=(?<packageName>[^\\s]+))?(?: versioning=(?<versioning>[^\\s]+))?\\s+FROM\\s+(?:[a-zA-Z0-9._/-]+:)?(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[0-9a-f]+))?"
-      ]
-    },
-    {
-      "description": "updates the SBOM generator Dockerfile frontend",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "sbom-generator/Dockerfile"
-      ],
-      "matchStrings": [
-        "# syntax=docker/dockerfile:(?<currentValue>[^\\s]+)"
-      ],
-      "depNameTemplate": "docker/dockerfile",
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
-    },
-    {
-      "description": "updates the SBOM generator tool versions",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "sbom-generator/Dockerfile",
-        "sbom-generator/auto-publish-versions.env"
-      ],
-      "matchStrings": [
-        "#\\s*renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)(?: versioning=(?<versioning>[^\\s]+))?\\s+(?:ARG )?[A-Z0-9_]+_VERSION=(?<currentValue>[^\\s]+)"
-      ]
-    },
-    {
-      "description": "updates generator Debian packages not supplied by the base image",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^sbom-generator/dependencies/debian-(amd64|arm64)\\.txt$/"
-      ],
-      "matchStrings": [
-        "(?<depName>[a-z0-9][a-z0-9+.-]*)=(?<currentValue>[^\\s]+)"
-      ],
-      "datasourceTemplate": "deb"
-    },
-    {
-      "description": "PGRX source tags from extension metadata",
+      "description": "Synchronize PGRX source tags and SQL versions in extension metadata",
       "customType": "regex",
       "managerFilePatterns": [
         "/^[^/]+/metadata\\.hcl$/"
       ],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
       ],
-      "depTypeTemplate": "pgrx-source"
+      "depTypeTemplate": "pgrx-source",
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}package = \"{{{newValue}}}\"\n{{{indentation}}}sql     = \"{{{replace '^v' '' newValue}}}\""
     },
     {
       "description": "PGRX build tool releases",
@@ -173,51 +129,6 @@
     }
   ],
   "packageRules": [
-    {
-      "matchDatasources": [
-        "deb"
-      ],
-      "matchFileNames": [
-        "sbom-generator/dependencies/debian-amd64.txt"
-      ],
-      "registryUrls": [
-        "https://packages.debian.org/bookworm/amd64/{{packageName}}"
-      ],
-      "groupName": "SBOM generator Debian and base image updates",
-      "description": "Work around Renovate #44330 using Debian package pages; see WORKAROUNDS.md",
-      "overrideDatasource": "custom.debian-bookworm",
-      "versioning": "deb"
-    },
-    {
-      "matchDatasources": [
-        "deb"
-      ],
-      "matchFileNames": [
-        "sbom-generator/dependencies/debian-arm64.txt"
-      ],
-      "registryUrls": [
-        "https://packages.debian.org/bookworm/arm64/{{packageName}}"
-      ],
-      "groupName": "SBOM generator Debian and base image updates",
-      "description": "Work around Renovate #44330 using Debian package pages; see WORKAROUNDS.md",
-      "overrideDatasource": "custom.debian-bookworm",
-      "versioning": "deb"
-    },
-    {
-      "description": "Keep the SBOM Python base on Bookworm to match pinned Debian packages",
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "python",
-        "library/python"
-      ],
-      "matchFileNames": [
-        "sbom-generator/Dockerfile"
-      ],
-      "groupName": "SBOM generator Debian and base image updates",
-      "allowedVersions": "/^\\d+\\.\\d+(?:\\.\\d+)?-slim-bookworm$/"
-    },
     {
       "description": "automerge checked latest generator digest updates",
       "matchPackageNames": [
@@ -288,23 +199,6 @@
       ]
     },
     {
-      "description": "Automerge non-major SBOM generator updates after all checks pass on the current base",
-      "matchFileNames": [
-        "sbom-generator/**",
-        ".github/workflows/sbom-generator.yml"
-      ],
-      "matchUpdateTypes": [
-        "minor",
-        "patch",
-        "digest",
-        "pin",
-        "pinDigest"
-      ],
-      "automerge": true,
-      "platformAutomerge": true,
-      "rebaseWhen": "behind-base-branch"
-    },
-    {
       "description": "Require manual merging for major updates",
       "matchUpdateTypes": [
         "major"
@@ -312,30 +206,14 @@
       "automerge": false
     },
     {
-      "description": "Keep SBOM updates separate from extension updates to satisfy PR scope",
-      "matchFileNames": [
-        "sbom-generator/**",
-        ".github/workflows/sbom-generator.yml"
-      ],
-      "additionalBranchPrefix": "sbom-"
-    },
-    {
-      "description": "Keep PGRX tools under review while build evidence is checked",
-      "matchFileNames": [
-        "pgrx/dependencies/**"
-      ],
-      "automerge": false
-    },
-    {
-      "description": "Require SQL version review and keep PGRX sources separate from GitHub Actions",
+      "description": "Keep PGRX sources separate from GitHub Actions; inherit the shared automerge policy",
       "matchDepTypes": [
         "pgrx-source"
       ],
-      "automerge": false,
       "groupName": null,
       "pinDigests": false,
       "prBodyNotes": [
-        "⚠️ The source package version does not update the separately maintained SQL version. Before merging, inspect the extension control file and SQL upgrade scripts, then update the `sql` values in metadata.hcl and affected test expectations when needed. Do not infer SQL versions from the package version or approve solely because CI passed."
+        "PGRX source tags and SQL versions are updated together, stripping a leading v for SQL. Minor and patch updates use the shared automerge policy with required acceptance checks. If upstream ships a different SQL version, investigate the release before merging. Major updates remain manual."
       ]
     },
     {
@@ -350,13 +228,5 @@
       "groupName": null,
       "pinDigests": false
     }
-  ],
-  "customDatasources": {
-    "debian-bookworm": {
-      "format": "plain",
-      "transformTemplates": [
-        "($prefix := \"<h1>Package: {{{packageName}}} (\"; $headers := releases[$substring(version, 0, $length($prefix)) = $prefix]; $assert($count($headers) = 1, \"Expected one Debian package version heading\"); $archVersions := releases[$contains(version, \"<td class='vcurrent'>\")]; $assert($count($archVersions) <= 1, \"Expected at most one architecture version\"); $version := $count($archVersions) = 1 ? $substringBefore($substringAfter($archVersions[0].version, \">\"), \"<\") : $substringBefore($substringAfter($headers[0].version, $prefix), \")\"); $assert($contains($version, /^[0-9][0-9A-Za-z.+:~-]*$/), \"Invalid Debian package version\"); {\"releases\": [{\"version\": $version}]})"
-      ]
-    }
-  }
+  ]
 }
