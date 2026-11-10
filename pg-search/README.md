@@ -35,7 +35,7 @@ spec:
     extensions:
     - name: pg-search
       image:
-        reference: ghcr.io/cnpg-extensions/pg-search:v0.25.6-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-search:v0.26.6-18-trixie
 ```
 
 `pg_search` also requires the `vector` extension. Make the `pgvector` image
@@ -59,7 +59,7 @@ spec:
     name: cluster-pg-search
   extensions:
   - name: pg_search
-    version: '0.25.6'
+    version: '0.26.6'
 ```
 
 Alternatively, you can enable the extension directly with SQL:
@@ -76,7 +76,7 @@ Once the database is ready, connect to it with `psql` and run:
 \dx pg_search
 ```
 
-You should see `pg_search` listed with version `0.25.6`. The extension must be
+You should see `pg_search` listed with version `0.26.6`. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
 setting, matching the image's catalog metadata.
 
@@ -84,9 +84,6 @@ setting, matching the image's catalog metadata.
 
 - `pg_search` requires `vector` from [pgvector](https://github.com/pgvector/pgvector).
   Install or mount pgvector before creating `pg_search`.
-- The image includes the OpenBLAS and GNU Fortran runtime libraries required by
-  `pg_search`. CloudNativePG uses the `system` runtime path declared in
-  `metadata.hcl` to locate them.
 
 ## Contributors
 

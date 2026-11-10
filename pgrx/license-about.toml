@@ -65,3 +65,11 @@ license = "Apache-2.0"
 path = "LICENSE"
 license = "Apache-2.0"
 checksum = "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+
+# tantivy-quant 0.1.0 omits package.license; use the repository MIT license.
+[tantivy-quant.clarify]
+license = "MIT"
+[[tantivy-quant.clarify.files]]
+path = "../LICENSE"
+license = "MIT"
+checksum = "acacd14bebbffdb30d62443c282fb4da3e81915a9f69c63d5d745a029f44de8a"

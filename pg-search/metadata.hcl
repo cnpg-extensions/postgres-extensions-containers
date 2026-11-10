@@ -11,7 +11,7 @@ metadata = {
   postgresql_parameters    = {}
   extension_control_path   = []
   dynamic_library_path     = []
-  ld_library_path          = ["system"]
+  ld_library_path          = []
   bin_path                 = []
   env                      = {}
   auto_update_os_libs      = false
@@ -23,15 +23,15 @@ metadata = {
     bookworm = {
       "18" = {
         # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver
-        package = "v0.25.6"
-        sql     = "0.25.6"
+        package = "v0.26.6"
+        sql     = "0.26.6"
       }
     }
     trixie = {
       "18" = {
         # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver
-        package = "v0.25.6"
-        sql     = "0.25.6"
+        package = "v0.26.6"
+        sql     = "0.26.6"
       }
     }
   }

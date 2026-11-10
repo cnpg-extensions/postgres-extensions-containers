@@ -123,3 +123,18 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
 - **Review when:** the extension, dependency lock, compiler, or runner resources
   change. Recheck native ARM64 builds and memory use before adopting any
   LTO-disable workaround.
+
+## pg-search 0.26.6: tantivy-quant license metadata
+
+- **Upstream:** [tantivy-quant 0.1.0](https://github.com/paradedb/tantivy/blob/f4a59c13f0f919cf1df59c8975fc580d1c58ff73/quant/Cargo.toml)
+  omits a license declaration and a crate-local license file. No upstream issue
+  is currently linked.
+- **Problem:** cargo-about cannot produce complete license evidence for the
+  pg-search 0.26.6 dependency graph.
+- **Workaround:** [pgrx/license-about.toml](pgrx/license-about.toml) clarifies MIT
+  using the parent repository's `LICENSE`, guarded by its SHA-256 checksum.
+  The ordinary evidence pipeline includes the license in the shipped notices
+  and SBOM. Upstream source and dependency resolution remain unchanged.
+- **Remove when:** the selected tantivy-quant release supplies discoverable
+  license metadata. Recheck the repository license on dependency updates and
+  validate Cargo license evidence and the composed SPDX document.

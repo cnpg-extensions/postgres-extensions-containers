@@ -24,7 +24,7 @@ ARG PGRX_SOURCE_REVISION
 USER 0
 
 COPY pgrx/ /pgrx/
-# TODO: If staging OS runtime libraries, follow pg-search/Dockerfile: copy
+# TODO: If staging OS runtime libraries, copy
 # capture_base_image_libs.sh and stage_system_libs.sh into /usr/local/bin/,
 # then run capture_base_image_libs.sh BEFORE installing any build dependencies.
 WORKDIR /build

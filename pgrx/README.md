@@ -303,9 +303,10 @@ and any initialization steps.
 
 #### Recipes with additional runtime needs
 
-The pg-search recipe captures base libraries before installing packages, then
-stages the packaged extension's additional runtime closure and copyright notices
-using the shared helpers. This includes quadmath where required.
+Recipes that need additional OS runtime libraries capture base libraries before
+installing packages, then stage the packaged extension's additional runtime
+closure and copyright notices using the shared helpers. pg-search 0.26.6 uses
+LLD and OpenBLAS at build time but does not stage additional runtime libraries.
 
 PostgreSQL Anonymizer declares its GitLab `source_repository` in metadata and
 uses the upstream `make extension` target, including runtime CSV data. Payload
