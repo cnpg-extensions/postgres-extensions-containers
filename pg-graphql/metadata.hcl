@@ -25,15 +25,15 @@ metadata = {
     trixie = {
       "18" = {
         # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver
-        package = "v1.6.2"
-        sql     = "1.6.2"
+        package = "v1.6.3"
+        sql     = "1.6.3"
       }
     }
     bookworm = {
       "18" = {
         # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver
-        package = "v1.6.2"
-        sql     = "1.6.2"
+        package = "v1.6.3"
+        sql     = "1.6.3"
       }
     }
   }
