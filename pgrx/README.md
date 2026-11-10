@@ -91,13 +91,7 @@ flowchart TD
     end
 
     subgraph Security["Security runner — per image"]
-        Scan["downstream.py<br/>Extract both SBOMs"]
-        subgraph Scanners["Scanner containers"]
-            Grype["Grype"]
-            Grant["Grant"]
-        end
-        Scan --> Grype
-        Scan --> Grant
+        Scan["Shared security-scans action<br/>Dockle + optional Snyk"]
     end
 
     Smoke["Reusable smoke.yml<br/>Jobs per image / CNPG version"]
@@ -116,8 +110,7 @@ flowchart TD
     Assemble --> Scan
     Assemble -. "workflow call" .-> Smoke
     Assemble -. "workflow call" .-> SLSA
-    Grype -->|"Must pass"| Promote
-    Grant -->|"Must pass"| Promote
+    Scan -->|"Job must succeed"| Promote
     Smoke -->|"Must pass"| Promote
     SLSA -->|"Must pass"| Promote
     Promote -. "workflow call" .-> ProdSLSA
@@ -137,12 +130,16 @@ and checks that every image and attestation descriptor survives unchanged.
 Cosign signs the assembled index. Later jobs use its immutable digest.
 
 Security, smoke tests, and testing-image SLSA provenance can then run in parallel.
-On the security runner, `downstream.py` extracts both platform SBOMs and launches
-Grype and Grant containers with read-only mounts. Reports stay on the runner and
-are uploaded as workflow artifacts. Grype reports vulnerabilities and Grant
-reports licenses; findings are retained for review, while scanner errors fail
-the job. The shared smoke workflow tests the extension in CloudNativePG, and the
-shared SLSA workflow separately attests the testing image's build provenance.
+The security runner uses the same shared `security-scans` action as mainline.
+Dockle checks image configuration and fails on warnings or errors. When
+`SNYK_TOKEN` is configured, Snyk scans the image and uploads findings to GitHub
+Code Scanning; the Snyk step is allowed to fail without blocking the job.
+This action does not explicitly scan both platform SBOMs or produce Grant
+license reports. Both SBOMs remain attached to the image for consumers to scan
+against current vulnerability databases using the [verification guide](#verify-images).
+Build-time SPDX validation remains in place. The shared smoke workflow tests the
+extension in CloudNativePG, and the shared SLSA workflow separately attests the
+testing image's build provenance.
 
 Branch builds publish testing images. After all required checks succeed, trusted
 `main` push or dispatch events can run the shared `copy-images` action on the
@@ -158,7 +155,7 @@ For full extension acceptance, dispatch
 [`.github/workflows/pgrx.yml`](../.github/workflows/pgrx.yml) with an
 `extension_name`. It builds all targets declared in the extension's metadata on
 native AMD64 and ARM64 runners, assembles and signs their indexes, checks
-SPDX/Grype/Grant results, and runs CNPG smoke tests. An optional `cnpg_version`
+SPDX output, runs mainline security checks, and runs CNPG smoke tests. An optional `cnpg_version`
 selects `main` or a full version such as `1.30.1`; otherwise the shared support
 policy selects the smoke versions. No local signing keys are needed.
 

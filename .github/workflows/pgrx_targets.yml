@@ -11,6 +11,9 @@ name: PGRX platform builds
         type: string
         required: false
         default: ''
+    secrets:
+      SNYK_TOKEN:
+        required: false
   workflow_dispatch:
     inputs: *id001
 permissions: {}
@@ -173,12 +176,8 @@ jobs:
     secrets:
       registry-password: ${{ secrets.GITHUB_TOKEN }}
   security:
+    name: Security checks
     needs: assemble
-    env:
-      # renovate: datasource=docker depName=anchore/grype
-      GRYPE_IMAGE: anchore/grype:v0.121.3@sha256:13113eeceab017260370cf540e1d25442c59665fd07d1b09b66d63bb0c282887
-      # renovate: datasource=docker depName=anchore/grant
-      GRANT_IMAGE: anchore/grant:v0.7.1@sha256:9ccd7c26dc48ce87cd9350e29fa8da5eaaedfabb3bc2e56f6b1ce3e9e7adc4b6
     runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
@@ -187,22 +186,17 @@ jobs:
     permissions:
       contents: read
       packages: read
+      security-events: write
     steps:
     - *id002
-    - *login
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
-    - name: Scan both platform SBOMs
-      env:
-        IMAGE: ${{ format('{0}@{1}', matrix.image, matrix.digest) }}
-      run: python3 pgrx/downstream.py --image "$IMAGE" --output "$RUNNER_TEMP/security-result"
-    - name: Save security reports
-      if: always()
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+    - name: Security checks
+      uses: cloudnative-pg/postgres-containers/.github/actions/security-scans@main
       with:
-        name: security-${{ inputs.extension_name }}-${{ strategy.job-index }}
-        path: ${{ runner.temp }}/security-result
-        if-no-files-found: ignore
+        image: ${{ format('{0}@{1}', matrix.image, matrix.digest) }}
+        registry_user: ${{ github.actor }}
+        registry_token: ${{ secrets.GITHUB_TOKEN }}
+        snyk_token: ${{ secrets.SNYK_TOKEN }}
+        dockerfile: ${{ inputs.extension_name }}/Dockerfile
   smoke:
     needs:
     - assemble

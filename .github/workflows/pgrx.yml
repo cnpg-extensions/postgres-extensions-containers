@@ -71,7 +71,10 @@ jobs:
       contents: read
       packages: write
       id-token: write
+      security-events: write
     uses: ./.github/workflows/pgrx_targets.yml
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     with:
       extension_name: ${{ matrix.extension }}
       cnpg_version: ${{ inputs.cnpg_version }}
