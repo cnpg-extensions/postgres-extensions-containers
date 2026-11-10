@@ -18,6 +18,9 @@ target "default" {
   }
   name = getBuildName(metadata.name, build.distro, build.pgVersion)
   args = {
+    PGRX_EXTENSION = metadata.name
+    PGRX_DISTRO = build.distro
     PGRX_SOURCE_REPOSITORY = metadata.source_repository
+    PGRX_BUILD_TIMESTAMP = build_timestamp
   }
 }
