@@ -46,39 +46,109 @@ do not claim that every dependency survives linker dead-code elimination.
 
 ## How images are built
 
-An extension's `metadata.hcl` selects its source version, PostgreSQL versions,
-and distributions. Preparation turns those choices into a build plan. Each
-**target** is one distribution/PostgreSQL combination; each target gets a
-separate build job for AMD64 and ARM64.
+[`pgrx.yml`](../.github/workflows/pgrx.yml) selects extensions and calls
+[`pgrx_targets.yml`](../.github/workflows/pgrx_targets.yml) for each one.
+`prepare.py` turns the extension's `metadata.hcl` into a build plan. Each
+**target** is one distribution/PostgreSQL combination; each target gets separate
+AMD64 and ARM64 jobs on matching native runners.
+
+The boxes below distinguish runner hosts from the containers they launch.
+Solid arrows show data flow or required completion. Dashed arrows show reusable
+workflow calls, positioned after the jobs they depend on; these calls are
+scheduled by GitHub Actions, not made by the Python scripts. Smoke and SLSA
+workflows manage their own jobs and runners.
 
 ```mermaid
 flowchart TD
-    M["Extension metadata and source release"] --> P["Prepare targets and build inputs"]
-    P --> A["Native AMD64 runner: build extension"]
-    P --> B["Native ARM64 runner: build extension"]
-    A --> C["Per-platform image, SBOM and BuildKit provenance"]
-    B --> C
-    C --> D["Assemble multi-platform index and sign its digest"]
-    D --> E["Security scans, CNPG smoke tests and SLSA provenance"]
-    E --> F["Main only: promote images and attest production digests"]
+    Entry["pgrx.yml"] -. "calls pgrx_targets.yml" .-> Prepare
+
+    subgraph PrepRunner["Preparation runner"]
+        Prepare["prepare.py"]
+    end
+
+    subgraph AMD["AMD64 runner — per target"]
+        AB["build.py + Docker Bake"]
+        subgraph AC["BuildKit-managed containers"]
+            AX["Build extension → finalize evidence"]
+            AG["SBOM generator + PGRX hook"]
+            AX --> AG
+        end
+        AB --> AX
+    end
+
+    subgraph ARM["ARM64 runner — per target"]
+        RB["build.py + Docker Bake"]
+        subgraph RC["BuildKit-managed containers"]
+            RX["Build extension → finalize evidence"]
+            RG["SBOM generator + PGRX hook"]
+            RX --> RG
+        end
+        RB --> RX
+    end
+
+    subgraph Assembly["Assembly runner"]
+        Assemble["assemble.py + Cosign<br/>Merge and sign"]
+    end
+
+    subgraph Security["Security runner — per image"]
+        Scan["downstream.py<br/>Extract both SBOMs"]
+        subgraph Scanners["Scanner containers"]
+            Grype["Grype"]
+            Grant["Grant"]
+        end
+        Scan --> Grype
+        Scan --> Grant
+    end
+
+    Smoke["Reusable smoke.yml<br/>Jobs per image / CNPG version"]
+    SLSA["Reusable SLSA workflow<br/>Testing provenance"]
+
+    subgraph Promotion["Promotion runner — main only"]
+        Promote["copy-images action"]
+    end
+
+    ProdSLSA["Reusable SLSA workflow<br/>Production provenance"]
+
+    Prepare --> AB
+    Prepare --> RB
+    AG -->|"Image + digest metadata"| Assemble
+    RG -->|"Image + digest metadata"| Assemble
+    Assemble --> Scan
+    Assemble -. "workflow call" .-> Smoke
+    Assemble -. "workflow call" .-> SLSA
+    Grype -->|"Must pass"| Promote
+    Grant -->|"Must pass"| Promote
+    Smoke -->|"Must pass"| Promote
+    SLSA -->|"Must pass"| Promote
+    Promote -. "workflow call" .-> ProdSLSA
 ```
 
-Each native build uses the extension's upstream build recipe, collects Cargo and
-license evidence, and copies the extension's runtime files into a minimal
-`scratch` image. The shared [SBOM generator](../sbom-generator/README.md#development)
-uses the builder and final filesystem to describe what ships. A PGRX hook adds
-the selected Rust packages and their license information to the same SPDX 2.3
+On each native runner, `build.py` checks the architecture before Docker Bake
+starts the build. Inside the build containers, the extension's Dockerfile
+installs tools, runs the upstream Rust build recipe, finalizes Cargo and license
+evidence, and copies runtime files into a minimal `scratch` image. The shared
+[SBOM generator](../sbom-generator/README.md#development) runs in its own container;
+the PGRX hook adds selected Rust packages and license information to its SPDX 2.3
 document. BuildKit attaches the SBOM and build provenance to the platform image.
 
-Assembly combines the platform images and their attestations without rebuilding
-Rust code. It checks that both platforms are present and that all their image
-and attestation descriptors survive unchanged. Signing and later checks use
-immutable image digests, so they refer to the assembled output.
+The build jobs push their images to the registry and pass digest metadata through
+workflow artifacts. On a separate runner, `assemble.py` combines both platforms
+and checks that every image and attestation descriptor survives unchanged.
+Cosign signs the assembled index. Later jobs use its immutable digest.
 
-Branch builds publish testing images. Production promotion is restricted to
-trusted `main` push or dispatch events and requires security, smoke, signing,
-and SLSA stages to succeed. Grype reports vulnerabilities and Grant reports
-licenses; findings are retained for review, while scanner errors fail the job.
+Security, smoke tests, and testing-image SLSA provenance can then run in parallel.
+On the security runner, `downstream.py` extracts both platform SBOMs and launches
+Grype and Grant containers with read-only mounts. Reports stay on the runner and
+are uploaded as workflow artifacts. Grype reports vulnerabilities and Grant
+reports licenses; findings are retained for review, while scanner errors fail
+the job. The shared smoke workflow tests the extension in CloudNativePG, and the
+shared SLSA workflow separately attests the testing image's build provenance.
+
+Branch builds publish testing images. After all required checks succeed, trusted
+`main` push or dispatch events can run the shared `copy-images` action on the
+promotion runner. It copies the checked images to production and signs their
+digests. A final SLSA workflow call attests the production images in their
+destination repositories.
 
 ## Development
 
@@ -173,20 +243,48 @@ metadata. `get-targets` defaults to Debian; use `--build-system pgrx` for PGRX
 or `--build-system all` for both families. OS-library maintenance excludes PGRX
 targets; catalog and testing-value generation support both.
 
+**Start from the [PGRX templates](templates/) and follow their structure.**
+The [Dockerfile template](templates/Dockerfile.tmpl) contains the integration
+points used by CI, native builds, and SBOM generation. Adapt the source URL,
+upstream build commands, dependencies, and copied runtime files for the extension;
+keep the shared setup and evidence steps.
+
 For a new extension:
 
-1. Add its canonical `source_repository` and literal source tag to metadata,
-   including a leading `v` when upstream uses one. Keep the SQL version separate.
-2. Add its recipe configuration and required apt dependencies. Keep upstream
-   recipe URL comments immediately above the Dockerfile's build commands.
-3. Declare the supported distribution/PostgreSQL combinations in metadata;
-   preparation creates their native build jobs automatically.
-4. Run the local checks and full extension acceptance above. Use the existing
-   SBOM generator and hook; do not add a second composer or a build-system-specific
-   consumer interface.
+1. Copy and complete the Dockerfile, metadata, and README templates, replacing
+   every placeholder and TODO. In metadata, add the canonical `source_repository`
+   and literal source tag, including a leading `v` when upstream uses one.
+   Keep the SQL version separate.
+2. Preserve all Dockerfile `ARG` declarations **in their template locations and
+   stages**, including `BUILDKIT_SBOM_SCAN_STAGE`, `BASE`, `PG_MAJOR`, `EXT_VERSION`,
+   `TARGETARCH`, `TARGETPLATFORM`, the `PGRX_*` identity arguments, and
+   `PGRX_BUILD_TIMESTAMP`. They pass CI's selected versions, architecture, source
+   identity, and timestamp into the build and evidence tools. Some are consumed
+   by helper scripts rather than referenced directly in the Dockerfile. Docker
+   arguments are stage-scoped, so retain repeated declarations such as `PG_MAJOR`
+   in the final stage too.
+3. Keep the stage named `builder`, copy `pgrx/` to `/pgrx/`, and extract the source
+   into `/build`. **Call `/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}"
+   /build/Cargo.lock` after extraction and before compilation.** It installs the
+   build environment, selects cargo-pgrx from the source lockfile, and prepares
+   the SBOM hook and reporting tools.
+4. Add the extension to `RECIPES` in [`build_config.py`](build_config.py), matching
+   the Dockerfile's manifest path, features, and package/install layout. Add any
+   required apt dependencies and keep the upstream recipe URL immediately above
+   the build commands.
+5. **Call `/pgrx/finalize-pgrx-evidence.sh` after compilation and packaging.** It
+   records the completed payload and generates Cargo and license evidence needed
+   by the SBOM hook. Preserve the diagnostic `pgrx-sbom` stage and copy the
+   generated Rust license notices into the final image alongside the runtime
+   files, as the template shows.
+6. Declare supported distribution/PostgreSQL combinations in metadata;
+   preparation creates their native build jobs automatically. Run the local
+   checks and full extension acceptance above. Use the existing SBOM generator
+   and hook; do not add a second composer or a build-system-specific consumer
+   interface.
 
-The [templates](templates/) provide a starting point. Extension READMEs should
-explain SQL and catalog names, preload requirements, and any initialization steps.
+In the extension README, explain SQL and catalog names, preload requirements,
+and any initialization steps.
 
 #### Recipes with additional runtime needs
 
@@ -200,49 +298,19 @@ evidence includes that data directory recursively. Its catalog preloads `anon`;
 initialize its legacy fake-data functions with the mounted data path described
 in the extension README.
 
-### Dependency updates
+## Directory guide
 
-Renovate manages PGRX source tags in extension metadata and build-tool versions
-in `dependencies/tools.json`. Buildx and Cosign setup follow the Debian workflow.
-The security job declares digest-pinned Grype and Grant images directly in
-`.github/workflows/pgrx_targets.yml`, following the SBOM generator workflow;
-there is no central workflow-tool installer. CNPG support policy owns its latest
-release pin in `.github/workflows/cnpg-versions.yml`; operator manifests follow
-the same live release-branch or `main` policy as shared smoke tests.
+Extension-specific Dockerfiles and metadata live at repository root. The main
+entrypoints and supporting directories here are:
 
-Preparation resolves the source revision and archive URL and selects each
-platform child from the current Debian base tag. Base tags follow the shared
-`getBaseImage` policy; their resolved digests are recorded per run rather than
-maintained in a separate dependency manifest. Builds derive the matching cargo-pgrx
-version from upstream Cargo.lock and tool artifact URLs from their managed
-versions. No manual lock-refresh step is required. The build plan and generated
-evidence record source identity, source hashes, tool versions, and the actual
-platform base child. Review source recipes and SQL version changes manually; `sql` remains independently
-maintained in metadata and is not advanced by source tag updates.
-
-The reporting-tool configuration owns the hook's embedded SPDX identifier list;
-update that list when changing the license parser. System dependencies install
-through the Debian apt repositories with the ordinary `apt-get update` and
-`apt-get install` flow; individual package artifacts are not pinned in a
-separate lock inventory.
-
-The shared smoke workflow installs Task and Dagger for both build families.
-The shared Taskfile owns Kind, the Kubernetes node, kubectl, and the Dagger engine;
-the shared Dagger test function owns Chainsaw. Catalog checks use the shared
-Task/Dagger tests. Catalog installation follows the shared Taskfile unchanged:
-it installs Git with apk and applies `cnpg-extensions/artifacts` catalogs from `main`.
-
-### Keep shared behavior aligned with upstream
-
-[`cnpg-versions.yml`](../.github/workflows/cnpg-versions.yml) holds the shared CNPG
-support policy, with one Renovate-managed latest-release pin. Its logic was
-extracted from Debian's `bake_targets.yml` to avoid a separate PGRX support
-matrix. When upstream changes that version-selection logic, apply its intent to
-the shared workflow even if Git merges cleanly. See the
-[upstream merge process](../MERGE.md).
-
-PGRX follows Debian's release-acceptance level: build-time validation, security
-scanning, signing, shared runtime smoke tests, and required SLSA jobs. These
-stages do not repeat full OCI-graph verification or compare every BuildKit
-provenance field against preparation records. Consumers can independently
-[verify images](#verify-images).
+| File or directory | Purpose |
+| --- | --- |
+| [`prepare.py`](prepare.py) | Turns extension metadata into native build jobs and Bake definitions. |
+| [`assemble.py`](assemble.py) | Combines platform images, preserves attestations, and publishes checked tags. |
+| [`build_config.py`](build_config.py) | Registers extension recipes and their Cargo feature selection. |
+| [`install-pgrx-build-environment.sh`](install-pgrx-build-environment.sh) | Required Dockerfile setup step: installs build tools and the SBOM hook. |
+| [`finalize-pgrx-evidence.sh`](finalize-pgrx-evidence.sh) | Required post-build step: collects Cargo, license, and runtime-payload evidence. |
+| [`templates/`](templates/) | Dockerfile, metadata, and README templates to follow for new extensions. |
+| [`sbom/`](sbom/) | Hook that adds verified Rust dependencies and licenses to the shared generator's SPDX output. |
+| [`dependencies/`](dependencies/) | Rust, rustup, and cargo-about version configuration for extension builders. |
+| [`tests/`](tests/) | PGRX tests, run with `python3 pgrx/test.py`. |
