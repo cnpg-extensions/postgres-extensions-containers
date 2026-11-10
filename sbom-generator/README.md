@@ -10,11 +10,11 @@ PostgreSQL base image separately using its own SBOM.
 
 ### Verify the image and extract its SBOM
 
-You need Cosign, Docker Buildx, Grype, and Grant. This example uses the PgSphere image
-published by `cnpg-extensions`, pinned to its image index digest:
+You need Cosign, Docker Buildx, Grype, Grant, and slsa-verifier. This example uses
+the PgSphere image published by `cnpg-extensions`, pinned to its image index digest:
 
 ```bash
-IMAGE=ghcr.io/cnpg-extensions/pgsphere@sha256:54e6f0b0a9d9e4c80db8c6edcac98b451159c1fbaa91e429a92d4978f593518d
+IMAGE=ghcr.io/cnpg-extensions/pgsphere@sha256:22ca66315dc65e543de37bce3911ab3a68b4b654707f0a73e8894f1ff0ef9ba3
 
 cosign verify "$IMAGE" \
   --certificate-identity='https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/bake_targets.yml@refs/heads/main' \
@@ -67,7 +67,7 @@ To list packages associated with a license or inspect one package:
 
 ```bash
 grant list pgsphere.spdx.json MIT
-grant list pgsphere.spdx.json GPL-3.0-or-later --pkg gcc-12-base
+grant list pgsphere.spdx.json GPL-3.0-or-later --pkg postgresql-18-pgsphere
 ```
 
 See the [example report commands](../examples/sbom-reports.txt) for an OGR FDW
@@ -91,13 +91,12 @@ identifier. Retrieve the notice to read its terms.
 
 #### Retrieve an original notice
 
-Start with a checksum from `grant list`. For example, the
-[OGR FDW report](../examples/sbom-reports.txt) contains this entry. With
-`ogr-fdw.spdx.json` from that build, list its associated packages:
+Start with a checksum from `grant list`. For example, the PgSphere image above
+contains this entry. List its associated packages:
 
 ```bash
 CHECKSUM=da8191658b3452ce9caf31638ba61dab31a38c619fa39df119812e050f592fd3
-grant list ogr-fdw.spdx.json "$CHECKSUM"
+grant list pgsphere.spdx.json "$CHECKSUM"
 ```
 
 Find shipped notice paths with that SHA256 checksum:
@@ -107,20 +106,17 @@ jq -r --arg checksum "$CHECKSUM" '
   .files[] |
   select(any(.checksums[]?;
     .algorithm == "SHA256" and .checksumValue == $checksum)) |
-  .fileName' ogr-fdw.spdx.json
-# licenses/libgfortran5/copyright
+  .fileName' pgsphere.spdx.json
+# licenses/gcc-12-base/copyright
 # licenses/libgomp1/copyright
-# licenses/libquadmath0/copyright
 ```
 
 These paths contain identical copies of the shared GCC notice. Choose one of
 the returned paths and copy it from the same image used to produce the SBOM.
-For the locally generated example, the image is `ogr-fdw:syft-only-example`;
-replace `IMAGE` when inspecting another build. No shell inside the scratch
-image is needed:
+Keep `IMAGE` set to the PgSphere digest above, or replace it when inspecting
+another build. No shell inside the scratch image is needed:
 
 ```bash
-IMAGE=ogr-fdw:syft-only-example
 NOTICE=licenses/libgomp1/copyright
 CONTAINER=$(docker create --platform linux/amd64 "$IMAGE" /unused)
 docker cp "$CONTAINER:/$NOTICE" ./original-notice
