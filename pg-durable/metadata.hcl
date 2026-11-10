@@ -25,15 +25,15 @@ metadata = {
     bookworm = {
       "18" = {
         # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver
-        package = "v0.2.7"
-        sql     = "0.2.7"
+        package = "v0.2.9"
+        sql     = "0.2.9"
       }
     }
     trixie = {
       "18" = {
         # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver
-        package = "v0.2.7"
-        sql     = "0.2.7"
+        package = "v0.2.9"
+        sql     = "0.2.9"
       }
     }
   }
