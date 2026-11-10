@@ -159,7 +159,7 @@ jobs:
     - discover
     - contracts
     - build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - env:
         DISCOVERY: ${{ needs.discover.result }}

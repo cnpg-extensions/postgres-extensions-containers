@@ -223,7 +223,7 @@ jobs:
     - security
     - smoke
     - provenance
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
@@ -270,7 +270,7 @@ jobs:
     - promote
     - provenance
     - production-provenance
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
     - env:
         RESULTS: ${{ toJSON(needs) }}
