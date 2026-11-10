@@ -7,23 +7,10 @@ def tool_url(name, version, architecture):
     if architecture not in ("amd64", "arm64"):
         raise ValueError("unsupported architecture: " + architecture)
     rust_arch = {"amd64": "x86_64", "arm64": "aarch64"}[architecture]
-    if name in ("grype", "grant"):
-        return (
-            f"https://github.com/anchore/{name}/releases/download/v{numeric}/"
-            f"{name}_{numeric}_linux_{architecture}.tar.gz"
-        )
     templates = {
         "cargo-about": (
             "https://github.com/EmbarkStudios/cargo-about/releases/download/"
             f"{numeric}/cargo-about-{numeric}-{rust_arch}-unknown-linux-musl.tar.gz"
-        ),
-        "cosign": (
-            "https://github.com/sigstore/cosign/releases/download/v{version}/"
-            "cosign-linux-{architecture}"
-        ),
-        "actionlint": (
-            "https://github.com/rhysd/actionlint/releases/download/v{version}/"
-            "actionlint_{numeric}_linux_{architecture}.tar.gz"
         ),
         "rustup": (
             "https://static.rust-lang.org/rustup/archive/{numeric}/"

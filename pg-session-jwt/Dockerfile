@@ -37,7 +37,6 @@ RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 # https://github.com/neondatabase/neon/blob/fa504217c61bbcaf5c512d75830564541f917f8f/compute/compute-node.Dockerfile#L1380
 RUN cargo pgrx install --release
 
-ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 

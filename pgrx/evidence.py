@@ -81,6 +81,15 @@ def discover_extension_payload(extension_dir, sql_name):
     return sorted(files, key=lambda entry: entry[1])
 
 
+# Finalize after compilation using the same package, PostgreSQL feature,
+# non-PG defaults and feature policy as cargo-pgrx. Resolve target-filtered Cargo
+# metadata, emit Cargo/cargo-about reports, check the lock for drift, ship license
+# texts, and hash the completed library/control/SQL payload. Write the schema-v2
+# manifest last. The diagnostic pgrx-sbom Docker target exports this evidence;
+# it does not replace an image build that produces attestations.
+#
+# normalize_about handles cargo-about 0.9.2's repeated identical Boolean doctest
+# field before report hashing. Other duplicate keys and conflicting values fail.
 def main():
     build = Path("/build")
     directory = build / "pgrx-sbom"
@@ -251,7 +260,6 @@ def main():
         "source_url": source["url"],
         "revision": source["revision"],
         "archive_sha256": source["archive_sha256"],
-        "workspace_sha256": os.environ["PGRX_WORKSPACE_SHA256"],
     }
     manifest = {
         "schema_version": 2,

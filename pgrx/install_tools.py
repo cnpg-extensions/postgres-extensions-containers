@@ -45,6 +45,19 @@ def install_archive_tool(name, url):
     destination.chmod(0o755)
 
 
+# Extension Dockerfiles retain their attributed upstream build commands. The
+# shell wrapper installs Debian build dependencies with apt-get update/install
+# before this installs Renovate-managed Rust and reporting tools. Rustup uses
+# normal distribution verification for the selected compiler. Cargo-about uses
+# architecture-specific upstream release artifacts; among these installed tools,
+# only cargo-pgrx is built from source, at the exact version from the extension's
+# Cargo.lock and with its own dependencies locked by cargo install --locked.
+#
+# JWT v0.5.0 and Anonymizer 3.3.2 correct stale root-package lock versions in their
+# Dockerfiles, guarded by exact original/effective checksums. Any upstream lock
+# change requires review or removal of the correction. Record both lock hashes;
+# the legacy patches field remains empty for schema compatibility. These inputs
+# are generated from upstream Cargo.lock, not a second committed tool lock.
 def main():
     major, lock_file = sys.argv[1:]
     extension = os.environ["PGRX_EXTENSION"]

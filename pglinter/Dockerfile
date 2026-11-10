@@ -36,7 +36,6 @@ RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 # https://github.com/pmpetit/pglinter/blob/2.0.0/Makefile#L255-L262
 RUN cargo pgrx package --pg-config /usr/lib/postgresql/${PG_MAJOR}/bin/pg_config --profile release
 
-ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 

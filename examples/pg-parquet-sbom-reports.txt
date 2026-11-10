@@ -1,6 +1,6 @@
 # SBOM reports - pg-parquet 0.5.1, PostgreSQL 18, Bookworm, linux/amd64
 # Captured 2026-11-09 using Grype 0.120.1 and released Grant 0.6.8,
-# the versions configured in pgrx/dependencies/workflow-tools.json.
+# the workflow tool versions in use at capture time.
 #
 # Published Syft-based PGRX testing image, built 2026-10-25T05:49:28Z.
 # Build source: https://github.com/ardentperf-labs/postgres-extensions-containers/commit/2892e38067195dbd584d27a9bf5ca19ef8e9de64

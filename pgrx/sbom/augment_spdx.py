@@ -133,6 +133,11 @@ def target_matches(condition, facts, triple):
     return result
 
 
+# Propagate runtime features from the selected root using full Cargo identities.
+# Weak optional references must not activate unused backends or leak their
+# features into shared crates. Evaluate retained dependency conditions against
+# rustc --print cfg for the selected target; exclude build/dev and proc-macro-only
+# edges. This describes the configured graph, not linker dead-code elimination.
 def selected_graph(
     metadata, root, requested_features=None, target_cfg=None, rust_target=None
 ):
@@ -521,6 +526,12 @@ def cargo_about_license_expressions(packages, report):
     return resolved
 
 
+# The unchanged, digest-pinned generator owns the Syft version. Use only its
+# rust-cargo-lock-cataloger on a file: source containing the hash-verified extension
+# Cargo.lock, never cargo-about/cargo-pgrx/cached registry lockfiles elsewhere in
+# the builder. Record the Syft version, output hash and inventory count in the
+# augmentation annotation. Match selected runtime crates by name, version and
+# source to this inventory, emitting only the selected entries.
 def scan_cargo_lock(lock_path):
     """Use the generator's Syft binary, scoped to one verified lockfile.
 
@@ -572,6 +583,26 @@ def scan_cargo_lock(lock_path):
     return packages, evidence
 
 
+# API-v1 composition contract: read hash-verified builder reports, verify source
+# and target identity, and bind the root crate to identical final payload bytes
+# and ELF machine. Run once on the current generator document; historical
+# synthetic-package output and preexisting Cargo packages are not supported.
+#
+# Preserve the generator's files, checksums, relationships and license metadata.
+# Its retained Syft packages own shipped files; do not import builder-only
+# packages or the builder OS identity. The described root extension has its own
+# Cargo identity and DEPENDS_ON relationships to selected Rust packages.
+#
+# Cargo packages claim neither file-level analysis nor ownership of installed
+# files. Libraries, control/SQL files and bundled notices remain individual SPDX
+# file records with Syft's checksums and license metadata. Do not infer file
+# licenses from Cargo declarations or notice text; notices still ship for
+# distribution and compliance.
+#
+# Package license expressions come uniformly from cargo-about, preserving AND/OR
+# semantics. Missing, unknown or invalid expressions fail the build. Keep license
+# texts in SPDX and attribute shipped notices by full Cargo identity. The shared
+# generator performs full SPDX validation after this hook returns.
 def augment_spdx(document, context):
     require(context.api_version == 1, "unsupported hook API")
     evidence = Path(context.builder_path) / "build/pgrx-sbom"

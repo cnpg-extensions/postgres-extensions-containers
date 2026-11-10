@@ -5,11 +5,33 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import subprocess
+import time
 
 from prepare import save
-from record import load_preparation, validate_record
-from registry import wait_for_index_digest
+
+
+def wait_for_index_digest(reference, expected_digest, attempts=6):
+    """Allow registry tag visibility to catch up after a successful push."""
+    for attempt in range(attempts):
+        try:
+            raw = subprocess.check_output(
+                ["docker", "buildx", "imagetools", "inspect", reference, "--raw"]
+            )
+        except subprocess.CalledProcessError:
+            if attempt == attempts - 1:
+                raise
+        else:
+            actual = "sha256:" + hashlib.sha256(raw).hexdigest()
+            if actual == expected_digest:
+                return
+            if attempt == attempts - 1:
+                raise ValueError(
+                    f"registry index digest mismatch for {reference}: "
+                    f"expected {expected_digest}, got {actual}"
+                )
+        time.sleep(2)
 
 
 def check_assembly(index, sources, platforms):
@@ -42,13 +64,18 @@ def check_assembly(index, sources, platforms):
         raise ValueError("missing, duplicate or unexpected platform attestation")
 
 
+# Platform jobs hand off ordinary Bake metadata: target, staging name and
+# immutable digest. Reject missing/unexpected artifacts, then merge complete
+# staging indexes without changing image or attestation descriptors. Check both
+# platforms and their attestations before assigning normal tags, and read back
+# those tags until the exact index digest matches; stale tags are never accepted.
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--preparation", type=Path, required=True)
     parser.add_argument("--records", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    preparation = load_preparation(args.preparation)
+    preparation = json.loads((args.preparation / "preparation.json").read_text())
     expected = {
         "platform-" + preparation["extension"] + "-" + r["id"]
         for r in preparation["rows"]
@@ -60,22 +87,25 @@ def main():
     args.output.mkdir(parents=True)
     for target, settings in preparation["targets"].items():
         rows = [r for r in preparation["rows"] if r["target"] == target]
-        records = [
-            validate_record(
-                preparation,
-                r,
-                args.records / ("platform-" + preparation["extension"] + "-" + r["id"]),
+        references = []
+        for row in rows:
+            artifact = args.records / (
+                "platform-" + preparation["extension"] + "-" + row["id"]
             )
-            for r in rows
-        ]
+            metadata = json.loads((artifact / "metadata.json").read_text())
+            if set(metadata) != {target}:
+                raise ValueError("unexpected build target in platform metadata")
+            result = metadata[target]
+            if result["image.name"] != row["staging"]:
+                raise ValueError("unexpected staging image in platform metadata")
+            digest = result["containerimage.digest"]
+            if not re.fullmatch(r"sha256:[a-f0-9]{64}", digest):
+                raise ValueError("invalid build digest")
+            references.append(row["staging"].rsplit(":", 1)[0] + "@" + digest)
         output = args.output / target
         output.mkdir()
         repository = rows[0]["staging"].rsplit(":", 1)[0]
-        candidate = (
-            repository
-            + ":candidate-"
-            + hashlib.sha256((preparation["run_id"] + target).encode()).hexdigest()[:32]
-        )
+        candidate = repository + ":candidate-" + rows[0]["id"]
         definitions = json.loads(
             (args.preparation / (rows[0]["id"] + ".json")).read_text()
         )["target"][target]
@@ -84,7 +114,6 @@ def main():
             scope, content = annotation.split(":", 1)
             if "index" in scope.split(","):
                 annotations += ["--annotation", "index:" + content]
-        references = [r["image"] for r in records]
         command = [
             "docker",
             "buildx",
@@ -117,20 +146,6 @@ def main():
                 check=True,
             )
             wait_for_index_digest(tag, index_digest)
-        save(
-            output / "assembly.json",
-            {
-                "schema_version": 1,
-                "target": target,
-                "extension": preparation["extension"],
-                "preparation_sha256": preparation["preparation_sha256"],
-                "run_id": preparation["run_id"],
-                "image": image,
-                "index_digest": index_digest,
-                "platforms": preparation["platforms"],
-                "tags": settings["tags"],
-            },
-        )
         save(
             output / "metadata.json",
             {

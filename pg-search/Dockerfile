@@ -33,7 +33,6 @@ RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 RUN cd pg_search && cargo pgrx package
 RUN stage_system_libs.sh /build/target/release/pg_search-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/pg_search.so
 
-ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 

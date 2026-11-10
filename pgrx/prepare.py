@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Freeze one logical run into independently checkable platform definitions."""
+"""Prepare native Bake targets and their assembly plan."""
 
 import argparse
 from datetime import datetime, timezone
@@ -11,15 +11,11 @@ import re
 import subprocess
 
 from source import resolve_source
-from workflow import ROOT, discover, execute, select, source_digest
+from workflow import discover, execute, select
 
 
 def encoded(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
-
-
-def digest(value):
-    return hashlib.sha256(encoded(value)).hexdigest()
 
 
 def save(path, value):
@@ -75,6 +71,12 @@ def platform_base(reference, platform, manifests=None):
     return reference + "@" + child_digest, index_digest
 
 
+# Render the shared Debian Bake configuration with the PGRX overlay once per
+# run, selecting one timestamp, source revision and architecture-specific base
+# image for each build. Each target/platform row selects a matching native runner.
+# Source tags resolve to repository revisions and archive URLs here. The native
+# build downloads from upstream HTTPS and records the actual archive hash; there
+# is no preparation-time archive checksum comparison or separate committed lock.
 def prepare(inputs, generator, output):
     if not re.fullmatch(r"[^\s]+@sha256:[a-f0-9]{64}", generator):
         raise ValueError("digest-qualified generator required")
@@ -90,7 +92,6 @@ def prepare(inputs, generator, output):
         raise ValueError("fresh preparation directory required")
     output.mkdir(parents=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    workspace = source_digest()
     registry = "ghcr.io/" + os.environ["GITHUB_REPOSITORY_OWNER"].lower()
     environment = {
         **os.environ,
@@ -124,13 +125,7 @@ def prepare(inputs, generator, output):
     result = {
         "schema_version": 1,
         "extension": extension,
-        "inputs": inputs,
         "platforms": platforms,
-        "timestamp": timestamp,
-        "workspace_sha256": workspace,
-        "git_sha": environment["revision"],
-        "generator": generator,
-        "run_id": run_id,
         "targets": {},
         "rows": [],
     }
@@ -146,8 +141,6 @@ def prepare(inputs, generator, output):
         )
         result["targets"][name] = {
             "tags": original["tags"],
-            "distro": distro,
-            "pg_major": original["args"]["PG_MAJOR"],
         }
         for platform in platforms:
             architecture = platform.split("/")[1]
@@ -161,7 +154,7 @@ def prepare(inputs, generator, output):
                 + "-testing:stage-"
                 + row_id
             )
-            base, base_index = platform_base(
+            base, _ = platform_base(
                 original["args"]["BASE"],
                 platform,
                 manifests=base_manifests,
@@ -175,7 +168,6 @@ def prepare(inputs, generator, output):
                 PGRX_DISTRO=distro,
                 PGRX_SOURCE_REPOSITORY=repository_url,
                 PGRX_SOURCE_REVISION=source["revision"],
-                PGRX_WORKSPACE_SHA256=workspace,
                 PGRX_BUILD_TIMESTAMP=timestamp,
             )
             frozen["output"] = [
@@ -190,15 +182,10 @@ def prepare(inputs, generator, output):
                 "runner": (
                     "ubuntu-24.04" if architecture == "amd64" else "ubuntu-24.04-arm"
                 ),
-                "definition_sha256": digest(single),
                 "staging": staging,
-                "base": base,
-                "base_index": base_index,
-                "source": source,
             }
             result["rows"].append(row)
             save(output / (row_id + ".json"), single)
-    result["preparation_sha256"] = digest(result)
     save(output / "preparation.json", result)
     return result
 
@@ -218,14 +205,7 @@ def main():
     }
     if "GITHUB_OUTPUT" in os.environ:
         with open(os.environ["GITHUB_OUTPUT"], "a") as output:
-            output.write(
-                "matrix="
-                + json.dumps(matrix)
-                + "\n"
-                + "targets="
-                + json.dumps({"include": [{"target": t} for t in result["targets"]]})
-                + "\n"
-            )
+            output.write("matrix=" + json.dumps(matrix) + "\n")
     print(json.dumps(matrix))
 
 

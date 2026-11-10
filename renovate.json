@@ -161,27 +161,15 @@
       "depTypeTemplate": "pgrx-source"
     },
     {
-      "description": "PGRX workflow/build tool releases",
+      "description": "PGRX build tool releases",
       "customType": "regex",
       "managerFilePatterns": [
-        "/pgrx/dependencies/(workflow-tools|tools)\\.json$/"
+        "/pgrx/dependencies/tools\\.json$/"
       ],
       "matchStrings": [
         "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"",
         "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\""
       ]
-    },
-    {
-      "description": "PGRX digest-pinned execution images",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/pgrx/dependencies/workflow-tools\\.json$/"
-      ],
-      "matchStrings": [
-        "\"[a-z-]+\":\\s*\"(?<depName>[^\"\\s]+):(?<currentValue>[^\"@\\s]+)@(?<currentDigest>sha256:[a-f0-9]{64})\""
-      ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [

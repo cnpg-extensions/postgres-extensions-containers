@@ -1,9 +1,12 @@
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import downstream
@@ -14,37 +17,19 @@ class DownstreamTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        self.assembly_dir = self.root / 'assembly'
-        self.assembly_dir.mkdir()
         self.output = self.root / 'output'
-        self.preparation = {
-            'preparation_sha256': 'prepared-inputs',
-            'targets': ['pg18-trixie'],
-            'run_id': '123-2',
-        }
-        self.digest = 'sha256:' + 'a' * 64
-        self.assembly = {
-            'preparation_sha256': 'prepared-inputs',
-            'target': 'pg18-trixie',
-            'run_id': '123-2',
-            'image': 'registry.test/extension-testing@' + self.digest,
-            'index_digest': self.digest,
-            'platforms': ['linux/amd64', 'linux/arm64'],
-            'tags': ['registry.test/extension-testing:18',
-                     'registry.test/extension-testing:latest',
-                     'mirror.test/extension-testing:18'],
-        }
+        self.image = 'registry.test/extension-testing@sha256:' + 'a' * 64
+        self.platforms = ['linux/amd64', 'linux/arm64']
+        workflow = Path(__file__).resolve().parents[2] / '.github/workflows/pgrx_targets.yml'
+        self.images = yaml.safe_load(workflow.read_text())['jobs']['security']['env']
         self.addCleanup(patch.stopall)
-        patch('downstream.load_preparation', return_value=self.preparation).start()
+        patch.dict(os.environ, self.images).start()
         self.run = patch('downstream.subprocess.run').start()
         self.inspect = patch('downstream.subprocess.check_output').start()
 
-    def invoke(self, stage):
-        (self.assembly_dir / 'assembly.json').write_text(json.dumps(self.assembly))
+    def invoke(self):
         with patch.object(sys, 'argv', [
-            'downstream.py', stage,
-            '--preparation', str(self.root / 'preparation'),
-            '--assembly', str(self.assembly_dir),
+            'downstream.py', '--image', self.image,
             '--output', str(self.output),
         ]):
             downstream.main()
@@ -56,7 +41,7 @@ class DownstreamTest(unittest.TestCase):
                 'name': 'extension-' + platform,
                 'packages': [{'name': 'native-' + platform.split('/')[1]}],
             }}
-            for platform in self.assembly['platforms']
+            for platform in self.platforms
         }
 
     def test_security_scans_each_platform_document_from_one_inspection(self):
@@ -66,24 +51,35 @@ class DownstreamTest(unittest.TestCase):
 
         def scan(command, *, stdout, check):
             self.assertTrue(check)
-            sbom_path = Path(command[1].removeprefix('sbom:')
-                             if command[0] == 'grype' else command[2])
-            scanned.append((command[0], sbom_path.parent.name,
-                            json.loads(sbom_path.read_text())))
+            self.assertEqual(command[:3], ['docker', 'run', '--rm'])
+            mount = command[command.index('--volume') + 1]
+            host, container, mode = mount.rsplit(':', 2)
+            self.assertEqual((container, mode), ('/results', 'ro'))
+            directory = Path(host)
+            self.assertTrue(directory.is_absolute())
+            tool = 'grype' if self.images['GRYPE_IMAGE'] in command else 'grant'
+            scanner = self.images[tool.upper() + '_IMAGE']
+            self.assertIn(scanner, command)
+            arguments = command[command.index(scanner) + 1:]
+            self.assertEqual(arguments, (
+                ['sbom:/results/sbom.spdx.json', '-o', 'json'] if tool == 'grype'
+                else ['list', '/results/sbom.spdx.json', '-o', 'json']
+            ))
+            scanned.append((tool, directory.name,
+                            json.loads((directory / 'sbom.spdx.json').read_text())))
             stdout.write('{}\n')
 
         self.run.side_effect = scan
-        self.invoke('security')
+        self.invoke()
         self.inspect.assert_called_once_with([
-            'docker', 'buildx', 'imagetools', 'inspect', self.assembly['image'],
+            'docker', 'buildx', 'imagetools', 'inspect', self.image,
             '--format', '{{json .SBOM}}',
         ])
         self.assertEqual(scanned, [
             (tool, platform.split('/')[1], sboms[platform]['SPDX'])
-            for platform in self.assembly['platforms']
+            for platform in self.platforms
             for tool in ('grype', 'grant')
         ])
-        self.assertTrue(json.loads((self.output / 'result.json').read_text())['success'])
 
 if __name__ == '__main__':
     unittest.main()

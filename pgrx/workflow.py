@@ -2,9 +2,7 @@
 """Hosted workflow selection and source identity."""
 
 import argparse
-import hashlib
 import json
-import os
 from pathlib import Path
 import subprocess
 
@@ -46,29 +44,6 @@ def discover():
         for p in sorted(ROOT.glob("*/metadata.hcl"))
         if (value := metadata(p)).get("build_system", "debian") == "pgrx"
     }
-
-
-def source_digest(root=ROOT):
-    paths = execute(
-        ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-        root=root,
-    ).split("\0")
-    digest = hashlib.sha256()
-    for name in sorted(set(paths) - {""}):
-        if Path(name).name == "AGENTS.md":
-            continue
-        path = root / name
-        if not path.exists() and not path.is_symlink():
-            continue
-        data = os.readlink(path).encode() if path.is_symlink() else path.read_bytes()
-        digest.update(
-            name.encode()
-            + b"\0"
-            + str(path.lstat().st_mode & 0o777).encode()
-            + b"\0"
-            + hashlib.sha256(data).digest()
-        )
-    return digest.hexdigest()
 
 
 def select(inputs, inventory):

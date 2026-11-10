@@ -1,19 +1,28 @@
 # PGRX extension builds
 
-PGRX targets are discovered from `build_system = "pgrx"` in ordinary extension
-metadata. `get-targets` defaults to Debian; use `--build-system pgrx` for PGRX
-or `--build-system all` for both families. OS-library maintenance excludes PGRX
-targets; catalog and testing-value generation support both. Source tags remain literal
-(including `v`), while SQL versions remain separate. Extension READMEs describe
-usage; this directory contains build and validation internals.
+This project builds Rust-based PostgreSQL extensions from source using PGRX.
+Each published image supports AMD64 and ARM64 and includes a software bill of
+materials (SBOM), build provenance, and original license notices. Rust compilation
+runs on native hardware for each architecture.
 
-## Verify images
+To use an extension in CloudNativePG, start with that extension's README for
+installation, SQL names, and preload settings. This guide explains how to verify
+its image, test a build, and maintain its build recipe.
+
+## Usage
+
+PGRX images use the same SBOM and verification tools as the project's Debian-built
+extensions. Their SBOMs also include the Rust dependency graph selected for the
+extension. You do not need Rust, cargo-pgrx, or the build tools to inspect a
+published image. Scan the PostgreSQL base image separately using its own SBOM.
+
+### Verify images
 
 Follow the SBOM guide to [verify the image and extract its
 SBOM](../sbom-generator/README.md#verify-the-image-and-extract-its-sbom),
 [inspect and verify build provenance](../sbom-generator/README.md#inspect-and-verify-build-provenance),
 and [report vulnerabilities and licenses](../sbom-generator/README.md#report-vulnerabilities-and-licenses).
-Use the tools listed there; installing the PGRX workflow toolchain is unnecessary.
+The tools listed in that guide are sufficient; no PGRX build setup is needed.
 
 For PGRX images published by `cnpg-extensions` from `main`, use this exact
 `--certificate-identity` in the guide's Cosign command:
@@ -35,132 +44,84 @@ inspect`, then use `.SBOM.SPDX` and `.Provenance.SLSA` in the format expressions
 PGRX Cargo relationships describe the configured target dependency graph; they
 do not claim that every dependency survives linker dead-code elimination.
 
-## Build and evidence contract
+## How images are built
 
-The extension Dockerfiles retain their attributed upstream build commands.
-`install-pgrx-build-environment.sh` runs `apt-get update` and `apt-get install`
-for Debian build dependencies, then installs the Renovate-managed Rust and tool
-versions. Rustup installs the selected compiler using its normal distribution
-verification; reporting binaries come from versioned upstream releases. The
-cargo-pgrx version comes from the upstream extension Cargo.lock and is installed
-through Cargo with that exact version and its locked dependencies.
-The JWT Dockerfile corrects v0.5.0's package version with an inline sed command
-guarded by exact original and effective Cargo.lock checksums. Anonymizer 3.3.2
-similarly corrects its stale root Cargo.lock version with exact checksums. Any
-upstream lock change requires reviewing or removing the affected correction.
-The installer records both original and effective lock hashes; the legacy
-`patches` evidence field remains empty for schema compatibility. Cargo-about
-and other release tools use architecture-specific artifacts resolved from their
-Renovate-managed versions. Only cargo-pgrx is built from source. All locked crate
-sources are fetched before offline reporting because cargo-about queries
-metadata before applying its target filter.
-Preparation resolves each metadata source tag to a repository revision and
-archive URL. Each native build downloads the archive from the upstream HTTPS
-source and records its hash in build evidence, without comparing it against a
-prepared checksum.
-The build records the upstream Cargo.lock hash and derives cargo-pgrx from that
-lock; these generated inputs are not maintained in a separate committed lock.
+An extension's `metadata.hcl` selects its source version, PostgreSQL versions,
+and distributions. Preparation turns those choices into a build plan. Each
+**target** is one distribution/PostgreSQL combination; each target gets a
+separate build job for AMD64 and ARM64.
 
-The post-build finalizer resolves target-filtered Cargo metadata using the same
-package, PostgreSQL feature, non-PG defaults, and feature policy as cargo-pgrx.
-It emits Cargo metadata and cargo-about reports, checks Cargo.lock for drift, ships
-license texts, and hashes the finished library/control/SQL payload. The manifest
-uses evidence schema v2 and is written last. The diagnostic `pgrx-sbom` target exports these reports; it does
-not replace an attestation-producing image build.
+```mermaid
+flowchart TD
+    M["Extension metadata and source release"] --> P["Prepare targets and build inputs"]
+    P --> A["Native AMD64 runner: build extension"]
+    P --> B["Native ARM64 runner: build extension"]
+    A --> C["Per-platform image, SBOM and BuildKit provenance"]
+    B --> C
+    C --> D["Assemble multi-platform index and sign its digest"]
+    D --> E["Security scans, CNPG smoke tests and SLSA provenance"]
+    E --> F["Main only: promote images and attest production digests"]
+```
 
-The published, digest-pinned CNPG generator runs unchanged. Its API-v1 hook reads
-hashed reports from the builder mount and verifies target and source identity.
-It reruns the generator image's Syft binary with `rust-cargo-lock-cataloger` on a
-`file:` source containing only the hash-verified extension Cargo.lock. The scan
-cannot discover cargo-about, cargo-pgrx, or cached registry lockfiles elsewhere in
-the builder. Its version, output hash, and inventory count are recorded in the
-augmentation annotation; the generator image digest owns the Syft version.
-The hook selects runtime crates using Cargo metadata, matches each selected name,
-version, and source to that Syft inventory, and emits only the selected entries.
-It excludes build/dev and proc-macro-only edges, and binds the reported root to
-identical final payload bytes and ELF machine.
-Runtime features propagate from the selected root through active dependencies;
-weak optional feature references do not activate unused backends or leak their
-features into shared crates. Cargo metadata supplies full package identities;
-retained dependency conditions are evaluated against `rustc --print cfg` for
-the selected target. Generated Python bytecode is excluded from Docker
-contexts so local reporting caches cannot change the copied helper code.
-It preserves the generator's final-file inventory, retained Syft packages,
-checksums, relationships, and license metadata. Syft packages survive composition
-only when they own shipped files; builder-only packages and the builder's OS
-identity are not added to the final document. The hook runs once on the current
-generator output; it does not support historical synthetic-package output or
-preexisting Cargo packages. The selected root Cargo package is the document's
-described extension component and has its own Cargo identity; it `DEPENDS_ON`
-the selected Rust packages.
-Cargo packages do not claim file-level analysis or own installed files. The `.so`,
-control and SQL files, and bundled license notices remain individual SPDX file
-records with checksums and any license metadata supplied by Syft. The hook does
-not infer file licenses from Cargo declarations or shipped notice text. The
-notices remain in the image for distribution and compliance needs. Cargo package
-license expressions come uniformly from cargo-about, preserving AND/OR semantics. Missing, unknown or invalid expressions for selected crates
-fail the build. License texts remain in the SPDX document and shipped notices
-are attributed to crate entries by full Cargo identity. The generator performs
-full SPDX validation after the hook returns.
-cargo-about 0.9.2's repeated,
-identical Boolean `doctest` field is normalized before report hashing. Other
-duplicate JSON keys and conflicting values are rejected.
+Each native build uses the extension's upstream build recipe, collects Cargo and
+license evidence, and copies the extension's runtime files into a minimal
+`scratch` image. The shared [SBOM generator](../sbom-generator/README.md#development)
+uses the builder and final filesystem to describe what ships. A PGRX hook adds
+the selected Rust packages and their license information to the same SPDX 2.3
+document. BuildKit attaches the SBOM and build provenance to the platform image.
 
-Preparation freezes the workspace snapshot, timestamp, generator, resolved source
-identities, base indexes, targets, and definitions for a logical
-workflow run. Each base index resolves to its architecture-specific child
-manifest. Every native platform job builds one target on its matching
-architecture and records its staging-index digest, bound to that preparation.
-Assembly rejects missing or unexpected records and merges the full staging
-indexes. Before assigning normal tags, it checks that the candidate preserves
-the source descriptors and includes every expected architecture and its attached
-attestation.
+Assembly combines the platform images and their attestations without rebuilding
+Rust code. It checks that both platforms are present and that all their image
+and attestation descriptors survive unchanged. Signing and later checks use
+immutable image digests, so they refer to the assembled output.
 
-Sign, security, and smoke consume per-target assembly artifacts. Promotion passes
-the combined Bake metadata to the same CloudNativePG `copy-images` action used
-by Debian builds; that action copies the images and signs production digests.
-The shared reusable SLSA generator attests each assembled testing index; its
-success gates promotion. After promotion, the same generator attests each index
-in its production repository. Production promotion is restricted to trusted
-`main` push/dispatch events.
-Grype reports vulnerabilities and Grant reports licenses; findings are retained for review,
-while scanner errors fail the job. Both build paths use the shared CNPG support
-policy: `main`, the highest stable patch of the previous minor, and the pinned
-latest release. Smoke uses the shared Taskfile's live operator manifests and
-catalogs, including development images for `main`.
+Branch builds publish testing images. Production promotion is restricted to
+trusted `main` push or dispatch events and requires security, smoke, signing,
+and SLSA stages to succeed. Grype reports vulnerabilities and Grant reports
+licenses; findings are retained for review, while scanner errors fail the job.
 
-[`cnpg-versions.yml`](../.github/workflows/cnpg-versions.yml) holds this policy
-so Debian and PGRX test the same supported operator versions, with one
-Renovate-managed latest-release pin. The logic was extracted from Debian's
-`bake_targets.yml` to avoid maintaining a separate PGRX support matrix.
-This adds a small difference from upstream's inline workflow: when upstream
-changes that version-selection logic, apply its intent to the shared workflow,
-even if Git merges cleanly. See the [upstream merge process](../MERGE.md).
+## Development
 
-PGRX follows the Debian release-acceptance level: build-time validation, security
-scanning, signing, shared runtime smoke tests, and required SLSA jobs. Security
-extracts each platform's SPDX document with Buildx for Grype and Grant.
-These stages do not repeat full OCI-graph verification or compare every BuildKit
-provenance field against preparation records. Consumers can [verify images](#verify-images)
-using the shared SBOM guide and the PGRX signing identity above.
-Both build families call the shared [smoke workflow](../.github/workflows/smoke.yml),
-which uses the standard Task/Dagger setup, CNPG extension catalogs, and extension
-installation checks. PGRX supplies the assembled image digest and selected CNPG
-release directly to that workflow. The pg-search recipe
-captures base libraries before installing packages, then stages the packaged
-extension's additional runtime closure and copyright notices using the shared
-helpers. This includes quadmath where required.
+### Test a complete extension build
 
-## Local validation
+For full extension acceptance, dispatch
+[`.github/workflows/pgrx.yml`](../.github/workflows/pgrx.yml) with an
+`extension_name`. It builds all targets declared in the extension's metadata on
+native AMD64 and ARM64 runners, assembles and signs their indexes, checks
+SPDX/Grype/Grant results, and runs CNPG smoke tests. An optional `cnpg_version`
+selects `main` or a full version such as `1.30.1`; otherwise the shared support
+policy selects the smoke versions. No local signing keys are needed.
 
-The dedicated PGRX contract workflow runs independently of Go tests. It does not
-replace the shared Automerge gate or change branch protection.
+Both build families use the shared [smoke workflow](../.github/workflows/smoke.yml)
+and test the same CNPG versions: `main`, the highest stable patch of the previous
+minor, and the pinned latest release. Smoke uses the standard Task/Dagger setup,
+CNPG extension catalogs, and extension installation checks. PGRX supplies the
+assembled image digest and selected CNPG release directly. The shared Taskfile
+uses live operator manifests and catalogs, including development images for
+`main`.
+
+### Try an unsigned local build
+
+Use the extension's ordinary Bake targets with
+`-f docker-bake.hcl -f docker-bake-pgrx.hcl -f <extension>/metadata.hcl`
+in that order. Supply `build_timestamp` and the digest-qualified `sbom_generator`
+from preparation. Select explicit named Bake targets to build a single local
+distribution, and restrict the platform to your host's native architecture
+(for example, `--set '*.platforms=linux/amd64'` on AMD64). Do not emulate the
+other architecture for a Rust build.
+
+The diagnostic `pgrx-sbom` target exports Cargo evidence for inspection. It does
+not replace an image build that produces attestations or test hosted signing.
+
+### Local validation
+
+The dedicated [PGRX test workflow](../.github/workflows/pgrx-tests.yml) runs
+independently of Go tests. It does not replace the shared Automerge gate or
+change branch protection.
 
 Run from the repository root with actionlint and Python available. The Python
 tests also run Syft against fixture lockfiles and require the SPDX validator.
 Docker is needed for the tool extraction below.
-Signing and full extension acceptance run in GitHub Actions
-on native AMD64 and ARM64 runners; no local signing keys are needed.
 
 Create and activate a virtual environment for SPDX validation, then copy Syft
 from the same pinned generator used by the workflow:
@@ -198,45 +159,65 @@ incorrect inventory, ownership, dependency graph, or license report. Malformed
 evidence and other inputs that already cause a clear build failure rely on the
 build-time guards rather than separate rejection tests.
 
-For a quick downstream-only check, use `python3 pgrx/test.py`. CI runs this suite
+After setup, `python3 pgrx/test.py` runs just the downstream suite. CI runs it
 inside the pinned generator image so Syft and the SPDX validator match the
 production hook environment. The generator's
 BuildKit/SPDX/Grype/Grant integration fixture is maintained in
 `sbom-generator/tests/integration/`; its workflow runs it on both native
 architectures.
 
-For full extension acceptance, dispatch `.github/workflows/pgrx.yml` with an
-`extension_name`. It builds all metadata-declared targets on native AMD64 and
-ARM64, assembles and signs their indexes, checks SPDX/Grype/Grant results, and runs
-CNPG smoke tests. Branch builds publish testing packages; production promotion
-requires a trusted `main` event. An optional `cnpg_version` selects `main` or a full version such as `1.30.1`;
-otherwise the shared support policy selects the smoke versions.
+### Add or update an extension recipe
 
-For an unsigned local build, use the extension's ordinary Bake targets with
-`-f docker-bake.hcl -f docker-bake-pgrx.hcl -f <extension>/metadata.hcl`
-in that order. Supply `build_timestamp` and the digest-qualified `sbom_generator`
-from preparation. Select explicit named Bake targets to build a single local
-distribution. Diagnostic `pgrx-sbom` output can
-be used to inspect Cargo evidence; it does not test hosted signing.
+PGRX targets are discovered from `build_system = "pgrx"` in ordinary extension
+metadata. `get-targets` defaults to Debian; use `--build-system pgrx` for PGRX
+or `--build-system all` for both families. OS-library maintenance excludes PGRX
+targets; catalog and testing-value generation support both.
 
-## Dependency updates
+For a new extension:
 
-Renovate manages PGRX source tags in extension metadata, build-tool versions in
-`dependencies/tools.json` and `dependencies/workflow-tools.json`. Workflow execution
-images remain digest-pinned in `workflow-tools.json`. CNPG support policy owns
-its latest release pin in
-`.github/workflows/cnpg-versions.yml`; operator manifests follow the same live
-release-branch or `main` policy as shared smoke tests.
+1. Add its canonical `source_repository` and literal source tag to metadata,
+   including a leading `v` when upstream uses one. Keep the SQL version separate.
+2. Add its recipe configuration and required apt dependencies. Keep upstream
+   recipe URL comments immediately above the Dockerfile's build commands.
+3. Declare the supported distribution/PostgreSQL combinations in metadata;
+   preparation creates their native build jobs automatically.
+4. Run the local checks and full extension acceptance above. Use the existing
+   SBOM generator and hook; do not add a second composer or a build-system-specific
+   consumer interface.
+
+The [templates](templates/) provide a starting point. Extension READMEs should
+explain SQL and catalog names, preload requirements, and any initialization steps.
+
+#### Recipes with additional runtime needs
+
+The pg-search recipe captures base libraries before installing packages, then
+stages the packaged extension's additional runtime closure and copyright notices
+using the shared helpers. This includes quadmath where required.
+
+PostgreSQL Anonymizer declares its GitLab `source_repository` in metadata and
+uses the upstream `make extension` target, including runtime CSV data. Payload
+evidence includes that data directory recursively. Its catalog preloads `anon`;
+initialize its legacy fake-data functions with the mounted data path described
+in the extension README.
+
+### Dependency updates
+
+Renovate manages PGRX source tags in extension metadata and build-tool versions
+in `dependencies/tools.json`. Buildx and Cosign setup follow the Debian workflow.
+The security job declares digest-pinned Grype and Grant images directly in
+`.github/workflows/pgrx_targets.yml`, following the SBOM generator workflow;
+there is no central workflow-tool installer. CNPG support policy owns its latest
+release pin in `.github/workflows/cnpg-versions.yml`; operator manifests follow
+the same live release-branch or `main` policy as shared smoke tests.
 
 Preparation resolves the source revision and archive URL and selects each
 platform child from the current Debian base tag. Base tags follow the shared
 `getBaseImage` policy; their resolved digests are recorded per run rather than
 maintained in a separate dependency manifest. Builds derive the matching cargo-pgrx
 version from upstream Cargo.lock and tool artifact URLs from their managed
-versions. No manual lock-refresh step is required. The resulting preparation
-and build evidence record the source
-identity, source hashes, tool versions, and actual platform base child. Review
-source recipes and SQL version changes manually; `sql` remains independently
+versions. No manual lock-refresh step is required. The build plan and generated
+evidence record source identity, source hashes, tool versions, and the actual
+platform base child. Review source recipes and SQL version changes manually; `sql` remains independently
 maintained in metadata and is not advanced by source tag updates.
 
 The reporting-tool configuration owns the hook's embedded SPDX identifier list;
@@ -248,16 +229,20 @@ separate lock inventory.
 The shared smoke workflow installs Task and Dagger for both build families.
 The shared Taskfile owns Kind, the Kubernetes node, kubectl, and the Dagger engine;
 the shared Dagger test function owns Chainsaw. Catalog checks use the shared
-Task/Dagger tests. Catalog installation follows the shared Taskfile unchanged: it installs Git with apk
-and applies `cnpg-extensions/artifacts` catalogs from `main`.
+Task/Dagger tests. Catalog installation follows the shared Taskfile unchanged:
+it installs Git with apk and applies `cnpg-extensions/artifacts` catalogs from `main`.
 
-PostgreSQL Anonymizer declares its GitLab `source_repository` in metadata and
-uses the upstream `make extension` target, including runtime CSV
-data. Payload evidence includes that data directory recursively. Its catalog
-preloads `anon`; initialize its legacy fake-data functions with the mounted
-data path described in the extension README.
+### Keep shared behavior aligned with upstream
 
-Keep upstream recipe URL comments immediately above build commands. Add the
-canonical `source_repository` and source tag to metadata for a new extension,
-then add its recipe configuration and required apt dependencies, and extend the native matrix by metadata. Do not add a second SBOM
-composer or a build-system-specific consumer interface.
+[`cnpg-versions.yml`](../.github/workflows/cnpg-versions.yml) holds the shared CNPG
+support policy, with one Renovate-managed latest-release pin. Its logic was
+extracted from Debian's `bake_targets.yml` to avoid a separate PGRX support
+matrix. When upstream changes that version-selection logic, apply its intent to
+the shared workflow even if Git merges cleanly. See the
+[upstream merge process](../MERGE.md).
+
+PGRX follows Debian's release-acceptance level: build-time validation, security
+scanning, signing, shared runtime smoke tests, and required SLSA jobs. These
+stages do not repeat full OCI-graph verification or compare every BuildKit
+provenance field against preparation records. Consumers can independently
+[verify images](#verify-images).

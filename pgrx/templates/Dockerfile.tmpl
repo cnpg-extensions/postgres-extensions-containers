@@ -48,7 +48,6 @@ RUN cargo pgrx package \
 
 
 # Bind Cargo reports and license evidence to the completed payload.
-ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 

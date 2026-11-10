@@ -29,7 +29,6 @@ RUN cargo pgrx package \
       --no-default-features \
       --features pg${PG_MAJOR}
 
-ARG PGRX_WORKSPACE_SHA256
 ARG PGRX_BUILD_TIMESTAMP
 RUN /pgrx/finalize-pgrx-evidence.sh
 
