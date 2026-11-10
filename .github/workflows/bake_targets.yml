@@ -64,7 +64,7 @@ jobs:
           registry: ghcr.io/${{ github.repository_owner }}
           revision: ${{ github.sha }}
           # renovate: datasource=docker depName=ghcr.io/cnpg-extensions/cnpg-sbom-generator
-          sbom_generator: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:70fe22157aacf3962af79d7138343d8ff8660186ee3daa8a0aa27006dcbd6fcb
+          sbom_generator: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:9909ad887161b18d68f1e84c5568be3e8d3072ad861be843b596a0fdb6c48678
         with:
           # Use the checkout so Bake sees the injected Dockerfile declaration.
           source: .
