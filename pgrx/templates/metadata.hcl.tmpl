@@ -1,8 +1,10 @@
 # SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
-  # TODO: Set the catalog name used by the Cluster and Database resources.
+  # TODO: Set the source repository and Cluster catalog name.
+  # sql_name is the SQL extension name used by Database resources.
   build_system             = "pgrx"
+  source_repository        = "https://github.com/<owner>/<repo>"
   name                     = "{{ .Name }}"
   sql_name                 = "{{ replaceAll .Name "-" "_" }}"
 

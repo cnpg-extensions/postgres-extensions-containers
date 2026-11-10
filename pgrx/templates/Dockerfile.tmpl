@@ -3,8 +3,8 @@
 
 # TODO: Copy this file into the target directory and replace every placeholder
 # and TODO comment before using it. The target Dockerfile should remain the
-# source of truth for the upstream source tag, pgrx feature selection, package
-# layout, and runtime files.
+# source of truth for pgrx feature selection, package layout, and runtime files.
+# metadata.hcl declares the source repository and release tag.
 ARG BUILDKIT_SBOM_SCAN_STAGE=builder
 ARG BASE=ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
 FROM ${BASE} AS builder
@@ -24,14 +24,17 @@ COPY pgrx/ /pgrx/
 WORKDIR /build
 
 
-# TODO: Set <owner>/<repo>. EXT_VERSION is the exact upstream Git tag; preserve
-# any prefix or suffix because pgrx tags are not Debian package versions.
+# TODO: Set <owner>/<repo> to match metadata.hcl source_repository.
+# EXT_VERSION is the exact upstream Git tag; preserve any prefix or suffix
+# because pgrx tags are not Debian package versions.
 ADD https://github.com/<owner>/<repo>/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 
 # Call the shared installer after extracting the source. It derives the
 # matching cargo-pgrx version from Cargo.lock and prepares the pgrx/SBOM tools.
+# TODO: Add the extension to RECIPES in pgrx/build_config.py, matching this
+# manifest path, feature selection, and package/install layout.
 RUN /pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 

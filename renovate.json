@@ -157,7 +157,8 @@
       ],
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
-      ]
+      ],
+      "depTypeTemplate": "pgrx-source"
     },
     {
       "description": "PGRX workflow/build tool releases",
@@ -331,57 +332,32 @@
       "additionalBranchPrefix": "sbom-"
     },
     {
-      "description": "Keep PGRX updates under review while build evidence is checked",
+      "description": "Keep PGRX tools under review while build evidence is checked",
       "matchFileNames": [
-        "pgrx/dependencies/**",
-        "pg-durable/metadata.hcl",
-        "pg-graphql/metadata.hcl",
-        "pg-jsonschema/metadata.hcl",
-        "pglinter/metadata.hcl",
-        "pg-parquet/metadata.hcl",
-        "pg-search/metadata.hcl",
-        "pg-session-jwt/metadata.hcl",
-        "postgresql-anonymizer/metadata.hcl"
+        "pgrx/dependencies/**"
       ],
       "automerge": false
     },
     {
-      "description": "require SQL version review for PGRX source updates",
-      "matchDatasources": [
-        "github-tags",
-        "gitlab-tags"
-      ],
-      "matchFileNames": [
-        "pg-durable/metadata.hcl",
-        "pg-graphql/metadata.hcl",
-        "pg-jsonschema/metadata.hcl",
-        "pglinter/metadata.hcl",
-        "pg-parquet/metadata.hcl",
-        "pg-search/metadata.hcl",
-        "pg-session-jwt/metadata.hcl",
-        "postgresql-anonymizer/metadata.hcl"
+      "description": "Require SQL version review and keep PGRX sources separate from GitHub Actions",
+      "matchDepTypes": [
+        "pgrx-source"
       ],
       "automerge": false,
+      "groupName": null,
+      "pinDigests": false,
       "prBodyNotes": [
         "⚠️ The source package version does not update the separately maintained SQL version. Before merging, inspect the extension control file and SQL upgrade scripts, then update the `sql` values in metadata.hcl and affected test expectations when needed. Do not infer SQL versions from the package version or approve solely because CI passed."
       ]
     },
     {
-      "description": "Keep PGRX source and tool tags separate from GitHub Action updates",
+      "description": "Keep PGRX tool tags separate from GitHub Action updates",
       "matchDatasources": [
         "github-tags",
         "gitlab-tags"
       ],
       "matchFileNames": [
-        "pgrx/dependencies/**",
-        "pg-durable/metadata.hcl",
-        "pg-graphql/metadata.hcl",
-        "pg-jsonschema/metadata.hcl",
-        "pglinter/metadata.hcl",
-        "pg-parquet/metadata.hcl",
-        "pg-search/metadata.hcl",
-        "pg-session-jwt/metadata.hcl",
-        "postgresql-anonymizer/metadata.hcl"
+        "pgrx/dependencies/**"
       ],
       "groupName": null,
       "pinDigests": false

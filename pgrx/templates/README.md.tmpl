@@ -18,7 +18,8 @@ PostgreSQL extension that provides [describe the main functionality here].
 <!--
 TODO: Customize the image tag, extension names, SQL version, and Renovate
 instructions below. Use the package version from `metadata.hcl` for the image
-tag. Use metadata.sql_name for the Database extension name and SQL commands.
+tag. Replace the generated underscore name wherever necessary to match
+metadata.sql_name in the Database resource and SQL commands.
 The Database version is the SQL extension version and may omit a leading `v`.
 -->
 
@@ -92,30 +93,9 @@ libraries, PostgreSQL parameters, runtime libraries, or special SQL setup.
 
 ## Contributors
 
-This extension is maintained by:
-
-- FirstName LastName (@GitHub_Handle)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
+Maintained by FirstName LastName (@GitHub_Handle).
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `{{ replaceAll .Name "-" "_" }}`
-extension and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -1,10 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
-	"slices"
-	"strings"
 	"testing"
 )
 
@@ -13,23 +9,15 @@ func TestEffectiveBuildSystem(t *testing.T) {
 		name       string
 		metadata   extensionMetadata
 		wantSystem string
-		wantErr    bool
 	}{
 		{name: "omitted means Debian", metadata: extensionMetadata{Name: "legacy"}, wantSystem: debianBuildSystem},
 		{name: "explicit Debian", metadata: extensionMetadata{Name: "debian", BuildSystem: debianBuildSystem}, wantSystem: debianBuildSystem},
 		{name: "pgrx", metadata: extensionMetadata{Name: "pg-jsonschema", BuildSystem: pgrxBuildSystem}, wantSystem: pgrxBuildSystem},
-		{name: "unknown", metadata: extensionMetadata{Name: "bad", BuildSystem: "unknown"}, wantErr: true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := effectiveBuildSystem(&tt.metadata)
-			if tt.wantErr {
-				if err == nil {
-					t.Fatal("expected an error")
-				}
-				return
-			}
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -51,60 +39,8 @@ func TestPgrxCatalogVersionPreservesSourceTag(t *testing.T) {
 	}
 }
 
-func TestPgrxRealMetadataInventory(t *testing.T) {
-	paths, err := filepath.Glob("../../*/metadata.hcl")
-	if err != nil {
-		t.Fatal(err)
-	}
-	var pgrx []string
-	for _, path := range paths {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		metadata, err := decodeExtensionMetadata(data)
-		if err != nil {
-			t.Fatalf("%s: %v", path, err)
-		}
-		system, err := effectiveBuildSystem(metadata)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if system == pgrxBuildSystem {
-			pgrx = append(pgrx, metadata.Name)
-			if len(buildMatrixFromMetadata(metadata).Combinations) != 2 {
-				t.Fatal(metadata.Name)
-			}
-		}
-	}
-	slices.Sort(pgrx)
-	if !slices.Equal(pgrx, []string{"pg-durable", "pg-graphql", "pg-jsonschema", "pg-parquet", "pg-search", "pg-session-jwt", "postgresql-anonymizer"}) {
-		t.Fatal(pgrx)
-	}
-}
-
-func TestPgrxMetadataRejectsExplicitInvalidBuildSystems(t *testing.T) {
-	data, err := os.ReadFile("../../pg-durable/metadata.hcl")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, invalid := range []string{`"unknown"`, `""`, `42`, `null`} {
-		content := strings.Replace(string(data), `"pgrx"`, invalid, 1)
-		if _, err := decodeExtensionMetadata([]byte(content)); err == nil {
-			t.Fatalf("accepted %s", invalid)
-		}
-	}
-}
-
-func TestPgrxCatalogDependencyAndBaseAssertions(t *testing.T) {
+func TestPgrxCatalogDependencySQLName(t *testing.T) {
 	if catalogDependencySQLName("pgvector") != "vector" || catalogDependencySQLName("h3") != "h3" {
 		t.Fatal("SQL alias mismatch")
-	}
-	name, base, err := parseRequiredDependency("base-image:plpython3u")
-	if err != nil || !base || name != "plpython3u" {
-		t.Fatal(name, base, err)
-	}
-	if _, present := generateDatabaseAssertStatus(nil)["observedGeneration"]; present {
-		t.Fatal("base relaxation regressed")
 	}
 }

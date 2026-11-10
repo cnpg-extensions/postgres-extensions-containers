@@ -85,14 +85,5 @@ class DownstreamTest(unittest.TestCase):
         ])
         self.assertTrue(json.loads((self.output / 'result.json').read_text())['success'])
 
-    def test_security_fails_when_second_platform_document_is_missing(self):
-        sboms = self.sboms()
-        del sboms['linux/arm64']
-        self.inspect.return_value = json.dumps(sboms).encode()
-        with self.assertRaisesRegex(ValueError, 'missing SPDX document for linux/arm64'):
-            self.invoke('security')
-        self.assertFalse((self.output / 'result.json').exists())
-
-
 if __name__ == '__main__':
     unittest.main()

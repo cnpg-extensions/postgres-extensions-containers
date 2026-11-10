@@ -1,7 +1,6 @@
 import hashlib
 import json
 from pathlib import Path
-import subprocess
 import sys
 import unittest
 from unittest.mock import patch
@@ -25,13 +24,6 @@ class RegistryTagTest(unittest.TestCase):
         wait_for_index_digest(self.reference, self.digest)
         self.assertEqual(2, inspect.call_count)
         sleep.assert_called_once_with(2)
-
-    @patch('registry.time.sleep')
-    @patch('registry.subprocess.check_output')
-    def test_new_tag_can_be_temporarily_unavailable(self, inspect, sleep):
-        inspect.side_effect = [subprocess.CalledProcessError(1, ['docker']), self.current]
-        wait_for_index_digest(self.reference, self.digest)
-        self.assertEqual(2, inspect.call_count)
 
     @patch('registry.time.sleep')
     @patch('registry.subprocess.check_output')

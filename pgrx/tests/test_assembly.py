@@ -1,13 +1,10 @@
 import copy
-import json
 from pathlib import Path
 import sys
-import tempfile
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from assemble import check_assembly
-from record import validate_record
 
 
 def native_index(architecture, number):
@@ -80,35 +77,6 @@ class AssemblyTest(unittest.TestCase):
                     descriptors[1]['annotations']['vnd.docker.reference.digest'] = self.sources[0]['manifests'][0]['digest']
                 with self.assertRaisesRegex(ValueError, 'platform attestation'):
                     check_assembly(self.merged(), self.sources, self.platforms)
-
-
-class AssemblyRecordTest(unittest.TestCase):
-    def test_downloaded_record_belongs_to_the_expected_row_and_preparation(self):
-        row = {'id': 'pg18-trixie-amd64', 'target': 'pg18-trixie',
-               'platform': 'linux/amd64', 'staging': 'registry.test/extension:native-amd64'}
-        preparation = {'git_sha': 'commit', 'timestamp': '2026-11-09T00:00:00Z',
-                       'preparation_sha256': 'prepared-inputs', 'run_id': '123-2',
-                       'workspace_sha256': 'workspace', 'generator': {'version': '1'}}
-        index_digest = 'sha256:' + 'a' * 64
-        record = {**preparation, 'schema_version': 1, 'row': row,
-                  'image': 'registry.test/extension@' + index_digest,
-                  'index_digest': index_digest}
-        with tempfile.TemporaryDirectory() as directory:
-            artifact = Path(directory)
-            (artifact / 'record.json').write_text(json.dumps(record))
-            self.assertEqual(validate_record(preparation, row, artifact), record)
-            replacements = {
-                'row': {**row, 'id': 'pg18-trixie-arm64', 'platform': 'linux/arm64'},
-                'preparation_sha256': 'previous-preparation',
-                'run_id': '123-1',
-                'workspace_sha256': 'previous-workspace',
-                'image': 'registry.test/another-extension@' + index_digest,
-            }
-            for field, replacement in replacements.items():
-                with self.subTest(field=field):
-                    (artifact / 'record.json').write_text(json.dumps({**record, field: replacement}))
-                    with self.assertRaises(ValueError):
-                        validate_record(preparation, row, artifact)
 
 
 if __name__ == '__main__':

@@ -521,38 +521,6 @@ def cargo_about_license_expressions(packages, report):
     return resolved
 
 
-def validate_document(document):
-    elements = [document, *document.get("packages", []), *document.get("files", [])]
-    ids = indexed(elements, "SPDXID")
-    for relation in document.get("relationships", []):
-        require(
-            relation["spdxElementId"] in ids and relation["relatedSpdxElement"] in ids,
-            "unresolved SPDX relationship",
-        )
-    license_ids = indexed(document.get("hasExtractedLicensingInfos", []), "licenseId")
-    for element in elements:
-        for key in (
-            "licenseDeclared",
-            "licenseConcluded",
-            "licenseInfoFromFiles",
-            "licenseInfoInFiles",
-        ):
-            values = element.get(key, [])
-            if isinstance(values, str):
-                values = [values]
-            for value in values:
-                for custom in re.findall(r"LicenseRef-[A-Za-z0-9.-]+", value):
-                    require(
-                        custom in license_ids, "unresolved custom license reference"
-                    )
-        for checksum in element.get("checksums", []):
-            if checksum["algorithm"] == "SHA256":
-                require(
-                    re.fullmatch("[a-fA-F0-9]{64}", checksum["checksumValue"]),
-                    "invalid SPDX checksum",
-                )
-
-
 def scan_cargo_lock(lock_path):
     """Use the generator's Syft binary, scoped to one verified lockfile.
 

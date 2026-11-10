@@ -90,30 +90,9 @@ setting, matching the image's catalog metadata.
 
 ## Contributors
 
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
+Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `pg_search` extension,
-its Rust dependencies, and its system libraries is bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

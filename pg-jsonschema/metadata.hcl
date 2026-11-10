@@ -18,8 +18,8 @@ metadata = {
   required_extensions      = []
   create_extension         = true
 
-  // The source release is declared in pg-jsonschema/Dockerfile. Keep the
-  // catalog/image version synchronized with its Renovate tag comment.
+  // Package is the exact upstream source tag passed to Dockerfile as EXT_VERSION.
+  // Keep the SQL extension version synchronized with upstream control files.
   versions = {
     bookworm = {
       "18" = {
