@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       extension_name:
-        description: "The PostgreSQL extension to build (directory name)"
+        description: "The PostgreSQL extension directory, or all to rebuild every extension"
         required: true
         type: string
 
@@ -27,7 +27,7 @@ defaults:
 permissions: {}
 
 jobs:
-  # Gather extensions that have been modified
+  # Select changed payloads and representative branch validation targets.
   change-triage:
     name: Check changed files
     runs-on: ubuntu-26.04
@@ -57,8 +57,8 @@ jobs:
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
         run: |
-          if ! echo "$VALID_TARGETS" | jq -e --arg ext "$INPUT_EXTENSION_NAME" 'index($ext)' > /dev/null; then
-            echo "::error::'$INPUT_EXTENSION_NAME' is not a valid extension target. Valid targets: $VALID_TARGETS"
+          if [[ "$INPUT_EXTENSION_NAME" != all ]] && ! echo "$VALID_TARGETS" | jq -e --arg ext "$INPUT_EXTENSION_NAME" 'index($ext)' > /dev/null; then
+            echo "::error::'$INPUT_EXTENSION_NAME' is not a valid extension target. Use 'all' or one of: $VALID_TARGETS"
             exit 1
           fi
 
@@ -72,25 +72,28 @@ jobs:
           fi
           {
             echo 'EXTENSIONS<<YAML_EOF'
-            echo "$VALID_TARGETS" | jq -r '.[] | "\(.):\n  - \"\(.)/**\"\n  - *shared"'
+            echo "$VALID_TARGETS" | jq -r '.[] |
+              "\(.):\n  - \"\(.)/**\"\n  - \"!\(.)/test/**\"\n  - \"!\(.)/**/*.md\"\n_test_\(.):\n  - \"\(.)/test/**\""'
             echo 'YAML_EOF'
           } >> "$GITHUB_ENV"
 
       - name: Check for changes
+        if: github.event_name == 'push'
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
+          predicate-quantifier: some-with-excludes
           filters: |
-            _shared: &shared
+            _shared:
               - 'docker-bake.hcl'
               - 'scripts/**'
               - 'Taskfile.yml'
               - 'test/**'
               - 'dagger/maintenance/**'
-              - '.github/workflows/bake_targets.yml'
+              - '.github/workflows/**'
             ${{ env.EXTENSIONS }}
 
-      # Compute a matrix containing the list of all extensions that have been modified
+      # Only payload changes rebuild on main; shared and test changes validate on branches.
       - name: Compute matrix
         id: get-matrix
         env:
@@ -99,15 +102,34 @@ jobs:
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           EVENT_NAME: ${{ github.event_name }}
+          VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
+          # SQL-only, native/preload, base-image dependencies, upstream PostGIS, OS libraries/data.
+          INFRASTRUCTURE_SAMPLE: '["pgtap", "pg-cron", "powa", "mobilitydb", "ogr-fdw"]'
         run: |
           if [[ "${EVENT_NAME}" == 'workflow_dispatch' ]]; then
-            CHANGES="[\"$INPUT_EXTENSION_NAME\"]"
+            if [[ "$INPUT_EXTENSION_NAME" == all ]]; then
+              CHANGES="$VALID_TARGETS"
+            else
+              CHANGES=$(jq -cn --arg ext "$INPUT_EXTENSION_NAME" '[$ext]')
+            fi
+          else
+            CHANGES=$(jq -ce --arg ref "$GITHUB_REF" --argjson targets "$VALID_TARGETS" \
+              --argjson sample "$INFRASTRUCTURE_SAMPLE" '
+              . as $changes
+              | (map(select(startswith("_") | not))) as $direct
+              | if $ref == "refs/heads/main" then $direct
+                else
+                  if ($sample - $targets | length) > 0 then
+                    error("Infrastructure sample contains an unknown extension")
+                  else
+                    $direct + (map(select(startswith("_test_")) | ltrimstr("_test_")))
+                    + (if $changes | index("_shared") then $sample else [] end)
+                  end
+                end | unique
+            ' <<< "$CHANGES")
           fi
 
-          # Filter away the shared filter
-          EXTENSIONS_CHANGED=$(echo "$CHANGES" | jq -c 'map(select(. != "_shared"))')
-
-          echo "matrix=$EXTENSIONS_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(jq -c . <<< "$CHANGES")" >> "$GITHUB_OUTPUT"
 
   Bake:
     name: Bake

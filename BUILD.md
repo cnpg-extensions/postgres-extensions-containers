@@ -77,6 +77,35 @@ dagger call -sm ./dagger/maintenance/ create --name="<name>" [ARGUMENTS] \
 
 ## Usage and Targets
 
+On `main`, automatic builds select changed extension payloads, including version
+pins and system-library manifests. Documentation, tests, and shared build inputs
+do not trigger production rebuilds. Shared changes take effect on the next build.
+
+On non-main branches, shared CI, Dagger, packaging, and test changes select this
+sample for the existing build, security, and integration checks:
+
+- `pgtap`: SQL-only extension.
+- `pg-cron`: native library and shared preload.
+- `powa`: extensions supplied by the PostgreSQL base image.
+- `mobilitydb`: upstream PostGIS dependency.
+- `ogr-fdw`: bundled OS libraries, data files, and environment paths.
+
+Current extensions have no dependency on another extension present in this
+repository, so the sample does not cover local dependency resolution. No synthetic
+dependency is added. Direct payload changes always select their extension; changes
+to extension-specific tests select that extension on branches only. Mixed shared
+and extension changes test the union, without duplicate builds.
+
+To build, test, and publish every extension using the latest merged inputs:
+
+```bash
+gh workflow run bake.yml --repo cnpg-extensions/postgres-extensions-containers \
+  --ref main -f extension_name=all
+```
+
+Use an extension directory instead of `all` to rebuild one extension. Dispatching
+on another branch builds and tests without copying images to production.
+
 ### 1. Build configuration check (dry run)
 
 To verify the configuration (running `docker buildx bake --check`) for all
