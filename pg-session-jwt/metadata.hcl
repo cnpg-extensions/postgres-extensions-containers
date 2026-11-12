@@ -21,14 +21,14 @@ metadata = {
   versions = {
     bookworm = {
       "18" = {
-        # renovate: datasource=github-tags depName=neondatabase/pg_session_jwt versioning=semver
+        # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver
         package = "v0.5.0"
         sql     = "0.5.0"
       }
     }
     trixie = {
       "18" = {
-        # renovate: datasource=github-tags depName=neondatabase/pg_session_jwt versioning=semver
+        # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver
         package = "v0.5.0"
         sql     = "0.5.0"
       }

@@ -150,3 +150,19 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
 - **Review when:** the extension, dependency lock, compiler, or runner resources
   change. Recheck native ARM64 builds and memory use before adopting any
   LTO-disable workaround.
+
+## pg-session-jwt: Renovate tag lookup
+
+- **Tracking:** [upstream issue #57](https://github.com/neondatabase/pg_session_jwt/issues/57).
+- **Problem:** the hosted Renovate run on 2026-11-12 received a GitHub GraphQL
+  error stating that the `neondatabase` organization IP allow list blocked its
+  request. Renovate reported this as a `github-tags` lookup returning `no-result`.
+- **Workaround:** [pg-session-jwt/metadata.hcl](pg-session-jwt/metadata.hcl) uses
+  `git-tags` with the public HTTPS Git URL. The existing PGRX custom manager in
+  [renovate.json](renovate.json) accepts this datasource and continues updating
+  the source tag and SQL version together. Direct Git tag discovery works from
+  the development environment; hosted Renovate recovery still needs validation.
+  This datasource does not supply release timestamps.
+- **Remove when:** hosted Renovate can successfully query this repository through
+  `github-tags` again. Restore both annotations and remove the extra datasource
+  alternative if no other extension uses it.
