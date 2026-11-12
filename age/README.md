@@ -8,6 +8,13 @@ SPDX-License-Identifier: Apache-2.0
 
 ## Usage
 
+### PostgreSQL compatibility
+
+AGE 1.8.0 images using PGDG package revision `+2` require PostgreSQL 18.7
+or later within major version 18. Upgrade PostgreSQL first: on 18.6, AGE
+prevents startup with `undefined symbol: heap_datum_check`. CNPG does not
+enforce extension minimum minor versions.
+
 ### 1. Add the age extension image to your Cluster
 
 Define the `age` extension under the `postgresql.extensions` section of
