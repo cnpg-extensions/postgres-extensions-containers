@@ -264,8 +264,10 @@ jobs:
             DIFF=$(git diff --no-ext-diff --no-color --unified=2 "origin/$DEFAULT_BRANCH"...HEAD -- "$FILE")
             # Every metadata/README annotation is directly above its value; -A2
             # includes both the removed (-) and replacement (+) value lines.
+            # Exclude annotations themselves: datasource contains the marker rc.
             if grep -EA2 '^[ +][[:space:]]*(//|#) renovate:' <<< "$DIFF" |
                grep '^\+' |
+               grep -Ev '^\+[[:space:]]*(//|#)' |
                grep -Ei 'alpha|beta|rc|~'; then
               # AGE final releases retain rc in their version names.
               # https://github.com/apache/age/releases/tag/PG18/v1.8.0-rc0
