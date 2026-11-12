@@ -36,7 +36,7 @@ class AcceptanceGatesTest(unittest.TestCase):
     def test_outer_gates_require_selected_builds(self):
         for filename, gate_id in [('bake.yml', 'automerge-gate'), ('pgrx.yml', 'gate')]:
             gate = workflow(filename)['jobs'][gate_id]
-            self.assertEqual(gate['if'], '${{ always() }}')
+            self.assertEqual(gate['if'], "${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}")
             for matrix in [[], ['example-extension']]:
                 for result in ['success', 'skipped', 'failure', 'cancelled', '']:
                     with self.subTest(workflow=filename, matrix=matrix, result=result):
@@ -49,7 +49,7 @@ class AcceptanceGatesTest(unittest.TestCase):
 
     def test_contracts_are_part_of_pgrx_acceptance(self):
         jobs = workflow('pgrx.yml')['jobs']
-        self.assertEqual(jobs['gate']['name'], 'PGRX acceptance')
+        self.assertEqual(jobs['gate']['name'], "${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'PGRX acceptance (fork preview)' || 'PGRX acceptance' }}")
         self.assertEqual(set(jobs['gate']['needs']), {'discover', 'contracts', 'build'})
         self.assertEqual(jobs['contracts']['uses'], './.github/workflows/pgrx-tests.yml')
         triggers = workflow('pgrx-tests.yml')
