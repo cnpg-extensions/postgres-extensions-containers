@@ -3,6 +3,10 @@ name: Build, test and publish a target extension
 on:
   workflow_call:
     inputs:
+      ref:
+        description: Optional commit SHA to test (disables production publishing)
+        type: string
+        default: ''
       extension_name:
         description: "The PostgreSQL extension to build (directory name)"
         required: true
@@ -31,6 +35,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           persist-credentials: false
 
       - name: Log in to the GitHub Container registry
@@ -62,7 +68,7 @@ jobs:
           BUILDX_METADATA_PROVENANCE: disabled
           environment: testing
           registry: ghcr.io/${{ github.repository_owner }}
-          revision: ${{ github.sha }}
+          revision: ${{ inputs.ref || github.sha }}
           # renovate: datasource=docker depName=ghcr.io/cnpg-extensions/cnpg-sbom-generator
           sbom_generator: ghcr.io/cnpg-extensions/cnpg-sbom-generator:latest@sha256:9909ad887161b18d68f1e84c5568be3e8d3072ad861be843b596a0fdb6c48678
         with:
@@ -136,6 +142,8 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           persist-credentials: false
 
       - name: Security checks
@@ -168,10 +176,11 @@ jobs:
       extension_name: ${{ inputs.extension_name }}
       image: ${{ matrix.image }}
       cnpg_version: ${{ matrix.cnpg }}
+      ref: ${{ inputs.ref }}
 
   copytoproduction:
     name: Copy images to production
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && inputs.ref == '' }}
     runs-on: ubuntu-26.04
     needs:
       - testbuild
@@ -193,7 +202,7 @@ jobs:
 
   production-provenance:
     name: Provenance for production images
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && inputs.ref == ''
     needs:
       - testbuild
       - copytoproduction
@@ -228,7 +237,7 @@ jobs:
     steps:
       - env:
           RESULTS: ${{ toJSON(needs) }}
-          PROMOTION_ALLOWED: ${{ github.ref == 'refs/heads/main' }}
+          PROMOTION_ALLOWED: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && inputs.ref == '' }}
         run: |
           python3 - <<'PYTHON'
           import json, os

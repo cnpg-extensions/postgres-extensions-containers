@@ -35,6 +35,10 @@ class SelectionTest(unittest.TestCase):
             sample = json.loads(step['env']['INFRASTRUCTURE_SAMPLE'])
             targets = sample + ['fixture-extension']
             cases = [
+                ('manual_pr', 'a' * 40, ['fixture-extension'], 'all', ['fixture-extension']),
+                ('manual_pr', 'a' * 40, ['_test_fixture-extension'], '', ['fixture-extension']),
+                ('manual_pr', 'a' * 40, ['_shared'], 'all', sample),
+                ('manual_pr', 'a' * 40, [], 'fixture-extension', []),
                 ('pull_request', 'refs/pull/1/merge', ['_shared'], '', sample),
                 ('merge_group', 'refs/heads/gh-readonly-queue/main/test', ['_shared', 'fixture-extension'], '', targets),
                 ('push', 'refs/heads/main', ['_shared', '_test_fixture-extension'], '', []),
@@ -48,14 +52,14 @@ class SelectionTest(unittest.TestCase):
             for event, ref, changes, requested, expected in cases:
                 with self.subTest(workflow=name, event=event, ref=ref, changes=changes, requested=requested):
                     result, output = run_step(step, CHANGES=json.dumps(changes), EVENT_NAME=event,
-                        GITHUB_REF=ref, INPUT_EXTENSION_NAME=requested, VALID_TARGETS=json.dumps(targets),
+                        GITHUB_REF=ref, SELECTION_REF=ref, INPUT_EXTENSION_NAME=requested, VALID_TARGETS=json.dumps(targets),
                         INFRASTRUCTURE_SAMPLE=json.dumps(sample))
                     self.assertEqual(result.returncode, 0, result.stderr)
                     selected = json.loads(output.strip().removeprefix('matrix='))
                     self.assertEqual(sorted(selected), sorted(expected))
                     self.assertEqual(len(selected), len(set(selected)))
             result, _ = run_step(step, CHANGES='["_shared"]', EVENT_NAME='pull_request',
-                GITHUB_REF='refs/pull/1/merge', INPUT_EXTENSION_NAME='', VALID_TARGETS='[]',
+                GITHUB_REF='refs/pull/1/merge', SELECTION_REF='refs/pull/1/merge', INPUT_EXTENSION_NAME='', VALID_TARGETS='[]',
                 INFRASTRUCTURE_SAMPLE=json.dumps(sample))
             self.assertNotEqual(result.returncode, 0)
 
@@ -82,7 +86,7 @@ class SelectionTest(unittest.TestCase):
                 discovery = next(s for s in job['steps'] if s.get('id') == 'get-targets')
                 self.assertEqual(discovery['with']['args'], 'get-targets --build-system pgrx' if name == 'pgrx' else 'get-targets')
                 filtering = next(s for s in job['steps'] if s.get('id') == 'filter')
-                self.assertEqual(filtering['if'], "github.event_name != 'workflow_dispatch'")
+                self.assertEqual(filtering['if'], "github.event_name != 'workflow_dispatch' || inputs.pr_number != ''")
                 self.assertEqual(filtering['with']['predicate-quantifier'], 'some-with-excludes')
                 matrix = next(s for s in job['steps'] if s.get('id') == 'get-matrix')
                 self.assertEqual(matrix['env']['CHANGES'], '${{ steps.filter.outputs.changes }}')

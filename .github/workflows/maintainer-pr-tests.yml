@@ -1,0 +1,62 @@
+name: Maintainer PR tests
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+permissions: {}
+concurrency:
+  group: maintainer-tests-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: false
+jobs:
+  prepare:
+    if: github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      # Trusted base workflow only; do not execute PR code before authorization.
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            // A maintainer can explicitly authorize this event's head SHA with Re-run all jobs.
+            const actors = Number(process.env.GITHUB_RUN_ATTEMPT) > 1
+              ? [process.env.TRIGGERING_ACTOR]
+              : [pr.user.login, context.actor, process.env.TRIGGERING_ACTOR];
+            for (const username of new Set(actors)) {
+              const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username});
+              if (!['write', 'maintain', 'admin'].includes(data.permission)) throw new Error(`${username} requires write access`);
+            }
+  test:
+    needs: prepare
+    permissions:
+      # The reusable workflow declares a catalog job with contents: write;
+      # explicit refs skip that job. Discovery/build jobs retain read access.
+      contents: write
+      pull-requests: read
+      actions: read
+      statuses: write
+      packages: write
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/bake.yml
+    with:
+      pr_number: ${{ format('{0}', github.event.pull_request.number) }}
+      expected_sha: ${{ github.event.pull_request.head.sha }}
+  pgrx:
+    needs: prepare
+    permissions:
+      # The reusable workflow declares a catalog job with contents: write;
+      # explicit refs skip that job. Discovery/build jobs retain read access.
+      contents: write
+      pull-requests: read
+      actions: read
+      statuses: write
+      packages: write
+      id-token: write
+      security-events: write
+    uses: ./.github/workflows/pgrx.yml
+    with:
+      pr_number: ${{ format('{0}', github.event.pull_request.number) }}
+      expected_sha: ${{ github.event.pull_request.head.sha }}

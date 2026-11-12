@@ -59,6 +59,33 @@ trigger production rebuilds on `main`. Direct extension payload changes still
 build automatically. The sample and manual single/all-extension rebuild commands
 are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same selection policy through its own workflow.
 
+## CI: authorized testing of fork PRs
+
+- **Problem:** fork PR builds need GHCR publishing permissions, while required
+  checks must report against the tested PR commit.
+- **Workaround:** the trusted `pull_request_target` caller checks write, maintain,
+  or admin access for the author and actors on initial runs. A maintainer can
+  authorize an external PR with **Re-run all jobs**. It calls the existing Debian
+  and PGRX workflows, which resolve the PR number and reject a head different
+  from the authorized event SHA. Checkouts explicitly opt in to fork code.
+- **Selection and reporting:** both workflows retain Dagger discovery, changed-file
+  selection, representative samples, and acceptance gates. They post pending and
+  final statuses on the tested head under the existing required gate names.
+  Explicit refs disable production and catalogs. Manual dispatch by PR number
+  remains available; `extension_name` is ignored and PGRX uses its full CNPG matrix.
+- **Duplicate runs:** ordinary fork PR runs skip discovery, builds, and gates;
+  the skipped gates have distinct `(fork preview)` names. The authorized caller runs only for forks.
+  Same-repository PRs retain their existing path. New heads need fresh authorization.
+- **Validation:** local lint, selection, and whitespace checks pass. Earlier hosted
+  testing confirmed the trigger and initial authorization; the revised checkout,
+  rerun authorization, status source identity, and ruleset acceptance remain
+  unverified. The caller must exist on the default branch before it can test fork
+  PRs, so the bootstrap PR cannot validate that path. Older runs may still have
+  conflicting check names.
+- **Review/remove when:** upstream supports equivalent authorized fork testing or
+  tests no longer need privileged publishing. Review authorization, reporting,
+  SHA propagation, and Debian/PGRX acceptance during upstream merges.
+
 ## PostgreSQL Anonymizer 3.3.2: stale root Cargo.lock version
 
 - **Upstream:** [3.3.2 Cargo.lock](https://gitlab.com/dalibo/postgresql_anonymizer/-/blob/3.3.2/Cargo.lock)

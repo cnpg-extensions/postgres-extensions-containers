@@ -1,6 +1,18 @@
 name: Build, test and publish extensions
 
 on:
+  workflow_call:
+    inputs:
+      pr_number:
+        type: string
+        required: true
+      expected_sha:
+        description: Authorized event head; reject a newer PR revision
+        type: string
+        required: true
+    secrets:
+      SNYK_TOKEN:
+        required: false
   # Required gates must report even when no extension needs rebuilding.
   pull_request:
   merge_group:
@@ -8,9 +20,13 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
+      pr_number:
+        description: Optional PR number; selects changed extensions and disables production publishing
+        type: string
+        default: ''
       extension_name:
         description: "The PostgreSQL extension directory, or all to rebuild every extension"
-        required: true
+        required: false
         type: string
 
 defaults:
@@ -22,17 +38,45 @@ permissions: {}
 jobs:
   # Select changed payloads and representative branch validation targets.
   change-triage:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     name: Check changed files
     permissions:
       contents: read
       pull-requests: read
+      statuses: write
     runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix}}
+      ref: ${{ steps.pr.outputs.sha }}
+      base_ref: ${{ steps.pr.outputs.base_ref }}
     steps:
+      - name: Resolve manual PR and start status
+        if: inputs.pr_number != ''
+        id: pr
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        with:
+          script: |
+            if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('Expected a PR number');
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            if (pr.state !== 'open') throw new Error('PR must be open');
+            if (process.env.EXPECTED_SHA && pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
+            core.setOutput('sha', pr.head.sha);
+            core.setOutput('base', pr.base.sha);
+            core.setOutput('base_ref', pr.base.ref);
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: pr.head.sha, context: 'Automerge gate', state: 'pending',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ steps.pr.outputs.sha }}
+          fetch-depth: ${{ inputs.pr_number != '' && '0' || '1' }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           persist-credentials: false
 
       - name: Fetch valid targets
@@ -48,7 +92,7 @@ jobs:
           args: get-targets
 
       - name: Validate extension name
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number == ''
         env:
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
@@ -73,11 +117,22 @@ jobs:
             echo 'YAML_EOF'
           } >> "$GITHUB_ENV"
 
+      - name: Resolve manual PR diff base
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number != ''
+        id: diff-base
+        env:
+          BASE_SHA: ${{ steps.pr.outputs.base }}
+        run: |
+          git fetch --no-tags origin "$BASE_SHA"
+          echo "sha=$(git merge-base HEAD "$BASE_SHA")" >> "$GITHUB_OUTPUT"
+
       - name: Check for changes
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name != 'workflow_dispatch' || inputs.pr_number != ''
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
+          base: ${{ steps.diff-base.outputs.sha }}
+          ref: ${{ steps.pr.outputs.sha }}
           predicate-quantifier: some-with-excludes
           filters: |
             _shared:
@@ -89,6 +144,17 @@ jobs:
               - '.github/workflows/**'
             ${{ env.EXTENSIONS }}
 
+      - name: Verify selected PR revision
+        if: inputs.pr_number != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          TEST_SHA: ${{ steps.pr.outputs.sha }}
+        with:
+          script: |
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            if (pr.head.sha !== process.env.TEST_SHA) throw new Error('PR changed during selection; rerun for the new head');
+
       # Only payload changes rebuild on main; shared and test changes validate on branches.
       - name: Compute matrix
         id: get-matrix
@@ -97,7 +163,8 @@ jobs:
           CHANGES: ${{ steps.filter.outputs.changes }}
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
-          EVENT_NAME: ${{ github.event_name }}
+          EVENT_NAME: ${{ inputs.pr_number != '' && 'manual_pr' || github.event_name }}
+          SELECTION_REF: ${{ steps.pr.outputs.sha || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # SQL-only, native/preload, base-image dependencies, upstream PostGIS, OS libraries/data.
           INFRASTRUCTURE_SAMPLE: '["pgtap", "pg-cron", "powa", "mobilitydb", "ogr-fdw"]'
@@ -109,7 +176,7 @@ jobs:
               CHANGES=$(jq -cn --arg ext "$INPUT_EXTENSION_NAME" '[$ext]')
             fi
           else
-            CHANGES=$(jq -ce --arg ref "$GITHUB_REF" --argjson targets "$VALID_TARGETS" \
+            CHANGES=$(jq -ce --arg ref "$SELECTION_REF" --argjson targets "$VALID_TARGETS" \
               --argjson sample "$INFRASTRUCTURE_SAMPLE" '
               . as $changes
               | (map(select(startswith("_") | not))) as $direct
@@ -144,12 +211,13 @@ jobs:
     uses: ./.github/workflows/bake_targets.yml
     with:
       extension_name: ${{ matrix.extension }}
+      ref: ${{ needs.change-triage.outputs.ref }}
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   automerge-gate:
-    name: Automerge gate
-    if: ${{ always() }}
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Automerge gate (fork preview)' || 'Automerge gate' }}
+    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
       - change-triage
       - Bake
@@ -176,16 +244,18 @@ jobs:
           PYTHON
 
       - name: Checkout Renovate changes
-        if: startsWith(github.head_ref || github.ref_name, 'renovate/')
+        if: needs.change-triage.outputs.ref != '' || startsWith(github.head_ref || github.ref_name, 'renovate/')
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ needs.change-triage.outputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           fetch-depth: 0
           persist-credentials: false
 
       - name: Check Renovate versions for prereleases
-        if: startsWith(github.head_ref || github.ref_name, 'renovate/')
+        if: needs.change-triage.outputs.ref != '' || startsWith(github.head_ref || github.ref_name, 'renovate/')
         env:
-          DEFAULT_BRANCH: ${{ github.base_ref || github.event.repository.default_branch }}
+          DEFAULT_BRANCH: ${{ needs.change-triage.outputs.base_ref || github.base_ref || github.event.repository.default_branch }}
         run: |
           # Real examples: MobilityDB 1.3.0-alpha, HypoPG 2.0.0beta,
           # pg_partman 5.3.0RC1, MobilityDB 1.3.0~rc1-1.pgdg13+1.
@@ -216,9 +286,29 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: write
-    if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main'
+    if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && needs.change-triage.outputs.ref == ''
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
         with:
           event-type: update-catalogs
+
+  report-pr-status:
+    if: ${{ always() && needs.change-triage.outputs.ref != '' }}
+    needs: [change-triage, automerge-gate]
+    runs-on: ubuntu-26.04
+    permissions:
+      statuses: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          TEST_SHA: ${{ needs.change-triage.outputs.ref }}
+          PASSED: ${{ needs.automerge-gate.result == 'success' }}
+        with:
+          script: |
+            if (!/^[0-9a-f]{40}$/.test(process.env.TEST_SHA)) throw new Error('ref must be a full commit SHA');
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: process.env.TEST_SHA, context: 'Automerge gate',
+              state: process.env.PASSED === 'true' ? 'success' : 'failure',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });

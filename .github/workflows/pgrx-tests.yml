@@ -2,6 +2,11 @@ name: PGRX contract tests
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: Optional commit SHA to test
+        type: string
+        default: ''
   workflow_dispatch:
 
 permissions:
@@ -18,6 +23,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           persist-credentials: false
 
       - name: Run PGRX contract tests
