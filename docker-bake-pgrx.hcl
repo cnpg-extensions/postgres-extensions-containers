@@ -7,7 +7,7 @@ now = build_timestamp
 
 function getExtensionVersion {
   params = [distro, pgVersion]
-  result = getExtensionPackage(distro, pgVersion)
+  result = trimprefix(getExtensionPackage(distro, pgVersion), "v")
 }
 
 // The upstream source version is owned by metadata; build inputs are resolved

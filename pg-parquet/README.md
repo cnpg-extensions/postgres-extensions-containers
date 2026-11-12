@@ -37,7 +37,7 @@ spec:
     extensions:
     - name: pg-parquet
       image:
-        reference: ghcr.io/cnpg-extensions/pg-parquet:v0.5.1-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-parquet:0.5.1-18-trixie
 ```
 
 ### 2. Enable the extension in a database

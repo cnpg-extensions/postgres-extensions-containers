@@ -33,7 +33,7 @@ spec:
     extensions:
     - name: pg-session-jwt
       image:
-        reference: ghcr.io/cnpg-extensions/pg-session-jwt:v0.5.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-session-jwt:0.5.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database

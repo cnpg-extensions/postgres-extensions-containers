@@ -35,7 +35,7 @@ spec:
     extensions:
     - name: pg-search
       image:
-        reference: ghcr.io/cnpg-extensions/pg-search:v0.26.6-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-search:0.26.6-18-trixie
 ```
 
 `pg_search` also requires the `vector` extension. Make the `pgvector` image
