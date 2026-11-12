@@ -523,6 +523,13 @@ func (m *Maintenance) GenerateCatalogs(
 
 			for i := range catalog.Spec.Images {
 				img := &catalog.Spec.Images[i]
+				// Prefer extensions already supplied by the upstream catalog for
+				// this OS and PostgreSQL major, while retaining local coverage elsewhere.
+				if slices.ContainsFunc(img.Extensions, func(existing ExtensionConfiguration) bool {
+					return existing.Name == metadata.Name
+				}) {
+					continue
+				}
 				if !matrix.contains(catalogOS, strconv.Itoa(img.Major)) {
 					continue
 				}
