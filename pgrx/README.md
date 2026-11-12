@@ -185,6 +185,7 @@ not replace an image build that produces attestations or test hosted signing.
 The [PGRX test workflow](../.github/workflows/pgrx-tests.yml) is called by the
 PGRX build workflow and can also be dispatched separately. Its contract tests
 are required by the `PGRX acceptance` gate; Go tests remain independent.
+These tests exercise PGRX tooling and SBOM composition, not workflow YAML.
 
 Both build workflows report their local gates on every pull request,
 merge-queue commit, and push to `main`. Discovery selects the extensions to
@@ -208,10 +209,10 @@ extension, stripping only a leading `v` from the source tag for SQL. If upstream
 ships a different SQL version, investigate the release before merging.
 
 The release acceptance jobs publish testing images and require registry write
-and signing permissions. Fork pull requests retain GitHub's read-only token
-restrictions; affected builds cannot pass those stages. A maintainer must move
-the reviewed changes to a trusted branch and PR in the publishing repository.
-Do not bypass the gates or use a privileged pull-request trigger to run fork code.
+and signing permissions. Fork PRs use the
+[maintainer-authorized test path](../WORKAROUNDS.md#ci-authorized-testing-of-fork-prs);
+ordinary fork builds and preview gates are skipped. Authorized runs report the
+required statuses directly on the tested head SHA.
 
 Run from the repository root with Docker, bash, jq, Python 3, and actionlint available. Run the
 downstream suite inside the pinned generator image, matching CI's Syft,
@@ -224,14 +225,6 @@ docker run --rm --entrypoint python3 \
   --volume "$PWD:/workspace:ro" --workdir /workspace \
   "$generator" pgrx/test.py
 
-# Export YAML using the generator's existing PyYAML, then test the actual shell
-# selection steps with the host's bash and jq (also run by the contract workflow).
-docker run --rm --entrypoint python3 \
-  --volume "$PWD:/workspace:ro" --workdir /workspace \
-  "$generator" -c 'import json, pathlib, yaml; print(json.dumps({name: yaml.safe_load(pathlib.Path(f".github/workflows/{file}.yml").read_text()) for name, file in [("debian", "bake"), ("pgrx", "pgrx")]}))' \
-  > /tmp/pgrx-selection-workflows.json
-python3 pgrx/tests/check_selection.py < /tmp/pgrx-selection-workflows.json
-
 actionlint .github/workflows/bake.yml \
   .github/workflows/bake_targets.yml \
   .github/workflows/pgrx.yml \
@@ -242,7 +235,7 @@ actionlint .github/workflows/bake.yml \
 ```
 
 PGRX tests retain coverage for Rust package selection, licenses, ownership,
-shipped files, generator/hook composition, build selection, and native-platform
+shipped files, generator/hook composition, build preparation, and native-platform
 assembly. Shared Go tests have their own workflow.
 
 The generator source, release workflow, and BuildKit/SPDX/Grype/Grant integration
