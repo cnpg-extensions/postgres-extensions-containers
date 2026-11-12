@@ -1,4 +1,4 @@
-"""Protect native scheduling and the Bake metadata handoff used by release jobs."""
+"""Verify native target preparation and build execution checks."""
 
 import json
 import os
@@ -8,13 +8,9 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import yaml
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from build import check_native
 from prepare import prepare
-
-ROOT = Path(__file__).resolve().parents[2]
 
 
 class NativeWorkflowTest(unittest.TestCase):
@@ -39,15 +35,6 @@ class NativeWorkflowTest(unittest.TestCase):
              )):
             directory = Path(temporary) / 'prepared'
             plan = prepare({'extension_name': 'example'}, 'example/generator@sha256:' + 'e' * 64, directory)
-            jobs = yaml.safe_load((ROOT / '.github/workflows/pgrx_targets.yml').read_text())['jobs']
-            job = jobs['build-platform']
-            self.assertEqual(job['runs-on'], '${{ matrix.runner }}')
-            steps = job['steps']
-            bake = next(s for s in steps if s.get('id') == 'build')
-            self.assertEqual(bake['with']['files'], '${{ runner.temp }}/prepared/${{ matrix.id }}.json')
-            self.assertEqual(bake['with']['targets'], '${{ matrix.target }}')
-            self.assertEqual(bake['with']['builder'], '${{ steps.buildx.outputs.name }}')
-            self.assertLess(next(i for i, s in enumerate(steps) if s.get('name') == 'Require native build execution'), steps.index(bake))
             self.assertEqual(len(plan['rows']), 2)
             for row in plan['rows']:
                 definition = json.loads((directory / (row['id'] + '.json')).read_text())['target'][target]

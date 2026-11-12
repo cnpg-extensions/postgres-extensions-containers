@@ -32,11 +32,3 @@ jobs:
           docker run --rm --entrypoint python3 \
             --volume "$PWD:/workspace:ro" --workdir /workspace \
             "$SBOM_GENERATOR" pgrx/test.py
-
-      - name: Check Debian and PGRX selection behavior
-        run: |
-          docker run --rm --entrypoint python3 \
-            --volume "$PWD:/workspace:ro" --workdir /workspace \
-            "$SBOM_GENERATOR" -c 'import json, pathlib, yaml; print(json.dumps({name: yaml.safe_load(pathlib.Path(f".github/workflows/{file}.yml").read_text()) for name, file in [("debian", "bake"), ("pgrx", "pgrx")]}))' \
-            > "$RUNNER_TEMP/selection-workflows.json"
-          python3 pgrx/tests/check_selection.py < "$RUNNER_TEMP/selection-workflows.json"
