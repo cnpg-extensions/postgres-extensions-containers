@@ -111,7 +111,7 @@
         "/^[^/]+/metadata\\.hcl$/"
       ],
       "matchStrings": [
-        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags|git-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
       ],
       "depTypeTemplate": "pgrx-source",
       "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}package = \"{{{newValue}}}\"\n{{{indentation}}}sql     = \"{{{replace '^v' '' newValue}}}\""
