@@ -35,6 +35,8 @@ class SelectionTest(unittest.TestCase):
             sample = json.loads(step['env']['INFRASTRUCTURE_SAMPLE'])
             targets = sample + ['fixture-extension']
             cases = [
+                ('pull_request_target', 'a' * 40, ['_shared'], '', sample),
+                ('pull_request_target', 'a' * 40, [], '', []),
                 ('pull_request', 'refs/pull/1/merge', ['_shared'], '', sample),
                 ('merge_group', 'refs/heads/gh-readonly-queue/main/test', ['_shared', 'fixture-extension'], '', targets),
                 ('push', 'refs/heads/main', ['_shared', '_test_fixture-extension'], '', []),
@@ -48,14 +50,14 @@ class SelectionTest(unittest.TestCase):
             for event, ref, changes, requested, expected in cases:
                 with self.subTest(workflow=name, event=event, ref=ref, changes=changes, requested=requested):
                     result, output = run_step(step, CHANGES=json.dumps(changes), EVENT_NAME=event,
-                        GITHUB_REF=ref, INPUT_EXTENSION_NAME=requested, VALID_TARGETS=json.dumps(targets),
+                        GITHUB_REF=ref, SELECTION_REF=ref, INPUT_EXTENSION_NAME=requested, VALID_TARGETS=json.dumps(targets),
                         INFRASTRUCTURE_SAMPLE=json.dumps(sample))
                     self.assertEqual(result.returncode, 0, result.stderr)
                     selected = json.loads(output.strip().removeprefix('matrix='))
                     self.assertEqual(sorted(selected), sorted(expected))
                     self.assertEqual(len(selected), len(set(selected)))
             result, _ = run_step(step, CHANGES='["_shared"]', EVENT_NAME='pull_request',
-                GITHUB_REF='refs/pull/1/merge', INPUT_EXTENSION_NAME='', VALID_TARGETS='[]',
+                GITHUB_REF='refs/pull/1/merge', SELECTION_REF='refs/pull/1/merge', INPUT_EXTENSION_NAME='', VALID_TARGETS='[]',
                 INFRASTRUCTURE_SAMPLE=json.dumps(sample))
             self.assertNotEqual(result.returncode, 0)
 

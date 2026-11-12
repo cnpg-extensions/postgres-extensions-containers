@@ -59,6 +59,31 @@ trigger production rebuilds on `main`. Direct extension payload changes still
 build automatically. The sample and manual single/all-extension rebuild commands
 are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same selection policy through its own workflow.
 
+## CI: maintainer-authorized testing of fork PRs
+
+- **Problem:** fork PR tests need permission to publish GHCR testing images.
+  This is a downstream automation choice, inspired by CloudNativePG's
+  [maintainer-authorized `/test` workflow](https://github.com/cloudnative-pg/cloudnative-pg/blob/main/.github/workflows/continuous-delivery.yml).
+- **Workaround:** [maintainer-pr-tests.yml](.github/workflows/maintainer-pr-tests.yml)
+  uses `pull_request_target`. Initial runs require write, maintain, or admin
+  access for the PR author, event actor, and triggering actor. Maintainers can
+  authorize external PRs with **Re-run all jobs**, which checks the rerunning
+  actor and tests the original event's head SHA. New commits require fresh
+  authorization. Checkout v7's fork-code opt-in is enabled after authorization.
+- **Shared infrastructure:** calls the existing Debian and PGRX workflows with
+  the immutable head SHA, preserving discovery, selection, and acceptance gates.
+  Explicit refs disable production promotion, production provenance, and catalog
+  updates. Testing images still publish using `GITHUB_TOKEN`. The reported
+  `Maintainer extension tests` status requires both workflows to pass; required
+  merge checks must be configured separately.
+- **Validation:** [PR #2](https://github.com/ardentperf-labs/postgres-extensions-containers/pull/2)
+  confirmed the fork trigger and authorization. Checkout's opt-in, maintainer
+  reruns for external authors, and the complete privileged path still need hosted
+  validation.
+- **Review/remove when:** upstream offers equivalent authorized fork testing or
+  tests no longer need privileged image publishing. Recheck authorization, SHA
+  propagation, publishing guards, and Debian/PGRX behavior during upstream merges.
+
 ## PostgreSQL Anonymizer 3.3.2: stale root Cargo.lock version
 
 - **Upstream:** [3.3.2 Cargo.lock](https://gitlab.com/dalibo/postgresql_anonymizer/-/blob/3.3.2/Cargo.lock)

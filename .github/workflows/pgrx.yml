@@ -1,5 +1,14 @@
 name: Build, test and publish PGRX extensions
 'on':
+  workflow_call:
+    inputs:
+      ref:
+        description: Optional authorized commit SHA to test (disables publishing)
+        type: string
+        default: ''
+    secrets:
+      SNYK_TOKEN:
+        required: false
   workflow_dispatch:
     inputs:
       extension_name:
@@ -33,6 +42,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' && inputs.ref != '' }}
           persist-credentials: false
 
       - name: Fetch valid targets
@@ -100,6 +111,7 @@ jobs:
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           EVENT_NAME: ${{ github.event_name }}
+          SELECTION_REF: ${{ inputs.ref || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # Standard packaging and the install path with a guarded lock correction.
           INFRASTRUCTURE_SAMPLE: '["pg-durable", "pg-session-jwt"]'
@@ -111,7 +123,7 @@ jobs:
               CHANGES=$(jq -cn --arg ext "$INPUT_EXTENSION_NAME" '[$ext]')
             fi
           else
-            CHANGES=$(jq -ce --arg ref "$GITHUB_REF" --argjson targets "$VALID_TARGETS" \
+            CHANGES=$(jq -ce --arg ref "$SELECTION_REF" --argjson targets "$VALID_TARGETS" \
               --argjson sample "$INFRASTRUCTURE_SAMPLE" '
               . as $changes
               | (map(select(startswith("_") | not))) as $direct
@@ -133,6 +145,8 @@ jobs:
     permissions:
       contents: read
     uses: ./.github/workflows/pgrx-tests.yml
+    with:
+      ref: ${{ inputs.ref }}
   build:
     needs: discover
     if: ${{ needs.discover.outputs.matrix != '[]' }}
@@ -151,6 +165,7 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     with:
       extension_name: ${{ matrix.extension }}
+      ref: ${{ inputs.ref }}
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
     name: PGRX acceptance
@@ -183,7 +198,7 @@ jobs:
   catalogs:
     name: Update Catalogs
     needs: [discover, gate]
-    if: github.ref == 'refs/heads/main' && needs.discover.outputs.matrix != '[]'
+    if: github.ref == 'refs/heads/main' && needs.discover.outputs.matrix != '[]' && github.event_name != 'pull_request_target' && inputs.ref == ''
     runs-on: ubuntu-26.04
     permissions:
       contents: write

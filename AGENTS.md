@@ -14,6 +14,12 @@ infrastructure. Borrow patterns from the SBOM generator when they solve a need
 that the Debian path does not cover. Avoid creating a parallel framework where
 existing project behavior is sufficient.
 
+Minimize avoidable conflicts with future upstream merges. Prefer small,
+localized changes and preserve upstream file and job structure where practical.
+When refactoring shared infrastructure, weigh reuse against the ongoing cost of
+reconciling upstream changes. A clean merge still requires behavioral review
+across downstream implementations.
+
 Review upstream changes for behavioral applicability, even when Git merges
 cleanly. Distinguish pending upstream updates from intentional downstream
 choices. Record actual source workarounds and their removal conditions, rather

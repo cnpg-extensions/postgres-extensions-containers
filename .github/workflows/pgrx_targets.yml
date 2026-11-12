@@ -2,6 +2,10 @@ name: PGRX platform builds
 'on':
   workflow_call:
     inputs: &id001
+      ref:
+        description: Optional commit SHA to test (disables publishing)
+        type: string
+        default: ''
       extension_name:
         description: PGRX extension directory
         type: string
@@ -39,6 +43,8 @@ jobs:
       name: Use current workspace
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       with:
+        ref: ${{ inputs.ref }}
+        allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' && inputs.ref != '' }}
         persist-credentials: false
     - name: Write typed inputs
       env:
@@ -212,6 +218,7 @@ jobs:
     uses: ./.github/workflows/smoke.yml
     with:
       extension_name: ${{ inputs.extension_name }}
+      ref: ${{ inputs.ref }}
       image: ${{ format('{0}@{1}', matrix.image.image, matrix.image.digest) }}
       cnpg_version: ${{ matrix.cnpg }}
   # Use Debian's shared copy-images action with combined Bake metadata. It copies
@@ -235,10 +242,10 @@ jobs:
         bake_build_metadata: ${{ needs.assemble.outputs.metadata }}
         registry_user: ${{ github.actor }}
         registry_token: ${{ secrets.GITHUB_TOKEN }}
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    if: ${{ github.ref == 'refs/heads/main' && inputs.ref == '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
   production-provenance:
     name: Provenance for production images
-    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    if: ${{ github.ref == 'refs/heads/main' && inputs.ref == '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
     needs:
     - assemble
     - promote
@@ -274,7 +281,7 @@ jobs:
     steps:
     - env:
         RESULTS: ${{ toJSON(needs) }}
-        PROMOTION_ALLOWED: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+        PROMOTION_ALLOWED: ${{ github.ref == 'refs/heads/main' && inputs.ref == '' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
       run: |-
         python3 - <<'PY'
         import json, os

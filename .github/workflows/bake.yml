@@ -1,6 +1,15 @@
 name: Build, test and publish extensions
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Optional authorized commit SHA to test (disables publishing)
+        type: string
+        default: ''
+    secrets:
+      SNYK_TOKEN:
+        required: false
   # Required gates must report even when no extension needs rebuilding.
   pull_request:
   merge_group:
@@ -33,6 +42,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' && inputs.ref != '' }}
           persist-credentials: false
 
       - name: Fetch valid targets
@@ -98,6 +109,7 @@ jobs:
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           EVENT_NAME: ${{ github.event_name }}
+          SELECTION_REF: ${{ inputs.ref || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # SQL-only, native/preload, base-image dependencies, upstream PostGIS, OS libraries/data.
           INFRASTRUCTURE_SAMPLE: '["pgtap", "pg-cron", "powa", "mobilitydb", "ogr-fdw"]'
@@ -109,7 +121,7 @@ jobs:
               CHANGES=$(jq -cn --arg ext "$INPUT_EXTENSION_NAME" '[$ext]')
             fi
           else
-            CHANGES=$(jq -ce --arg ref "$GITHUB_REF" --argjson targets "$VALID_TARGETS" \
+            CHANGES=$(jq -ce --arg ref "$SELECTION_REF" --argjson targets "$VALID_TARGETS" \
               --argjson sample "$INFRASTRUCTURE_SAMPLE" '
               . as $changes
               | (map(select(startswith("_") | not))) as $direct
@@ -144,6 +156,7 @@ jobs:
     uses: ./.github/workflows/bake_targets.yml
     with:
       extension_name: ${{ matrix.extension }}
+      ref: ${{ inputs.ref }}
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -179,6 +192,8 @@ jobs:
         if: startsWith(github.head_ref || github.ref_name, 'renovate/')
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ inputs.ref }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' && inputs.ref != '' }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -216,7 +231,7 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: write
-    if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main'
+    if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && inputs.ref == ''
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
