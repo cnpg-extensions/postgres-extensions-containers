@@ -217,7 +217,7 @@ jobs:
 
   automerge-gate:
     name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Automerge gate (fork preview)' || 'Automerge gate' }}
-    if: ${{ always() }}
+    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
       - change-triage
       - Bake

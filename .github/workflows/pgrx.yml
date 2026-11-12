@@ -228,7 +228,7 @@ jobs:
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
     name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'PGRX acceptance (fork preview)' || 'PGRX acceptance' }}
-    if: ${{ always() }}
+    if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
     - discover
     - contracts
