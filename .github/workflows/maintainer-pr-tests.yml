@@ -8,10 +8,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
+    if: github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      statuses: write
     steps:
       # Trusted base workflow only; do not execute PR code before authorization.
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
@@ -28,10 +28,6 @@ jobs:
               const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username});
               if (!['write', 'maintain', 'admin'].includes(data.permission)) throw new Error(`${username} requires write access`);
             }
-            await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: pr.head.sha, context: 'Maintainer extension tests', state: 'pending',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
   test:
     needs: prepare
     permissions:
@@ -40,12 +36,14 @@ jobs:
       contents: write
       pull-requests: read
       actions: read
+      statuses: write
       packages: write
       id-token: write
       security-events: write
     uses: ./.github/workflows/bake.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      pr_number: ${{ format('{0}', github.event.pull_request.number) }}
+      expected_sha: ${{ github.event.pull_request.head.sha }}
   pgrx:
     needs: prepare
     permissions:
@@ -54,26 +52,11 @@ jobs:
       contents: write
       pull-requests: read
       actions: read
+      statuses: write
       packages: write
       id-token: write
       security-events: write
     uses: ./.github/workflows/pgrx.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
-  report:
-    if: always()
-    needs: [prepare, test, pgrx]
-    runs-on: ubuntu-26.04
-    permissions:
-      statuses: write
-    steps:
-      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          PASSED: ${{ needs.prepare.result == 'success' && needs.test.result == 'success' && needs.pgrx.result == 'success' }}
-        with:
-          script: |
-            await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: context.payload.pull_request.head.sha,
-              context: 'Maintainer extension tests', state: process.env.PASSED === 'true' ? 'success' : 'failure',
-              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
+      pr_number: ${{ format('{0}', github.event.pull_request.number) }}
+      expected_sha: ${{ github.event.pull_request.head.sha }}

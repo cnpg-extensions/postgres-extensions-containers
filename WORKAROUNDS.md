@@ -59,30 +59,29 @@ trigger production rebuilds on `main`. Direct extension payload changes still
 build automatically. The sample and manual single/all-extension rebuild commands
 are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same selection policy through its own workflow.
 
-## CI: maintainer-authorized testing of fork PRs
+## CI: authorized testing of fork PRs
 
-- **Problem:** fork PR tests need permission to publish GHCR testing images.
-  This is a downstream automation choice, inspired by CloudNativePG's
-  [maintainer-authorized `/test` workflow](https://github.com/cloudnative-pg/cloudnative-pg/blob/main/.github/workflows/continuous-delivery.yml).
-- **Workaround:** [maintainer-pr-tests.yml](.github/workflows/maintainer-pr-tests.yml)
-  uses `pull_request_target`. Initial runs require write, maintain, or admin
-  access for the PR author, event actor, and triggering actor. Maintainers can
-  authorize external PRs with **Re-run all jobs**, which checks the rerunning
-  actor and tests the original event's head SHA. New commits require fresh
-  authorization. Checkout v7's fork-code opt-in is enabled after authorization.
-- **Shared infrastructure:** calls the existing Debian and PGRX workflows with
-  the immutable head SHA, preserving discovery, selection, and acceptance gates.
-  Explicit refs disable production promotion, production provenance, and catalog
-  updates. Testing images still publish using `GITHUB_TOKEN`. The reported
-  `Maintainer extension tests` status requires both workflows to pass; required
-  merge checks must be configured separately.
-- **Validation:** [PR #2](https://github.com/ardentperf-labs/postgres-extensions-containers/pull/2)
-  confirmed the fork trigger and authorization. Checkout's opt-in, maintainer
-  reruns for external authors, and the complete privileged path still need hosted
-  validation.
-- **Review/remove when:** upstream offers equivalent authorized fork testing or
-  tests no longer need privileged image publishing. Recheck authorization, SHA
-  propagation, publishing guards, and Debian/PGRX behavior during upstream merges.
+- **Problem:** fork PR builds need GHCR publishing permissions, while required
+  checks must report against the tested PR commit.
+- **Workaround:** the trusted `pull_request_target` caller checks write, maintain,
+  or admin access for the author and actors on initial runs. A maintainer can
+  authorize an external PR with **Re-run all jobs**. It calls the existing Debian
+  and PGRX workflows, which resolve the PR number and reject a head different
+  from the authorized event SHA. Checkouts explicitly opt in to fork code.
+- **Selection and reporting:** both workflows retain Dagger discovery, changed-file
+  selection, representative samples, and acceptance gates. They post pending and
+  final statuses on the tested head under the existing required gate names.
+  Explicit refs disable production and catalogs. Manual dispatch by PR number
+  remains available; `extension_name` is ignored and PGRX uses its full CNPG matrix.
+- **Duplicate runs:** ordinary fork PR runs skip discovery and builds; their gates
+  have distinct `(fork preview)` names. The authorized caller runs only for forks.
+  Same-repository PRs retain their existing path. New heads need fresh authorization.
+- **Validation:** local lint and selection checks only for this design. Hosted
+  authorization, checkout, status source identity, and ruleset acceptance remain
+  unverified. Older runs may still have conflicting check names.
+- **Review/remove when:** upstream supports equivalent authorized fork testing or
+  tests no longer need privileged publishing. Review authorization, reporting,
+  SHA propagation, and Debian/PGRX acceptance during upstream merges.
 
 ## PostgreSQL Anonymizer 3.3.2: stale root Cargo.lock version
 

@@ -35,8 +35,10 @@ class SelectionTest(unittest.TestCase):
             sample = json.loads(step['env']['INFRASTRUCTURE_SAMPLE'])
             targets = sample + ['fixture-extension']
             cases = [
-                ('pull_request_target', 'a' * 40, ['_shared'], '', sample),
-                ('pull_request_target', 'a' * 40, [], '', []),
+                ('manual_pr', 'a' * 40, ['fixture-extension'], 'all', ['fixture-extension']),
+                ('manual_pr', 'a' * 40, ['_test_fixture-extension'], '', ['fixture-extension']),
+                ('manual_pr', 'a' * 40, ['_shared'], 'all', sample),
+                ('manual_pr', 'a' * 40, [], 'fixture-extension', []),
                 ('pull_request', 'refs/pull/1/merge', ['_shared'], '', sample),
                 ('merge_group', 'refs/heads/gh-readonly-queue/main/test', ['_shared', 'fixture-extension'], '', targets),
                 ('push', 'refs/heads/main', ['_shared', '_test_fixture-extension'], '', []),
@@ -84,7 +86,7 @@ class SelectionTest(unittest.TestCase):
                 discovery = next(s for s in job['steps'] if s.get('id') == 'get-targets')
                 self.assertEqual(discovery['with']['args'], 'get-targets --build-system pgrx' if name == 'pgrx' else 'get-targets')
                 filtering = next(s for s in job['steps'] if s.get('id') == 'filter')
-                self.assertEqual(filtering['if'], "github.event_name != 'workflow_dispatch'")
+                self.assertEqual(filtering['if'], "github.event_name != 'workflow_dispatch' || inputs.pr_number != ''")
                 self.assertEqual(filtering['with']['predicate-quantifier'], 'some-with-excludes')
                 matrix = next(s for s in job['steps'] if s.get('id') == 'get-matrix')
                 self.assertEqual(matrix['env']['CHANGES'], '${{ steps.filter.outputs.changes }}')

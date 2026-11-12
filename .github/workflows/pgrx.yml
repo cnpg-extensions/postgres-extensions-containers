@@ -2,19 +2,26 @@ name: Build, test and publish PGRX extensions
 'on':
   workflow_call:
     inputs:
-      ref:
-        description: Optional authorized commit SHA to test (disables publishing)
+      pr_number:
         type: string
-        default: ''
+        required: true
+      expected_sha:
+        description: Authorized event head; reject a newer PR revision
+        type: string
+        required: true
     secrets:
       SNYK_TOKEN:
         required: false
   workflow_dispatch:
     inputs:
+      pr_number:
+        description: Optional PR number; selects changed extensions and disables production publishing
+        type: string
+        default: ''
       extension_name:
         description: PGRX extension directory, or all to rebuild every PGRX extension
         type: string
-        required: true
+        required: false
       cnpg_version:
         description: Optional CNPG full version or main
         type: string
@@ -31,19 +38,47 @@ defaults:
 permissions: {}
 jobs:
   discover:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     name: Check changed files
     permissions:
       contents: read
       pull-requests: read
+      statuses: write
     runs-on: ubuntu-26.04
     outputs:
       matrix: ${{ steps.get-matrix.outputs.matrix}}
+      ref: ${{ steps.pr.outputs.sha }}
+      base_ref: ${{ steps.pr.outputs.base_ref }}
     steps:
+      - name: Resolve manual PR and start status
+        if: inputs.pr_number != ''
+        id: pr
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+          CNPG_VERSION: ${{ inputs.cnpg_version }}
+        with:
+          script: |
+            if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('Expected a PR number');
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            if (pr.state !== 'open') throw new Error('PR must be open');
+            if (process.env.EXPECTED_SHA && pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
+            core.setOutput('sha', pr.head.sha);
+            core.setOutput('base', pr.base.sha);
+            core.setOutput('base_ref', pr.base.ref);
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: pr.head.sha, context: 'PGRX acceptance', state: 'pending',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+            if (process.env.CNPG_VERSION) throw new Error('PR gate reporting requires the full CNPG support matrix');
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: ${{ inputs.ref }}
-          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' && inputs.ref != '' }}
+          ref: ${{ steps.pr.outputs.sha }}
+          fetch-depth: ${{ inputs.pr_number != '' && '0' || '1' }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
           persist-credentials: false
 
       - name: Fetch valid targets
@@ -59,7 +94,7 @@ jobs:
           args: get-targets --build-system pgrx
 
       - name: Validate extension name
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number == ''
         env:
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
@@ -84,11 +119,22 @@ jobs:
             echo 'YAML_EOF'
           } >> "$GITHUB_ENV"
 
+      - name: Resolve manual PR diff base
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number != ''
+        id: diff-base
+        env:
+          BASE_SHA: ${{ steps.pr.outputs.base }}
+        run: |
+          git fetch --no-tags origin "$BASE_SHA"
+          echo "sha=$(git merge-base HEAD "$BASE_SHA")" >> "$GITHUB_OUTPUT"
+
       - name: Check for changes
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name != 'workflow_dispatch' || inputs.pr_number != ''
         uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
+          base: ${{ steps.diff-base.outputs.sha }}
+          ref: ${{ steps.pr.outputs.sha }}
           predicate-quantifier: some-with-excludes
           filters: |
             _shared:
@@ -102,6 +148,17 @@ jobs:
               - '.github/workflows/**'
             ${{ env.EXTENSIONS }}
 
+      - name: Verify selected PR revision
+        if: inputs.pr_number != ''
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          TEST_SHA: ${{ steps.pr.outputs.sha }}
+        with:
+          script: |
+            const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
+            if (pr.head.sha !== process.env.TEST_SHA) throw new Error('PR changed during selection; rerun for the new head');
+
       # Only payload changes rebuild on main; shared and test changes validate on branches.
       - name: Compute matrix
         id: get-matrix
@@ -110,8 +167,8 @@ jobs:
           CHANGES: ${{ steps.filter.outputs.changes }}
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
-          EVENT_NAME: ${{ github.event_name }}
-          SELECTION_REF: ${{ inputs.ref || github.ref }}
+          EVENT_NAME: ${{ inputs.pr_number != '' && 'manual_pr' || github.event_name }}
+          SELECTION_REF: ${{ steps.pr.outputs.sha || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # Standard packaging and the install path with a guarded lock correction.
           INFRASTRUCTURE_SAMPLE: '["pg-durable", "pg-session-jwt"]'
@@ -142,11 +199,13 @@ jobs:
           echo "matrix=$(jq -c . <<< "$CHANGES")" >> "$GITHUB_OUTPUT"
 
   contracts:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    needs: discover
     permissions:
       contents: read
     uses: ./.github/workflows/pgrx-tests.yml
     with:
-      ref: ${{ inputs.ref }}
+      ref: ${{ needs.discover.outputs.ref }}
   build:
     needs: discover
     if: ${{ needs.discover.outputs.matrix != '[]' }}
@@ -165,10 +224,10 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     with:
       extension_name: ${{ matrix.extension }}
-      ref: ${{ inputs.ref }}
+      ref: ${{ needs.discover.outputs.ref }}
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
-    name: PGRX acceptance
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'PGRX acceptance (fork preview)' || 'PGRX acceptance' }}
     if: ${{ always() }}
     needs:
     - discover
@@ -198,7 +257,7 @@ jobs:
   catalogs:
     name: Update Catalogs
     needs: [discover, gate]
-    if: github.ref == 'refs/heads/main' && needs.discover.outputs.matrix != '[]' && github.event_name != 'pull_request_target' && inputs.ref == ''
+    if: github.ref == 'refs/heads/main' && needs.discover.outputs.matrix != '[]' && github.event_name != 'pull_request_target' && needs.discover.outputs.ref == ''
     runs-on: ubuntu-26.04
     permissions:
       contents: write
@@ -207,3 +266,23 @@ jobs:
       uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
       with:
         event-type: update-catalogs
+
+  report-pr-status:
+    if: ${{ always() && needs.discover.outputs.ref != '' }}
+    needs: [discover, gate]
+    runs-on: ubuntu-26.04
+    permissions:
+      statuses: write
+    steps:
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
+        env:
+          TEST_SHA: ${{ needs.discover.outputs.ref }}
+          PASSED: ${{ needs.gate.result == 'success' }}
+        with:
+          script: |
+            if (!/^[0-9a-f]{40}$/.test(process.env.TEST_SHA)) throw new Error('ref must be a full commit SHA');
+            await github.rest.repos.createCommitStatus({
+              ...context.repo, sha: process.env.TEST_SHA, context: 'PGRX acceptance',
+              state: process.env.PASSED === 'true' ? 'success' : 'failure',
+              target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
