@@ -6,6 +6,13 @@ PostgreSQL username/password checks. [Upstream documentation](https://github.com
 
 PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
 
+## PostgreSQL compatibility
+
+credcheck 6.0 images using PGDG package revision `+2` require PostgreSQL 18.7
+or later within major version 18. Upgrade PostgreSQL first: on 18.6, credcheck
+prevents startup with `undefined symbol: heap_datum_check`. CNPG does not
+enforce extension minimum minor versions.
+
 ## Declarative setup
 
 ```yaml

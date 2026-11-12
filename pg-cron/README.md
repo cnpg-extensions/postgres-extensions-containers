@@ -10,6 +10,13 @@ to schedule PostgreSQL commands directly from the database.
 
 ## Usage
 
+### PostgreSQL compatibility
+
+pg_cron 1.6.8 images using PGDG package revision `+3` require PostgreSQL 18.7
+or later within major version 18. Upgrade PostgreSQL first: on 18.6, pg_cron
+prevents startup with `undefined symbol: heap_datum_check`. CNPG does not
+enforce extension minimum minor versions.
+
 ### 1. Add the cron extension image to your Cluster
 
 Define the `pg_cron` extension under the `postgresql.extensions` section of
