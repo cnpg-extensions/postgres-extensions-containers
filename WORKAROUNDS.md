@@ -73,12 +73,15 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
   final statuses on the tested head under the existing required gate names.
   Explicit refs disable production and catalogs. Manual dispatch by PR number
   remains available; `extension_name` is ignored and PGRX uses its full CNPG matrix.
-- **Duplicate runs:** ordinary fork PR runs skip discovery and builds; their gates
-  have distinct `(fork preview)` names. The authorized caller runs only for forks.
+- **Duplicate runs:** ordinary fork PR runs skip discovery, builds, and gates;
+  the skipped gates have distinct `(fork preview)` names. The authorized caller runs only for forks.
   Same-repository PRs retain their existing path. New heads need fresh authorization.
-- **Validation:** local lint and selection checks only for this design. Hosted
-  authorization, checkout, status source identity, and ruleset acceptance remain
-  unverified. Older runs may still have conflicting check names.
+- **Validation:** local lint, selection, and whitespace checks pass. Earlier hosted
+  testing confirmed the trigger and initial authorization; the revised checkout,
+  rerun authorization, status source identity, and ruleset acceptance remain
+  unverified. The caller must exist on the default branch before it can test fork
+  PRs, so the bootstrap PR cannot validate that path. Older runs may still have
+  conflicting check names.
 - **Review/remove when:** upstream supports equivalent authorized fork testing or
   tests no longer need privileged publishing. Review authorization, reporting,
   SHA propagation, and Debian/PGRX acceptance during upstream merges.
