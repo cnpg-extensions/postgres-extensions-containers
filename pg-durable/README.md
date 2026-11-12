@@ -38,7 +38,7 @@ spec:
     extensions:
     - name: pg-durable
       image:
-        reference: ghcr.io/cnpg-extensions/pg-durable:v0.2.7-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-durable:0.2.7-18-trixie
 ```
 
 ### 2. Enable the extension in a database

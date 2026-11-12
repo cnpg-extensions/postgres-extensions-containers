@@ -33,7 +33,7 @@ spec:
     extensions:
     - name: pg-graphql
       image:
-        reference: ghcr.io/cnpg-extensions/pg-graphql:v1.6.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.2-18-trixie
 ```
 
 ### 2. Enable the extension in a database

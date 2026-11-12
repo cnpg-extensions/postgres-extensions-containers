@@ -34,7 +34,7 @@ spec:
     extensions:
     - name: pg-jsonschema
       image:
-        reference: ghcr.io/cnpg-extensions/pg-jsonschema:v0.3.4-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-jsonschema:0.3.4-18-trixie
 ```
 
 ### 2. Enable the extension in a database
