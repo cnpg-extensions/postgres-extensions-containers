@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pldebugger
-        package = "1:1.10-1.pgdg12+1"
+        package = "1:1.10-1.pgdg12+2"
         // SQL version cannot be updated by Renovate; if it changes, manually update pldebugger/README.md, pldebugger/metadata.hcl, and renovate.json.
         sql     = "1.1"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pldebugger
-        package = "1:1.10-1.pgdg13+1"
+        package = "1:1.10-1.pgdg13+2"
         // SQL version cannot be updated by Renovate; if it changes, manually update pldebugger/README.md, pldebugger/metadata.hcl, and renovate.json.
         sql     = "1.1"
       }
