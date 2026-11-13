@@ -23,7 +23,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-pltcl-18
-        package = "18.6-1.pgdg12+2"
+        package = "18.7-1.pgdg12+2"
         // SQL version is independent of the package version; inspect control files before merging.
         sql     = "1.0"
       }
@@ -31,7 +31,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-pltcl-18
-        package = "18.6-1.pgdg13+2"
+        package = "18.7-1.pgdg13+2"
         // SQL version is independent of the package version; inspect control files before merging.
         sql     = "1.0"
       }
