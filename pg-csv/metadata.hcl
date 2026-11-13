@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-csv
-        package = "1.0.2-1.pgdg12+1"
+        package = "1.0.2-1.pgdg12+2"
         // SQL catalog version is read from the packaged control file; review separately from package updates.
         sql = "1.0.1"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-csv
-        package = "1.0.2-1.pgdg13+1"
+        package = "1.0.2-1.pgdg13+2"
         // SQL catalog version is read from the packaged control file; review separately from package updates.
         sql = "1.0.1"
       }
