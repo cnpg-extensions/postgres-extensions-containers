@@ -293,7 +293,12 @@ catalog starts from CNPG's [upstream extension catalog](https://github.com/cloud
 then adds the images maintained in this repository. Definitions from the
 upstream catalog are retained.
 
-- **Frequency:** Built once a week.
+- **Frequency:** Refreshed daily at 10:00 UTC and after successful extension
+  builds on `main`. Allow up to 24 hours after images appear in the upstream
+  catalog for them to appear here; delayed or failed workflow runs can extend
+  this interval. To refresh sooner, manually run the
+  [Update Extension Image Catalogs workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml)
+  on `main`.
 - **Location:** Published in the [`artifacts`
   repository](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions).
 - **Naming Convention:** These are based on the `minimal` catalog and use the
