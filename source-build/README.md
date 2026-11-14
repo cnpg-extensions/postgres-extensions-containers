@@ -49,7 +49,7 @@ AMD64 and ARM64 runners.
 
 PR execution enters through the trusted base `maintainer-pr-tests.yml` workflow
 for both fork and same-repository PRs. Repository Admin permission is required;
-Write/Maintain access and recipe ownership do not authorize execution. Reruns
+Write/Maintain access does not authorize execution. Reruns
 validate the triggering admin and reject a changed head SHA. Each candidate
 preparation, platform build, assembly, and security job repeats the inline check
 before checkout, including when only that failed job is rerun. The Debian build
@@ -58,25 +58,12 @@ authorization for a later rerun. Read-only smoke/tooling jobs receive no publish
 or signing credentials. Manual execution
 uses the protected main selector and an explicit PR number for branch testing.
 
-`Update policy` runs protected base code and examines the entire bot diff.
-Only recognized stable version pairs qualify; unknown/mixed changes require a
-current-head project-admin approval. Review events refresh the status through a
-protected default-branch receiver; the notification job executes no PR code. Native
-CODEOWNERS remains the review boundary. No Renovate review bypass or privileged
-execution preauthorization is enabled until its real App identity and permissions
-have been demonstrated.
-
-Deployment requires separate acceptance and review rulesets. Keep Debian's
-`Automerge gate`, add trusted `Source-build acceptance` and `Update policy`, and
-verify their producers before retiring `PGRX acceptance`. Require one approval,
-CODEOWNER review and stale-approval dismissal. A verified Renovate App may bypass
-only the review ruleset, never acceptance. Workflow edits on collaborator branches
-also require repository-level protection of privileged execution; code-level
-checks alone cannot constrain a workflow that an attacker can rewrite. This is
-an unresolved hosted-configuration blocker: a modified branch workflow can remove
-inline checks. Protected environments/credential rules or a trusted-workflow
-policy must enforce that boundary in GitHub before rollout; these code changes
-do not establish that enforcement.
+Repository maintainers maintain all extensions. Renovate's existing root
+configuration determines which updates qualify for automerge, subject to the
+required build/test checks. Keep Debian's `Automerge gate` and the shared
+`Source-build acceptance` gate; this does not require a separate bot-diff policy
+check or an extension-owner review-exemption mechanism. Privileged execution
+continues to use the existing admin authorization checks described above.
 
 Historical PGRX signature verification remains documented in `pgrx/README.md`.
 The renamed hosted signing and SLSA identities must be observed and verified
