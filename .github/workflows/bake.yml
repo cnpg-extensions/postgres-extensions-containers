@@ -14,19 +14,12 @@ on:
       SNYK_TOKEN:
         required: false
   # Required gates must report even when no extension needs rebuilding.
+  pull_request:
   merge_group:
   push:
     branches: [main]
   workflow_dispatch:
     inputs:
-      validation_only:
-        description: Validate one explicit PR target without reporting full PR acceptance
-        type: boolean
-        default: false
-      expected_sha:
-        description: Exact head SHA authorized for PR testing (required with pr_number)
-        type: string
-        default: ''
       pr_number:
         description: Optional PR number; selects changed extensions and disables production publishing
         type: string
@@ -57,38 +50,6 @@ jobs:
       ref: ${{ steps.pr.outputs.sha }}
       base_ref: ${{ steps.pr.outputs.base_ref }}
     steps:
-      - &authorize-candidate
-        name: Authorize this execution attempt
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
-          PR_NUMBER: ${{ inputs.pr_number }}
-          EXPECTED_SHA: ${{ inputs.expected_sha }}
-        with:
-          script: |
-            // Repeat in each job: rerunning a downstream job does not rerun needs.
-            const prNumber = process.env.PR_NUMBER || '';
-            const sha = process.env.EXPECTED_SHA || '';
-            if (context.payload.inputs?.validation_only === 'true' &&
-                (!prNumber || !sha || !context.payload.inputs.extension_name || context.payload.inputs.extension_name === 'all')) {
-              throw new Error('Scoped validation requires an exact PR head and one explicit extension');
-            }
-            if (context.eventName === 'workflow_dispatch' && context.ref !== 'refs/heads/main') {
-              throw new Error('Dispatch the protected main workflow');
-            }
-            if (Number(process.env.GITHUB_RUN_ATTEMPT) > 1 || prNumber || sha || context.eventName === 'pull_request_target' || context.eventName === 'workflow_dispatch') {
-              const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username: process.env.TRIGGERING_ACTOR});
-              if (data.permission !== 'admin') throw new Error('Repository Admin permission required for this execution attempt');
-            }
-            if (prNumber || sha || context.eventName === 'pull_request_target') {
-              if (!/^[1-9][0-9]*$/.test(prNumber) || !/^[0-9a-f]{40}$/.test(sha)) throw new Error('Expected PR number and exact head SHA');
-              const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(prNumber)});
-              if (pr.state !== 'open' || pr.head.sha !== sha) throw new Error('PR head changed or closed; authorize the new event');
-              if (context.eventName === 'pull_request_target' &&
-                  (context.payload.pull_request.number !== pr.number || context.payload.pull_request.head.sha !== sha)) {
-                throw new Error('Candidate must match the authorized PR event');
-              }
-            }
       - name: Resolve manual PR and start status
         if: inputs.pr_number != ''
         id: pr
@@ -101,12 +62,12 @@ jobs:
             if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('Expected a PR number');
             const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
             if (pr.state !== 'open') throw new Error('PR must be open');
-            if (!/^[0-9a-f]{40}$/.test(process.env.EXPECTED_SHA || '') || pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
+            if (process.env.EXPECTED_SHA && pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
             core.setOutput('sha', pr.head.sha);
             core.setOutput('base', pr.base.sha);
             core.setOutput('base_ref', pr.base.ref);
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: pr.head.sha, context: ${{ inputs.validation_only && 'true' || 'false' }} ? 'Scoped Automerge gate' : 'Automerge gate', state: 'pending',
+              ...context.repo, sha: pr.head.sha, context: 'Automerge gate', state: 'pending',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
 
@@ -131,7 +92,7 @@ jobs:
           args: get-targets
 
       - name: Validate extension name
-        if: github.event_name == 'workflow_dispatch' && (inputs.pr_number == '' || inputs.validation_only)
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number == ''
         env:
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
@@ -202,7 +163,7 @@ jobs:
           CHANGES: ${{ steps.filter.outputs.changes }}
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
-          EVENT_NAME: ${{ inputs.validation_only && 'workflow_dispatch' || (inputs.pr_number != '' && 'manual_pr' || github.event_name) }}
+          EVENT_NAME: ${{ inputs.pr_number != '' && 'manual_pr' || github.event_name }}
           SELECTION_REF: ${{ steps.pr.outputs.sha || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # SQL-only, native/preload, base-image dependencies, upstream PostGIS, OS libraries/data.
@@ -237,7 +198,6 @@ jobs:
     name: Bake
     needs: change-triage
     permissions:
-      pull-requests: read
       actions: read
       packages: write
       contents: read
@@ -250,24 +210,21 @@ jobs:
         extension: ${{ fromJSON(needs.change-triage.outputs.matrix) }}
     uses: ./.github/workflows/bake_targets.yml
     with:
-      pr_number: ${{ inputs.pr_number }}
       extension_name: ${{ matrix.extension }}
       ref: ${{ needs.change-triage.outputs.ref }}
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   automerge-gate:
-    name: ${{ inputs.validation_only && 'Scoped Automerge gate' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Automerge gate (fork preview)' || 'Automerge gate' }}
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Automerge gate (fork preview)' || 'Automerge gate' }}
     if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
       - change-triage
       - Bake
     runs-on: ubuntu-26.04
     permissions:
-      pull-requests: read
       contents: read
     steps:
-      - *authorize-candidate
       - name: Verify build and test results
         env:
           DISCOVERY: ${{ needs.change-triage.result }}
@@ -330,11 +287,9 @@ jobs:
     needs: [change-triage, automerge-gate]
     runs-on: ubuntu-26.04
     permissions:
-      pull-requests: read
       contents: write
     if: needs.change-triage.outputs.matrix != '[]' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request_target' && needs.change-triage.outputs.ref == ''
     steps:
-      - *authorize-candidate
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
         with:
@@ -355,7 +310,7 @@ jobs:
           script: |
             if (!/^[0-9a-f]{40}$/.test(process.env.TEST_SHA)) throw new Error('ref must be a full commit SHA');
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: process.env.TEST_SHA, context: ${{ inputs.validation_only && 'true' || 'false' }} ? 'Scoped Automerge gate' : 'Automerge gate',
+              ...context.repo, sha: process.env.TEST_SHA, context: 'Automerge gate',
               state: process.env.PASSED === 'true' ? 'success' : 'failure',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });

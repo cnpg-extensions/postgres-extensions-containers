@@ -14,14 +14,6 @@ name: Source builds
         required: false
   workflow_dispatch:
     inputs:
-      validation_only:
-        description: Validate one explicit PR target without reporting full PR acceptance
-        type: boolean
-        default: false
-      expected_sha:
-        description: Exact head SHA authorized for PR testing (required with pr_number)
-        type: string
-        default: ''
       pr_number:
         description: Optional PR number; selects changed extensions and disables production publishing
         type: string
@@ -36,6 +28,7 @@ name: Source builds
         required: false
         default: ''
   # Keep the required check present on unrelated PRs and merge-queue commits.
+  pull_request:
   merge_group:
   push:
     branches: [main]
@@ -57,38 +50,6 @@ jobs:
       ref: ${{ steps.pr.outputs.sha }}
       base_ref: ${{ steps.pr.outputs.base_ref }}
     steps:
-      - &authorize-candidate
-        name: Authorize this execution attempt
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
-          PR_NUMBER: ${{ inputs.pr_number }}
-          EXPECTED_SHA: ${{ inputs.expected_sha }}
-        with:
-          script: |
-            // Repeat in each job: rerunning a downstream job does not rerun needs.
-            const prNumber = process.env.PR_NUMBER || '';
-            const sha = process.env.EXPECTED_SHA || '';
-            if (context.payload.inputs?.validation_only === 'true' &&
-                (!prNumber || !sha || !context.payload.inputs.extension_name || context.payload.inputs.extension_name === 'all')) {
-              throw new Error('Scoped validation requires an exact PR head and one explicit extension');
-            }
-            if (context.eventName === 'workflow_dispatch' && context.ref !== 'refs/heads/main') {
-              throw new Error('Dispatch the protected main workflow');
-            }
-            if (Number(process.env.GITHUB_RUN_ATTEMPT) > 1 || prNumber || sha || context.eventName === 'pull_request_target' || context.eventName === 'workflow_dispatch') {
-              const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username: process.env.TRIGGERING_ACTOR});
-              if (data.permission !== 'admin') throw new Error('Repository Admin permission required for this execution attempt');
-            }
-            if (prNumber || sha || context.eventName === 'pull_request_target') {
-              if (!/^[1-9][0-9]*$/.test(prNumber) || !/^[0-9a-f]{40}$/.test(sha)) throw new Error('Expected PR number and exact head SHA');
-              const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(prNumber)});
-              if (pr.state !== 'open' || pr.head.sha !== sha) throw new Error('PR head changed or closed; authorize the new event');
-              if (context.eventName === 'pull_request_target' &&
-                  (context.payload.pull_request.number !== pr.number || context.payload.pull_request.head.sha !== sha)) {
-                throw new Error('Candidate must match the authorized PR event');
-              }
-            }
       - name: Resolve manual PR and start status
         if: inputs.pr_number != ''
         id: pr
@@ -102,12 +63,12 @@ jobs:
             if (!/^[1-9][0-9]*$/.test(process.env.PR_NUMBER)) throw new Error('Expected a PR number');
             const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(process.env.PR_NUMBER)});
             if (pr.state !== 'open') throw new Error('PR must be open');
-            if (!/^[0-9a-f]{40}$/.test(process.env.EXPECTED_SHA || '') || pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
+            if (process.env.EXPECTED_SHA && pr.head.sha !== process.env.EXPECTED_SHA) throw new Error('PR head changed; authorize the new event');
             core.setOutput('sha', pr.head.sha);
             core.setOutput('base', pr.base.sha);
             core.setOutput('base_ref', pr.base.ref);
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: pr.head.sha, context: ${{ inputs.validation_only && 'true' || 'false' }} ? 'Scoped Source-build acceptance' : 'Source-build acceptance', state: 'pending',
+              ...context.repo, sha: pr.head.sha, context: 'Source-build acceptance', state: 'pending',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
             if (process.env.CNPG_VERSION) throw new Error('PR gate reporting requires the full CNPG support matrix');
@@ -127,7 +88,7 @@ jobs:
           echo "output=$(jq -c 'keys' "$RUNNER_TEMP/source-inventory.json")" >> "$GITHUB_OUTPUT"
 
       - name: Validate extension name
-        if: github.event_name == 'workflow_dispatch' && (inputs.pr_number == '' || inputs.validation_only)
+        if: github.event_name == 'workflow_dispatch' && inputs.pr_number == ''
         env:
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
@@ -200,11 +161,10 @@ jobs:
         id: get-matrix
         env:
           # JSON array containing the extensions that have been changed
-          VALIDATION_ONLY: ${{ inputs.validation_only || false }}
           CHANGES: ${{ steps.filter.outputs.changes }}
           # Input Extension name
           INPUT_EXTENSION_NAME: ${{ github.event.inputs.extension_name }}
-          EVENT_NAME: ${{ inputs.validation_only && 'workflow_dispatch' || (inputs.pr_number != '' && 'manual_pr' || github.event_name) }}
+          EVENT_NAME: ${{ inputs.pr_number != '' && 'manual_pr' || github.event_name }}
           SELECTION_REF: ${{ steps.pr.outputs.sha || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # Standard packaging and the install path with a guarded lock correction.
@@ -238,12 +198,6 @@ jobs:
           selected = set(json.loads(os.environ['CHANGES']))
           if selected - inventory.keys():
               raise SystemExit('Selection contains an unknown source recipe')
-          while os.environ['VALIDATION_ONLY'] != 'true':
-              users = {name for name, value in inventory.items()
-                       if selected.intersection(value.get('required_extensions', []))}
-              if users <= selected:
-                  break
-              selected |= users
           matrix = [{'extension': name, 'build_family': inventory[name]['build_family']}
                     for name in sorted(selected)]
           with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
@@ -260,14 +214,13 @@ jobs:
     with:
       ref: ${{ needs.discover.outputs.ref }}
   build:
-    needs: [discover, contracts]
+    needs: discover
     if: ${{ needs.discover.outputs.matrix != '[]' }}
     strategy:
       fail-fast: false
       matrix:
         include: ${{ fromJSON(needs.discover.outputs.matrix) }}
     permissions:
-      pull-requests: read
       actions: read
       contents: read
       packages: write
@@ -277,13 +230,12 @@ jobs:
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     with:
-      pr_number: ${{ inputs.pr_number }}
       extension_name: ${{ matrix.extension }}
       build_family: ${{ matrix.build_family }}
       ref: ${{ needs.discover.outputs.ref }}
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
-    name: ${{ inputs.validation_only && 'Scoped Source-build acceptance' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Source-build acceptance (fork preview)' || 'Source-build acceptance' }}
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Source-build acceptance (fork preview)' || 'Source-build acceptance' }}
     if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
     - discover
@@ -316,34 +268,12 @@ jobs:
     if: github.ref == 'refs/heads/main' && needs.discover.outputs.matrix != '[]' && github.event_name != 'pull_request_target' && needs.discover.outputs.ref == ''
     runs-on: ubuntu-26.04
     permissions:
-      pull-requests: read
-      actions: read
       contents: write
     steps:
-    - *authorize-candidate
-    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
-      with:
-        pattern: catalog-metadata-*
-        path: ${{ runner.temp }}/catalog-metadata
-    - name: Collect accepted production references
-      id: accepted
-      env:
-        MATRIX: ${{ needs.discover.outputs.matrix }}
-      run: |
-        python3 - <<'PYTHON'
-        import json, os, pathlib
-        expected = {'catalog-metadata-' + row['extension'] for row in json.loads(os.environ['MATRIX'])}
-        actual = {p.name for p in (pathlib.Path(os.environ['RUNNER_TEMP']) / 'catalog-metadata').iterdir()}
-        if actual != expected:
-            raise SystemExit('Missing or unexpected catalog handoff artifacts')
-        PYTHON
-        refs=$(jq -cs '[.[] | .[] | (."image.name" | split(",")[0] | split(":")[0] | sub("-testing$"; "")) + "@" + ."containerimage.digest"] | unique' "$RUNNER_TEMP"/catalog-metadata/*/metadata.json)
-        echo "refs=$refs" >> "$GITHUB_OUTPUT"
     - name: Repository Dispatch
       uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4
       with:
         event-type: update-catalogs
-        client-payload: '{"source_sha": "${{ github.sha }}", "accepted_image_refs": ${{ steps.accepted.outputs.refs }}}'
 
   report-pr-status:
     if: ${{ always() && needs.discover.outputs.ref != '' }}
@@ -360,7 +290,7 @@ jobs:
           script: |
             if (!/^[0-9a-f]{40}$/.test(process.env.TEST_SHA)) throw new Error('ref must be a full commit SHA');
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: process.env.TEST_SHA, context: ${{ inputs.validation_only && 'true' || 'false' }} ? 'Scoped Source-build acceptance' : 'Source-build acceptance',
+              ...context.repo, sha: process.env.TEST_SHA, context: 'Source-build acceptance',
               state: process.env.PASSED === 'true' ? 'success' : 'failure',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });

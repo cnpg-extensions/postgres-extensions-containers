@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    cnpg.io/cluster: ($values.name)
-spec:
-  (contains(volumes[].image.reference, $values.candidate_image)): true

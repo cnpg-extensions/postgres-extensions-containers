@@ -8,14 +8,7 @@ on:
   repository_dispatch:
     types: [update-catalogs]
 
-concurrency:
-  group: extension-catalog-publication
-  cancel-in-progress: false
-
 permissions: read-all
-
-env:
-  ARTIFACTS_REPOSITORY: ${{ vars.ARTIFACTS_REPOSITORY || 'cnpg-extensions/artifacts' }}
 
 defaults:
   run:
@@ -26,20 +19,8 @@ jobs:
     name: Updating catalogs
     runs-on: ubuntu-26.04
     permissions:
-      contents: read
       id-token: write
     steps:
-      - name: Reject obsolete release dispatch
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        with:
-          script: |
-            const {data: main} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
-            const sha = context.payload.client_payload?.source_sha;
-            const refs = context.payload.client_payload?.accepted_image_refs;
-            if (refs && (!Array.isArray(refs) || refs.some(ref => typeof ref !== 'string' || (!/^ghcr\.io\/[a-z0-9-]+\/[a-z0-9-]+@sha256:[a-f0-9]{64}$/.test(ref) || ref.split('/')[1] !== context.repo.owner.toLowerCase()) || ref.includes('-testing@')))) throw new Error('Invalid production references');
-            if (context.eventName === 'repository_dispatch' && refs !== undefined && (sha !== main.commit.sha || !Array.isArray(context.payload.client_payload.accepted_image_refs) || !context.payload.client_payload.accepted_image_refs.length)) throw new Error('Obsolete or incomplete catalog dispatch');
-            if (context.sha !== main.commit.sha) throw new Error('Catalog checkout is obsolete');
-
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -57,7 +38,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           path: artifacts
-          repository: ${{ env.ARTIFACTS_REPOSITORY }}
+          repository: cnpg-extensions/artifacts
           token: ${{ secrets.REPO_GHA_PAT }}
           ref: main
 
@@ -71,13 +52,7 @@ jobs:
           version: ${{ env.DAGGER_VERSION }}
           verb: call
           module: ./dagger/maintenance/
-          args: >-
-            generate-catalogs --catalogs-dir upstream-artifacts/image-catalogs-extensions/
-            --registry-owner '${{ github.repository_owner }}'
-            --previous-catalogs-dir artifacts/image-catalogs-extensions/
-            --accepted-image-refs '${{ join(github.event.client_payload.accepted_image_refs, ',') }}'
-            --accepted-source-sha '${{ github.event.client_payload.source_sha }}'
-            export --path artifacts/image-catalogs-extensions/
+          args: generate-catalogs --catalogs-dir upstream-artifacts/image-catalogs-extensions/ export --path artifacts/image-catalogs-extensions/
 
       - name: Install cosign
         uses: sigstore/cosign-installer@756fe2d284c7292c4e9b62c8a28f1e5629c59532 # v4.1.3
@@ -95,17 +70,6 @@ jobs:
           git add -A .
           git status
           git diff --staged
-
-      - name: Recheck publication head
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        with:
-          script: |
-            const {data: main} = await github.rest.repos.getBranch({...context.repo, branch: 'main'});
-            const sha = context.payload.client_payload?.source_sha;
-            const refs = context.payload.client_payload?.accepted_image_refs;
-            if (refs && (!Array.isArray(refs) || refs.some(ref => typeof ref !== 'string' || (!/^ghcr\.io\/[a-z0-9-]+\/[a-z0-9-]+@sha256:[a-f0-9]{64}$/.test(ref) || ref.split('/')[1] !== context.repo.owner.toLowerCase()) || ref.includes('-testing@')))) throw new Error('Invalid production references');
-            if (context.eventName === 'repository_dispatch' && refs !== undefined && (sha !== main.commit.sha || !Array.isArray(context.payload.client_payload.accepted_image_refs) || !context.payload.client_payload.accepted_image_refs.length)) throw new Error('Obsolete or incomplete catalog dispatch');
-            if (context.sha !== main.commit.sha) throw new Error('Catalog checkout is obsolete');
 
       - uses: EndBug/add-and-commit@cc9c08ba6c8df3b93a8f2db63e89b98368ae2ae8 # v11
         if: github.ref == 'refs/heads/main'

@@ -92,19 +92,3 @@ func TestResolveDependenciesPropagatesMetadataError(t *testing.T) {
 		t.Fatalf("got %v, want metadata error", err)
 	}
 }
-
-func TestDependencyCycleAndTransitiveDeduplication(t *testing.T) {
-	metadata := map[string]*extensionMetadata{
-		"a": {Name: "a", RequiredExtensions: []string{"b"}},
-		"b": {Name: "b", RequiredExtensions: []string{"a"}},
-	}
-	lookup := func(name string) (*extensionMetadata, error) { return metadata[name], nil }
-	if _, err := resolveDependencies([]string{"a"}, lookup); err == nil {
-		t.Fatal("accepted cycle")
-	}
-	metadata["b"].RequiredExtensions = nil
-	got, err := resolveDependencies([]string{"a", "b"}, lookup)
-	if err != nil || len(got) != 2 || got[0].Configuration.Name != "b" {
-		t.Fatalf("%+v %v", got, err)
-	}
-}

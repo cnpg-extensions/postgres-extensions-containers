@@ -38,16 +38,23 @@ func (m *Maintenance) UpdateOSLibs(
 	// +default="all"
 	target string,
 ) (*dagger.Directory, error) {
-	targetExtensions, err := getExtensions(ctx, source, WithOSLibsFilter(), WithBuildSystemFilter(debianBuildSystem))
+	extDir := source
+	if target != "all" {
+		extDir = source.Filter(dagger.DirectoryFilterOpts{
+			Include: []string{path.Join(target, "**")},
+		})
+		hasMetadataFile, err := extDir.Exists(ctx, path.Join(target, metadataFile))
+		if err != nil {
+			return nil, err
+		}
+		if !hasMetadataFile {
+			return nil, fmt.Errorf("not a valid target, metadata.hcl file is missing. Target: %s", target)
+		}
+	}
+
+	targetExtensions, err := getExtensions(ctx, extDir, WithOSLibsFilter(), WithBuildSystemFilter(debianBuildSystem))
 	if err != nil {
 		return source, err
-	}
-	if target != "all" {
-		for dir, name := range targetExtensions {
-			if name != target {
-				delete(targetExtensions, dir)
-			}
-		}
 	}
 	if len(targetExtensions) == 0 && target != "all" {
 		return nil, fmt.Errorf("the target %q does not require OS Libs update", target)
@@ -170,7 +177,6 @@ func (m *Maintenance) GenerateTestingValues(
 		return nil, err
 	}
 
-	targetExtensionImage = annotations["candidate-resolved-reference"]
 	pgImage := annotations[AnnotationImageBaseName]
 	if pgImage == "" {
 		return nil, fmt.Errorf(
@@ -214,31 +220,8 @@ func (m *Maintenance) GenerateTestingValues(
 	databaseConfig := generateDatabaseConfig(extensionInfos)
 	databaseAssertStatus := generateDatabaseAssertStatus(extensionInfos)
 
-	accepted := dag.Git("https://github.com/cnpg-extensions/artifacts.git").Branch("main").Tree().Directory("image-catalogs-extensions")
-	catalogs, err := getMinimalCatalogs(ctx, accepted)
-	if err != nil {
-		return nil, err
-	}
-	var candidate *ImageCatalog
-	for _, catalog := range catalogs {
-		if catalog.Metadata.Labels[LabelImageOS] != distribution {
-			continue
-		}
-		candidate, err = candidateCatalog(catalog, metadata, locator, extensionInfos[1:])
-		if err != nil {
-			return nil, err
-		}
-		break
-	}
-	if candidate == nil {
-		return nil, fmt.Errorf("no accepted catalog for %s", distribution)
-	}
-
 	// Build values.yaml content
 	values := TestingValues{
-		CandidateImage:         targetExtensionImage,
-		Catalog:                candidate,
-		PgMajor:                pgMajor,
 		Name:                   metadata.Name,
 		SQLName:                metadata.SQLName,
 		SharedPreloadLibraries: metadata.SharedPreloadLibraries,
@@ -491,23 +474,7 @@ func (m *Maintenance) GenerateCatalogs(
 	// The directory containing the starting catalogs. Defaults to "/image-catalogs"
 	// +defaultPath="/image-catalogs"
 	catalogsDir *dagger.Directory,
-	// Explicit production digests accepted by the completed source release gate.
-	// +optional
-	acceptedImageRefs []string,
-	// Source commit accepted by the release gate.
-	// +optional
-	acceptedSourceSha string,
-	// Previously published catalogs; source releases are retained on refresh.
-	// +optional
-	previousCatalogsDir *dagger.Directory,
-	// GHCR owner for accepted source releases; Debian references retain their upstream defaults.
-	// +default="cnpg-extensions"
-	registryOwner string,
 ) (*dagger.Directory, error) {
-	registryOwner = strings.ToLower(registryOwner)
-	if err := validateRegistryOwner(registryOwner); err != nil {
-		return nil, err
-	}
 	outDir := dag.Directory()
 
 	catalogs, err := getMinimalCatalogs(ctx, catalogsDir)
@@ -528,37 +495,12 @@ func (m *Maintenance) GenerateCatalogs(
 
 	metadataByDir := make(map[string]*extensionMetadata, len(targetExtensions))
 	for dir, extension := range targetExtensions {
-		metadata, err := lookupExtensionMetadata(ctx, source, extension)
+		metadata, err := parseExtensionMetadata(ctx, source.Directory(dir))
 		if err != nil {
 			return nil, fmt.Errorf("while parsing extension %s metadata: %w", extension, err)
 		}
+		metadata.BuildSystem, metadata.RecipePath = recipeFamily(path.Join(dir, metadataFile)), dir
 		metadataByDir[dir] = metadata
-	}
-
-	previous := []*ImageCatalog{}
-	if previousCatalogsDir != nil {
-		previous, err = getMinimalCatalogs(ctx, previousCatalogsDir)
-		if err != nil {
-			return nil, err
-		}
-	}
-	accepted := map[string]string{}
-	for _, ref := range acceptedImageRefs {
-		if err := validateProductionReference(ref, registryOwner); err != nil {
-			return nil, err
-		}
-		annotations, err := getImageAnnotations(ctx, ref, "", nil)
-		if err != nil {
-			return nil, err
-		}
-		key, err := acceptedSourceKey(ref, annotations, acceptedSourceSha, metadataByDir, registryOwner)
-		if err != nil {
-			return nil, err
-		}
-		if _, exists := accepted[key]; exists {
-			return nil, fmt.Errorf("duplicate accepted target %s", key)
-		}
-		accepted[key] = ref
 	}
 
 	for _, catalog := range catalogs {
@@ -587,20 +529,24 @@ func (m *Maintenance) GenerateCatalogs(
 					continue
 				}
 
-				var extensionsConfig *ExtensionConfiguration
-				if metadata.BuildSystem == debianBuildSystem || metadata.BuildSystem == "" {
-					var targetExtensionImage string
-					targetExtensionImage, err = getExtensionImageWithTimestamp(metadata, catalogOS, img.Major)
-					if err == nil {
-						extensionsConfig, err = generateExtensionConfiguration(metadata, targetExtensionImage)
-					}
-				} else {
-					extensionsConfig, err = sourceCatalogConfiguration(metadata, catalogOS, img.Major, accepted, previous, registryOwner)
-				}
+				targetExtensionImage, err := getExtensionImageWithTimestamp(metadata, catalogOS, img.Major)
 				if err != nil {
 					return nil, fmt.Errorf("while retrieving extension %s image: %w", extension, err)
 				}
-				img.Extensions = append(img.Extensions, *extensionsConfig)
+
+				extensionsConfig := ExtensionConfiguration{
+					Name: metadata.Name,
+					ImageVolumeSource: ImageVolumeSource{
+						Reference: targetExtensionImage,
+					},
+					ExtensionControlPath: metadata.ExtensionControlPath,
+					DynamicLibraryPath:   metadata.DynamicLibraryPath,
+					LdLibraryPath:        metadata.LdLibraryPath,
+					BinPath:              metadata.BinPath,
+					Env:                  envMapToSlice(metadata.Env),
+				}
+
+				img.Extensions = append(img.Extensions, extensionsConfig)
 
 				// Sort extensions by name
 				sort.Slice(img.Extensions, func(i, j int) bool {

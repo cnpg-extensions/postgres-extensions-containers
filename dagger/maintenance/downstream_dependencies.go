@@ -27,54 +27,35 @@ func resolveDependencies(dependencies []string,
 	lookupMetadata func(string) (*extensionMetadata, error),
 ) ([]*testingExtensionInfo, error) {
 	var out []*testingExtensionInfo
-	state := map[string]int{}
-	var visit func([]string) error
-	visit = func(dependencies []string) error {
-		for _, requiredDependency := range dependencies {
-			dep, isBaseImageDependency, err := parseRequiredDependency(requiredDependency)
-			if err != nil {
-				return err
-			}
-			if isBaseImageDependency {
-				out = append(out, &testingExtensionInfo{
-					SQLName:         dep,
-					CreateExtension: true,
-				})
-				continue
-			}
-
-			if state[dep] == 1 {
-				return fmt.Errorf("dependency cycle at %q", dep)
-			}
-			if state[dep] == 2 {
-				continue
-			}
-			state[dep] = 1
-			info, err := catalogTestingDependency(dep)
-			if err != nil {
-				return err
-			}
-			metadata, err := lookupMetadata(dep)
-			if err != nil {
-				return err
-			}
-			if metadata != nil {
-				if err := visit(metadata.RequiredExtensions); err != nil {
-					return err
-				}
-				info.Configuration.Name = metadata.Name
-				info.SQLName = metadata.SQLName
-				info.CreateExtension = metadata.CreateExtension
-			}
-			out = append(out, info)
-			state[dep] = 2
+	for _, requiredDependency := range dependencies {
+		dep, isBaseImageDependency, err := parseRequiredDependency(requiredDependency)
+		if err != nil {
+			return nil, err
+		}
+		if isBaseImageDependency {
+			out = append(out, &testingExtensionInfo{
+				SQLName:         dep,
+				CreateExtension: true,
+			})
+			continue
 		}
 
-		return nil
+		info, err := catalogTestingDependency(dep)
+		if err != nil {
+			return nil, err
+		}
+		metadata, err := lookupMetadata(dep)
+		if err != nil {
+			return nil, err
+		}
+		if metadata != nil {
+			info.Configuration.Name = metadata.Name
+			info.SQLName = metadata.SQLName
+			info.CreateExtension = metadata.CreateExtension
+		}
+		out = append(out, info)
 	}
-	if err := visit(dependencies); err != nil {
-		return nil, err
-	}
+
 	return out, nil
 }
 

@@ -71,20 +71,12 @@ func getImageAnnotations(ctx context.Context, imageRef string, username string, 
 		if err != nil {
 			return nil, err
 		}
-		if indexManifest.Annotations == nil {
-			indexManifest.Annotations = map[string]string{}
-		}
-		indexManifest.Annotations["candidate-resolved-reference"] = ref.Context().Name() + "@" + head.Digest.String()
 		return indexManifest.Annotations, nil
 	case ocispecv1.MediaTypeImageManifest:
 		manifest, err := containerregistryv1.ParseManifest(bytes.NewReader(head.Manifest))
 		if err != nil {
 			return nil, err
 		}
-		if manifest.Annotations == nil {
-			manifest.Annotations = map[string]string{}
-		}
-		manifest.Annotations["candidate-resolved-reference"] = ref.Context().Name() + "@" + head.Digest.String()
 		return manifest.Annotations, nil
 	}
 

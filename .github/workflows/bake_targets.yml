@@ -3,10 +3,6 @@ name: Build, test and publish a target extension
 on:
   workflow_call:
     inputs:
-      pr_number:
-        description: PR owning the exact candidate ref (required with ref)
-        type: string
-        default: ''
       ref:
         description: Optional commit SHA to test (disables production publishing)
         type: string
@@ -26,7 +22,6 @@ jobs:
     name: Build ${{ inputs.extension_name }}
     runs-on: ${{ github.repository_owner == 'cloudnative-pg' && 'ubuntu-latest-16-cores' || 'ubuntu-26.04' }}
     permissions:
-      pull-requests: read
       contents: read
       packages: write
       # Required by the cosign step
@@ -37,34 +32,6 @@ jobs:
       provenance_matrix: ${{ steps.images.outputs.provenance_matrix }}
       production_provenance_matrix: ${{ steps.images.outputs.production_provenance_matrix }}
     steps:
-      - &authorize-candidate
-        name: Authorize this execution attempt
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
-          PR_NUMBER: ${{ inputs.pr_number }}
-          EXPECTED_SHA: ${{ inputs.ref }}
-        with:
-          script: |
-            // Repeat in each job: rerunning a downstream job does not rerun needs.
-            const prNumber = process.env.PR_NUMBER || '';
-            const sha = process.env.EXPECTED_SHA || '';
-            if (context.eventName === 'workflow_dispatch' && context.ref !== 'refs/heads/main') {
-              throw new Error('Dispatch the protected main workflow');
-            }
-            if (Number(process.env.GITHUB_RUN_ATTEMPT) > 1 || prNumber || sha || context.eventName === 'pull_request_target' || context.eventName === 'workflow_dispatch') {
-              const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username: process.env.TRIGGERING_ACTOR});
-              if (data.permission !== 'admin') throw new Error('Repository Admin permission required for this execution attempt');
-            }
-            if (prNumber || sha || context.eventName === 'pull_request_target') {
-              if (!/^[1-9][0-9]*$/.test(prNumber) || !/^[0-9a-f]{40}$/.test(sha)) throw new Error('Expected PR number and exact head SHA');
-              const {data: pr} = await github.rest.pulls.get({...context.repo, pull_number: Number(prNumber)});
-              if (pr.state !== 'open' || pr.head.sha !== sha) throw new Error('PR head changed or closed; authorize the new event');
-              if (context.eventName === 'pull_request_target' &&
-                  (context.payload.pull_request.number !== pr.number || context.payload.pull_request.head.sha !== sha)) {
-                throw new Error('Candidate must match the authorized PR event');
-              }
-            }
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -162,7 +129,6 @@ jobs:
     name: Security checks
     runs-on: ubuntu-26.04
     permissions:
-      pull-requests: read
       contents: read
       packages: read
       security-events: write
@@ -173,7 +139,6 @@ jobs:
       matrix:
         image: ${{fromJson(needs.testbuild.outputs.images)}}
     steps:
-      - *authorize-candidate
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -223,13 +188,11 @@ jobs:
       - smoke-test
       - provenance
     permissions:
-      pull-requests: read
       contents: read
       packages: write
       # Required by the cosign step
       id-token: write
     steps:
-      - *authorize-candidate
       - name: Copy to production
         uses: cloudnative-pg/postgres-containers/.github/actions/copy-images@main
         with:

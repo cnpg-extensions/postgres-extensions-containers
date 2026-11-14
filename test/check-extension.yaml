@@ -34,7 +34,5 @@ spec:
              exit 0
            fi
            DB_URI=$(echo $DB_URI | sed "s|/\*|/|")
-           result="$(psql "$DB_URI" -tAc "SELECT EXISTS (SELECT FROM pg_catalog.pg_extension WHERE extname = '${EXT_SQL_NAME}' AND extversion = '${EXT_VERSION}')" -q)"
-           echo "pg_extension installation/version assertion: $result"
-           test "$result" = "t"
+           test "$(psql "$DB_URI" -tAc "SELECT EXISTS (SELECT FROM pg_catalog.pg_extension WHERE extname = '${EXT_SQL_NAME}' AND extversion = '${EXT_VERSION}')" -q)" = "t"
            echo "Extension '${EXT_SQL_NAME} v${EXT_VERSION}' is installed!"

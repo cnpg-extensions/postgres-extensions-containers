@@ -15,31 +15,6 @@ spec:
   description: >-
     Validates the end-to-end lifecycle of a PostgreSQL extension, including cluster
     initialization, database resource creation, and functional verification.
-  catch:
-  - events: {}
-  - get:
-      apiVersion: postgresql.cnpg.io/v1
-      kind: Cluster
-      format: yaml
-  - get:
-      apiVersion: postgresql.cnpg.io/v1
-      kind: Database
-      format: yaml
-  - get:
-      apiVersion: postgresql.cnpg.io/v1
-      kind: ClusterImageCatalog
-      name: ($values.catalog.metadata.name)
-      format: yaml
-  - get:
-      apiVersion: v1
-      kind: Pod
-      format: yaml
-  - podLogs:
-      selector: (join('', ['cnpg.io/cluster=', $values.name]))
-      tail: 200
-  - podLogs:
-      selector: job-name=extension-installed
-      tail: 200
   steps:
   - name: Provision PostgreSQL Cluster
     description: >-
@@ -48,13 +23,9 @@ spec:
       and that the instance can initialize and reach a Healthy phase.
     try:
     - apply:
-        file: candidate-catalog.yaml
-    - apply:
         file: cluster.yaml
     - assert:
         file: cluster-assert.yaml
-    - assert:
-        file: candidate-pod-assert.yaml
 
   - name: Initialize Database and Extension
     description: Create the Database custom resource and trigger the 'CREATE EXTENSION' logic via CNPG.

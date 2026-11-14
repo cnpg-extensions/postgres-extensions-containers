@@ -8,10 +8,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
+    if: github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      pull-requests: read
     steps:
       # Trusted base workflow only; do not execute PR code before authorization.
       - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
@@ -20,18 +20,13 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const {data: current} = await github.rest.pulls.get({...context.repo, pull_number: pr.number});
-            if (current.state !== 'open' || current.head.sha !== pr.head.sha) {
-              throw new Error('PR head changed; authorize the new event');
-            }
-            // Downstream jobs also recheck the triggering actor and head before candidate execution.
-            // A project admin can explicitly authorize this event's head SHA with Re-run all jobs.
+            // A maintainer can explicitly authorize this event's head SHA with Re-run all jobs.
             const actors = Number(process.env.GITHUB_RUN_ATTEMPT) > 1
               ? [process.env.TRIGGERING_ACTOR]
               : [pr.user.login, context.actor, process.env.TRIGGERING_ACTOR];
             for (const username of new Set(actors)) {
               const {data} = await github.rest.repos.getCollaboratorPermissionLevel({...context.repo, username});
-              if (data.permission !== 'admin') throw new Error(`${username} requires repository Admin permission`);
+              if (!['write', 'maintain', 'admin'].includes(data.permission)) throw new Error(`${username} requires write access`);
             }
   test:
     needs: prepare

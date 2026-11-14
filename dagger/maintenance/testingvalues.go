@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"strconv"
 
 	"dagger/maintenance/internal/dagger"
 )
@@ -19,9 +17,6 @@ type DatabaseConfig struct {
 }
 
 type TestingValues struct {
-	CandidateImage         string                    `yaml:"candidate_image"`
-	Catalog                *ImageCatalog             `yaml:"catalog"`
-	PgMajor                int                       `yaml:"pg_major"`
 	Name                   string                    `yaml:"name"`
 	SQLName                string                    `yaml:"sql_name"`
 	SharedPreloadLibraries []string                  `yaml:"shared_preload_libraries"`
@@ -57,7 +52,10 @@ func generateTestingValuesExtensions(
 	registryPassword *dagger.Secret,
 ) ([]*testingExtensionInfo, error) {
 	var out []*testingExtensionInfo
-	configuration := &ExtensionConfiguration{Name: metadata.Name}
+	configuration, err := generateExtensionConfiguration(metadata, locator.ExtensionImage)
+	if err != nil {
+		return nil, err
+	}
 	out = append(out, &testingExtensionInfo{
 		Configuration:   configuration,
 		SQLName:         metadata.SQLName,
@@ -68,19 +66,6 @@ func generateTestingValuesExtensions(
 	dependencies, err := resolveTestingDependencies(ctx, source, metadata.RequiredExtensions)
 	if err != nil {
 		return nil, err
-	}
-	inventory, err := recipeInventory(ctx, source)
-	if err != nil {
-		return nil, err
-	}
-	for _, dependency := range dependencies {
-		if dependency.Configuration == nil {
-			continue
-		}
-		local := inventory[dependency.Configuration.Name]
-		if local != nil && !buildMatrixFromMetadata(local).contains(locator.Distribution, strconv.Itoa(locator.PgMajor)) {
-			return nil, fmt.Errorf("dependency %q does not support %s/%d", local.Name, locator.Distribution, locator.PgMajor)
-		}
 	}
 	out = append(out, dependencies...)
 
