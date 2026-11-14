@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
-  source_repository        = "https://github.com/pmpetit/pglinter"
   name                     = "pglinter"
   sql_name                 = "pglinter"
   image_name               = "pglinter"

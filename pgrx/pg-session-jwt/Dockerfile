@@ -11,14 +11,13 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_REPOSITORY
-ARG PGRX_SOURCE_REVISION
 
 USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
-ADD https://github.com/neondatabase/pg_session_jwt/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ENV PGRX_SOURCE_REPOSITORY=https://github.com/neondatabase/pg_session_jwt
+ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # v0.5.0 ships the previous package version. Review/remove this correction

@@ -46,15 +46,16 @@ keep the shared setup and evidence steps.
 For a new extension:
 
 1. Copy and complete the Dockerfile, metadata, and README templates, replacing
-   every placeholder and TODO. In metadata, add the canonical `source_repository`
-   and literal source tag, including a leading `v` when upstream uses one.
+   every placeholder and TODO. Set the canonical source repository in the
+   Dockerfile and the literal source tag in metadata, including a leading `v`
+   when upstream uses one.
    Set `sql` to the tag without a leading `v`, immediately below `package` so
    Renovate updates both together.
 2. Preserve all Dockerfile `ARG` declarations **in their template locations and
    stages**, including `BUILDKIT_SBOM_SCAN_STAGE`, `BASE`, `PG_MAJOR`, `EXT_VERSION`,
-   `TARGETARCH`, `TARGETPLATFORM`, the `PGRX_*` identity arguments, and
+   `TARGETARCH`, `TARGETPLATFORM`, `PGRX_EXTENSION`, `PGRX_DISTRO`, and
    `PGRX_BUILD_TIMESTAMP`. They pass CI's selected versions, architecture, source
-   identity, and timestamp into the build and evidence tools. Some are consumed
+   selection, and timestamp into the build and evidence tools. Some are consumed
    by helper scripts rather than referenced directly in the Dockerfile. Docker
    arguments are stage-scoped, so retain repeated declarations such as `PG_MAJOR`
    in the final stage too.
@@ -78,6 +79,14 @@ For a new extension:
    and hook; do not add a second composer or a build-system-specific consumer
    interface.
 
+The Dockerfile's `PGRX_SOURCE_REPOSITORY` environment variable supplies both the
+archive URL and source attribution. The installer records the commit embedded in
+the downloaded Git archive and its SHA-256; a missing or invalid commit header
+fails the build. Preparation does not resolve tags. A moved upstream tag can
+therefore select different commits in separate builds, but evidence describes
+each actual archive rather than a later tag lookup. There is no cross-platform
+source-consistency gate.
+
 In the extension README, explain SQL and catalog names, preload requirements,
 and any initialization steps.
 
@@ -88,7 +97,7 @@ installing packages, then stage the packaged extension's additional runtime
 closure and copyright notices using the shared helpers. pg-search 0.26.6 uses
 LLD and OpenBLAS at build time but does not stage additional runtime libraries.
 
-PostgreSQL Anonymizer declares its GitLab `source_repository` in metadata and
+PostgreSQL Anonymizer declares its GitLab source URL in its Dockerfile and
 uses the upstream `make extension` target, including runtime CSV data. Payload
 evidence includes that data directory recursively. Its catalog preloads `anon`;
 initialize its legacy fake-data functions with the mounted data path described

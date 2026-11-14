@@ -11,8 +11,6 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_REPOSITORY
-ARG PGRX_SOURCE_REVISION
 
 USER 0
 
@@ -21,7 +19,8 @@ WORKDIR /build
 
 
 # EXT_VERSION is the exact upstream Git tag, including its v prefix.
-ADD https://github.com/microsoft/pg_durable/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ENV PGRX_SOURCE_REPOSITORY=https://github.com/microsoft/pg_durable
+ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 

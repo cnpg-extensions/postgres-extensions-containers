@@ -188,14 +188,12 @@ def main():
     config["patches"] = []
     config["lock_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
     (report / "build-config.json").write_text(json.dumps(config, indent=2) + "\n")
-    # Bake supplies the canonical repository and exact release tag (EXT_VERSION).
-    # Preparation supplies PGRX_SOURCE_REVISION; direct builds may omit it,
-    # in which case resolve_source resolves the tag to a revision here.
+    # The recipe supplies its repository; the downloaded Git archive supplies
+    # the actual commit, even if the release tag has moved since acquisition.
     source_record = resolve_source(
         os.environ["PGRX_SOURCE_REPOSITORY"],
         os.environ["EXT_VERSION"],
         archive=Path("/tmp/source.tar.gz").read_bytes(),
-        revision=os.getenv("PGRX_SOURCE_REVISION") or None,
     )
     (report / "source.json").write_text(json.dumps(source_record, indent=2) + "\n")
     # cargo-about queries the full metadata graph before filtering the target.

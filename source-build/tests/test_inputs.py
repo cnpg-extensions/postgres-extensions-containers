@@ -1,4 +1,6 @@
 import hashlib
+import io
+import tarfile
 import json
 from pathlib import Path
 import sys
@@ -48,15 +50,17 @@ class SourceResolutionTest(unittest.TestCase):
             },
         )
 
-    def test_supplied_archive_and_revision_avoid_source_requests(self):
-        archive = b"already downloaded"
+    def test_archive_commit_avoids_later_tag_resolution(self):
         revision = "abcdef0123456789abcdef0123456789abcdef01"
+        data = io.BytesIO()
+        with tarfile.open(fileobj=data, mode="w:gz", pax_headers={"comment": revision}) as tar:
+            tar.addfile(tarfile.TarInfo("project/file"))
+        archive = data.getvalue()
         with patch("source.fetch", side_effect=AssertionError("unexpected fetch")):
             result = resolve_source(
                 "https://github.com/owner/project",
                 "v1.2.3",
                 archive=archive,
-                revision=revision,
             )
         self.assertEqual(result["host"], "github.com")
         self.assertEqual(result["repository"], "owner/project")
@@ -68,6 +72,16 @@ class SourceResolutionTest(unittest.TestCase):
         self.assertEqual(
             result["archive_sha256"], hashlib.sha256(archive).hexdigest()
         )
+
+    def test_archive_without_commit_cannot_be_mislabeled_from_current_tag(self):
+        for headers in ({}, {"comment": "not-a-commit"}):
+            with self.subTest(headers=headers):
+                data = io.BytesIO()
+                with tarfile.open(fileobj=data, mode="w:gz", pax_headers=headers) as tar:
+                    tar.addfile(tarfile.TarInfo("project/file"))
+                with patch("source.fetch", side_effect=AssertionError("unexpected fetch")):
+                    with self.assertRaisesRegex(ValueError, "identify its Git commit"):
+                        resolve_source("https://github.com/owner/project", "v1.2.3", data.getvalue())
 
 
 class BaseResolutionTest(unittest.TestCase):

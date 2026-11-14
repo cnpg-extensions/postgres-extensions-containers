@@ -11,15 +11,14 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_REPOSITORY
-ARG PGRX_SOURCE_REVISION
 
 USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
 # EXT_VERSION is the exact upstream Git tag; preserve its v prefix.
-ADD https://github.com/supabase/pg_graphql/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ENV PGRX_SOURCE_REPOSITORY=https://github.com/supabase/pg_graphql
+ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 # This is the upstream release build command:

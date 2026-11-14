@@ -11,14 +11,13 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_REPOSITORY
-ARG PGRX_SOURCE_REVISION
 
 USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
-ADD https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${EXT_VERSION}/postgresql_anonymizer-${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ENV PGRX_SOURCE_REPOSITORY=https://gitlab.com/dalibo/postgresql_anonymizer
+ADD ${PGRX_SOURCE_REPOSITORY}/-/archive/${EXT_VERSION}/postgresql_anonymizer-${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 # 3.3.2 retains 3.3.1 for the root package in Cargo.lock. Review/remove on update.
 RUN echo 'dc76277a2144f415409a8f8be6ce553908e83b01c02d18aeeb1d7d44c69c4fd6  Cargo.lock' | sha256sum --check --strict - \

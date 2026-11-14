@@ -4,7 +4,7 @@
 # TODO: Copy this file into the target directory and replace every placeholder
 # and TODO comment before using it. The target Dockerfile should remain the
 # source of truth for pgrx feature selection, package layout, and runtime files.
-# metadata.hcl declares the source repository and release tag.
+# metadata.hcl declares the release tag; this recipe owns its source URL.
 # BuildKit scans the builder stage to include its generated SBOM evidence.
 ARG BUILDKIT_SBOM_SCAN_STAGE=builder
 # Bake selects the PostgreSQL builder image.
@@ -18,8 +18,6 @@ ARG TARGETARCH
 ARG TARGETPLATFORM
 ARG PGRX_EXTENSION
 ARG PGRX_DISTRO
-ARG PGRX_SOURCE_REPOSITORY
-ARG PGRX_SOURCE_REVISION
 
 USER 0
 
@@ -30,10 +28,11 @@ COPY source-build/ /source-build/
 WORKDIR /build
 
 
-# TODO: Set <owner>/<repo> to match metadata.hcl source_repository.
+# TODO: Set the canonical source repository below.
 # EXT_VERSION is the exact upstream Git tag; preserve any prefix or suffix
 # because pgrx tags are not Debian package versions.
-ADD https://github.com/<owner>/<repo>/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ENV PGRX_SOURCE_REPOSITORY=https://github.com/<owner>/<repo>
+ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 

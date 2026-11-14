@@ -2,8 +2,10 @@
 """Resolve release identity and record downloaded source archives."""
 
 import hashlib
+import io
 import json
 import re
+import tarfile
 from urllib.parse import quote, urlsplit
 import urllib.request
 
@@ -77,16 +79,21 @@ def source_revision(host, repository, version):
     return revision.lower()
 
 
-def resolve_source(repository_url, version, archive=None, revision=None):
+def resolve_source(repository_url, version, archive=None):
     """Resolve release identity and hash the supplied archive when available."""
     host, repository = source_repository(repository_url)
     url = source_archive_url(repository_url, version)
-    if revision is None:
+    if archive is None:
         revision = source_revision(host, repository, version)
-    elif not isinstance(revision, str) or not re.fullmatch(
-        r"[a-fA-F0-9]{40}", revision
-    ):
-        raise ValueError("invalid supplied source revision")
+    else:
+        if not isinstance(archive, bytes):
+            raise ValueError("source archive must be bytes")
+        # GitHub and GitLab Git archives embed the actual commit in a global
+        # PAX header. Never label a tag archive with a later API lookup result.
+        with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
+            revision = tar.pax_headers.get("comment")
+        if not isinstance(revision, str) or not re.fullmatch(r"[a-fA-F0-9]{40}", revision):
+            raise ValueError("source archive must identify its Git commit")
     revision = revision.lower()
     result = {
         "repository": repository,
@@ -96,7 +103,5 @@ def resolve_source(repository_url, version, archive=None, revision=None):
         "url": url,
     }
     if archive is not None:
-        if not isinstance(archive, bytes):
-            raise ValueError("source archive must be bytes")
         result["archive_sha256"] = hashlib.sha256(archive).hexdigest()
     return result

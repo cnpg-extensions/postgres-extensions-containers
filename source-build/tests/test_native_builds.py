@@ -15,6 +15,11 @@ from prepare import prepare
 
 class NativeWorkflowTest(unittest.TestCase):
     def test_each_prepared_job_builds_only_its_native_platform(self):
+        for family in ('pgrx', 'universe'):
+            with self.subTest(family=family):
+                self.check_prepared_family(family)
+
+    def check_prepared_family(self, family):
         target = 'example-18-trixie'
         original = {
             'args': {'EXT_VERSION': 'v1.0', 'PG_MAJOR': '18', 'BASE': 'example/base:18'},
@@ -26,12 +31,11 @@ class NativeWorkflowTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary, \
              patch.dict(os.environ, GITHUB_REPOSITORY_OWNER='example', GITHUB_RUN_ID='123'), \
              patch('prepare.discover', return_value={'example': {
-                 'source_repository': 'https://github.com/example/extension', 'image_name': 'extension',
-                 'build_family': 'pgrx', 'recipe_path': 'pgrx/example',
+                 'image_name': 'extension',
+                 'build_family': family, 'recipe_path': family + '/example',
                  'versions': {'trixie': {'18': {'package': 'v1.0'}}},
              }}), \
              patch('prepare.execute', side_effect=['a' * 40, json.dumps({'target': {target: original}})]), \
-             patch('prepare.resolve_source', return_value={'revision': 'b' * 40}), \
              patch('prepare.platform_base', side_effect=lambda ref, platform, **kw: (
                  ref + '@sha256:' + ('c' if platform.endswith('amd64') else 'd') * 64, 'unused',
              )):
@@ -44,6 +48,9 @@ class NativeWorkflowTest(unittest.TestCase):
                 self.assertEqual(row['runner'].endswith('-arm'), row['architecture'] == 'arm64')
                 self.assertEqual(definition['tags'], [row['staging']])
                 self.assertEqual(definition['attest'], original['attest'])
+                self.assertEqual(definition['args']['EXT_VERSION'], 'v1.0')
+                self.assertFalse(any('SOURCE_REPOSITORY' in key or 'SOURCE_REVISION' in key
+                                     for key in definition['args']))
             self.assertNotEqual(plan['rows'][0]['staging'], plan['rows'][1]['staging'])
 
     def test_emulation_does_not_make_a_foreign_worker_native(self):
