@@ -16,14 +16,13 @@ USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
-ENV PGRX_SOURCE_REPOSITORY=https://github.com/paradedb/paradedb
-ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ADD https://github.com/paradedb/paradedb/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # ParadeDB builds with LLD and OpenBLAS:
 # https://github.com/paradedb/paradedb/blob/v0.26.6/docker/Dockerfile.source#L16-L19
 RUN apt-get update && apt-get install -y --no-install-recommends lld libopenblas-dev
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/paradedb/paradedb
 
 # ParadeDB packages from the pg_search workspace directory:
 # https://github.com/paradedb/paradedb/blob/v0.26.6/.github/workflows/publish-pg_search-debian.yml#L300-L307

@@ -19,14 +19,13 @@ WORKDIR /build
 
 
 # EXT_VERSION is the exact upstream Git tag, including its v prefix.
-ENV PGRX_SOURCE_REPOSITORY=https://github.com/microsoft/pg_durable
-ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ADD https://github.com/microsoft/pg_durable/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 
 # Call the shared installer after extracting the source. It derives the
 # matching cargo-pgrx version from Cargo.lock and prepares the pgrx/SBOM tools.
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/microsoft/pg_durable
 
 
 # Upstream package command, adapted only for the shared installer and /build:

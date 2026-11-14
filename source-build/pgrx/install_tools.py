@@ -87,7 +87,7 @@ def install_archive_tool(name, url):
 # the legacy patches field remains empty for schema compatibility. These inputs
 # are generated from upstream Cargo.lock, not a second committed tool lock.
 def main():
-    major, lock_file = sys.argv[1:]
+    major, lock_file, repository_url = sys.argv[1:]
     # Bake supplies the catalog name to select the build recipe. BuildKit
     # supplies TARGETARCH to select Rust tool downloads and the target triple.
     extension = os.environ["PGRX_EXTENSION"]
@@ -191,7 +191,7 @@ def main():
     # The recipe supplies its repository; the downloaded Git archive supplies
     # the actual commit, even if the release tag has moved since acquisition.
     source_record = resolve_source(
-        os.environ["PGRX_SOURCE_REPOSITORY"],
+        repository_url,
         os.environ["EXT_VERSION"],
         archive=Path("/tmp/source.tar.gz").read_bytes(),
     )

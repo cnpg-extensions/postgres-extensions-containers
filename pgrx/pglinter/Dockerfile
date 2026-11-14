@@ -16,8 +16,7 @@ USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
-ENV PGRX_SOURCE_REPOSITORY=https://github.com/pmpetit/pglinter
-ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ADD https://github.com/pmpetit/pglinter/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # 2.0.0 omits Cargo.lock. Borrow the first upstream lockfile, which still
@@ -28,7 +27,7 @@ RUN { test "${EXT_VERSION}" = 2.0.0 && test ! -e Cargo.lock && \
     || { echo 'Upstream pglinter release changed: manually review/remove the borrowed Cargo.lock' >&2; exit 1; }
 ADD --checksum=sha256:01e53fa8890c497dc1b52cc75ef4ad4ecdadf996c22ad510ec6232f3a7ec0dca https://raw.githubusercontent.com/pmpetit/pglinter/d76a73d631b5435843917154a86e40c9d3889740/Cargo.lock /build/Cargo.lock
 
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/pmpetit/pglinter
 
 # Keep the upstream release profile (fat LTO) on both architectures; native
 # ARM64 runner validation and the difference from upstream CI are in WORKAROUNDS.md.

@@ -16,8 +16,7 @@ USER 0
 
 COPY source-build/ /source-build/
 WORKDIR /build
-ENV PGRX_SOURCE_REPOSITORY=https://gitlab.com/dalibo/postgresql_anonymizer
-ADD ${PGRX_SOURCE_REPOSITORY}/-/archive/${EXT_VERSION}/postgresql_anonymizer-${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ADD https://gitlab.com/dalibo/postgresql_anonymizer/-/archive/${EXT_VERSION}/postgresql_anonymizer-${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 # 3.3.2 retains 3.3.1 for the root package in Cargo.lock. Review/remove on update.
 RUN echo 'dc76277a2144f415409a8f8be6ce553908e83b01c02d18aeeb1d7d44c69c4fd6  Cargo.lock' | sha256sum --check --strict - \
@@ -27,7 +26,7 @@ RUN cp Cargo.lock /tmp/pgrx-original-Cargo.lock && \
     ! cmp -s /tmp/pgrx-original-Cargo.lock Cargo.lock && \
     echo '2a30c53c32de09d29aed744677dab082396ff6c91c27664fbe32d3b1117b0e42  Cargo.lock' | sha256sum --check --strict -
 
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://gitlab.com/dalibo/postgresql_anonymizer
 # The upstream extension target packages anon and installs its runtime CSV data:
 # https://gitlab.com/dalibo/postgresql_anonymizer/-/blob/3.3.2/Makefile
 RUN make extension PGVER=pg${PG_MAJOR} PG_CONFIG=/usr/lib/postgresql/${PG_MAJOR}/bin/pg_config

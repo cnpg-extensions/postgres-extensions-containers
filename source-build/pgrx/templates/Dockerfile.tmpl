@@ -31,8 +31,7 @@ WORKDIR /build
 # TODO: Set the canonical source repository below.
 # EXT_VERSION is the exact upstream Git tag; preserve any prefix or suffix
 # because pgrx tags are not Debian package versions.
-ENV PGRX_SOURCE_REPOSITORY=https://github.com/<owner>/<repo>
-ADD ${PGRX_SOURCE_REPOSITORY}/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+ADD https://github.com/<owner>/<repo>/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 
@@ -44,7 +43,7 @@ RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 # installed=False. For cargo pgrx install, use installed=True and copy from
 # /usr/lib and /usr/share as in pgrx/pg-graphql/Dockerfile. For a workspace member,
 # set its manifest path and build from that directory as in pgrx/pg-search/Dockerfile.
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/<owner>/<repo>
 
 
 # TODO: Replace this command with the upstream commands used to build the
