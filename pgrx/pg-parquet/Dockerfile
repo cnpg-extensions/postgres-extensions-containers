@@ -21,7 +21,7 @@ WORKDIR /build
 ADD https://github.com/CrunchyData/pg_parquet/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/CrunchyData/pg_parquet
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 # Upstream package command: https://github.com/CrunchyData/pg_parquet/blob/v0.5.1/Makefile#L40-L41
 RUN cargo pgrx package \

@@ -25,7 +25,7 @@ RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
 # Call the shared installer after extracting the source. It derives the
 # matching cargo-pgrx version from Cargo.lock and prepares the pgrx/SBOM tools.
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/microsoft/pg_durable
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 
 # Upstream package command, adapted only for the shared installer and /build:

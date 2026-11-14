@@ -620,7 +620,6 @@ def augment_spdx(document, context):
         "sql_name",
         "source_version",
         "sql_version",
-        "repository",
         "revision",
         "archive_sha256",
     ):

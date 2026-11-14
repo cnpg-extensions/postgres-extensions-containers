@@ -61,8 +61,7 @@ For a new extension:
    in the final stage too.
 3. Keep the stage named `builder`, copy `source-build/` to `/source-build/`, and extract the source
    into `/build`. **Call `/source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}"
-   /build/Cargo.lock https://github.com/<owner>/<repo>` after extraction and before
-   compilation.** Use the same canonical repository as the `ADD` URL. It installs the
+   /build/Cargo.lock` after extraction and before compilation.** It installs the
    build environment, selects cargo-pgrx from the source lockfile, and prepares
    the SBOM hook and reporting tools.
 4. Add the extension to `RECIPES` in [`build_config.py`](../source-build/pgrx/build_config.py), matching
@@ -80,9 +79,10 @@ For a new extension:
    and hook; do not add a second composer or a build-system-specific consumer
    interface.
 
-Keep the upstream archive URL in the Dockerfile's `ADD` instruction and pass its
-canonical repository URL to the installer for source attribution. Neither needs
-a Bake argument or metadata field. The installer records the commit embedded in
+Keep the upstream archive URL in the Dockerfile's `ADD` instruction. BuildKit
+provenance records that URL and the archive digest; the build recipe provides
+repository attribution. The PGRX SBOM does not duplicate the repository URL.
+The installer records the commit embedded in
 the downloaded Git archive and its SHA-256; a missing or invalid commit header
 fails the build. Preparation does not resolve tags. A moved upstream tag can
 therefore select different commits in separate builds, but evidence describes

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from prepare import platform_base
-from source import resolve_source, source_archive_url
+from source import archive_identity, resolve_source
 
 
 class SourceResolutionTest(unittest.TestCase):
@@ -57,18 +57,8 @@ class SourceResolutionTest(unittest.TestCase):
             tar.addfile(tarfile.TarInfo("project/file"))
         archive = data.getvalue()
         with patch("source.fetch", side_effect=AssertionError("unexpected fetch")):
-            result = resolve_source(
-                "https://github.com/owner/project",
-                "v1.2.3",
-                archive=archive,
-            )
-        self.assertEqual(result["host"], "github.com")
-        self.assertEqual(result["repository"], "owner/project")
+            result = archive_identity(archive)
         self.assertEqual(result["revision"], revision)
-        self.assertEqual(
-            result["url"],
-            source_archive_url("https://github.com/owner/project", "v1.2.3"),
-        )
         self.assertEqual(
             result["archive_sha256"], hashlib.sha256(archive).hexdigest()
         )
@@ -81,7 +71,7 @@ class SourceResolutionTest(unittest.TestCase):
                     tar.addfile(tarfile.TarInfo("project/file"))
                 with patch("source.fetch", side_effect=AssertionError("unexpected fetch")):
                     with self.assertRaisesRegex(ValueError, "identify its Git commit"):
-                        resolve_source("https://github.com/owner/project", "v1.2.3", data.getvalue())
+                        archive_identity(data.getvalue())
 
 
 class BaseResolutionTest(unittest.TestCase):

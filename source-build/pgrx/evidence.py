@@ -258,9 +258,6 @@ def main():
         "sql_name": sql_name,
         "source_version": source["version"],
         "sql_version": sql_version,
-        "repository": source["repository"],
-        "source_host": source["host"],
-        "source_url": source["url"],
         "revision": source["revision"],
         "archive_sha256": source["archive_sha256"],
     }

@@ -38,7 +38,7 @@ class HookTest(unittest.TestCase):
                     {'pkg': 'build-tool', 'dep_kinds': [{'kind': 'build', 'target': None}]},
                     {'pkg': 'dev-tool', 'dep_kinds': [{'kind': 'dev', 'target': None}]}]},
                 *[{'id': name, 'features': [], 'deps': []} for name in ['runtime', 'build-tool', 'dev-tool', 'unused']]]}}
-        self.manifest = {'schema_version': 2, 'identity': {'extension': 'pg-demo', 'sql_name': 'demo', 'source_version': 'v1.0', 'sql_version': '1.0', 'repository': 'example/demo', 'revision': 'a'*40, 'archive_sha256': 'b'*64},
+        self.manifest = {'schema_version': 2, 'identity': {'extension': 'pg-demo', 'sql_name': 'demo', 'source_version': 'v1.0', 'sql_version': '1.0', 'revision': 'a'*40, 'archive_sha256': 'b'*64},
             'target': {'platform': 'linux/amd64', 'rust_target': 'x86_64-unknown-linux-gnu', 'pg_major': '18', 'distro': 'trixie'},
             'build': {'root_id': 'demo', 'manifest': 'Cargo.toml', 'features': ['pg18'], 'default_features': False, 'profile': 'release', 'rustflags': '', 'tools': {'rustc': 'fixture'}},
             'inputs': {'lock_sha256': digest((self.builder/'build/Cargo.lock').read_bytes()), 'timestamp': '2026-01-01T00:00:00Z'},

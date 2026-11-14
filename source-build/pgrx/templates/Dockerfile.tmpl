@@ -43,7 +43,7 @@ RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 # installed=False. For cargo pgrx install, use installed=True and copy from
 # /usr/lib and /usr/share as in pgrx/pg-graphql/Dockerfile. For a workspace member,
 # set its manifest path and build from that directory as in pgrx/pg-search/Dockerfile.
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/<owner>/<repo>
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 
 # TODO: Replace this command with the upstream commands used to build the

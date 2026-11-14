@@ -19,7 +19,7 @@ WORKDIR /build
 ADD https://github.com/supabase/pg_jsonschema/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
 RUN tar -xzf /tmp/source.tar.gz --strip-components=1 -C /build
 
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/supabase/pg_jsonschema
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 # The pgrx build arguments mirror the upstream command:
 # https://github.com/supabase/pg_jsonschema/blob/v0.3.4/.github/workflows/release.yml#L61-L63

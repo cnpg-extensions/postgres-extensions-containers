@@ -4,7 +4,6 @@
 set -Eeuo pipefail
 pg_major=${1:?PostgreSQL major version is required}
 lock_file=${2:?full path to Cargo.lock is required}
-repository_url=${3:?canonical source repository URL is required}
 [[ "$lock_file" == /build/Cargo.lock ]]
 : "${PGRX_EXTENSION:?}" "${PGRX_DISTRO:?}" "${TARGETARCH:?}"
 # Resolve build dependencies through the distribution repositories, as the
@@ -27,5 +26,5 @@ apt-get install --yes --no-install-recommends \
     xz-utils \
     patch
 rm -rf /var/lib/apt/lists/*
-python3 /source-build/pgrx/install_tools.py "$pg_major" "$lock_file" "$repository_url"
+python3 /source-build/pgrx/install_tools.py "$pg_major" "$lock_file"
 install -D -m 0644 /source-build/pgrx/sbom/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py

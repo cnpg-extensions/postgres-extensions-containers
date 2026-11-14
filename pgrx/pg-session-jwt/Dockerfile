@@ -28,7 +28,7 @@ RUN cp Cargo.lock /tmp/pgrx-original-Cargo.lock && \
     ! cmp -s /tmp/pgrx-original-Cargo.lock Cargo.lock && \
     echo '262845e77a113cf8d81fde7517d04df81f5f694d63a0c848fed72ff5b4390434  Cargo.lock' | sha256sum --check --strict -
 
-RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock https://github.com/neondatabase/pg_session_jwt
+RUN /source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}" /build/Cargo.lock
 
 # The upstream build example in Issue #28 uses `cargo pgrx install --release`:
 # https://github.com/neondatabase/pg_session_jwt/issues/28#issuecomment-2685604932

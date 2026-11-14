@@ -13,7 +13,7 @@ import urllib.request
 
 from build_config import RECIPES, effective_features
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from source import resolve_source
+from source import archive_identity
 
 PGRX = Path("/source-build/pgrx")
 BUILD = Path("/build")
@@ -87,7 +87,7 @@ def install_archive_tool(name, url):
 # the legacy patches field remains empty for schema compatibility. These inputs
 # are generated from upstream Cargo.lock, not a second committed tool lock.
 def main():
-    major, lock_file, repository_url = sys.argv[1:]
+    major, lock_file = sys.argv[1:]
     # Bake supplies the catalog name to select the build recipe. BuildKit
     # supplies TARGETARCH to select Rust tool downloads and the target triple.
     extension = os.environ["PGRX_EXTENSION"]
@@ -188,13 +188,12 @@ def main():
     config["patches"] = []
     config["lock_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
     (report / "build-config.json").write_text(json.dumps(config, indent=2) + "\n")
-    # The recipe supplies its repository; the downloaded Git archive supplies
-    # the actual commit, even if the release tag has moved since acquisition.
-    source_record = resolve_source(
-        repository_url,
-        os.environ["EXT_VERSION"],
-        archive=Path("/tmp/source.tar.gz").read_bytes(),
-    )
+    # The downloaded archive supplies its actual commit and hash. Its URL is
+    # already recorded by BuildKit for the recipe's ADD instruction.
+    source_record = {
+        "version": os.environ["EXT_VERSION"],
+        **archive_identity(Path("/tmp/source.tar.gz").read_bytes()),
+    }
     (report / "source.json").write_text(json.dumps(source_record, indent=2) + "\n")
     # cargo-about queries the full metadata graph before filtering the target.
     # Fetch all locked source archives so that reporting stays offline. This
