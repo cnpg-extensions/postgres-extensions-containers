@@ -100,7 +100,7 @@ project due to licensing constraints, but are otherwise fully compatible with
 | **[pltcl](pltcl)** | Tcl procedural language for PostgreSQL | [www.postgresql.org/docs/18/pltcl.html](https://www.postgresql.org/docs/18/pltcl.html) | @ardentperf | PostgreSQL, TCL |
 | **[pointcloud](pointcloud)** | Types and functions for storing and querying LiDAR point-cloud data | [github.com/pgpointcloud/pointcloud](https://github.com/pgpointcloud/pointcloud) | @ardentperf | BSD-3-Clause |
 | **[powa](powa)** | Workload Analyzer history and snapshot schema | [powa.readthedocs.io/en/stable](https://powa.readthedocs.io/en/stable/) | @ardentperf | PostgreSQL |
-| **[postgresql-anonymizer](postgresql-anonymizer)** | Anonymization and data masking (anon) | [gitlab.com/dalibo/postgresql_anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer) | @ardentperf | PostgreSQL |
+| **[postgresql-anonymizer](pgrx/postgresql-anonymizer)** | Anonymization and data masking (anon) | [gitlab.com/dalibo/postgresql_anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer) | @ardentperf | PostgreSQL |
 | **[prefix](prefix)** | Prefix ranges for text lookup and indexing | [github.com/dimitri/prefix](https://github.com/dimitri/prefix) | @ardentperf | BSD-2-Clause |
 | **[preprepare](preprepare)** | Pre-prepare PostgreSQL statements on the server side | [github.com/dimitri/preprepare](https://github.com/dimitri/preprepare) | @ardentperf | PostgreSQL |
 | **[prioritize](prioritize)** | Get and set the nice priorities of PostgreSQL backends | [pgxn.org/dist/prioritize](http://pgxn.org/dist/prioritize/) | @ardentperf | PostgreSQL |
@@ -280,7 +280,7 @@ extract its platform-specific SPDX, and report vulnerabilities and licenses with
 Grype and Grant. See the [example report](./examples/sbom-reports.txt) and
 [generator release workflow](https://github.com/cnpg-extensions/cnpg-sbom-generator/blob/main/.github/workflows/sbom-generator.yml).
 
-For PGRX images, see the [verification notes](./pgrx/README.md#verify-images)
+For PGRX and Universe images, see the [verification notes](./source-build/README.md#verify-images)
 for the signing identity and signature format.
 
 
@@ -309,4 +309,4 @@ kubectl apply -f \
 Clusters using this catalog should reference it instead of the corresponding
 upstream base catalog; it already includes the upstream extension definitions.
 
-PGRX build contributors: see the [build and local validation guide](./pgrx/README.md).
+PGRX and Universe build contributors: see the [shared build and local validation guide](./source-build/README.md).

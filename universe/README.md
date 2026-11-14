@@ -2,7 +2,10 @@
 
 Recipes whose dependency burden makes Debian packaging prohibitive live here.
 Ordinary extensions should use Debian packaging; PGRX extensions use `pgrx/`.
-Use shared `source-build/` orchestration, native AMD64/ARM64 compilation, and the
-shared digest-pinned SBOM generator. See the [canonical design review](https://github.com/ardentperf-labs/postgres-extensions-containers/issues/3)
-and [pg-duckdb pilot](pg-duckdb/README.md). Inclusion requires dependency review,
-accurate shipped-component identities, and shared acceptance checks.
+Inclusion requires a concrete dependency-packaging rationale, accurate shipped
+component identities in the SBOM, and the shared acceptance checks.
+
+Use the [shared source-build guide](../source-build/README.md) for native
+AMD64/ARM64 compilation, image verification, release stages and local validation.
+The [pg-duckdb recipe](pg-duckdb/README.md) documents its packaging rationale,
+source evidence, payload and runtime requirements.

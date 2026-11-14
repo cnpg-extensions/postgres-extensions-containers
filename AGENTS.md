@@ -36,7 +36,7 @@ Keep PGRX release acceptance aligned with Debian: build-time validation,
 security scanning, signing, shared runtime smoke tests, and required SLSA jobs.
 Do not add repeated full OCI-graph verification or per-field BuildKit provenance
 comparisons against preparation records to these stages. Keep independent
-[consumer verification](pgrx/README.md#verify-images) available.
+[consumer verification](source-build/README.md#verify-images) available.
 
 ## Keep orchestration small
 

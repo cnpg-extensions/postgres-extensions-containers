@@ -1,7 +1,6 @@
 # pg-duckdb pilot
 
 Maintainer: [@ardentperf](https://github.com/ardentperf).
-Canonical design/inclusion review: [issue #3](https://github.com/ardentperf-labs/postgres-extensions-containers/issues/3).
 Targets: PostgreSQL 18 / Trixie, native linux/amd64 and linux/arm64.
 
 ## Selected release and evidence
@@ -45,8 +44,6 @@ packages are available in [PGDG](https://apt.postgresql.org/pub/repos/apt/pool/m
 lists forky/sid, not Trixie. Package availability alone does not resolve the exact
 DuckDB gitlink, matching httpfs pin, and private static registration interface.
 
-The inclusion rationale remains subject to review in issue #3; this is not a
-claim of an accepted packaging exception or a claim that Debian packaging is impossible.
 Revisit Debian packaging when the fork/ABI/unbundling burden is resolved.
 
 This DuckDB revision's `extension/icu/README.md` explicitly says it no longer
@@ -118,7 +115,7 @@ DuckDB execution defaults to superusers; `duckdb.allowed_role` can delegate it,
 including access to secrets. Local filesystem access follows upstream server-file
 role checks. See this release's `docs/settings.md` before granting access.
 
-## Build and outstanding validation
+## Build and validation
 
 From repository root, on a native AMD64 worker (ARM64 uses `linux/arm64`):
 
@@ -132,27 +129,18 @@ docker buildx build --platform linux/amd64 \
   -f universe/pg-duckdb/Dockerfile .
 ```
 
-Use the shared native-worker preflight and source Bake overlay once integrated.
-No compilation or runtime validation has been performed. Parent coordinates
-fresh local builds, SPDX validation, Grype/Grant, and shared smoke tests before
-hosted dual-architecture validation. There is no extension-specific suite.
+Use the [shared native-worker preflight, preparation and local validation
+guide](../../source-build/README.md#development). The recipe uses the ordinary
+shared smoke tests; it has no extension-specific runtime suite. Runtime libraries
+require `ld_library_path = ["lib"]` so PostgreSQL can find the bundled closure,
+including libcurl.
 
-Requested shared hook checks: DuckDB/httpfs revisions; canonical versions and
-PURLs after composition; no compiler-only package claims; preservation of dpkg
-ownership/Syft records; notices and payload hash binding; both architectures.
-Local AMD64 compilation, linkage, shared-generator SPDX validation and the
-shared CNPG catalog smoke test passed on PostgreSQL 18 / Trixie. Runtime libraries
-require `ld_library_path = ["lib"]`; without it CNPG cannot find libcurl.
-The final attached SBOM includes the selected bundled components and generated
-data, with miniz's source version distinguished from its compatibility macro.
+Build evidence must retain DuckDB/httpfs revisions, canonical versions and PURLs,
+dpkg ownership and Syft records, original notices, and payload hash binding in
+each architecture's final SBOM. Compiler-only inputs must not be reported as
+shipped packages. Keep miniz's source version distinct from its compatibility macro.
 
-A one-off local Grype/Grant run successfully produced vulnerability and license
-reports, including findings in libcurl and Kerberos. These reports are acceptance
-evidence, not additional CI gates. CI uses the same shared security action as
-pre-migration PGRX. See issue #3 for image digests and local reports. Renovate tracks stable upstream
-GitHub releases and opens source-update PRs; SQL mappings and bundled-source
-evidence require review before those updates can merge.
-See the canonical issue for separately recorded hosted architecture builds,
-signing/SLSA, combined GHCR-backed runtime testing and rollout status. Candidate
-validation does not establish production publication or a real Renovate merge
-and release cycle.
+CI uses the shared security action. Optional local vulnerability and license
+reports use the [consumer verification commands](../../source-build/README.md#verify-images).
+Renovate tracks stable upstream GitHub releases and opens source-update PRs;
+SQL mappings and bundled-source evidence require review before those updates merge.
