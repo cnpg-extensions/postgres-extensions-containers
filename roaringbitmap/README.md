@@ -29,7 +29,7 @@ spec:
     - name: roaringbitmap
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-18-roaringbitmap
-        reference: ghcr.io/cnpg-extensions/roaringbitmap:1.2.0-18-trixie
+        reference: ghcr.io/cnpg-extensions/roaringbitmap:1.3.0-18-trixie
 ```
 
 Install the SQL extension in a database with a CNPG `Database` resource:
@@ -48,7 +48,7 @@ spec:
   - ensure: present
     name: roaringbitmap
     # renovate: suite=trixie-pgdg depName=postgresql-18-roaringbitmap extractVersion=^(?<version>\d+\.\d+)
-    version: '1.2'
+    version: '1.3'
 ```
 
 A SQL check that exercises the installed extension is:
