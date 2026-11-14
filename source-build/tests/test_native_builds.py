@@ -40,7 +40,7 @@ class NativeWorkflowTest(unittest.TestCase):
                  ref + '@sha256:' + ('c' if platform.endswith('amd64') else 'd') * 64, 'unused',
              )):
             directory = Path(temporary) / 'prepared'
-            plan = prepare({'extension_name': 'example'}, 'example/generator@sha256:' + 'e' * 64, directory)
+            plan = prepare({'extension_name': 'example', 'build_family': family}, 'example/generator@sha256:' + 'e' * 64, directory)
             self.assertEqual(len(plan['rows']), 2)
             for row in plan['rows']:
                 definition = json.loads((directory / (row['id'] + '.json')).read_text())['target'][target]
