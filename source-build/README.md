@@ -211,11 +211,7 @@ makes shared tools and resources available inside both families' builders.
 
 The final SPDX SBOM must include shipped dependencies at the recipe's documented
 package boundaries, including source-built counterparts of separately packaged
-Debian libraries that automatic scanning misses. The
-[pg_duckdb boundary](../universe/pg-duckdb/PACKAGING.md#sbom-contents) follows
-Debian DuckDB packaging: internal bundled code remains covered by its containing
-package, complete notices and aggregated license terms. It is not a separate
-package inventory of every embedded component. Never suppress actual shipped
+Debian libraries that automatic scanning misses. Never suppress actual shipped
 Debian binary ownership. A recipe that maps source-built components to Debian
 scanner identities must document the mapping, retain actual compiled versions
 and source provenance, and distinguish it from dpkg installation or Debian
@@ -263,6 +259,13 @@ build timestamp alone does not prove which commit a tag selected. Recipes may
 resolve commits privately when required to acquire matching nested dependencies.
 This does not introduce a new public source-identity contract.
 
+### Example: pg_duckdb's dependency boundaries
+
+The [pg_duckdb boundary](../universe/pg-duckdb/PACKAGING.md#sbom-contents) follows
+Debian DuckDB packaging: internal bundled code remains covered by its containing
+package, complete notices and aggregated license terms. It is not a separate
+package inventory of every embedded component. The Cargo lookup policy described
+below does not apply to DuckDB's dependencies.
 
 ### Example: pg-search's Rust dependencies
 
@@ -302,7 +305,7 @@ The PGRX helpers implement this policy deliberately:
 
 This is PGRX's automatic implementation of the shared evidence principle.
 Universe recipes must establish their own ecosystem identities and defensible
-versions; the Cargo lookup policy does not apply to DuckDB's dependencies. The
+versions. The
 published output remains ordinary SPDX and Package URLs, with no additional
 consumer schema or API.
 
