@@ -9,7 +9,7 @@ vars:
   NC: \033[0m
 
   E2E_NETWORK: pg-extensions-e2e
-  DAGGER_ENGINE_NAME: dagger-engine-pg-extensions
+  DAGGER_ENGINE_NAME: pg-extensions-dagger
   REGISTRY_NAME: registry.pg-extensions
   REGISTRY_HOST_NAME: localhost
   REGISTRY_HOST_PORT: 5000
@@ -77,10 +77,10 @@ tasks:
       build_timestamp: '{{now | date "2006-01-02T15:04:05Z07:00"}}'
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
     vars:
-      BAKE_OVERLAY:
-        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
       RECIPE_PATH:
         sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      BAKE_OVERLAY:
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
     preconditions:
       - sh: test -f "{{.RECIPE_PATH}}/metadata.hcl"
         msg: 'Not a valid target, metadata.hcl file is missing. Target: {{.TARGET}}'
@@ -116,10 +116,10 @@ tasks:
       build_timestamp: '{{now | date "2006-01-02T15:04:05Z07:00"}}'
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
     vars:
-      BAKE_OVERLAY:
-        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
       RECIPE_PATH:
         sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      BAKE_OVERLAY:
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
       BUILDER: '{{.BUILDER | default ""}}'
       PUSH: '{{.PUSH | default "false"}}'
       DRY_RUN: '{{.DRY_RUN | default "false"}}'
