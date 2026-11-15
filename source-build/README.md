@@ -4,120 +4,9 @@ These utilities prepare and assemble native PostgreSQL extension builds. Recipes
 live under `pgrx/<name>` and `universe/<name>`; directory location determines the
 build family. Shared tools live here, while Rust-specific tools live in `pgrx/`.
 
-Use the [PGRX recipe instructions](#add-a-pgrx-recipe) for Rust extensions and the
-[Universe recipe instructions](#add-a-universe-recipe) for other source builds. The
+Use the [PGRX recipe instructions](pgrx/README.md) for Rust extensions and the
+[Universe recipe instructions](universe/README.md) for other source builds. The
 [repository build guide](../BUILD.md) covers the shared Task/Dagger commands.
-
-## Add a PGRX recipe
-
-PGRX recipes are discovered from `pgrx/<extension>/metadata.hcl`. Directory location selects the PGRX build family.
-
-**Start from the [PGRX templates](pgrx/templates/) and follow their structure.**
-The [Dockerfile template](pgrx/templates/Dockerfile.tmpl) contains the integration
-points used by CI, native builds, and SBOM generation. Adapt the source URL,
-upstream build commands, dependencies, and copied runtime files for the extension;
-keep the shared setup and evidence steps.
-
-For a new extension:
-
-1. Copy and complete the Dockerfile, metadata, and README templates, replacing
-   every placeholder and TODO. Set the canonical source repository in the
-   Dockerfile and the literal source tag in metadata, including a leading `v`
-   when upstream uses one.
-   Set `sql` to the tag without a leading `v`, immediately below `package` so
-   Renovate updates both together.
-2. Preserve all Dockerfile `ARG` declarations **in their template locations and
-   stages**, including `BUILDKIT_SBOM_SCAN_STAGE`, `BASE`, `PG_MAJOR`, `EXT_VERSION`,
-   `TARGETARCH`, `TARGETPLATFORM`, `PGRX_EXTENSION`, `PGRX_DISTRO`, and
-   `PGRX_BUILD_TIMESTAMP`. They pass CI's selected versions, architecture, source
-   selection, and timestamp into the build and evidence tools. Some are consumed
-   by helper scripts rather than referenced directly in the Dockerfile. Docker
-   arguments are stage-scoped, so retain repeated declarations such as `PG_MAJOR`
-   in the final stage too.
-3. Keep the stage named `builder`, copy `source-build/` to `/source-build/`, and extract the source
-   into `/build`. **Call `/source-build/pgrx/install-pgrx-build-environment.sh "${PG_MAJOR}"
-   /build/Cargo.lock` after extraction and before compilation.** It installs the
-   build environment, selects cargo-pgrx from the source lockfile, and prepares
-   the SBOM hook and reporting tools.
-4. Add the extension to `RECIPES` in [`build_config.py`](pgrx/build_config.py), matching
-   the Dockerfile's manifest path, features, and package/install layout. Add any
-   required apt dependencies and keep the upstream recipe URL immediately above
-   the build commands.
-5. **Call `/source-build/pgrx/finalize-pgrx-evidence.sh` after compilation and packaging.** It
-   records the completed payload and generates Cargo and license evidence needed
-   by the SBOM hook. Preserve the diagnostic `pgrx-sbom` stage and copy the
-   generated Rust license notices into the final image alongside the runtime
-   files, as the template shows.
-6. Declare supported distribution/PostgreSQL combinations in metadata;
-   preparation creates their native build jobs automatically. Run the shared
-   [local builds and checks](#local-builds). Use the existing SBOM generator
-   and hook; do not add a second composer or a build-system-specific consumer
-   interface.
-
-In the extension README, explain SQL and catalog names, preload requirements,
-and any initialization steps.
-
-### Recipes with additional runtime needs
-
-Recipes that need additional OS runtime libraries capture base libraries before
-installing packages, then stage the packaged extension's additional runtime
-closure and copyright notices using the shared helpers. pg-search 0.26.6 uses
-LLD and OpenBLAS at build time but does not stage additional runtime libraries.
-
-PostgreSQL Anonymizer declares its GitLab source URL in its Dockerfile and
-uses the upstream `make extension` target, including runtime CSV data. Payload
-evidence includes that data directory recursively. Its catalog preloads `anon`;
-initialize its legacy fake-data functions with the mounted data path described
-in the extension README.
-
-### PGRX source updates
-
-Renovate PGRX source and build-tool updates inherit the shared minor, patch and
-digest automerge policy, subject to required checks. Major updates remain manual.
-Renovate updates `package` and the adjacent `sql` value together for every PGRX
-extension, stripping only a leading `v` from the source tag for SQL. If upstream
-ships a different SQL version, investigate the release before merging.
-
-## Add a Universe recipe
-
-Universe is for extensions whose dependency burden makes Debian packaging
-prohibitive. Ordinary extensions should use Debian packaging; Rust extensions
-use PGRX. Document the specific obstacles and shipped-component evidence in
-`PACKAGING.md`.
-
-Start from the [Dockerfile, README and metadata templates](universe/templates/).
-They use the existing scaffolder and do not require a separate generator:
-
-```sh
-dagger call -sm ./dagger/maintenance/ create \
-  --name=my-extension --versions=18 --distros=trixie \
-  --templates-dir=./source-build/universe/templates \
-  export --path=./universe/my-extension
-```
-
-Replace all TODOs and placeholders. Follow the [pg-duckdb recipe](../universe/pg-duckdb/)
-for a completed example. Keep the public README focused on installation and use;
-put the Debian packaging rationale and a short SBOM overview in `PACKAGING.md`.
-
-The Dockerfile owns source acquisition, compilation and payload staging. It copies
-`source-build/` broadly into the builder, uses the shared SBOM generator's hook
-interface, and copies only the runtime payload and notices into the scratch image.
-Keep source tags literal in `package`; set `sql` to the version actually declared
-by the extension, and configure root Renovate rules for verified mappings.
-
-Unlike PGRX's Cargo helpers, Universe has no general dependency-discovery or
-license-collection helper. Each recipe must identify its bundled/static runtime
-components, stage required libraries and original notices, and provide evidence
-for the shared generator. The template's `acquire.py`, `evidence.py` and
-`augment_spdx.py` names are examples of recipe-owned files, not supplied utilities.
-Use inline Dockerfile commands where sufficient; do not create scripts just to
-match the example names.
-
-Preserve the generator's OS package ownership and shipped-file inventory. A hook
-adds source-built packages with accurate names, versions or revisions, dependency
-relationships and licenses; it does not replace the generator. Runtime components
-and bundled data must meet the [licensing policy](../README.md#open-source-licensing-policy).
-Build-only dependencies must not be reported as part of the distributed payload.
 
 ## Dependency evidence in the SBOM
 
@@ -241,19 +130,6 @@ arguments. The shared [local smoke-test instructions](../BUILD.md#local-testing-
 accept logical names such as `pg-duckdb`. Universe uses the ordinary installation
 and version checks; no separate extension-specific runtime suite is required.
 
-### PGRX Bake targets
-
-Use the extension's ordinary Bake targets with
-`-f docker-bake.hcl -f docker-bake-pgrx.hcl -f pgrx/<extension>/metadata.hcl`
-in that order. Supply `build_timestamp` and the digest-qualified `sbom_generator`
-from preparation. Select explicit named Bake targets to build a single local
-distribution, and restrict the platform to your host's native architecture
-(for example, `--set '*.platforms=linux/amd64'` on AMD64). Do not emulate the
-other architecture for a Rust build.
-
-The diagnostic `pgrx-sbom` target exports Cargo evidence for inspection. It does
-not replace an image build that produces attestations or test hosted signing.
-
 ## Tooling tests
 
 Run the existing suite in the pinned generator image so its Syft, SPDX validator
@@ -329,20 +205,5 @@ extensions. Scan the PostgreSQL base image separately using its own SBOM.
 | [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
 | [`source.py`](source.py) | Shared source-resolution helpers. |
 | [`tests/`](tests/) | Shared tooling and recipe-hook tests. |
-| [`pgrx/`](pgrx/) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
-| [`universe/templates/`](universe/templates/) | Dockerfile, user README and metadata templates for Universe recipes. |
-
-### PGRX tools
-
-Extension-specific Dockerfiles and metadata live under `pgrx/<extension>/`. Rust-specific
-tools live under `source-build/pgrx/`:
-
-| File or directory | Purpose |
-| --- | --- |
-| [`build_config.py`](pgrx/build_config.py) | Registers extension recipes and their Cargo feature selection. |
-| [`install-pgrx-build-environment.sh`](pgrx/install-pgrx-build-environment.sh) | Required Dockerfile setup step: installs build tools and the SBOM hook. |
-| [`finalize-pgrx-evidence.sh`](pgrx/finalize-pgrx-evidence.sh) | Required post-build step: collects Cargo, license, and runtime-payload evidence. |
-| [`templates/`](pgrx/templates/) | Dockerfile, metadata, and README templates to follow for new extensions. |
-| [`sbom/`](pgrx/sbom/) | Hook that adds verified Rust dependencies and licenses to the shared generator's SPDX output. |
-| [`dependencies/`](pgrx/dependencies/) | Rust, rustup, and cargo-about version configuration for extension builders. |
-| [`tests/`](pgrx/tests/) | PGRX tests, run with `python3 source-build/test.py`. |
+| [`pgrx/`](pgrx/README.md) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
+| [`universe/`](universe/README.md) | Recipe-authoring guide and templates for Universe builds. |

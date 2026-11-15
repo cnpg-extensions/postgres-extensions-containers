@@ -23,4 +23,4 @@ summarize its bundled components and Debian packaging rationale.
 ## Contributing
 
 For recipe development and local builds, see the
-[source-build guide](../source-build/README.md#add-a-universe-recipe).
+[source-build guide](../source-build/universe/README.md).

@@ -31,4 +31,4 @@ this does not mean every dependency survives linker dead-code elimination.
 ## Contributing
 
 For recipe development and local builds, see the
-[source-build guide](../source-build/README.md#add-a-pgrx-recipe).
+[source-build guide](../source-build/pgrx/README.md).

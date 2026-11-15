@@ -54,8 +54,8 @@ following scaffolded files:
 > For a complete walkthrough of the requirements and package discovery phase,
 > see [`CONTRIBUTING_NEW_EXTENSION.md`](./CONTRIBUTING_NEW_EXTENSION.md).
 
-For Universe source builds, use the [source-build templates](source-build/README.md#add-a-universe-recipe).
-For Rust extensions, follow the [PGRX template guide](source-build/README.md#add-a-pgrx-recipe).
+For Universe source builds, use the [source-build templates](source-build/universe/README.md).
+For Rust extensions, follow the [PGRX template guide](source-build/pgrx/README.md).
 
 ### Advanced Scaffolding
 
