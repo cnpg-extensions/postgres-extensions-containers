@@ -34,9 +34,9 @@ manage, getting the software packaged for Debian is generally straightforward
 too. When Debian packaging is difficult, we commonly discover that the same
 underlying blockers also affect our own distribution and adoption in Kubernetes
 environments.
-Proposals must distinguish packaging or delivery obstacles that a source build
-can address from unresolved licensing or dependency-management work that still
-has to be completed.
+Proposals must distinguish packaging or delivery obstacles, and generally
+should outline the steps required to complete Debian packaging in the long term.
+For an example, see the [pg_duckdb Debian and PGDG inclusion plan](../universe/pg-duckdb/PACKAGING.md#appendix-debian-and-pgdg-inclusion).
 
 For PGRX, the obstacle is the shared build toolchain. `cargo-pgrx` itself
 has not yet been accepted into Debian. Packaging has been discussed, but we
