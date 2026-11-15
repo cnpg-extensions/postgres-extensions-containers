@@ -35,7 +35,7 @@ this document does not duplicate their pins.
 original notices. `augment_spdx.py` preserves the generator's existing records
 and adds source evidence through its hook interface. Builder reports are private
 validation inputs; consumers use the standard SPDX document described in the
-[Universe dependency guidance](../README.md#dependency-evidence-in-the-sbom). Neither is a generic
+[shared dependency guidance](../../source-build/README.md#dependency-evidence-in-the-sbom). Neither is a generic
 Universe dependency or license helper. Source-input relationships do not prove
 that every object survives linker dead-code elimination.
 
