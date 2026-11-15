@@ -16,7 +16,7 @@ configuration, preload requirements and runtime caveats.
 ## Image information
 
 Images include an SBOM, provenance and original license notices under `/licenses`.
-See [image verification and SBOM inspection](../source-build/README.md#verify-images)
+See [image verification and SBOM inspection](../README.md#verify-images)
 for consumer instructions. The [pg_duckdb packaging notes](pg-duckdb/PACKAGING.md)
 summarize its bundled components and Debian packaging rationale.
 

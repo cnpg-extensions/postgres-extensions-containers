@@ -97,7 +97,7 @@ Cosign signs the assembled index. Later jobs use its immutable digest.
 Security, smoke tests, and testing-image SLSA provenance can then run in parallel.
 Security uses the shared Dockle/optional-Snyk action. The attached platform SBOMs
 remain available for consumer vulnerability and license reports through the
-[verification guide](#verify-images).
+[verification guide](../README.md#verify-images).
 Build-time SPDX validation remains in place. The shared smoke workflow tests the
 extension in CloudNativePG, and the shared SLSA workflow separately attests the
 testing image's build provenance.
@@ -266,6 +266,21 @@ assembly and generator/hook composition. Recipe evidence tests should cover lost
 packages, identifiers, notices and payload ownership. Universe's evidence is
 recipe-specific and must be reviewed when upstream components change.
 
+## Directory guide
+
+| File or directory | Purpose |
+| --- | --- |
+| [`prepare.py`](prepare.py) | Turns metadata into native build rows and Bake definitions. |
+| [`workflow.py`](workflow.py) | Discovers source recipes and their location-derived families. |
+| [`build.py`](build.py) | Checks native host, daemon and BuildKit-worker architecture. |
+| [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
+| [`source.py`](source.py) | Shared source-resolution helpers. |
+| [`tests/`](tests/) | Shared tooling and recipe-hook tests. |
+| [`pgrx/`](pgrx/README.md) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
+| [`universe/`](universe/README.md) | Recipe-authoring guide and templates for Universe builds. |
+
+### Test files
+
 The shared runner and files under `source-build/tests/` are listed below. These
 checks use fixtures and mocked external commands; they do not build extensions
 or run PostgreSQL.
@@ -279,51 +294,3 @@ or run PostgreSQL.
 | [`test_assembly.py`](tests/test_assembly.py) | [`assemble.py`](assemble.py) | Complete platform coverage and preservation of image and attestation descriptors during assembly. |
 | [`test_registry.py`](tests/test_registry.py) | [`assemble.py`](assemble.py) | Waiting for the expected registry index digest and rejecting stale or different index contents. |
 | [`test_universe_hook.py`](tests/test_universe_hook.py) | [`pg-duckdb/evidence.py`](../universe/pg-duckdb/evidence.py), [`pg-duckdb/augment_spdx.py`](../universe/pg-duckdb/augment_spdx.py) | pg-duckdb dependency identities, vendor versions, notice preservation, payload binding and preservation of existing SBOM records. |
-
-## Verify images
-
-Follow the SBOM guide to [verify the image and extract its
-SBOM](https://github.com/cnpg-extensions/cnpg-sbom-generator#verify-the-image-and-extract-its-sbom),
-[inspect and verify build provenance](https://github.com/cnpg-extensions/cnpg-sbom-generator#inspect-and-verify-build-provenance),
-and [report vulnerabilities and licenses](https://github.com/cnpg-extensions/cnpg-sbom-generator#report-vulnerabilities-and-licenses).
-The tools listed in that guide are sufficient; no source-build toolchain is needed.
-
-For images published by `cnpg-extensions` from `main` through the shared source
-workflow, use this exact `--certificate-identity` in the guide's Cosign command:
-
-```text
-https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/source-build-targets.yml@refs/heads/main
-```
-
-For older PGRX images published through `pgrx_targets.yml`, use their original
-signing identity instead:
-
-```text
-https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/pgrx_targets.yml@refs/heads/main
-```
-
-Keep the guide's GitHub Actions OIDC issuer and add
-`--new-bundle-format=false` for this repository's legacy-format signatures.
-For another publisher, change both the image repository and the exact workflow
-identity to that publisher's repository and trusted branch. After copying an
-image, verify the destination repository's signature as well.
-
-The guide's extraction examples use a multi-platform index. For a
-single-platform index, confirm its platform with `docker buildx imagetools
-inspect`, then use `.SBOM.SPDX` and `.Provenance.SLSA` in the format expressions.
-
-PGRX and Universe use the same published SBOM format and consumer tools as Debian
-extensions. Scan the PostgreSQL base image separately using its own SBOM.
-
-## Directory guide
-
-| File or directory | Purpose |
-| --- | --- |
-| [`prepare.py`](prepare.py) | Turns metadata into native build rows and Bake definitions. |
-| [`workflow.py`](workflow.py) | Discovers source recipes and their location-derived families. |
-| [`build.py`](build.py) | Checks native host, daemon and BuildKit-worker architecture. |
-| [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
-| [`source.py`](source.py) | Shared source-resolution helpers. |
-| [`tests/`](tests/) | Shared tooling and recipe-hook tests. |
-| [`pgrx/`](pgrx/README.md) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
-| [`universe/`](universe/README.md) | Recipe-authoring guide and templates for Universe builds. |
