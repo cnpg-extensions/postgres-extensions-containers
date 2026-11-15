@@ -45,7 +45,7 @@ class HookComposition(unittest.TestCase):
         self.add_file('lib/pg_duckdb.so', 'extension binary')
         self.add_file('system/libduckdb.so', 'engine binary')
         self.add_file('share/extension/pg_duckdb.control', 'control')
-        for name in ['pg_duckdb', *self.hook.DEBIAN_PACKAGES]:
+        for name in ['pg_duckdb', *self.hook.source_packages(self.builder)]:
             path = 'licenses/' + name + '/copyright'
             self.add_file(path, 'Copyright authors of ' + name + '\nOriginal combined license terms')
         self.add_file('licenses/libduckdb2.0/Apache-2.0', 'Full Apache terms')
@@ -73,13 +73,13 @@ class HookComposition(unittest.TestCase):
         self.assertIn(installed, result['packages'])
         self.assertEqual(result['files'], before['files'])
         packages = {p['name']: p for p in result['packages']}
-        self.assertEqual(set(packages), {'libc6', 'pg_duckdb', *self.hook.DEBIAN_PACKAGES})
+        self.assertEqual(set(packages), {'libc6', 'pg_duckdb', *self.hook.source_packages(self.builder)})
         self.assertEqual(packages['libduckdb2.0']['versionInfo'], '2.0.0')
         self.assertEqual(packages['pg_duckdb']['SPDXID'], 'SPDXRef-Source-pg-duckdb')
         self.assertEqual(packages['libduckdb2.0']['SPDXID'], 'SPDXRef-Source-libduckdb2.0')
         self.assertIn(dict(spdxElementId=packages['pg_duckdb']['SPDXID'], relationshipType='DEPENDS_ON',
                            relatedSpdxElement=packages['libduckdb2.0']['SPDXID']), result['relationships'])
-        for name in self.hook.DEBIAN_PACKAGES:
+        for name in self.hook.source_packages(self.builder):
             if name not in ('libduckdb2.0', 'libxxhash0'):
                 self.assertIn(dict(spdxElementId=packages['libduckdb2.0']['SPDXID'], relationshipType='DEPENDS_ON',
                                    relatedSpdxElement=packages[name]['SPDXID']), result['relationships'])

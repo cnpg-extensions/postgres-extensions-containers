@@ -5,21 +5,6 @@ import re
 from pathlib import Path
 from urllib.parse import urlencode
 
-# Debian unstable package names; versions are the upstream code actually built,
-# without Debian revisions or a claim that Debian patches were applied.
-# binary name: (Debian source name, vendor path)
-DEBIAN_PACKAGES = {
-    'libduckdb2.0': ('duckdb', ''),
-    'libbrotli1': ('brotli', 'third_party/brotli'),
-    'liblz4-1': ('lz4', 'third_party/lz4'),
-    'libmbedcrypto16': ('mbedtls', 'third_party/mbedtls'),
-    'libsnappy1v5': ('snappy', 'third_party/snappy'),
-    'libyyjson0': ('yyjson', 'third_party/yyjson'),
-    'libzstd1': ('libzstd', 'third_party/zstd'),
-    'libxxhash0': ('xxhash', 'third_party/zstd'),
-}
-
-
 def read_version(path, pattern):
     matches = re.findall(pattern, path.read_text(), re.MULTILINE)
     if len(matches) != 1:
@@ -32,22 +17,30 @@ def header_version(path, prefix, parts=('MAJOR', 'MINOR', 'PATCH')):
                     for part in parts)
 
 
-def source_versions(builder):
+def source_packages(builder):
     build = Path(builder) / 'build'
     duck = build / 'third_party/duckdb'
     vendor = duck / 'third_party'
+    # Binary name: (Debian source name, vendor path, detected upstream version).
+    # Debian identities are scanner mappings, without Debian revision suffixes.
     return {
-        'pg_duckdb': read_version(build / 'pg_duckdb.control', r"^default_version\s*=\s*'([^']+)'"),
-        'libduckdb2.0': read_version(duck / 'build/release/DuckDBConfigVersion.cmake',
-                                   r'^set\(PACKAGE_VERSION "v?([^"]+)"\)'),
-        'libbrotli1': header_version(vendor / 'brotli/common/version.h', 'BROTLI_VERSION_'),
-        'liblz4-1': header_version(vendor / 'lz4/lz4.hpp', 'LZ4_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
-        'libmbedcrypto16': header_version(vendor / 'mbedtls/include/mbedtls/build_info.h', 'MBEDTLS_VERSION_'),
+        'libduckdb2.0': ('duckdb', '', read_version(
+            duck / 'build/release/DuckDBConfigVersion.cmake', r'^set\(PACKAGE_VERSION "v?([^"]+)"\)')),
+        'libbrotli1': ('brotli', 'third_party/brotli', header_version(
+            vendor / 'brotli/common/version.h', 'BROTLI_VERSION_')),
+        'liblz4-1': ('lz4', 'third_party/lz4', header_version(
+            vendor / 'lz4/lz4.hpp', 'LZ4_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'))),
+        'libmbedcrypto16': ('mbedtls', 'third_party/mbedtls', header_version(
+            vendor / 'mbedtls/include/mbedtls/build_info.h', 'MBEDTLS_VERSION_')),
         # Preprocessed by the build compiler: Snappy selects Clang/GCC variants.
-        'libsnappy1v5': header_version(build / 'snappy-version.h', 'SNAPPY_', ('MAJOR', 'MINOR', 'PATCHLEVEL')),
-        'libyyjson0': header_version(vendor / 'yyjson/include/yyjson.hpp', 'YYJSON_VERSION_'),
-        'libzstd1': header_version(vendor / 'zstd/include/zstd.h', 'ZSTD_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
-        'libxxhash0': header_version(vendor / 'zstd/include/zstd/common/xxhash.hpp', 'XXH_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
+        'libsnappy1v5': ('snappy', 'third_party/snappy', header_version(
+            build / 'snappy-version.h', 'SNAPPY_', ('MAJOR', 'MINOR', 'PATCHLEVEL'))),
+        'libyyjson0': ('yyjson', 'third_party/yyjson', header_version(
+            vendor / 'yyjson/include/yyjson.hpp', 'YYJSON_VERSION_')),
+        'libzstd1': ('libzstd', 'third_party/zstd', header_version(
+            vendor / 'zstd/include/zstd.h', 'ZSTD_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'))),
+        'libxxhash0': ('xxhash', 'third_party/zstd', header_version(
+            vendor / 'zstd/include/zstd/common/xxhash.hpp', 'XXH_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'))),
     }
 
 
@@ -60,7 +53,7 @@ def augment_spdx(document, context):
     if context.api_version != 1:
         raise ValueError('unsupported hook API')
     final = Path(context.final_path)
-    versions = source_versions(context.builder_path)
+    packages = source_packages(context.builder_path)
     result = deepcopy(document)
     files = {p['fileName'].removeprefix('./'): p for p in result['files']}
     # Copied Debian copyright/common-license files can make the shared scan
@@ -68,7 +61,7 @@ def augment_spdx(document, context):
     # those notice-only records with the explicit compiled-version mappings.
     mapped_notices = {record['SPDXID'] for path, record in files.items()
                       if len(Path(path).parts) >= 3 and Path(path).parts[0] == 'licenses'
-                      and Path(path).parts[1] in DEBIAN_PACKAGES}
+                      and Path(path).parts[1] in packages}
     replaced = set()
     for package in result['packages']:
         owned = {r['relatedSpdxElement'] for r in result.get('relationships', [])
@@ -105,20 +98,20 @@ def augment_spdx(document, context):
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
         return sid
 
-    pg_version = versions['pg_duckdb']
+    pg_version = read_version(Path(context.builder_path) / 'build/pg_duckdb.control',
+                              r"^default_version\s*=\s*'([^']+)'")
     pg_id = add_package('pg_duckdb', pg_version, 'pkg:github/duckdb/pg_duckdb@v' + pg_version,
                         'https://github.com/duckdb/pg_duckdb/tree/v' + pg_version)
     ids = {}
     arch = {'linux/amd64': 'amd64', 'linux/arm64': 'arm64'}[context.platform]
-    for name, (source, vendor) in DEBIAN_PACKAGES.items():
-        version = versions[name]
-        url = 'https://github.com/duckdb/duckdb/tree/v' + versions['libduckdb2.0'] + ('/' + vendor if vendor else '')
+    for name, (source, vendor, version) in packages.items():
+        url = 'https://github.com/duckdb/duckdb/tree/v' + packages['libduckdb2.0'][2] + ('/' + vendor if vendor else '')
         ids[name] = add_package(name, version, debian_purl(name, source, version, arch), url)
 
     relate(result['SPDXID'], 'DESCRIBES', pg_id)
     relate(pg_id, 'DEPENDS_ON', ids['libduckdb2.0'])
     relate(ids['libzstd1'], 'DEPENDS_ON', ids['libxxhash0'])
-    for name in DEBIAN_PACKAGES:
+    for name in packages:
         if name not in ('libduckdb2.0', 'libxxhash0'):
             relate(ids['libduckdb2.0'], 'DEPENDS_ON', ids[name])
     relate(files['lib/pg_duckdb.so']['SPDXID'], 'GENERATED_FROM', pg_id)
