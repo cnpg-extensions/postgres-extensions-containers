@@ -91,6 +91,9 @@ tools live under `source-build/pgrx/`:
 | [`build_config.py`](build_config.py) | Registers extension recipes and their Cargo feature selection. |
 | [`install-pgrx-build-environment.sh`](install-pgrx-build-environment.sh) | Required Dockerfile setup step: installs build tools and the SBOM hook. |
 | [`finalize-pgrx-evidence.sh`](finalize-pgrx-evidence.sh) | Required post-build step: collects Cargo, license, and runtime-payload evidence. |
+| [`install_tools.py`](install_tools.py) | Installs the selected Rust tools and locked cargo-pgrx version, initializes PostgreSQL support and records build configuration. |
+| [`evidence.py`](evidence.py) | Collects Cargo metadata, license notices and final runtime-payload evidence after packaging. |
+| [`license-about.toml`](license-about.toml) | Configures cargo-about license selection and package-specific license clarifications. |
 | [`templates/`](templates/) | Dockerfile, metadata, and README templates to follow for new extensions. |
 | [`sbom/`](sbom/) | Hook that adds verified Rust dependencies and licenses to the shared generator's SPDX output. |
 | [`dependencies/`](dependencies/) | Rust, rustup, and cargo-about version configuration for extension builders. |
