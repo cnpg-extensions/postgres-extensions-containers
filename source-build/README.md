@@ -209,11 +209,7 @@ makes shared tools and resources available inside both families' builders.
 
 ## Dependency evidence in the SBOM
 
-The final SPDX SBOM must include shipped dependencies. Never suppress actual shipped
-Debian binary ownership. A recipe that maps source-built components to Debian
-scanner identities must document the mapping, retain actual compiled versions
-and source provenance, and distinguish it from dpkg installation or Debian
-patch-level claims.
+The final SPDX SBOM must include shipped dependencies.
 Each separately reported dependency must use its canonical upstream or ecosystem
 package name, including the name
 used by vulnerability advisories where applicable. This matters even when no CVE
