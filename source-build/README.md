@@ -5,8 +5,7 @@
 Building from source is an exception for toolchain, dependency packaging and
 delivery obstacles, not a general alternative to contributing Debian packages.
 
-For extensions whose build tools and dependencies are readily available
-in the Debian ecosystem, contributors are expected to package the extension for
+Contributors are generally expected to package the extension for
 Debian. Once packaged, the extension can use this repository's Debian build
 path. Absence of a package today, convenience, faster onboarding, or a preference
 for Dockerfiles is not sufficient justification for a source build.
