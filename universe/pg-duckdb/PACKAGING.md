@@ -89,7 +89,9 @@ The PostgreSQL 18/Trixie amd64 build uses five Debian library packages from its
 base image: libc6, libgcc-s1, libstdc++6, liblz4-1 and libxxhash0. pg_duckdb links
 to system LZ4, which links to system xxHash; the source-built DuckDB library
 contains separate embedded copies. Only source-built libduckdb.so is staged as
-an additional shared library. Thus the eight Debian-style SBOM identities do
+an additional shared library, copied directly from its install path. This recipe
+does not use the base-library capture or system-library staging helpers. Thus the
+eight Debian-style SBOM identities do
 not mean that eight Debian binary packages were installed into this payload.
 Upstream's loadable httpfs is not shipped here; its curl/OpenSSL build
 requirements must not become runtime inventory entries just because apt
