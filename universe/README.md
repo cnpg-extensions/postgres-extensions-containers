@@ -32,7 +32,7 @@ Use established SPDX fields and Package URL types:
 - Include an accurate standard PURL when the component's ecosystem and source
   support one. Do not guess registry membership, CPEs, versions or identifiers
   merely to satisfy a scanner. Preserve canonical names when a reliable PURL is
-  unavailable, and explain unresolved identity evidence in the recipe README.
+  unavailable, and explain unresolved identity evidence in the recipe's packaging notes.
 - Express dependency relationships using standard SPDX relationships. Keep
   distinct components distinct, including forks with the same name and version.
 - Preserve shipped-file inventory, runtime package ownership, checksums, license
