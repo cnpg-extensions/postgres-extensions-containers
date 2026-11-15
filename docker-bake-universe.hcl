@@ -1,4 +1,4 @@
-// Load after docker-bake.hcl for non-Rust source recipes.
+// Load after docker-bake.hcl for Universe recipes.
 variable "build_timestamp" {
   default = ""
 }

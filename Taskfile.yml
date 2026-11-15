@@ -78,7 +78,7 @@ tasks:
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
     vars:
       BAKE_OVERLAY:
-        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-source.hcl -f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-source.hcl";; esac'
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
       RECIPE_PATH:
         sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
     preconditions:
@@ -117,7 +117,7 @@ tasks:
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
     vars:
       BAKE_OVERLAY:
-        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-source.hcl -f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-source.hcl";; esac'
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
       RECIPE_PATH:
         sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
       BUILDER: '{{.BUILDER | default ""}}'

@@ -1,8 +1,9 @@
 # PGRX extension builds
 
 This project builds Rust-based PostgreSQL extensions from source using PGRX.
-For image verification, native build utilities, shared smoke tests and local
-validation, see the [shared source-build guide](../source-build/README.md).
+For native build utilities, shared smoke tests and local validation, see the
+[shared source-build guide](../source-build/README.md). For published images, use
+[image verification and SBOM inspection](../source-build/README.md#verify-images).
 Start with the extension's README for installation, SQL names and preload settings.
 
 PGRX SBOMs include the Rust dependency graph selected for the configured target.

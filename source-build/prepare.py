@@ -104,7 +104,7 @@ def prepare(inputs, generator, output):
                 "-f",
                 "docker-bake.hcl",
                 "-f",
-                "docker-bake-pgrx.hcl" if family == "pgrx" else "docker-bake-source.hcl",
+                "docker-bake-pgrx.hcl" if family == "pgrx" else "docker-bake-universe.hcl",
                 "-f",
                 recipe_path + "/metadata.hcl",
                 "--print",
