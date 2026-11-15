@@ -35,7 +35,10 @@ underlying blockers also affect our own distribution and adoption in Kubernetes
 environments.
 Proposals must distinguish packaging or delivery obstacles, and generally
 should outline the steps required to complete Debian packaging in the long term.
-For an example, see the [pg_duckdb Debian and PGDG inclusion plan](../universe/pg-duckdb/PACKAGING.md#appendix-debian-and-pgdg-inclusion).
+For an example, see the [pg_duckdb Debian and PGDG inclusion plan](../universe/pg-duckdb/PACKAGING.md#appendix-debian-and-pgdg-inclusion),
+which explains how unresolved Debian/PGDG package ownership, archive acceptance
+and backport publication justify an interim source build while the Debian path
+is pursued.
 
 For PGRX, the obstacle is the shared build toolchain. `cargo-pgrx` itself
 has not yet been accepted into Debian. Packaging has been discussed, but we
@@ -49,9 +52,7 @@ SBOM generator. This makes the compliance and dependency-management work
 repeatable across PGRX extensions.
 
 Universe covers other source builds with complex dependency packaging or
-delivery obstacles. For pg_duckdb, unresolved Debian/PGDG package ownership,
-archive acceptance and backport publication justify an interim source build
-while the Debian path is pursued.
+delivery obstacles.
 
 The complex dependencies that justify a Universe source build must be exposed at the recipe's documented package
 boundaries, with established upstream/ecosystem identities and actual versions.
