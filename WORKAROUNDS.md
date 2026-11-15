@@ -84,7 +84,8 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
   conflicting check names.
 - **Review/remove when:** upstream supports equivalent authorized fork testing or
   tests no longer need privileged publishing. Review authorization, reporting,
-  SHA propagation, and Debian/Source-build acceptance during upstream merges.
+  SHA propagation, and the `Automerge gate` / `Source-build automerge gate` checks
+  during upstream merges.
 
 ## PostgreSQL Anonymizer 3.3.2: stale root Cargo.lock version
 

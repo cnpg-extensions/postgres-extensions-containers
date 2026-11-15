@@ -68,7 +68,7 @@ jobs:
             core.setOutput('base', pr.base.sha);
             core.setOutput('base_ref', pr.base.ref);
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: pr.head.sha, context: 'Source-build acceptance', state: 'pending',
+              ...context.repo, sha: pr.head.sha, context: 'Source-build automerge gate', state: 'pending',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
             if (process.env.CNPG_VERSION) throw new Error('PR gate reporting requires the full CNPG support matrix');
@@ -235,7 +235,7 @@ jobs:
       ref: ${{ needs.discover.outputs.ref }}
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
-    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Source-build acceptance (fork preview)' || 'Source-build acceptance' }}
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Source-build automerge gate (fork preview)' || 'Source-build automerge gate' }}
     if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
     - discover
@@ -290,7 +290,7 @@ jobs:
           script: |
             if (!/^[0-9a-f]{40}$/.test(process.env.TEST_SHA)) throw new Error('ref must be a full commit SHA');
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha: process.env.TEST_SHA, context: 'Source-build acceptance',
+              ...context.repo, sha: process.env.TEST_SHA, context: 'Source-build automerge gate',
               state: process.env.PASSED === 'true' ? 'success' : 'failure',
               target_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
