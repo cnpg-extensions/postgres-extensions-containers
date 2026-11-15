@@ -126,39 +126,27 @@ class HookComposition(unittest.TestCase):
             self.assertTrue(result['comment'].startswith('Existing generator scope'))
             self.assertIn('not an exhaustive', result['comment'])
 
-    def test_nested_and_later_source_notices(self):
-        evidence = load('evidence')
+    def test_consolidated_notices_preserved_by_hook(self):
+        evidence, hook = load('evidence'), load('augment_spdx')
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / 'source'
-            directory = root / 'src/compression/algorithm'
-            directory.mkdir(parents=True)
-            (root / 'LICENSE').write_text('Root MIT license')
-            (directory / 'LICENSE').write_text('Copyright Algorithm authors; MIT terms')
-            header = directory / 'algorithm.hpp'
-            header.write_text('// Ordinary banner\n\n#include <vector>\n'
-                '// Copyright First author\n// Permission and complete first terms\n'
-                'int value;\n/* Copyright Second author\nRedistribution and complete second terms */\n'
-                'const char *example = "// Copyright Not a notice";\n'
-                '/* Public\n * domain by Hash author */\n')
-            paths = evidence.collect_notices(root, evidence.adjacent_notices(root, {header}), Path(tmp) / 'licenses')
-            text = '\n'.join(p.read_text() for p in paths)
-            for expected in ['Root MIT license', 'Algorithm authors', 'First author',
-                             'complete first terms', 'Second author', 'complete second terms',
-                             'domain by Hash author']:
-                self.assertIn(expected, text)
-            self.assertNotIn('Not a notice', text)
-            self.assertEqual({p.name for p in paths}, {'LICENSE', 'algorithm.hpp.notice'})
-
-    def test_versions_follow_selected_macros(self):
-        evidence = load('evidence')
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / 'yyjson'
-            (root / 'include').mkdir(parents=True)
-            header = root / 'include/yyjson.hpp'
-            for version in ['0.9.0', '0.12.0']:
-                header.write_text('#define YYJSON_VERSION_STRING "' + version + '"\n')
-                self.assertEqual(evidence.vendor_identity(root),
-                                 (version, 'pkg:github/ibireme/yyjson@' + version))
+            root = Path(tmp)
+            notice = root / 'licenses/pg_duckdb/copyright'
+            notice.parent.mkdir(parents=True)
+            text = 'Copyright 2024 Upstream\nMIT terms\n\nCopyright 2015 Embedded author\nComplete Zlib terms\n'
+            notice.write_text(text)
+            component = evidence.package('pg_duckdb', '1.2.0',
+                'https://github.com/duckdb/pg_duckdb', 'revision', None, root=root)
+            (root / 'build').mkdir()
+            (root / 'build/universe-evidence.json').write_text(json.dumps(dict(components=[component], payload=[])))
+            document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[], relationships=[], files=[
+                dict(SPDXID='SPDXRef-notice', fileName='./licenses/pg_duckdb/copyright'),
+                dict(SPDXID='SPDXRef-so', fileName='./lib/pg_duckdb.so')])
+            result = hook.augment_spdx(document, SimpleNamespace(api_version=1, builder_path=root))
+            self.assertEqual(result['hasExtractedLicensingInfos'][0]['extractedText'], text)
+            package = result['packages'][0]
+            self.assertIn('Embedded author', package['copyrightText'])
+            self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
+                               relatedSpdxElement='SPDXRef-notice'), result['relationships'])
 
 
 if __name__ == '__main__':

@@ -41,7 +41,8 @@ RUN make clean-all \
 COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh
 RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so"
 
-# Stage the payload and original notices; add recipe-owned SBOM evidence.
+# Copy reviewed copyright files and record recipe-owned SBOM evidence.
+COPY universe/pg-duckdb/licenses/ /licenses/
 COPY universe/pg-duckdb/evidence.py universe/pg-duckdb/augment_spdx.py /recipe/
 RUN python3 /recipe/evidence.py \
     && install -D -m 0644 /recipe/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py

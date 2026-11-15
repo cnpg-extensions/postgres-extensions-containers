@@ -53,9 +53,7 @@ def augment_spdx(document, context):
             else component['repository'])
         package = dict(SPDXID=sid, name=component['name'], downloadLocation=source_url,
                        filesAnalyzed=False, licenseConcluded=component['license'], licenseDeclared=component['license'],
-                       copyrightText=component['copyright'], sourceInfo='Selected source: ' + source_url
-                       + ('; supplemental notices: ' + json.dumps(component['notice_sources'], sort_keys=True)
-                          if component.get('notice_sources') else ''))
+                       copyrightText=component['copyright'], sourceInfo='Selected source: ' + source_url)
         if component.get('debian_package'):
             package['sourceInfo'] += ('; Debian packaging counterpart: ' + component['debian_package']
                                       + '; this component is built from upstream source, not installed by dpkg')

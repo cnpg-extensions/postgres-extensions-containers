@@ -23,9 +23,9 @@ for every embedded source component.
 - Keep separate source-built records for the seven libraries Debian DuckDB uses
   as system packages: yyjson (`libyyjson0`), LZ4 (`liblz4-1`), Zstandard
   (`libzstd1`), Brotli (`libbrotli1`), Mbed TLS crypto (`libmbedcrypto16`),
-  Snappy (`libsnappy1v5`) and xxHash (`libxxhash0`). Selection still follows the
-  shipped library's actual build inputs. xxHash is nested inside the vendored
-  Zstandard tree and is recorded separately when used.
+  Snappy (`libsnappy1v5`) and xxHash (`libxxhash0`). This is a fixed inventory
+  reviewed against the supported source revision and default build. xxHash is
+  nested inside the vendored Zstandard tree but remains a separate record.
 - Preserve their real upstream/source identities. A source-built Brotli is not
   a Debian-installed `libbrotli1`; the Debian name is explanatory `sourceInfo`,
   never a fabricated `pkg:deb` identifier. A system LZ4 and a vendored LZ4 may
@@ -42,22 +42,36 @@ RE2 and jemalloc independently, but the inspected DuckDB package still embeds
 its modified copies. Reassess this recipe mapping when Debian changes that
 choice. Do not infer new entries from the builder's installed development tools.
 
-Original notices remain under `/licenses`, including notices of folded
-components. The containing package aggregates their full license text using
-SPDX `LicenseRef` and extracted licensing information, preserves copyright
-attribution, and associates every notice through `DISTRIBUTION_ARTIFACT`.
-Build evidence records only the public package identities. Internal code's
-notices are collected directly into the containing package, preserving source
-paths without constructing a second component/version graph. The SPDX document comment states this scope explicitly. Consumers
-must not interpret absence of an internal component record as proof that its
-code is absent or unaffected by an advisory.
+### Copyright files and release review
 
-Versions come from selected source headers and release metadata where available.
-Modified snapshots retain source URLs identifying their revision and vendor path.
-Unknown release versions are omitted from SPDX `versionInfo`; commit/path strings
-are not synthesized as versions. DuckDB's reported version override is recorded
-separately from its source identity. The attached SBOM contains these identities;
-this document does not duplicate their pins.
+Like Debian's [copyright packaging](https://www.debian.org/doc/debian-policy/ch-docs.html#copyright-information),
+this recipe maintains consolidated copyright files rather than rediscovering
+licenses during each build or shipping C++ files to carry their notices.
+[DuckDB's copyright file](licenses/duckdb/copyright) starts with Debian DuckDB
+2.0.0+dfsg2-1's copyright document and retains supplemental original notices from
+the reviewed source snapshot. The other copyright files cover pg_duckdb and the
+seven library counterparts that Debian packages separately. They preserve the
+actual bundled versions' terms, rather than substituting copyright files from
+possibly different installed Debian versions.
+
+The Dockerfile copies these nine files into `/licenses/<name>/copyright`.
+Common-license texts referenced by the source documents are included so the
+extension's attribution does not depend on `/usr/share/common-licenses` existing
+in another image. Source paths and supplemental notice URLs remain in the files.
+The SBOM associates them with their containing packages; composite terms use
+`LicenseRef` and extracted licensing information. Internal components remain
+covered by DuckDB, not extra package records.
+
+`evidence.py` has one static library table containing upstream versions,
+identities, Debian counterparts and vendor paths. There is no Ninja dependency
+traversal, header-version parser, comment parser or build-time license download.
+Both source revision checks ensure changed sources receive a release review.
+When updating the sources or build settings, review the dependency inventory,
+Debian's packaging boundary and all copyright files together. Unknown snapshot
+versions, such as this Snappy copy, remain omitted rather than guessed.
+
+The SPDX document states its scope explicitly. Absence of an internal component
+record is not evidence that its code is absent or unaffected by an advisory.
 
 The shared system-library helper stages additional runtime libraries under
 `/system`, excluding libraries supplied by the PostgreSQL base image, and preserves
@@ -86,11 +100,11 @@ copies; reporting one does not account for the other.
 
 The original native build passed PostgreSQL 18 preload, `CREATE EXTENSION` and
 a forced `DuckDBScan` query. Follow-up notice validation reuses that compiled
-builder with the current evidence collector and the Dockerfile's individual
-COPY operations. All 42 shared tests passed. The generated SPDX has nine source
-packages and 406 notice files: checks verified preservation of every previously
-collected notice, the missing attribution identified by the copyright audit,
-and each file's containing-package relationship and extracted license text.
+builder with the current evidence recorder and the Dockerfile's individual
+COPY operations. All 41 shared tests passed. The generated SPDX has nine source
+packages and nine consolidated copyright files. Artifact checks verified that
+the contents of all 406 previously collected notice files remain present, with
+containing-package relationships and extracted license text.
 This does not claim a new compilation or native ARM64 coverage.
 
 These are measured counts for this version, platform and base, not assertions
@@ -99,21 +113,12 @@ that future recipes must keep a fixed inventory. The native build needed
 evidence that its library is shipped. Bookworm and native ARM64 builds and
 hosted signing/SLSA acceptance are not covered by this local measurement.
 
-`evidence.py` collects original notices and records the files copied by the
+`evidence.py` records package identities and the actual files copied by the
 Dockerfile. The final image copies the installed extension into `/lib` and
-`/share`, plus the shared helper's `/system` and `/licenses` directories;
-there is no intermediate `/payload` directory.
-
-Notice collection covers selected DuckDB `src/` and extension inputs, adjacent
-nested LICENSE files, and selected third-party directories. It preserves legal
-comment blocks throughout source files, including notices after banners/includes
-and later notices in amalgamated sources. This covers ALP/ALPRD, Salesforce's
-merge-sort code, Martin Ankerl's hashing, ADBC/nanoarrow, Preshing's semaphore,
-and additional miniz/Brotli notices. Public-domain statements are retained too.
-Referenced upstream license/NOTICE files absent from the vendored tree are
-included with their source URLs. Those notice revisions identify attribution
-sources, not inferred versions of embedded code. Generated-data notices remain
-part of DuckDB's combined terms.
+`/share`, plus `/system` and `/licenses`; there is no intermediate `/payload`.
+The checked-in copyright files cover the nested and later-source notices found
+in the audit, including ALP/ALPRD, Salesforce, Martin Ankerl, ADBC/nanoarrow,
+Preshing's semaphore, miniz, Brotli and public-domain statements.
 
 `augment_spdx.py` preserves the generator's existing records and adds source
 packages through its hook interface. Builder reports are private validation
