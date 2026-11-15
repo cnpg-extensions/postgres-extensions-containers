@@ -69,11 +69,6 @@ extensions with documented complex dependency packaging or delivery obstacles.
 
 ## Open Source Licensing Policy
 
-Debian archive acceptance provides the licensing precedent for material shipped
-in Debian `main` or `contrib`. Source builds must establish that precedent or
-OSI-approved licensing for their selected sources and bundled dependencies.
-All build families retain the redistribution obligations below.
-
 All software and other materials distributed in our PostgreSQL extension container images must either be available under an [OSI-approved license](https://opensource.org/licenses) or have already been accepted and shipped in Debian’s `main` or `contrib` archive areas under the same applicable licensing terms.
 
 This requirement covers all distributed material: extensions, libraries, dependencies, utilities, and bundled data in final images. Where Debian acceptance is relied upon, it must cover that material. Build-time dependencies that are not distributed are outside this policy’s scope.
