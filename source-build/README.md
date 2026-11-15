@@ -33,8 +33,7 @@ Our experience is that when licensing and dependencies are straightforward to
 manage, getting the software packaged for Debian is generally straightforward
 too. When Debian packaging is difficult, we commonly discover that the same
 underlying blockers also affect our own distribution and adoption in Kubernetes
-environments. Source builds change how software is built and delivered; they do
-not remove those blockers or reduce our compliance and security obligations.
+environments.
 Proposals must distinguish packaging or delivery obstacles that a source build
 can address from unresolved licensing or dependency-management work that still
 has to be completed.
