@@ -2,23 +2,23 @@
 
 ## Debian packaging obstacles
 
-The selected release's [compilation guide](https://github.com/duckdb/pg_duckdb/blob/v1.2.0/docs/compilation.md)
-describes `ReleaseStaticSystem`: pg_duckdb embeds its pinned DuckDB fork and
-matching httpfs through private static archives and generated registration
-objects. A stock DuckDB development package does not provide that exact interface.
-Debian packaging would require coordinated packaging of the fork and httpfs, or
-unbundling patches that replace this integration. Namespace-modified bundled
-code, such as DuckDB's LZ4, adds to that work.
+The recipe follows the selected release's upstream Docker image build: pg_duckdb
+links dynamically to its pinned DuckDB fork. A stock DuckDB development package
+does not establish compatibility with that fork's interfaces. Debian packaging
+would require coordinated packaging of the fork and its bundled dependencies,
+or unbundling patches. Namespace-modified code, such as DuckDB's LZ4, adds to
+that work. Ordinary dependencies use Debian packages.
 
-Ordinary dependencies use Debian packages, including OpenSSL, curl and the LZ4
-used for PostgreSQL TOAST. Their availability does not resolve the embedded
-engine's packaging burden. Revisit Debian packaging when that burden is resolved.
+The build uses upstream's default release settings, Clang for DuckDB and GCC for
+pg_duckdb, with the Clang version supplied by Trixie. The final CNPG extension
+image contains the extension payload rather than a complete PostgreSQL server.
+Revisit Debian packaging when the fork and bundled-dependency burden is resolved.
 
 ## SBOM contents
 
 The shared generator records shipped files and OS package ownership. The
-recipe-owned hook adds pg_duckdb, embedded DuckDB, httpfs and bundled components
-selected from the static-link build inputs. Examples include fmt, yyjson,
+recipe-owned hook adds pg_duckdb, DuckDB and bundled components
+selected from the shipped shared library's build inputs. Examples include fmt, yyjson,
 cpp-httplib, miniz, utf8proc, LZ4, Zstandard, Brotli, Mbed TLS and FSST. The image
 also contains generated Unicode, CLDR and IANA time-zone data. The upstream
 extension named `icu` uses its own implementation and generated data; that name
@@ -52,8 +52,9 @@ unresolved license information does not itself establish compliance with the
 The Dockerfile clones the release named by `EXT_VERSION` and initializes its Git
 submodules recursively, following upstream's checkout instructions. The upstream
 CMake configuration fetches the matching pinned httpfs revision. The evidence
-step reads the actual pg_duckdb, DuckDB and httpfs checkout revisions after the
-build. No GitHub API lookup or archive-specific build patch is needed.
+step reads the actual pg_duckdb and DuckDB checkout revisions after the build.
+Loadable httpfs is not installed in the image, matching upstream; downloaded
+extensions are outside the image SBOM. No GitHub API lookup or archive-specific build patch is needed.
 
 BuildKit can reuse a cached checkout for an unchanged recipe and version; invalidate
 that cache when a fresh checkout is needed. Release tags are not frozen across

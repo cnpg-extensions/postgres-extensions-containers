@@ -19,17 +19,23 @@ RUN /usr/local/bin/capture_base_image_libs.sh
 
 # Build tools and system development libraries.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential ca-certificates curl git cmake ninja-build python3 pkg-config \
-    libssl-dev libcurl4-openssl-dev liblz4-dev libicu-dev postgresql-server-dev-${PG_MAJOR} \
+    build-essential ca-certificates curl git cmake ninja-build python3 pkg-config clang ccache \
+    libssl-dev libcurl4-openssl-dev liblz4-dev postgresql-server-dev-${PG_MAJOR} \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 # Follow upstream's checkout procedure at the release selected by metadata.
 RUN git clone --branch "${EXT_VERSION}" --single-branch https://github.com/duckdb/pg_duckdb . \
     && git submodule update --init --recursive
 
-# Upstream recipe: https://github.com/duckdb/pg_duckdb/blob/v1.2.0/docs/compilation.md
-RUN CMAKE_BUILD_PARALLEL_LEVEL=2 make -j2 DISABLE_UNITY=1 DUCKDB_BUILD=ReleaseStaticSystem PG_CONFIG=/usr/lib/postgresql/${PG_MAJOR}/bin/pg_config PG_DUCKDB_VERSION=${EXT_VERSION} \
-    && CMAKE_BUILD_PARALLEL_LEVEL=2 make -j2 DISABLE_UNITY=1 install DESTDIR=/install DUCKDB_BUILD=ReleaseStaticSystem PG_CONFIG=/usr/lib/postgresql/${PG_MAJOR}/bin/pg_config
+# Match upstream's Docker image compiler selection and default release build.
+# Trixie supplies its supported Clang version rather than Bookworm's clang-14.
+ENV DUCKDB_CC=/usr/bin/clang DUCKDB_CXX=/usr/bin/clang++
+ENV PATH=/usr/lib/ccache:$PATH
+ENV CCACHE_DIR=/ccache
+RUN make clean-all \
+    && make -j$(nproc) \
+    && make install \
+    && DESTDIR=/install make install
 
 # Stage additional system libraries and their notices using the shared helper.
 COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh

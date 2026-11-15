@@ -50,13 +50,9 @@ SOURCE_NAMES = {
 
 
 def runtime_inputs(builddir):
-    # These are precisely the DuckDB objects/archives in pg_duckdb's static
-    # Makefile link line, including extension archives outside libduckdb_static.
-    targets = ['src/libduckdb_static.a', 'src/main/http/libduckdb_httplib.a',
-               'src/main/extension/libduckdb_loadable_extensions.a']
-    targets += [str(p.relative_to(builddir)) for p in builddir.glob('extension/*/lib*_extension.a')]
-    targets += ['src/CMakeFiles/duckdb.dir/duckdb_static_extension_loader.c.o',
-                'src/CMakeFiles/duckdb.dir/__/extension/loader/static_extension_autoregister.cpp.o']
+    # Follow only the shipped shared library's build graph, excluding loadable
+    # extensions that upstream builds but does not install into its Docker image.
+    targets = ['src/libduckdb.so']
     inputs = subprocess.check_output(['ninja', '-C', str(builddir), '-t', 'inputs', *targets], text=True).splitlines()
     sources = set(inputs)
     objects = set(targets)
@@ -129,14 +125,12 @@ def license_evidence(text, name):
 
 
 def main():
-    # CMake FetchContent checks out the httpfs revision pinned by pg_duckdb.
     builddir = DUCK / 'build/release'
-    http = builddir / '_deps/httpfs_extension_fc-src'
     def revision(directory):
         return subprocess.check_output(['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
     evidence = dict(repository='https://github.com/duckdb/pg_duckdb',
                     version=os.environ['EXT_VERSION'], revision=revision(BUILD),
-                    duckdb_revision=revision(DUCK), httpfs_revision=revision(http),
+                    duckdb_revision=revision(DUCK),
                     timestamp=os.environ['BUILD_TIMESTAMP'])
     pg = os.environ['PG_MAJOR']
     copy(Path(f'/install/usr/lib/postgresql/{pg}/lib/pg_duckdb.so'), PAYLOAD / 'lib/pg_duckdb.so')
@@ -155,7 +149,7 @@ def main():
                 target = PAYLOAD / 'licenses' / name / path.relative_to(directory)
                 copy(path, target)
                 notices.append(str(target.relative_to(PAYLOAD)))
-        if name not in {'pg_duckdb', 'duckdb', 'duckdb-httpfs'}:
+        if name not in {'pg_duckdb', 'duckdb'}:
             for path in sorted(directory.rglob('*')):
                 if path.suffix not in {'.h', '.hpp', '.c', '.cpp', '.cc'}:
                     continue
@@ -188,29 +182,22 @@ def main():
     duckver = re.search(r'^DUCKDB_VERSION\s*=\s*(\S+)', (BUILD / 'Makefile').read_text(), re.M)[1]
     component('duckdb', duckver.removeprefix('v'), 'https://github.com/duckdb/duckdb', evidence['duckdb_revision'], DUCK, 'pg_duckdb',
               'pkg:github/duckdb/duckdb@' + evidence['duckdb_revision'])
-    # FetchContent records the actual checked-out httpfs, not the current branch.
-    httprev = evidence['httpfs_revision']
-    component('duckdb-httpfs', httprev, 'https://github.com/duckdb/duckdb-httpfs', httprev, http, 'duckdb',
-              'pkg:github/duckdb/duckdb-httpfs@' + httprev)
     # Only library compilation units and their header dependencies: compiler/test
     # executables in the same build tree must not become shipped packages.
     selected = runtime_inputs(builddir)
     if evidence['revision'] != '8756099e267c47f0b86c24de4cf995327f1f4279':
         raise ValueError('Review vendor source identities and generated-data notice URLs for updated source')
-    for root, revision, parent in [(DUCK, evidence['duckdb_revision'], 'duckdb'),
-                                   (http, httprev, 'duckdb-httpfs')]:
+    for root, revision, parent in [(DUCK, evidence['duckdb_revision'], 'duckdb')]:
         if not (root / 'third_party').is_dir():
             continue
         for directory in sorted((root / 'third_party').iterdir()):
             if not directory.is_dir() or str(directory) + '/' not in selected:
                 continue
             name, version, purl = vendor_identity(directory, revision)
-            repo = 'https://github.com/' + purl.split('/')[1] + '/' + purl.split('/')[2].split('@')[0] if purl else 'https://github.com/duckdb/' + ('duckdb' if parent == 'duckdb' else 'duckdb-httpfs')
+            repo = 'https://github.com/' + purl.split('/')[1] + '/' + purl.split('/')[2].split('@')[0] if purl else 'https://github.com/duckdb/duckdb'
             component(name, version, repo, revision + ':third_party/' + directory.name,
                       directory, parent, purl)
-            components[-1]['source_url'] = ('https://github.com/duckdb/'
-                + ('duckdb' if parent == 'duckdb' else 'duckdb-httpfs')
-                + '/tree/' + revision + '/third_party/' + directory.name)
+            components[-1]['source_url'] = ('https://github.com/duckdb/duckdb/tree/' + revision + '/third_party/' + directory.name)
     icu = DUCK / 'extension/icu'
     for filename, patterns in [
         ('datetime/generated/tz_data.cpp', [('tzdata', r'IANA release ([0-9]+[a-z]+)')]),

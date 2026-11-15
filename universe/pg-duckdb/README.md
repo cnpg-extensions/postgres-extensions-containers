@@ -86,7 +86,7 @@ for querying with DuckDB and accessing external data.
   `$PGDATA/pg_duckdb/extensions`. The PostgreSQL user needs write access to these
   directories. Superusers can configure `duckdb.temporary_directory` and
   `duckdb.extension_directory`.
-- The image includes DuckDB's json, icu and httpfs extensions. Optional extensions
+- The image includes DuckDB's json and icu extensions. Loadable extensions such as httpfs
   downloaded at runtime are not covered by the image's SBOM or bundled notices.
 
 ## Licenses and Copyright
