@@ -30,10 +30,6 @@ class HookComposition(unittest.TestCase):
                     repository='https://github.com/duckdb/' + name,
                     purl='pkg:github/duckdb/' + name + '@' + revision,
                     notices=[], license='MIT', copyright='Copyright authors', license_text=''))
-            for name in ['cldr', 'Unicode Character Database']:
-                components.append(dict(name=name, version='17', revision='same-file', parent='duckdb',
-                    repository='https://github.com/duckdb/duckdb', purl=None,
-                    notices=[], license='MIT', copyright='Copyright authors', license_text=''))
             (root / 'build/universe-evidence.json').write_text(json.dumps(dict(components=components, payload=[])))
             document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[dict(SPDXID='SPDXRef-libc', name='libc6', versionInfo='2.41')],
                 files=[dict(SPDXID='SPDXRef-so', fileName='./lib/pg_duckdb.so')], relationships=[dict(spdxElementId='SPDXRef-libc', relationshipType='CONTAINS', relatedSpdxElement='SPDXRef-so')])
@@ -50,7 +46,6 @@ class HookComposition(unittest.TestCase):
             duck = next(p for p in result['packages'] if p['name'] == 'duckdb')
             self.assertEqual(duck['versionInfo'], '2.0.0')
             self.assertEqual(duck['externalRefs'][0]['referenceLocator'], 'pkg:github/duckdb/duckdb@duck-sha')
-            self.assertTrue(duck['licenseDeclared'].startswith('LicenseRef-'))
             self.assertNotIn('cldr', [p['name'] for p in result['packages']])
             self.assertNotIn('Unicode Character Database', [p['name'] for p in result['packages']])
 
@@ -60,16 +55,16 @@ class HookComposition(unittest.TestCase):
             root = Path(tmp)
             (root / 'build').mkdir()
             path = 'licenses/Redis HyperLogLog/LICENSE'
-            for stage in ['payload', 'final']:
+            for stage in ['', 'final']:
                 notice = root / stage / path
                 notice.parent.mkdir(parents=True)
                 notice.write_text('Original combined MIT and BSD notices')
-            text = (root / 'payload' / path).read_text()
+            text = (root / path).read_text()
             component = dict(name='pg_duckdb', version=None,
                 revision='sha:third_party/hyperloglog', parent=None,
                 repository='https://github.com/duckdb/duckdb', purl=None,
                 notices=[path], license='LicenseRef-composite', copyright='Copyright authors', license_text=text)
-            evidence = dict(components=[component], payload=[dict(path=path,
+            evidence = dict(components=[component], payload=[dict(path=path, source=path,
                 sha256=hashlib.sha256(text.encode()).hexdigest())])
             (root / 'build/universe-evidence.json').write_text(json.dumps(evidence))
             document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[], relationships=[], files=[
@@ -95,9 +90,7 @@ class HookComposition(unittest.TestCase):
             (root / 'build').mkdir()
             components = []
             for name, parent, counterpart in [
-                ('pg_duckdb', None, None), ('PostgreSQL', 'pg_duckdb', None),
-                ('duckdb', 'pg_duckdb', None), ('re2', 'duckdb', None),
-                ('jemalloc', 'duckdb', None), ('cldr', 'duckdb', None),
+                ('pg_duckdb', None, None), ('duckdb', 'pg_duckdb', None),
                 ('lz4', 'duckdb', 'liblz4-1'), ('zstd', 'duckdb', 'libzstd1'),
                 ('xxhash', 'zstd', 'libxxhash0'),
             ]:
@@ -126,13 +119,6 @@ class HookComposition(unittest.TestCase):
             self.assertEqual(packages['lz4']['externalRefs'][0]['referenceLocator'],
                              'pkg:github/example/lz4@1.0')
             self.assertIn('not installed by dpkg', packages['lz4']['sourceInfo'])
-            licenses = {p['licenseId']: p['extractedText'] for p in result['hasExtractedLicensingInfos']}
-            for parent, children in [('pg_duckdb', ['PostgreSQL']), ('duckdb', ['re2', 'jemalloc', 'cldr'])]:
-                for name in [parent] + children:
-                    self.assertIn('Original terms for ' + name, licenses[packages[parent]['licenseDeclared']])
-                    self.assertIn(dict(spdxElementId=packages[parent]['SPDXID'],
-                        relationshipType='DISTRIBUTION_ARTIFACT', relatedSpdxElement='SPDXRef-file-' + name),
-                        result['relationships'])
             self.assertIn(dict(spdxElementId=packages['zstd']['SPDXID'], relationshipType='DEPENDS_ON',
                                relatedSpdxElement=packages['xxhash']['SPDXID']), result['relationships'])
             self.assertIn(dict(spdxElementId='SPDXRef-duck-so', relationshipType='GENERATED_FROM',
@@ -140,26 +126,39 @@ class HookComposition(unittest.TestCase):
             self.assertTrue(result['comment'].startswith('Existing generator scope'))
             self.assertIn('not an exhaustive', result['comment'])
 
-    def test_miniz_source_version_is_not_its_compatibility_version(self):
+    def test_nested_and_later_source_notices(self):
         evidence = load('evidence')
         with tempfile.TemporaryDirectory() as tmp:
-            directory = Path(tmp) / 'miniz'
-            directory.mkdir()
-            (directory / 'miniz.hpp').write_text('/* miniz.c 2.0.8 - source version */\n#define MZ_VERSION "10.0.3"\n')
-            self.assertEqual(evidence.vendor_identity(directory, 'revision'),
-                             ('miniz', '2.0.8', 'pkg:github/richgel999/miniz@2.0.8'))
-        expression, _ = evidence.license_evidence('Mixed PostgreSQL and BSD redistribution terms', 'PostgreSQL')
-        self.assertTrue(expression.startswith('LicenseRef-'))
+            root = Path(tmp) / 'source'
+            directory = root / 'src/compression/algorithm'
+            directory.mkdir(parents=True)
+            (root / 'LICENSE').write_text('Root MIT license')
+            (directory / 'LICENSE').write_text('Copyright Algorithm authors; MIT terms')
+            header = directory / 'algorithm.hpp'
+            header.write_text('// Ordinary banner\n\n#include <vector>\n'
+                '// Copyright First author\n// Permission and complete first terms\n'
+                'int value;\n/* Copyright Second author\nRedistribution and complete second terms */\n'
+                'const char *example = "// Copyright Not a notice";\n'
+                '/* Public\n * domain by Hash author */\n')
+            paths = evidence.collect_notices(root, evidence.adjacent_notices(root, {header}), Path(tmp) / 'licenses')
+            text = '\n'.join(p.read_text() for p in paths)
+            for expected in ['Root MIT license', 'Algorithm authors', 'First author',
+                             'complete first terms', 'Second author', 'complete second terms',
+                             'domain by Hash author']:
+                self.assertIn(expected, text)
+            self.assertNotIn('Not a notice', text)
+            self.assertEqual({p.name for p in paths}, {'LICENSE', 'algorithm.hpp.notice'})
 
     def test_versions_follow_selected_macros(self):
         evidence = load('evidence')
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp) / 'fmt'
-            (root / 'include/fmt').mkdir(parents=True)
-            header = root / 'include/fmt/core.h'
-            for macro, expected in [('60102', '6.1.2'), ('110103', '11.1.3')]:
-                header.write_text('#define FMT_VERSION ' + macro + '\n')
-                self.assertEqual(evidence.vendor_identity(root, 'revision'), ('fmt', expected, 'pkg:github/fmtlib/fmt@' + expected))
+            root = Path(tmp) / 'yyjson'
+            (root / 'include').mkdir(parents=True)
+            header = root / 'include/yyjson.hpp'
+            for version in ['0.9.0', '0.12.0']:
+                header.write_text('#define YYJSON_VERSION_STRING "' + version + '"\n')
+                self.assertEqual(evidence.vendor_identity(root),
+                                 (version, 'pkg:github/ibireme/yyjson@' + version))
 
 
 if __name__ == '__main__':

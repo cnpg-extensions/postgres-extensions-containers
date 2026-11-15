@@ -39,16 +39,17 @@ RUN make clean-all \
 
 # Stage additional system libraries and their notices using the shared helper.
 COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh
-RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so" \
-    && mkdir -p /payload \
-    && cp -a /system /licenses /payload/
+RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so"
 
 # Stage the payload and original notices; add recipe-owned SBOM evidence.
-ARG BUILD_TIMESTAMP
 COPY universe/pg-duckdb/evidence.py universe/pg-duckdb/augment_spdx.py /recipe/
 RUN python3 /recipe/evidence.py \
     && install -D -m 0644 /recipe/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
 
 FROM scratch
-COPY --from=builder /payload/ /
+ARG PG_MAJOR=18
+COPY --from=builder /install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so /lib/
+COPY --from=builder /install/usr/share/postgresql/${PG_MAJOR}/extension/ /share/extension/
+COPY --from=builder /system/ /system/
+COPY --from=builder /licenses/ /licenses/
 USER 65532:65532

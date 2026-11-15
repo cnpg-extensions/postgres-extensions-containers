@@ -10,7 +10,7 @@ import shlex
 import urllib.request
 
 BUILD = Path('/build')
-PAYLOAD = Path('/payload')
+LICENSES = Path('/licenses')
 DUCK = BUILD / 'third_party/duckdb'
 
 
@@ -23,29 +23,12 @@ def copy(source, target):
     shutil.copy2(source, target)
 
 
-# Paths and macro names are source interfaces, never a release-to-version table.
+# Version extraction is needed only for separately reported libraries.
 VENDORS = {
-    'fmt': ('fmt', 'fmtlib/fmt', 'include/fmt/core.h', ('FMT_VERSION',)),
-    'yyjson': ('yyjson', 'ibireme/yyjson', 'include/yyjson.hpp', ('YYJSON_VERSION_STRING',)),
-    'utf8proc': ('utf8proc', 'JuliaStrings/utf8proc', 'include/utf8proc.hpp', ('UTF8PROC_VERSION_MAJOR', 'UTF8PROC_VERSION_MINOR', 'UTF8PROC_VERSION_PATCH')),
-    'miniz': ('miniz', 'richgel999/miniz', 'miniz.hpp', ('MZ_VERSION',)),
-    'lz4': ('lz4', 'lz4/lz4', 'lz4.hpp', ('LZ4_VERSION_MAJOR', 'LZ4_VERSION_MINOR', 'LZ4_VERSION_RELEASE')),
-    'zstd': ('zstd', 'facebook/zstd', 'include/zstd.h', ('ZSTD_VERSION_MAJOR', 'ZSTD_VERSION_MINOR', 'ZSTD_VERSION_RELEASE')),
-    'brotli': ('brotli', 'google/brotli', 'common/version.h', ('BROTLI_VERSION_MAJOR', 'BROTLI_VERSION_MINOR', 'BROTLI_VERSION_PATCH')),
-    'httplib': ('cpp-httplib', 'yhirose/cpp-httplib', 'httplib.hpp', ('CPPHTTPLIB_VERSION',)),
-}
-
-
-# Canonical projects without an unambiguous release macro in this snapshot.
-# Keep the actual DuckDB revision/path rather than assigning an upstream tag.
-SOURCE_NAMES = {
-    'concurrentqueue': 'concurrentqueue', 'fast_float': 'fast_float',
-    'fastpforlib': 'FastPFor', 'fsst': 'fsst',
-    'hyperloglog': 'Redis HyperLogLog', 'jaro_winkler': 'JaroWinkler',
-    'jemalloc': 'jemalloc', 'mbedtls': 'mbedtls', 'parquet': 'parquet-format',
-    'pcg': 'pcg-cpp', 'pdqsort': 'pdqsort', 're2': 're2',
-    'ska_sort': 'ska_sort', 'skiplist': 'skiplist', 'snappy': 'snappy',
-    'tdigest': 't-digest', 'thrift': 'thrift', 'vergesort': 'vergesort',
+    'yyjson': ('ibireme/yyjson', 'include/yyjson.hpp', ('YYJSON_VERSION_STRING',)),
+    'lz4': ('lz4/lz4', 'lz4.hpp', ('LZ4_VERSION_MAJOR', 'LZ4_VERSION_MINOR', 'LZ4_VERSION_RELEASE')),
+    'zstd': ('facebook/zstd', 'include/zstd.h', ('ZSTD_VERSION_MAJOR', 'ZSTD_VERSION_MINOR', 'ZSTD_VERSION_RELEASE')),
+    'brotli': ('google/brotli', 'common/version.h', ('BROTLI_VERSION_MAJOR', 'BROTLI_VERSION_MINOR', 'BROTLI_VERSION_PATCH')),
 }
 
 
@@ -81,36 +64,68 @@ def runtime_inputs(builddir):
     return '\n'.join(sorted(selected))
 
 
-def vendor_identity(directory, revision):
-    if directory.name == 'miniz':
-        text = (directory / 'miniz.hpp').read_text()
-        version = re.match(r'/\* miniz\.c ([0-9.]+)', text)[1]
-        return 'miniz', version, 'pkg:github/richgel999/miniz@' + version
-    if directory.name == 'fsst':
-        revision = re.search(r'@ commit ([0-9a-f]{40})', (directory / 'README.md').read_text())[1]
-        return 'fsst', revision, 'pkg:github/cwida/fsst@' + revision
+def vendor_identity(directory):
     if directory.name == 'mbedtls':
         version = (directory / 'VERSION').read_text().strip()
-        return 'mbedtls', version, 'pkg:github/Mbed-TLS/mbedtls@' + version
-    if directory.name not in VENDORS:
-        return SOURCE_NAMES[directory.name], None, None
-    name, repo, filename, macros = VENDORS[directory.name]
+        return version, 'pkg:github/Mbed-TLS/mbedtls@' + version
+    if directory.name == 'snappy':
+        # This snapshot has compiler-dependent version macros; retain its source path.
+        return None, None
+    repo, filename, macros = VENDORS[directory.name]
     text = (directory / filename).read_text()
-    values = [re.search(r'^#define\s+' + macro + r'\s+"?([0-9.]+)', text, re.M)[1]
-              for macro in macros]
-    version = '.'.join(values)
-    if macros == ('FMT_VERSION',):
-        number = int(version)
-        version = f'{number // 10000}.{number // 100 % 100}.{number % 100}'
-    return name, version, 'pkg:github/' + repo + '@' + version
+    version = '.'.join(re.search(r'^#define\s+' + macro + r'\s+"?([0-9.]+)', text, re.M)[1]
+                       for macro in macros)
+    return version, 'pkg:github/' + repo + '@' + version
 
 
-def license_evidence(text, name):
+def source_notices(text):
+    # Skip quoted strings and retain complete legal comment blocks anywhere in
+    # the file, including notices after banners/includes and amalgamated code.
+    tokens = re.finditer(r'''"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|'''
+                         r'(/\*[\s\S]*?\*/|//[^\n]*(?:\n[ \t]*//[^\n]*)*)', text)
+    return '\n\n'.join(dict.fromkeys(m[1] for m in tokens if m[1] and
+        re.search(r'copyright|licen[sc]e|redistribution|public[\s*]+domain', m[1], re.I)))
+
+
+def collect_notices(directory, paths, destination):
+    notices = []
+    for path in sorted(set(paths)):
+        if not path.is_file():
+            continue
+        target = destination / path.relative_to(directory)
+        if re.match(r'^(LICENSE|COPYING|NOTICE|COPYRIGHT)', path.name, re.I):
+            copy(path, target)
+        elif path.suffix in {'.h', '.hpp', '.c', '.cpp', '.cc'}:
+            text = source_notices(path.read_text(errors='replace'))
+            if not text:
+                continue
+            target = target.with_name(target.name + '.notice')
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(text + '\n')
+        else:
+            continue
+        notices.append(target)
+    return notices
+
+
+def adjacent_notices(directory, sources):
+    # Source files outside third_party may have their own nested LICENSE files.
+    paths = set(sources)
+    for source in sources:
+        parent = source.parent
+        while parent.is_relative_to(directory):
+            paths.update(p for p in parent.iterdir() if p.is_file() and
+                         re.match(r'^(LICENSE|COPYING|NOTICE|COPYRIGHT)', p.name, re.I))
+            if parent == directory:
+                break
+            parent = parent.parent
+    return paths
+
+
+def license_evidence(text):
     # Composite/nonstandard notices retain their complete terms as LicenseRefs.
     normalized = ' '.join(text.split())
-    if name == 'PostgreSQL':
-        expression = 'LicenseRef-Universe-' + hashlib.sha256(text.encode()).hexdigest()[:24]
-    elif text.count('UNICODE LICENSE V3') == 1 and 'Third-Party Software Licenses' not in text:
+    if text.count('UNICODE LICENSE V3') == 1 and 'Third-Party Software Licenses' not in text:
         expression = 'Unicode-3.0'
     elif ('Unicode data license' in text or 'UNICODE LICENSE' in text
             or sum(marker in normalized for marker in [
@@ -134,132 +149,121 @@ def license_evidence(text, name):
 
 
 def main():
-    builddir = DUCK / 'build/release'
     def revision(directory):
         return subprocess.check_output(['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(repository='https://github.com/duckdb/pg_duckdb',
-                    version=os.environ['EXT_VERSION'], revision=revision(BUILD),
-                    duckdb_revision=revision(DUCK),
-                    timestamp=os.environ['BUILD_TIMESTAMP'])
+
+    pg_revision, duck_revision = revision(BUILD), revision(DUCK)
+    if pg_revision != '8756099e267c47f0b86c24de4cf995327f1f4279':
+        raise ValueError('Review source licenses and supplemental notice URLs for updated source')
     pg = os.environ['PG_MAJOR']
-    copy(Path(f'/install/usr/lib/postgresql/{pg}/lib/pg_duckdb.so'), PAYLOAD / 'lib/pg_duckdb.so')
-    for path in Path(f'/install/usr/share/postgresql/{pg}/extension').glob('pg_duckdb*'):
-        copy(path, PAYLOAD / 'share/extension' / path.name)
-    # System libraries and their notices are staged by the shared shell helper.
-    listing = subprocess.check_output(['ldd', str(PAYLOAD / 'lib/pg_duckdb.so')], text=True)
-    assert 'not found' not in listing, listing
+    selected = {Path(p) for p in runtime_inputs(DUCK / 'build/release').splitlines()
+                if Path(p).is_absolute() and Path(p).is_file()}
     components = []
 
-    def component(name, version, repo, revision, directory, parent, purl=None, source_files=None):
-        notices = []
-        candidates = source_files if source_files is not None else (
-            directory.iterdir() if name in {'pg_duckdb', 'duckdb'} else directory.rglob('*'))
-        for path in sorted(candidates):
-            if path.is_file() and re.match(r'^(LICENSE|COPYING|NOTICE|COPYRIGHT)', path.name, re.I):
-                target = PAYLOAD / 'licenses' / name / path.relative_to(directory)
-                copy(path, target)
-                notices.append(str(target.relative_to(PAYLOAD)))
-        if name not in {'pg_duckdb', 'duckdb'}:
-            for path in sorted(source_files if source_files is not None else directory.rglob('*')):
-                if path.suffix not in {'.h', '.hpp', '.c', '.cpp', '.cc'}:
-                    continue
-                text = path.read_text(errors='replace')
-                # Preserve original leading source comments, without rewriting terms.
-                header = re.match(r'\s*(/\*[\s\S]*?\*/|(?://[^\n]*\n)+)', text)
-                if header and re.search(r'copyright|license|redistribution', header[0], re.I):
-                    target = PAYLOAD / 'licenses' / name / (str(path.relative_to(directory)) + '.notice')
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    target.write_text(header[0])
-                    notices.append(str(target.relative_to(PAYLOAD)))
-        notice_text = '\n\n'.join((PAYLOAD / notice).read_text(errors='replace') for notice in notices)
-        license_id, copyright = license_evidence(notice_text, name) if notice_text else ('NOASSERTION', 'NOASSERTION')
-        components.append(dict(license=license_id, copyright=copyright, license_text=notice_text,name=name, version=version, repository=repo, revision=revision,
-                               parent=parent, purl=purl, notices=notices,
-                               debian_package=DEBIAN_LIBRARY_PACKAGES.get(name)))
+    def component(name, version, repo, rev, parent, purl=None):
+        record = dict(name=name, version=version, repository=repo, revision=rev,
+                      parent=parent, purl=purl, notices=[],
+                      debian_package=DEBIAN_LIBRARY_PACKAGES.get(name))
+        components.append(record)
+        return record
 
-    component('pg_duckdb', evidence['version'].removeprefix('v'), evidence['repository'], evidence['revision'], BUILD, None,
-              'pkg:github/duckdb/pg_duckdb@' + evidence['version'])
-    component('PostgreSQL', None,
-              evidence['repository'], evidence['revision'] + ':src/vendor',
-              BUILD / 'src/vendor', 'pg_duckdb')
-    # Vendored ruleutils and numeric/list headers carry PostgreSQL copyright.
-    # Its development package supplies the original redistribution terms.
-    notice = Path(f'/usr/share/doc/postgresql-server-dev-{pg}/copyright')
-    target = PAYLOAD / 'licenses/PostgreSQL/copyright'
-    copy(notice, target)
-    components[-1]['notices'].append(str(target.relative_to(PAYLOAD)))
-    components[-1]['license_text'] += '\n\n' + target.read_text()
-    components[-1]['license'], components[-1]['copyright'] = license_evidence(components[-1]['license_text'], 'PostgreSQL')
+    def collect(owner, directory, paths):
+        owner['notices'].extend(collect_notices(directory, paths, LICENSES / owner['name']))
+
+    def download(owner, relative, url):
+        target = LICENSES / owner['name'] / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with urllib.request.urlopen(url) as response:
+            target.write_bytes(response.read())
+        owner['notices'].append(target)
+        owner.setdefault('notice_sources', {})[str(target.relative_to(LICENSES.parent))] = url
+
+    version = os.environ['EXT_VERSION']
+    pg_owner = component('pg_duckdb', version.removeprefix('v'),
+                         'https://github.com/duckdb/pg_duckdb', pg_revision, None,
+                         'pkg:github/duckdb/pg_duckdb@' + version)
+    collect(pg_owner, BUILD, list(BUILD.iterdir()) + list((BUILD / 'src/vendor').rglob('*')))
+    target = LICENSES / 'pg_duckdb/PostgreSQL/copyright'
+    copy(Path(f'/usr/share/doc/postgresql-server-dev-{pg}/copyright'), target)
+    pg_owner['notices'].append(target)
+
     duckver = re.search(r'^DUCKDB_VERSION\s*=\s*(\S+)', (BUILD / 'Makefile').read_text(), re.M)[1]
-    component('duckdb', duckver.removeprefix('v'), 'https://github.com/duckdb/duckdb', evidence['duckdb_revision'], DUCK, 'pg_duckdb',
-              'pkg:github/duckdb/duckdb@' + evidence['duckdb_revision'])
-    # Only library compilation units and their header dependencies: compiler/test
-    # executables in the same build tree must not become shipped packages.
-    selected = runtime_inputs(builddir)
-    if evidence['revision'] != '8756099e267c47f0b86c24de4cf995327f1f4279':
-        raise ValueError('Review vendor source identities and generated-data notice URLs for updated source')
-    for root, revision, parent in [(DUCK, evidence['duckdb_revision'], 'duckdb')]:
-        if not (root / 'third_party').is_dir():
+    duck_owner = component('duckdb', duckver.removeprefix('v'), 'https://github.com/duckdb/duckdb',
+                           duck_revision, 'pg_duckdb', 'pkg:github/duckdb/duckdb@' + duck_revision)
+    collect(duck_owner, DUCK, DUCK.iterdir())
+    # Keep internal code's notices directly under DuckDB, without constructing
+    # package identities or versions that the public SBOM does not expose.
+    for directory in sorted((DUCK / 'third_party').iterdir()):
+        if not directory.is_dir() or not any(p.is_relative_to(directory) for p in selected):
             continue
-        for directory in sorted((root / 'third_party').iterdir()):
-            if not directory.is_dir() or str(directory) + '/' not in selected:
-                continue
-            name, version, purl = vendor_identity(directory, revision)
-            repo = 'https://github.com/' + purl.split('/')[1] + '/' + purl.split('/')[2].split('@')[0] if purl else 'https://github.com/duckdb/duckdb'
-            component(name, version, repo, revision + ':third_party/' + directory.name,
-                      directory, parent, purl)
-            components[-1]['source_url'] = ('https://github.com/duckdb/duckdb/tree/' + revision + '/third_party/' + directory.name)
-    # xxHash is nested in Zstandard's source tree but Debian links libxxhash0
-    # separately. Do not lose this boundary merely because it has no top-level
-    # third_party directory. Preserve its own source notices and real version.
+        owner = duck_owner
+        if directory.name in DEBIAN_LIBRARY_PACKAGES:
+            version, purl = vendor_identity(directory)
+            repo = 'https://github.com/' + purl.removeprefix('pkg:github/').split('@')[0] if purl else 'https://github.com/duckdb/duckdb'
+            owner = component(directory.name, version, repo, duck_revision + ':third_party/' + directory.name,
+                              'duckdb', purl)
+            owner['source_url'] = 'https://github.com/duckdb/duckdb/tree/' + duck_revision + '/third_party/' + directory.name
+        collect(owner, DUCK, directory.rglob('*'))
+
+    sources = {p for p in selected if p.is_relative_to(DUCK / 'src') or p.is_relative_to(DUCK / 'extension')}
+    collect(duck_owner, DUCK, adjacent_notices(DUCK, sources))
+    # These selected sources refer to upstream terms/NOTICE files absent from
+    # the vendored tree. The notice revisions are attribution sources, not claims
+    # that the embedded code is exactly those upstream releases.
+    supplemental = [
+        ('src/common/checksum.cpp', 'robin-hood-hashing/LICENSE',
+         'https://raw.githubusercontent.com/martinus/robin-hood-hashing/3.11.5/LICENSE'),
+        ('src/include/duckdb/common/adbc/adbc.h', 'adbc/NOTICE.txt',
+         'https://raw.githubusercontent.com/apache/arrow-adbc/89fe37cf2050202685398cb50502e31a4d293306/NOTICE.txt'),
+        ('src/include/duckdb/common/arrow/nanoarrow/nanoarrow.h', 'nanoarrow/NOTICE.txt',
+         'https://raw.githubusercontent.com/apache/arrow-nanoarrow/ee22361fa22581e9b8e26cc0c0a37134ffdcfba2/NOTICE.txt'),
+        ('src/include/duckdb/common/adbc/adbc.h', 'adbc/LICENSE.txt',
+         'https://raw.githubusercontent.com/apache/arrow-adbc/89fe37cf2050202685398cb50502e31a4d293306/LICENSE.txt'),
+    ]
+    for source, target, url in supplemental:
+        if DUCK / source in selected:
+            download(duck_owner, target, url)
+
     xxhash = DUCK / 'third_party/zstd/include/zstd/common/xxhash.hpp'
     xxhash_source = DUCK / 'third_party/zstd/common/xxhash.cpp'
-    if str(xxhash_source) in selected or str(xxhash) in selected:
-        text = xxhash.read_text()
-        version = '.'.join(re.search(r'^#define\s+XXH_VERSION_' + part + r'\s+(\d+)', text, re.M)[1]
+    if xxhash in selected or xxhash_source in selected:
+        version = '.'.join(re.search(r'^#define\s+XXH_VERSION_' + part + r'\s+(\d+)', xxhash.read_text(), re.M)[1]
                            for part in ('MAJOR', 'MINOR', 'RELEASE'))
-        component('xxhash', version, 'https://github.com/Cyan4973/xxHash',
-                  evidence['duckdb_revision'] + ':third_party/zstd',
-                  DUCK / 'third_party/zstd', 'zstd',
-                  'pkg:github/Cyan4973/xxHash@' + version,
-                  source_files=[xxhash, xxhash_source])
-        components[-1]['source_url'] = ('https://github.com/duckdb/duckdb/blob/'
-                                       + evidence['duckdb_revision']
-                                       + '/third_party/zstd/include/zstd/common/xxhash.hpp')
+        owner = component('xxhash', version, 'https://github.com/Cyan4973/xxHash',
+                          duck_revision + ':third_party/zstd', 'zstd', 'pkg:github/Cyan4973/xxHash@' + version)
+        owner['source_url'] = 'https://github.com/duckdb/duckdb/blob/' + duck_revision + '/third_party/zstd/include/zstd/common/xxhash.hpp'
+        collect(owner, DUCK, [xxhash, xxhash_source])
+
     icu = DUCK / 'extension/icu'
-    for filename, patterns in [
-        ('datetime/generated/tz_data.cpp', [('tzdata', r'IANA release ([0-9]+[a-z]+)')]),
-        ('collation/generated/collation_data.cpp', [('cldr', r'CLDR release-([0-9.]+)'), ('Unicode Character Database', r'UCD ([0-9.]+)')]),
-    ]:
-        path = icu / filename
-        if str(path) not in selected:
-            continue
-        for name, pattern in patterns:
-            version = re.search(pattern, path.read_text())[1]
-            urls = {
-                'tzdata': 'https://raw.githubusercontent.com/unicode-org/icu-data/6eac2f4d349d9f4a0825103bb41845d8e5ab7add/LICENSE',
-                'cldr': 'https://raw.githubusercontent.com/unicode-org/cldr/release-' + version + '/LICENSE',
-                'Unicode Character Database': 'https://www.unicode.org/license.txt',
-            }
-            url = urls[name]
-            target = PAYLOAD / 'licenses' / name / 'LICENSE'
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with urllib.request.urlopen(url) as response:
-                target.write_bytes(response.read())
-            text = target.read_text()
-            license_id, copyright = license_evidence(text, name)
-            components.append(dict(name=name, version=version,
-                repository=('https://github.com/unicode-org/icu-data' if name == 'tzdata' else
-                            'https://github.com/unicode-org/cldr' if name == 'cldr' else
-                            'https://www.unicode.org/Public/' + version + '/ucd/'),
-                revision=evidence['duckdb_revision'] + ':extension/icu/' + filename,
-                parent='duckdb', purl=None, notices=[str(target.relative_to(PAYLOAD))],
-                license=license_id, copyright=copyright, license_text=text,
-                notice_source=url, source_url='https://github.com/duckdb/duckdb/blob/' + evidence['duckdb_revision'] + '/extension/icu/' + filename))
-    evidence['components'] = components
-    evidence['payload'] = [dict(path=str(p.relative_to(PAYLOAD)), sha256=digest(p))
-                           for p in sorted(PAYLOAD.rglob('*')) if p.is_file()]
-    (BUILD / 'universe-evidence.json').write_text(json.dumps(evidence, indent=2) + '\n')
+    if icu / 'datetime/generated/tz_data.cpp' in selected:
+        download(duck_owner, 'tzdata/LICENSE',
+                 'https://raw.githubusercontent.com/unicode-org/icu-data/6eac2f4d349d9f4a0825103bb41845d8e5ab7add/LICENSE')
+    if icu / 'collation/generated/collation_data.cpp' in selected:
+        version = re.search(r'CLDR release-([0-9.]+)', (icu / 'collation/generated/collation_data.cpp').read_text())[1]
+        download(duck_owner, 'cldr/LICENSE', 'https://raw.githubusercontent.com/unicode-org/cldr/release-' + version + '/LICENSE')
+        download(duck_owner, 'Unicode Character Database/LICENSE', 'https://www.unicode.org/license.txt')
+
+    for owner in components:
+        notices = sorted(set(owner['notices']))
+        text = '\n\n'.join(p.read_text(errors='replace') for p in notices)
+        owner['license'], owner['copyright'] = license_evidence(text)
+        # Parent packages combine internal components with different terms.
+        if owner['name'] in {'pg_duckdb', 'duckdb'}:
+            owner['license'] = 'LicenseRef-Universe-' + hashlib.sha256(text.encode()).hexdigest()[:24]
+        owner['license_text'] = text
+        owner['notices'] = [str(p.relative_to(LICENSES.parent)) for p in notices]
+
+    # Match the Dockerfile's individual COPY operations, without a staging /payload.
+    roots = [(Path(f'/install/usr/lib/postgresql/{pg}/lib/pg_duckdb.so'), Path('lib/pg_duckdb.so')),
+             (Path(f'/install/usr/share/postgresql/{pg}/extension'), Path('share/extension')),
+             (Path('/system'), Path('system')), (LICENSES, Path('licenses'))]
+    payload = []
+    for source, destination in roots:
+        for path in sorted(source.rglob('*')) if source.is_dir() else [source]:
+            if path.is_file():
+                target = destination / path.relative_to(source) if source.is_dir() else destination
+                payload.append(dict(path=str(target), source=str(path).lstrip('/'), sha256=digest(path)))
+    (BUILD / 'universe-evidence.json').write_text(json.dumps(dict(components=components, payload=payload), indent=2) + '\n')
 
 
 if __name__ == '__main__':

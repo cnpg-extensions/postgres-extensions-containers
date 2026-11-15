@@ -4,11 +4,8 @@ Universe contains PostgreSQL extension images with complex bundled dependencies.
 These images use the same CloudNativePG installation mechanism as the other
 extensions in this repository.
 
-## Available extensions
-
-| Extension | Purpose |
-| --- | --- |
-| [pg_duckdb](pg-duckdb/README.md) | DuckDB analytics from PostgreSQL. |
+See the [supported extensions](../README.md#supported-extensions) in the top-level
+README for the extension list and links to usage instructions.
 
 Follow the extension's README for supported versions, Cluster and Database
 configuration, preload requirements and runtime caveats.
