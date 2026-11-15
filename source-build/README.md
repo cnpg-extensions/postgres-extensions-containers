@@ -252,8 +252,7 @@ This does not introduce a new public source-identity contract.
 The [pg_duckdb boundary](../universe/pg-duckdb/PACKAGING.md#sbom-contents) follows
 Debian DuckDB packaging: internal bundled code remains covered by its containing
 package, complete notices and aggregated license terms. It is not a separate
-package inventory of every embedded component. The Cargo lookup policy described
-below does not apply to DuckDB's dependencies.
+package inventory of every embedded component.
 
 ### Example: pg-search's Rust dependencies
 
