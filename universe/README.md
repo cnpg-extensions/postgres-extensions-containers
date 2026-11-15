@@ -21,8 +21,9 @@ must use its canonical upstream or ecosystem package name, including the name
 used by vulnerability advisories where applicable. This matters even when no CVE
 exists today: future advisories should be matchable to the shipped component.
 Do not substitute a recipe-local nickname for an established package identity.
-Matching still depends on scanner and advisory support; unknown versions or
-missing identifiers can limit automated matching.
+Matching still depends on scanner and advisory support. Unknown versions can
+broaden scanner matches as well as reduce coverage; missing identifiers can also
+limit automated matching.
 
 Use established SPDX fields and Package URL types:
 
