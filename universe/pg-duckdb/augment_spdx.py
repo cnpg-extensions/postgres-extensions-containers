@@ -55,7 +55,7 @@ def augment_spdx(document, context):
     def relate(parent, kind, child):
         relationships.append(dict(spdxElementId=parent, relationshipType=kind, relatedSpdxElement=child))
 
-    def add_package(name, version, purl, source_url, source_info):
+    def add_package(name, version, purl, source_url):
         notice_dir = final / 'licenses' / name
         notices = sorted(p for p in notice_dir.rglob('*') if p.is_file())
         text = '\n\n'.join(p.read_text() for p in notices)
@@ -64,7 +64,7 @@ def augment_spdx(document, context):
         result['packages'].append(dict(
             SPDXID=sid, name=name, versionInfo=version, downloadLocation=source_url,
             filesAnalyzed=False, licenseConcluded=license_id, licenseDeclared=license_id,
-            copyrightText='NOASSERTION', sourceInfo=source_info,
+            copyrightText='NOASSERTION',
             externalRefs=[dict(referenceCategory='PACKAGE-MANAGER', referenceType='purl', referenceLocator=purl)]))
         extracted = result.setdefault('hasExtractedLicensingInfos', [])
         if not any(item['licenseId'] == license_id for item in extracted):
@@ -73,17 +73,13 @@ def augment_spdx(document, context):
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
         return sid
 
-    pg_url = 'https://github.com/duckdb/pg_duckdb/tree/v1.2.0'
     pg_id = add_package('pg_duckdb', '1.2.0', 'pkg:github/duckdb/pg_duckdb@v1.2.0',
-                        pg_url, 'Selected source: ' + pg_url)
+                        'https://github.com/duckdb/pg_duckdb/tree/v1.2.0')
     ids = {}
     arch = {'linux/amd64': 'amd64', 'linux/arm64': 'arm64'}[context.platform]
     for name, (source, version, vendor) in DEBIAN_PACKAGES.items():
         url = 'https://github.com/duckdb/duckdb/tree/v' + DEBIAN_PACKAGES['libduckdb2.0'][1] + ('/' + vendor if vendor else '')
-        source_info = ('Selected source: ' + url + '; Debian scanner mapping: ' + name
-                       + '; compiled upstream version: ' + version
-                       + '; built from upstream source, not installed by dpkg; no Debian patch-level claim')
-        ids[name] = add_package(name, version, debian_purl(name, source, version, arch), url, source_info)
+        ids[name] = add_package(name, version, debian_purl(name, source, version, arch), url)
 
     relate(result['SPDXID'], 'DESCRIBES', pg_id)
     relate(pg_id, 'DEPENDS_ON', ids['libduckdb2.0'])

@@ -83,7 +83,8 @@ class HookComposition(unittest.TestCase):
         self.assertNotIn(notice_only, result['packages'])
         self.assertIn(self.document['relationships'][0], result['relationships'])
         mapped = next(p for p in result['packages'] if p['name'] == 'liblz4-1' and p['versionInfo'] == '1.9.4')
-        self.assertIn('not installed by dpkg', mapped['sourceInfo'])
+        self.assertIn(dict(spdxElementId=mapped['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
+                           relatedSpdxElement=self.file_id('licenses/liblz4-1/copyright')), result['relationships'])
 
     def test_debian_mapping_retains_compiled_version_and_source_name(self):
         result = self.run_hook()

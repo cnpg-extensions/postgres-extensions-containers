@@ -23,8 +23,8 @@ with `pkg:deb/debian` identifiers, to enable Debian vulnerability matching.
 current unstable binary versions, invent Debian revision suffixes, or claim
 Debian security patches were applied. The compiled Clang configuration selects
 Snappy 1.2.1; GCC would select a different bundled Snappy version and requires
-an inventory review. Source URLs and the fact that these are source-built
-scanner mappings, not dpkg-installed binaries, are retained in `sourceInfo`.
+an inventory review. Source URLs are recorded in `downloadLocation`; the document
+scope explains that the Debian identities are source-built scanner mappings.
 
 ### Copyright snapshot and version mapping
 
