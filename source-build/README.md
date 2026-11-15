@@ -95,10 +95,38 @@ recipe-specific and must be reviewed when upstream components change.
 
 ## Verify images
 
-See [image verification and SBOM extraction](../BUILD.md#verify-source-built-images)
-for consumer commands and signing identities. PGRX and Universe use the same
-published SBOM format and consumer tools as Debian extensions. Scan the PostgreSQL
-base image separately using its own SBOM.
+Follow the SBOM guide to [verify the image and extract its
+SBOM](https://github.com/cnpg-extensions/cnpg-sbom-generator#verify-the-image-and-extract-its-sbom),
+[inspect and verify build provenance](https://github.com/cnpg-extensions/cnpg-sbom-generator#inspect-and-verify-build-provenance),
+and [report vulnerabilities and licenses](https://github.com/cnpg-extensions/cnpg-sbom-generator#report-vulnerabilities-and-licenses).
+The tools listed in that guide are sufficient; no source-build toolchain is needed.
+
+For images published by `cnpg-extensions` from `main` through the shared source
+workflow, use this exact `--certificate-identity` in the guide's Cosign command:
+
+```text
+https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/source-build-targets.yml@refs/heads/main
+```
+
+For older PGRX images published through `pgrx_targets.yml`, use their original
+signing identity instead:
+
+```text
+https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/pgrx_targets.yml@refs/heads/main
+```
+
+Keep the guide's GitHub Actions OIDC issuer and add
+`--new-bundle-format=false` for this repository's legacy-format signatures.
+For another publisher, change both the image repository and the exact workflow
+identity to that publisher's repository and trusted branch. After copying an
+image, verify the destination repository's signature as well.
+
+The guide's extraction examples use a multi-platform index. For a
+single-platform index, confirm its platform with `docker buildx imagetools
+inspect`, then use `.SBOM.SPDX` and `.Provenance.SLSA` in the format expressions.
+
+PGRX and Universe use the same published SBOM format and consumer tools as Debian
+extensions. Scan the PostgreSQL base image separately using its own SBOM.
 
 ## Directory guide
 
