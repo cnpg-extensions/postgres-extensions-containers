@@ -254,6 +254,25 @@ Debian DuckDB packaging: internal bundled code remains covered by its containing
 package, complete notices and aggregated license terms. It is not a separate
 package inventory of every embedded component.
 
+The recipe's [SBOM hook](../universe/pg-duckdb/augment_spdx.py) applies the shared
+principles in three ways:
+
+- **Identities and versions:** bundled Zstandard is reported as `libzstd1`, with
+  the Debian source-package identity `libzstd` in its standard Debian PURL.
+  Its version is read from the bundled source headers; DuckDB's version comes
+  from its generated CMake configuration. These are source-built scanner
+  mappings, so advisory matches still require applicability review.
+- **Relationships and payload:** `DEPENDS_ON` connects pg_duckdb to DuckDB and
+  DuckDB to its separately reported libraries. `GENERATED_FROM` connects the
+  shipped `pg_duckdb.so` and `libduckdb.so` files to their source-package
+  records. The hook preserves the shared generator's file inventory and
+  packages that own shipped binaries, keeping system and embedded library
+  copies distinct.
+- **License evidence:** copyright and common-license texts are shipped under
+  `/licenses/`. The hook reads those final-image files into SPDX extracted
+  licensing information, references them through `LicenseRef` identifiers and
+  links the notice files to their packages with `DISTRIBUTION_ARTIFACT`.
+
 ### Example: pg-search's Rust dependencies
 
 The pg-search 0.26.6 dependency graph includes Git forks of published Rust crates.
