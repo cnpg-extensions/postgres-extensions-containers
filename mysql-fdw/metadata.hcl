@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-mysql-fdw
-        package = "2.9.3-2.pgdg12+1"
+        package = "2.9.3-2.pgdg12+2"
         // SQL version cannot be updated by Renovate; if it changes, manually update mysql-fdw/README.md, mysql-fdw/metadata.hcl, and renovate.json.
         sql     = "1.2"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-mysql-fdw
-        package = "2.9.3-2.pgdg13+1"
+        package = "2.9.3-2.pgdg13+2"
         // SQL version cannot be updated by Renovate; if it changes, manually update mysql-fdw/README.md, mysql-fdw/metadata.hcl, and renovate.json.
         sql     = "1.2"
       }

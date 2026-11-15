@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pgpcre
-        package = "0.20190509-9.pgdg12+1"
+        package = "0.20190509-9.pgdg12+2"
         // The PGDG release version is date-based and independent of the fixed SQL catalog version.
         sql     = "1"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pgpcre
-        package = "0.20190509-9.pgdg13+1"
+        package = "0.20190509-9.pgdg13+2"
         // The PGDG release version is date-based and independent of the fixed SQL catalog version.
         sql     = "1"
       }

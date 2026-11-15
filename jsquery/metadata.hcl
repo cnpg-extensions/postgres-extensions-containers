@@ -20,7 +20,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-jsquery
-        package = "1.2-3.pgdg12+1"
+        package = "1.2-3.pgdg12+2"
         // SQL version does not track the Debian package version; review it against the package control file on upgrades.
         sql     = "1.1"
       }
@@ -28,7 +28,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-jsquery
-        package = "1.2-3.pgdg13+1"
+        package = "1.2-3.pgdg13+2"
         // SQL version does not track the Debian package version; review it against the package control file on upgrades.
         sql     = "1.1"
       }

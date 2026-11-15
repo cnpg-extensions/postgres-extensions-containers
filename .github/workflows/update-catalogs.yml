@@ -2,8 +2,8 @@ name: Update Extension Image Catalogs
 
 on:
   schedule:
-    # Refresh catalogs one hour after the upstream CloudNativePG workflow.
-    - cron: 0 10 * * 1
+    # Refresh catalogs daily at 10:00 UTC, one hour after upstream's Monday run.
+    - cron: 0 10 * * *
   workflow_dispatch:
   repository_dispatch:
     types: [update-catalogs]

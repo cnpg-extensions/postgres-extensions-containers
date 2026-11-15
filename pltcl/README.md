@@ -29,7 +29,7 @@ spec:
     - name: pltcl
       image:
         # renovate: suite=trixie-pgdg depName=postgresql-pltcl-18
-        reference: ghcr.io/cnpg-extensions/pltcl:18.6-18-trixie
+        reference: ghcr.io/cnpg-extensions/pltcl:18.7-18-trixie
       ld_library_path:
       - system
       env:
