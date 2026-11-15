@@ -25,14 +25,14 @@ cleanly. Distinguish pending upstream updates from intentional downstream
 choices. Record actual source workarounds and their removal conditions, rather
 than documenting inherited choices as new exceptions.
 
-Keep Debian and PGRX on the shared CNPG support policy in
+Keep Debian, PGRX and Universe on the shared CNPG support policy in
 [cnpg-versions.yml](.github/workflows/cnpg-versions.yml), with one Renovate-managed
 latest-release pin. This logic was extracted from Debian's `bake_targets.yml`;
 when upstream changes its version selection, apply the same intent to the shared
 workflow rather than creating a separate PGRX support matrix. Follow the
 [upstream merge process](MERGE.md).
 
-Keep PGRX release acceptance aligned with Debian: build-time validation,
+Keep PGRX and Universe release acceptance aligned with Debian: build-time validation,
 security scanning, signing, shared runtime smoke tests, and required SLSA jobs.
 Do not add repeated full OCI-graph verification or per-field BuildKit provenance
 comparisons against preparation records to these stages. Keep independent
@@ -98,7 +98,8 @@ self-checksums. Simplify producers and consumers together, including workflow
 jobs and artifact handoffs. Do not remove a check merely because it is custom:
 retain checks that prevent incorrect or incomplete published output.
 
-Use trusted upstream HTTPS source archives and record what was actually built.
+Use trusted upstream HTTPS source archives or Git checkouts and record what was
+actually built.
 Do not reintroduce preparation-time archive checksum enforcement or
 cross-platform source-consistency machinery that was intentionally removed.
 Keep useful source evidence, lockfile guards for actual recipe workarounds,

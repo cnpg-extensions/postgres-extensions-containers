@@ -25,7 +25,8 @@ Debian security patches were applied. The hook reads pg_duckdb's control file,
 DuckDB's generated CMake version file and the bundled libraries' version macros.
 For Snappy, the Dockerfile preprocesses its header with the build compiler so
 the hook reads the selected Clang/GCC variant. Missing or ambiguous version
-definitions fail SBOM generation instead of silently retaining an old version. Source URLs are recorded in `downloadLocation`; the document
+definitions fail SBOM generation instead of silently retaining an old version.
+Source URLs are recorded in `downloadLocation`; the document
 scope explains that the Debian identities are source-built scanner mappings.
 
 ### Copyright snapshot and version mapping
@@ -36,6 +37,9 @@ SHA256 values. The copyright files are checked in verbatim and copied to
 `/licenses/<Debian-binary-package>/copyright`, matching the system-library
 helper's directory layout. The copyright source version is provenance for the
 notice document, **not** the version reported for our compiled library.
+
+The compiled versions below describe the inspected pg_duckdb 1.2.0 build;
+they are detected from source on subsequent builds, not pinned by this table.
 
 | Package / checked-in copyright | Compiled version in SBOM | Copyright source package |
 |---|---|---|
@@ -55,7 +59,7 @@ files can describe tests, tools and documentation beyond the shipped library;
 they are not an inventory of additional runtime components.
 
 There is no license extraction script, build-time copyright download, dependency
-discovery or comment parser. `augment_spdx.py` has one static package table and
+discovery or comment parser. `augment_spdx.py` has one maintained package mapping with source-version readers and
 emits records directly, without an intermediate JSON manifest. License texts are
 read from the final image. Docker COPY handles staging, and the shared generator
 inventories shipped files; the hook does not repeat builder-to-final comparisons.
@@ -91,8 +95,7 @@ to system LZ4, which links to system xxHash; the source-built DuckDB library
 contains separate embedded copies. Only source-built libduckdb.so is staged as
 an additional shared library, copied directly from its install path. This recipe
 does not use the base-library capture or system-library staging helpers. Thus the
-eight Debian-style SBOM identities do
-not mean that eight Debian binary packages were installed into this payload.
+eight Debian-style SBOM identities do not mean that eight Debian binary packages were installed into this payload.
 Upstream's loadable httpfs is not shipped here; its curl/OpenSSL build
 requirements must not become runtime inventory entries just because apt
 installed them in the builder.
@@ -104,9 +107,11 @@ the standard SPDX document described in the
 The original native build passed PostgreSQL preload, `CREATE EXTENSION` and a
 forced `DuckDBScan` query. Follow-up SBOM checks reuse that compiled amd64 builder;
 they do not establish fresh compilation, ARM64 or hosted signing/SLSA acceptance.
-The local checks passed 43 shared tests, verified all eight copyright copies
-against their Debian source archives, and exercised the actual BuildKit SPDX
-through Grype. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
+Earlier local validation passed 43 shared tests and verified all eight copyright
+copies against their Debian source archives. The Debian-identity implementation
+was also exercised through Grype using actual BuildKit SPDX output; later
+simplifications were checked against the existing compiled builder and SBOM
+inventory rather than rerunning compilation or hosted acceptance. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
 matching; scanner matches on the real document still require applicability review.
 
 ## Release updates

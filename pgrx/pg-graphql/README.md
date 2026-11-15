@@ -33,7 +33,7 @@ spec:
     extensions:
     - name: pg-graphql
       image:
-        reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.2-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -54,7 +54,7 @@ spec:
     name: cluster-pg-graphql
   extensions:
   - name: pg_graphql
-    version: '1.6.2'
+    version: '1.6.3'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

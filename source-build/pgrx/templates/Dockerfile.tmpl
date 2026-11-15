@@ -56,7 +56,7 @@ RUN cargo pgrx package \
 
 
 # TODO: If staging OS runtime libraries, run stage_system_libs.sh with the
-# compiled .so path here, BEFORE finalizing evidence (see pgrx/pg-search/Dockerfile).
+# compiled .so path here, BEFORE finalizing evidence.
 # Bind Cargo reports and license evidence to the completed payload. Keep the
 # timestamp argument here so a new timestamp does not invalidate compilation.
 ARG PGRX_BUILD_TIMESTAMP
@@ -70,14 +70,14 @@ ARG PG_MAJOR
 
 # Licenses
 # TODO: Copy any required OS shared libraries under /system/ and their
-# corresponding licenses under /licenses/system/.
+# corresponding licenses under /licenses/.
 COPY --from=builder /build/pgrx-licenses/rust/ /licenses/rust/
 
 # Libraries
 # TODO: Match the package folder and actual library name; these need not match
 # the catalog name. See pgrx/pg-durable/Dockerfile for an explicit --out-dir.
 # If the extension needs OS shared libraries, copy them under /system/ and copy
-# their corresponding licenses under /licenses/system/.
+# their corresponding licenses under /licenses/.
 COPY --from=builder /build/target/release/{{ replaceAll .Name "-" "_" }}-pg${PG_MAJOR}/usr/lib/postgresql/${PG_MAJOR}/lib/{{ replaceAll .Name "-" "_" }}.so /lib/
 
 # Share

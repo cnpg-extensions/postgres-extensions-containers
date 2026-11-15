@@ -16,6 +16,9 @@ for them. Shared build infrastructure, maintenance code, workflows, security
 metadata, and generally applicable documentation should be reviewed for each
 upstream sync.
 
+The commands below assume `origin` is the downstream repository and `upstream`
+is CloudNativePG. Substitute your configured remote names when they differ.
+
 ## Merge records
 
 The append-only [merge-records/](./merge-records/) directory is the source of
@@ -61,9 +64,9 @@ needed, preserve the original text and add a dated correction note.
    merge preview when practical:
 
    ```sh
-   git merge-base downstream/main upstream/main
-   git log --oneline --left-right downstream/main...upstream/main
-   git merge-tree --write-tree downstream/main upstream/main
+   git merge-base origin/main upstream/main
+   git log --oneline --left-right origin/main...upstream/main
+   git merge-tree --write-tree origin/main upstream/main
    ```
 
    Create a new dated record under `merge-records/` before changing code;
@@ -86,8 +89,8 @@ needed, preserve the original text and add a dated correction note.
    exclusion comment.
 
    For each substantive shared-infrastructure change, review whether its
-   intent should also affect the downstream PGRX path, even if Git merges
-   cleanly or the changed file has no PGRX counterpart. Trace relevant callers
+   intent should also affect the downstream PGRX and Universe paths, even if Git merges
+   cleanly or the changed file has no source-build counterpart. Trace relevant callers
    and parallel implementations, including target discovery and cleanup,
    build and release gates, security and provenance, catalog publication,
    smoke-test support policy, and tool updates. Record the affected downstream

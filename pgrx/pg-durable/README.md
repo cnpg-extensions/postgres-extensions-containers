@@ -38,7 +38,7 @@ spec:
     extensions:
     - name: pg-durable
       image:
-        reference: ghcr.io/cnpg-extensions/pg-durable:0.2.7-18-trixie
+        reference: ghcr.io/cnpg-extensions/pg-durable:0.2.9-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -59,7 +59,7 @@ spec:
     name: cluster-pg-durable
   extensions:
   - name: pg_durable
-    version: '0.2.7'
+    version: '0.2.9'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

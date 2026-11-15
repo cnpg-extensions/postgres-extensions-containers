@@ -79,7 +79,7 @@ for querying with DuckDB and accessing external data.
 
 - `pg_duckdb` requires `shared_preload_libraries`; adding it to an existing
   cluster requires PostgreSQL to restart. Keep `ld_library_path: [system]` so the
-  extension can load its bundled runtime libraries, including libcurl.
+  extension can load its bundled DuckDB shared library.
 - DuckDB execution defaults to superusers. Review upstream's role and secret
   access settings before granting access through `duckdb.allowed_role`.
 - Temporary files and downloaded extensions use `$PGDATA/pg_duckdb/temp` and

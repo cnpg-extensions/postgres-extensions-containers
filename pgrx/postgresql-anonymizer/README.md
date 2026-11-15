@@ -75,5 +75,6 @@ Maintained by Jeremy Schneider (@ardentperf).
 ## Licenses and Copyright
 
 The extension uses the PostgreSQL license. The image bundles its license and
-Rust dependency notices under `/licenses/rust/`. The source archive and upstream
-Cargo.lock are pinned by the shared PGRX build workflow.
+Rust dependency notices under `/licenses/rust/`. The Dockerfile downloads the source tag selected in metadata. Cargo builds use
+the release lockfile, with the guarded root-version correction documented in
+[the workaround register](../../WORKAROUNDS.md#postgresql-anonymizer-332-stale-root-cargolock-version).

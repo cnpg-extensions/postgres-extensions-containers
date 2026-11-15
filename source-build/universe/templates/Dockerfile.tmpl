@@ -29,17 +29,17 @@ RUN tar -xzf /tmp/source.tar.gz --strip-components=1 --no-same-owner -C /build \
 # This placeholder must be replaced before building.
 RUN echo 'TODO: implement upstream compilation and installation' >&2 && exit 1
 
-# Keep timestamp-dependent evidence after compilation to preserve build caching.
-ARG BUILD_TIMESTAMP
-# TODO: Implement these recipe-owned files. There is no generic Universe
-# dependency detector, payload stager or license collector. Stage /payload/lib,
-# /payload/share/extension and /payload/licenses, including runtime dependencies.
-# Preserve dpkg ownership for the shared generator; add bundled/static component
-# evidence through its augment_spdx(document, context) hook, not a new composer.
-COPY universe/{{ .Name }}/evidence.py universe/{{ .Name }}/augment_spdx.py /recipe/
-RUN python3 /recipe/evidence.py \
-    && install -D -m 0644 /recipe/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
+# TODO: Stage original notices under /licenses and implement the recipe hook.
+# Use inline copy commands where sufficient; no separate evidence script is required.
+# Preserve dpkg ownership for the shared generator and add source-built components
+# through augment_spdx(document, context), using the documented package boundaries.
+COPY universe/{{ .Name }}/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
 
 FROM scratch
-COPY --from=builder /payload/ /
+ARG PG_MAJOR={{ .DefaultVersion }}
+# TODO: Adjust installed filenames; copy additional runtime libraries separately
+# under /system only when needed, and declare the corresponding metadata path.
+COPY --from=builder /install/usr/lib/postgresql/${PG_MAJOR}/lib/{{ replaceAll .Name "-" "_" }}.so /lib/
+COPY --from=builder /install/usr/share/postgresql/${PG_MAJOR}/extension/ /share/extension/
+COPY --from=builder /licenses/ /licenses/
 USER 65532:65532

@@ -7,7 +7,7 @@ This guide explains how to build Postgres extensions container images for
 > [!IMPORTANT]
 > If you are looking to contribute a new PostgreSQL extension to this
 > repository, please refer to the [`CONTRIBUTING_NEW_EXTENSION.md` file](CONTRIBUTING_NEW_EXTENSION.md).
-> This guide covers the entire lifecycle, from proposing the extension and
+> That contribution guide covers the entire lifecycle, from proposing the extension and
 > scaffolding the project to local validation and submitting a Pull Request.
 
 ## Prerequisites
@@ -95,12 +95,12 @@ sample for the existing build, security, and integration checks:
 - `pg-durable` (PGRX): standard Rust packaging and background-worker extension.
 - `pg-session-jwt` (PGRX): Rust install path and guarded upstream lockfile correction.
 
-The Debian and PGRX workflows select their own members of this sample. Required
-gates report on every PR and merge-queue commit, including empty build selections.
+The Debian workflow selects its sample; the shared source workflow selects the
+PGRX sample and all discovered Universe recipes. Family-specific source tooling
+changes select only that family's sample. Required gates report on every PR and
+merge-queue commit, including empty build selections.
 
-Current extensions have no dependency on another extension present in this
-repository, so the sample does not cover local dependency resolution. No synthetic
-dependency is added. Direct payload changes always select their extension; changes
+Direct payload changes always select their extension; changes
 to extension-specific tests select that extension on branches only. Mixed shared
 and extension changes test the union, without duplicate builds.
 
@@ -113,21 +113,22 @@ gh workflow run source-build.yml --repo cnpg-extensions/postgres-extensions-cont
   --ref main -f extension_name=all
 ```
 
-Use an extension directory instead of `all` to rebuild one extension. Dispatching
-on another branch builds and tests without copying images to production.
+Use a logical extension name (for example, `pg-duckdb`) instead of `all` to
+rebuild one extension. Dispatching on another branch builds and tests without
+copying images to production.
 
 ### 1. Build configuration check (dry run)
 
 To verify the configuration (running `docker buildx bake --check`) for all
-projects without building or pulling layers:
+Debian recipes without executing their build steps:
 
 ```bash
 task checks:all
 ```
 
-### 2. Build all projects
+### 2. Build all Debian recipes
 
-To build all discovered projects:
+To build all discovered Debian recipes:
 
 ```bash
 task
@@ -137,15 +138,15 @@ task bake:all
 
 ### 3. Build a specific project
 
-To build a single project (e.g., the directory named `pgvector`):
+To build a single project (e.g., the directory named `pg-cron`):
 
 ```bash
-task bake TARGET=pgvector
+task bake TARGET=pg-cron
 ```
 
-### 4. Push all images
+### 4. Push all Debian images
 
-To build all images and immediately push them to the configured registry:
+To build all Debian images and immediately push them to the configured registry:
 
 ```bash
 task bake:all PUSH=true
@@ -153,10 +154,10 @@ task bake:all PUSH=true
 
 ### 5. Push images for a specific project
 
-To push images for a single project (e.g., the directory named `pgvector`):
+To push images for a single project (e.g., the directory named `pg-cron`):
 
 ```bash
-task bake TARGET=pgvector PUSH=true
+task bake TARGET=pg-cron PUSH=true
 ```
 
 ### 6. Dry run mode
@@ -167,8 +168,14 @@ To see the commands that would be executed without running the actual
 ```bash
 task DRY_RUN=true
 # or
-task bake TARGET=pgvector DRY_RUN=true
+task bake TARGET=pg-cron DRY_RUN=true
 ```
+
+The `:all` tasks discover Debian recipes only. For PGRX and Universe, use
+`task checks TARGET=<name>` and `task bake TARGET=<name>` individually. Source
+bakes require a native Docker-container builder via `BUILDER=<name>` and the
+digest-qualified generator image in the lowercase `sbom_generator` environment
+variable. See [source-build setup](source-build/README.md#local-builds).
 
 ## Local testing guide
 
@@ -188,14 +195,17 @@ This single command automates environment setup, image building, and test
 execution:
 
 ```bash
-# Replace <extension> with the name of the extension (e.g., pgvector)
+# Replace <extension> with the name of the extension (e.g., pg-cron)
 task e2e:test:full TARGET="<extension>"
 ```
 
-Example for testing the `pgvector` extension:
+For source recipes, also supply `BUILDER=<name>` and export `sbom_generator`
+as described above.
+
+Example for testing the `pg-cron` extension:
 
 ```bash
-task e2e:test:full TARGET="pgvector"
+task e2e:test:full TARGET="pg-cron"
 ```
 
 **When to use the step-by-step guide:** If the automated test fails during
@@ -248,8 +258,8 @@ export KUBECONFIG=$PWD/kubeconfig
 > reachable within Kubernetes at `registry.pg-extensions:5000`. When testing your
 > local builds, you must point the extension's `reference` to this internal
 > address.
-> For example, if you are testing a locally built `pgvector` image, use:
-> `reference: registry.pg-extensions:5000/pgvector-testing:<tag>`
+> For example, if you are testing a locally built `pg-cron` image, use:
+> `reference: registry.pg-extensions:5000/pg-cron-testing:<tag>`
 
 To allow the test suite (which runs within the Docker network) to reach the
 Kubernetes API server, export the internal Kubeconfig:
@@ -308,7 +318,7 @@ It is possible to pass arguments to the [Chainsaw test command](https://kyverno.
 argument, like:
 
 ```bash
-task e2e:test TARGET="pgvector" KUBECONFIG_PATH="./kubeconfig" EXTRA_ARGS="--skip-delete,--fail-fast"
+task e2e:test TARGET="pg-cron" KUBECONFIG_PATH="./kubeconfig" EXTRA_ARGS="--skip-delete,--fail-fast"
 ```
 
 ---

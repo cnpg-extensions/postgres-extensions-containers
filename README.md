@@ -127,7 +127,8 @@ extensions for [CloudNativePG](https://cloudnative-pg.io/).
 
 The table lists all recipes in this repository, including Debian, PGRX and
 Universe extensions. License notes are a summary; consult the image notices and
-SBOM for the complete set of distributed components.
+SBOM for the reported package boundaries and distributed license notices.
+Bundled components are not necessarily separate SBOM records.
 
 ---
 
@@ -230,7 +231,6 @@ pg-cron:1.6.7-202509101200-18-trixie
 For convenience, **rolling tags** should also be published:
 
 ```
-pg-cron:1.6.7-18-trixie
 pg-cron:1.6.7-18-trixie
 ```
 

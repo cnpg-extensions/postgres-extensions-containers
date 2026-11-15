@@ -8,7 +8,7 @@ On dependency updates, check the linked issue, pull request, or release contract
 verify the replacement, and remove temporary measures and their entries together
 when they are no longer needed. Some entries describe packaging adaptations
 rather than pending upstream bug fixes. Where no upstream issue is linked, say so
-instead of implying that a fix is scheduled. Last reviewed: 2026-10-19.
+instead of implying that a fix is scheduled.
 
 Generator-specific dependency and license-reporting adaptations are maintained
 in the [SBOM generator repository](https://github.com/cnpg-extensions/cnpg-sbom-generator/blob/main/WORKAROUNDS.md).
@@ -57,7 +57,7 @@ completed 1,915 jobs each. These counts exclude skipped jobs.
 Shared changes now select a representative sample on non-main branches and do not
 trigger production rebuilds on `main`. Direct extension payload changes still
 build automatically. The sample and manual single/all-extension rebuild commands
-are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same selection policy through its own workflow.
+are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX and Universe use the same selection policy through the shared source-build workflow.
 
 ## CI: authorized testing of fork PRs
 
@@ -66,15 +66,16 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
 - **Workaround:** the trusted `pull_request_target` caller checks write, maintain,
   or admin access for the author and actors on initial runs. A maintainer can
   authorize an external PR with **Re-run all jobs**. It calls the existing Debian
-  and PGRX workflows, which resolve the PR number and reject a head different
+  and shared source-build workflows, which resolve the PR number and reject a head different
   from the authorized event SHA. Checkouts explicitly opt in to fork code.
-- **Selection and reporting:** both workflows retain Dagger discovery, changed-file
-  selection, representative samples, and acceptance gates. They post pending and
+- **Selection and reporting:** Debian uses Dagger discovery; source builds use
+  `source-build/workflow.py`. Both apply changed-file selection, representative
+  samples, and acceptance gates. They post pending and
   final statuses on the tested head under the existing required gate names.
   Explicit refs disable production and catalogs. Manual dispatch by PR number
-  remains available; `extension_name` is ignored and PGRX uses its full CNPG matrix.
+  remains available; `extension_name` is ignored and source builds use the full CNPG matrix.
 - **Duplicate runs:** ordinary fork PR runs skip discovery, builds, and gates;
-  the skipped gates have distinct `(fork preview)` names. The authorized caller runs only for forks.
+  the authorized caller runs only for forks.
   Same-repository PRs retain their existing path. New heads need fresh authorization.
 - **Validation:** local lint, selection, and whitespace checks pass. Earlier hosted
   testing confirmed the trigger and initial authorization; the revised checkout,
@@ -92,7 +93,7 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
 - **Upstream:** [3.3.2 Cargo.lock](https://gitlab.com/dalibo/postgresql_anonymizer/-/blob/3.3.2/Cargo.lock)
   records `anon` as 3.3.1 while Cargo.toml declares 3.3.2. No upstream issue is linked.
 - **Problem:** locked Cargo fetch rejects the inconsistent release before compilation.
-- **Workaround:** [postgresql-anonymizer/Dockerfile](postgresql-anonymizer/Dockerfile)
+- **Workaround:** [postgresql-anonymizer/Dockerfile](pgrx/postgresql-anonymizer/Dockerfile)
   changes only the root package version to 3.3.2, guarded by exact original and
   effective lock checksums. Both hashes remain in build evidence; dependencies
   are unchanged.
@@ -108,7 +109,7 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
   No upstream issue is linked.
 - **Problem:** our builder derives cargo-pgrx and dependency evidence from an
   upstream lockfile and requires locked dependency resolution.
-- **Workaround:** [pglinter/Dockerfile](pglinter/Dockerfile) downloads that
+- **Workaround:** [pglinter/Dockerfile](pgrx/pglinter/Dockerfile) downloads that
   commit's Cargo.lock with a pinned SHA-256. It requires source version 2.0.0,
   the exact release Cargo.toml checksum, and an absent source lockfile before
   downloading. The borrowed lock still identifies pglinter 2.0.0 and pgrx 0.18.0;
@@ -134,7 +135,7 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
   [Upstream CI](https://github.com/pmpetit/pglinter/blob/2.0.0/.github/actions/reusable-package-action-native/action.yml)
   selects `release-lto-off` on ARM64 to avoid runner memory exhaustion, as
   described in [PR #99](https://github.com/pmpetit/pglinter/pull/99).
-- **Downstream decision:** [pglinter/Dockerfile](pglinter/Dockerfile) uses
+- **Downstream decision:** [pglinter/Dockerfile](pgrx/pglinter/Dockerfile) uses
   `--profile release` on both AMD64 and ARM64. We leave the upstream Cargo
   profiles unchanged and do not apply its CI setting that disables LTO.
 - **Evidence:** on 2026-11-09, the [native ARM64 fat-LTO probe](https://github.com/ardentperf-labs/postgres-extensions-containers/actions/runs/42719148797)
@@ -158,7 +159,7 @@ are documented in [BUILD.md](BUILD.md#usage-and-targets). PGRX uses the same sel
 - **Problem:** the hosted Renovate run on 2026-11-12 received a GitHub GraphQL
   error stating that the `neondatabase` organization IP allow list blocked its
   request. Renovate reported this as a `github-tags` lookup returning `no-result`.
-- **Workaround:** [pg-session-jwt/metadata.hcl](pg-session-jwt/metadata.hcl) uses
+- **Workaround:** [pg-session-jwt/metadata.hcl](pgrx/pg-session-jwt/metadata.hcl) uses
   `git-tags` with the public HTTPS Git URL. The existing PGRX custom manager in
   [renovate.json](renovate.json) accepts this datasource and continues updating
   the source tag and SQL version together. Direct Git tag discovery works from

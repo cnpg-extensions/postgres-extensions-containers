@@ -13,7 +13,8 @@ settings. Use those instructions to add the image and enable the SQL extension.
 
 ## Image information
 
-Images include an SBOM, provenance and original license notices under `/licenses`.
+Images carry SBOM and provenance attestations, with original license notices
+inside the image under `/licenses`.
 See [image verification and SBOM inspection](../README.md#verify-images)
 for consumer instructions. PGRX SBOMs include the configured Rust dependency graph;
 this does not mean every dependency survives linker dead-code elimination.

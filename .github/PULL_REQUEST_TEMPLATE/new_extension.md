@@ -32,21 +32,21 @@ Closes #<!-- proposal issue id -->
       issue exists and is referenced via `Closes #<id>` above.
 - [ ] The commit message follows the format:
       ``feat: add `<extension-name>` container image``.
-- [ ] The Debian package was verified to exist in the `main` component on both
-      Debian `stable` (`trixie`) and `oldstable` (`bookworm`) via `apt search`.
-- [ ] The extension was scaffolded with `task create-extension NAME=<ext>` and all
-      `TODO` comments in the generated files were resolved.
-- [ ] `metadata.hcl` sets the correct `package` (full Debian version) and, when
+- [ ] The Debian package was verified in `main` on the supported distributions,
+      or the proposal documents the reason for a PGRX/Universe source build.
+- [ ] The extension follows its family templates (Debian, PGRX or Universe),
+      and all generated `TODO` comments were resolved.
+- [ ] `metadata.hcl` sets the correct `package` (full Debian version or literal source tag) and, when
       `create_extension = true`, the matching `sql` (catalog) version.
 - [ ] `create_extension` is set correctly (`false` for PostgreSQL *modules* with
-      no `.control` file, verified with `dpkg -L`).
-- [ ] The `renovate:` annotations in `metadata.hcl` and `README.md` are present
-      and intact (`suite=`, `depName=`, `extractVersion=`).
+      no `.control` file, verified in the package or source installation).
+- [ ] Renovate annotations and rules match the recipe family and upstream
+      version scheme, with a verified package-to-SQL-version mapping.
 - [ ] Every distributed component meets the
       [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers#open-source-licensing-policy),
       with any exceptions explicitly approved and documented;
       SPDX `licenses` in `metadata.hcl` are accurate.
-- [ ] `task checks:all` passes locally.
+- [ ] `task checks TARGET="<extension-name>"` passes locally.
 - [ ] Full E2E passes: `task e2e:test:full TARGET="<extension-name>"`.
 - [ ] `README.md` is complete and includes a working `Cluster` example (plus a
       `Database` example with `CREATE EXTENSION` when `create_extension = true`).
@@ -62,7 +62,8 @@ Closes #<!-- proposal issue id -->
 
 - [ ] The linked proposal issue is approved (label `new-extension`) and the
       `Closes #<id>` reference is correct.
-- [ ] CI is green: the `bake` workflow built the new target for the full
+- [ ] CI is green: the applicable Debian or shared source-build workflow built
+      the new target for the full
       `pgVersions × distributions × {amd64, arm64}` matrix.
 - [ ] DCO check passes and history is a single clean commit with the required
       `feat: add ...` message format.
@@ -73,7 +74,7 @@ Closes #<!-- proposal issue id -->
 - [ ] `metadata.hcl` reviewed: `package`/`sql` versions, `create_extension`,
       runtime settings (`shared_preload_libraries`, `*_path`, `env`,
       `required_extensions`) and behavior flags are correct.
-- [ ] `renovate:` annotations are intact so automated version PRs will track
+- [ ] Renovate annotations and rules are correct so automated version PRs track
       the package going forward.
 - [ ] `Dockerfile` reviewed: final stage is `FROM scratch` and contains only the
       expected artifacts; the `USER 65532:65532` directive matches the nonroot

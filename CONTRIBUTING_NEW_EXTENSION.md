@@ -24,8 +24,8 @@ Before proposing a change, ensure your local machine is compatible with the
    existing project ecosystem.
     ```sh
     task prereqs      # Check if Go, Task, and Docker are ready
-    task checks:all   # Validate current configurations
-    task bake:all     # Optional: build all existing extensions to confirm the Dagger engine
+    task checks:all   # Validate Debian recipe configurations
+    task bake:all     # Optional: build all Debian recipes
     ```
 
 ---
@@ -34,12 +34,16 @@ Before proposing a change, ensure your local machine is compatible with the
 
 To maintain high standards and avoid duplicated effort or architectural
 conflicts, every new extension begins with a formal proposal.
-During this phase, you must verify that the extension is available as a
+Prefer an extension available as a
 Debian package in the `main` component (which by definition complies with
 the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
 from a trusted, auditable repository, and identify its versioning logic. The PGDG (PostgreSQL Global Development Group) repository is the
 recommended source; other Debian repositories are acceptable provided they meet
-the same standards.
+the same standards. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
+Other source builds must justify their dependency-packaging obstacles under the
+[Universe criteria](source-build/universe/README.md). The package discovery and
+default scaffolding below describe the Debian path; source recipes use their
+family templates and native build instructions.
 
 ### Identifying the Package & Version
 
@@ -111,7 +115,8 @@ After gathering the package details and verifying the extension's license,
 submit your proposal:
 
 1. Point your browser to ["New Extension Proposal"](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose).
-2. Provide the package name, versioning info, and a link to the upstream source.
+2. Provide the package name or proposed source-build family, versioning info,
+   and a link to the upstream source.
 3. State the license clearly. All components distributed in the final image must
    satisfy the [Open Source Licensing Policy](README.md#open-source-licensing-policy).
    Identify any material requiring an explicitly approved and documented exception.
@@ -156,6 +161,7 @@ Your `metadata.hcl` file requires two version fields:
 
 - **`package`**: The full Debian package version (e.g., `0.8.2-1.pgdg13+1`).
   This includes packaging metadata and is used to install the correct package.
+  For source recipes, this is the literal upstream source tag instead.
 
 - **`sql`**: The PostgreSQL extension version as it appears in the catalog
   (e.g., `0.8.2`). This is the version of the extension that will be verified
@@ -173,8 +179,10 @@ Your `metadata.hcl` file requires two version fields:
 
 ### Automated Dependency Updates
 
-Renovate opens dependency update pull requests for manual review and merge.
-Automatic merging is disabled for all extension dependency updates.
+Renovate automatically merges eligible minor, patch and digest updates after
+required checks pass. Major updates and package-specific exceptions require
+manual review. Verify the package-to-SQL-version mapping before enabling an
+automatic update rule; see the [update policy](README.md#automated-dependency-updates).
 
 ---
 
@@ -192,8 +200,12 @@ The repository provides a framework for full End-to-End validation. Ensure that
 the entire pipeline is working:
 
 ```sh
-task checks:all
+task checks TARGET="<extension-name>"
 ```
+
+For PGRX and Universe, first configure the native builder and pinned
+`sbom_generator` environment variable described in [BUILD.md](BUILD.md#usage-and-targets).
+Pass `BUILDER=<name>` to the E2E task.
 
 Then run the full E2E tests for the extension. This task will build your image,
 push it to a local registry, spin up a Kind cluster, and run the functional
@@ -239,7 +251,8 @@ Pay close attention to the image location. Inside the Kubernetes cluster, the
 local registry is reachable at `registry.pg-extensions:5000`:
 
 ```yaml
-image: registry.pg-extensions:5000/<extension-name>-testing:<tag>
+image:
+  reference: registry.pg-extensions:5000/<extension-name>-testing:<tag>
 ```
 
 ### Extending Tests

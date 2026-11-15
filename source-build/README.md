@@ -33,7 +33,7 @@ flowchart TD
     subgraph AMD["AMD64 runner — per target"]
         AB["build.py + Docker Bake"]
         subgraph AC["BuildKit-managed containers"]
-            AX["Build extension → finalize evidence"]
+            AX["Build extension → stage runtime files and notices"]
             AG["SBOM generator + recipe hook"]
             AX --> AG
         end
@@ -43,7 +43,7 @@ flowchart TD
     subgraph ARM["ARM64 runner — per target"]
         RB["build.py + Docker Bake"]
         subgraph RC["BuildKit-managed containers"]
-            RX["Build extension → finalize evidence"]
+            RX["Build extension → stage runtime files and notices"]
             RG["SBOM generator + recipe hook"]
             RX --> RG
         end
@@ -171,7 +171,7 @@ Use established SPDX fields and Package URL types:
 
 Use the shared generator's existing augmentation hook for missing source-built
 components. Evidence must describe the selected sources and final payload;
-validate their binding during the build. Builder reports and recipe helpers are
+use recipe build steps and the shared shipped-file inventory to associate them. Builder reports and recipe helpers are
 private implementation details, not a second consumer schema. Do not publish
 custom JSON annotations, identifier qualifiers, sidecars or attestations as an
 alternative API. SPDX identifiers and document namespaces are opaque;
