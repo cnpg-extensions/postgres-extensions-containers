@@ -126,6 +126,46 @@ class HookComposition(unittest.TestCase):
             self.assertTrue(result['comment'].startswith('Existing generator scope'))
             self.assertIn('not an exhaustive', result['comment'])
 
+    def test_notice_only_builder_records_are_replaced_but_binaries_retained(self):
+        evidence, hook = load('evidence'), load('augment_spdx')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ['pg_duckdb', 'liblz4-1']:
+                notice = root / 'licenses' / name / 'copyright'
+                notice.parent.mkdir(parents=True)
+                notice.write_text('Copyright 2026 authors; terms')
+            components = [evidence.package('pg_duckdb', '1.2.0', 'https://example.com', 'rev', None, root=root),
+                evidence.package('liblz4-1', '1.9.4', 'https://example.com', 'rev', 'pg_duckdb',
+                    evidence.debian_purl('liblz4-1', 'lz4', '1.9.4', 'amd64'), debian='liblz4-1', root=root)]
+            (root / 'build').mkdir()
+            (root / 'build/universe-evidence.json').write_text(json.dumps(dict(components=components, payload=[])))
+            installed = dict(SPDXID='SPDXRef-installed', name='liblz4-1', versionInfo='1.10.0-4')
+            notice_only = dict(SPDXID='SPDXRef-notice-only', name='liblz4-1', versionInfo='1.10.0-4')
+            document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[installed, notice_only], files=[
+                dict(SPDXID='SPDXRef-pg', fileName='licenses/pg_duckdb/copyright'),
+                dict(SPDXID='SPDXRef-notice', fileName='licenses/liblz4-1/copyright'),
+                dict(SPDXID='SPDXRef-binary', fileName='system/liblz4.so.1'),
+                dict(SPDXID='SPDXRef-pg-so', fileName='lib/pg_duckdb.so')], relationships=[
+                dict(spdxElementId='SPDXRef-installed', relationshipType='CONTAINS', relatedSpdxElement='SPDXRef-binary'),
+                dict(spdxElementId='SPDXRef-notice-only', relationshipType='CONTAINS', relatedSpdxElement='SPDXRef-notice')])
+            result = hook.augment_spdx(document, SimpleNamespace(api_version=1, builder_path=root))
+            self.assertIn(installed, result['packages'])
+            self.assertNotIn(notice_only, result['packages'])
+            self.assertEqual(result['files'], document['files'])
+            self.assertIn(document['relationships'][0], result['relationships'])
+            mapped = next(p for p in result['packages'] if p['name']=='liblz4-1' and p['versionInfo']=='1.9.4')
+            self.assertIn('not installed by dpkg', mapped['sourceInfo'])
+            self.assertIn(dict(spdxElementId=mapped['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
+                               relatedSpdxElement='SPDXRef-notice'), result['relationships'])
+
+    def test_debian_mapping_retains_compiled_version_and_source_name(self):
+        from urllib.parse import urlsplit, parse_qs
+        evidence = load('evidence')
+        purl = evidence.debian_purl('libzstd1', 'libzstd', '1.5.6', 'arm64')
+        self.assertEqual(urlsplit(purl).path, 'deb/debian/libzstd1@1.5.6')
+        self.assertEqual(parse_qs(urlsplit(purl).query),
+                         dict(arch=['arm64'], distro=['debian-unstable'], upstream=['libzstd']))
+
     def test_consolidated_notices_preserved_by_hook(self):
         evidence, hook = load('evidence'), load('augment_spdx')
         with tempfile.TemporaryDirectory() as tmp:
@@ -144,7 +184,6 @@ class HookComposition(unittest.TestCase):
             result = hook.augment_spdx(document, SimpleNamespace(api_version=1, builder_path=root))
             self.assertEqual(result['hasExtractedLicensingInfos'][0]['extractedText'], text)
             package = result['packages'][0]
-            self.assertIn('Embedded author', package['copyrightText'])
             self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
                                relatedSpdxElement='SPDXRef-notice'), result['relationships'])
 

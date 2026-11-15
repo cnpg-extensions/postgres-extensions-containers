@@ -41,10 +41,11 @@ RUN make clean-all \
 COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh
 RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so"
 
-# Assemble reviewed upstream notices and record recipe-owned SBOM evidence.
-COPY universe/pg-duckdb/licenses.sh /recipe/licenses.sh
+# Debian source-package copyright files, in the shared helper's layout.
+COPY universe/pg-duckdb/licenses/ /licenses/
 COPY universe/pg-duckdb/evidence.py universe/pg-duckdb/augment_spdx.py /recipe/
-RUN bash /recipe/licenses.sh \
+RUN mkdir -p /licenses/pg_duckdb \
+    && cat /build/LICENSE /build/NOTICE > /licenses/pg_duckdb/copyright \
     && python3 /recipe/evidence.py \
     && install -D -m 0644 /recipe/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
 

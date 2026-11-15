@@ -25,11 +25,26 @@ def augment_spdx(document, context):
         if hashlib.sha256(data).hexdigest() != payload['sha256']:
             raise ValueError('payload hash mismatch: ' + path)
     components = evidence['components']
+    # Copied Debian copyright/common-license files can make the shared scan
+    # select builder packages that contribute no binary here. Replace only
+    # those notice-only records with the explicit compiled-version mappings.
+    mapped_notices = {files[path]['SPDXID'] for c in components if c.get('debian_package')
+                      for path in c['notices']}
+    replaced = set()
+    for package in result['packages']:
+        owned = {r['relatedSpdxElement'] for r in result.get('relationships', [])
+                 if r['spdxElementId'] == package['SPDXID'] and r['relationshipType'] == 'CONTAINS'}
+        if owned and owned <= mapped_notices:
+            replaced.add(package['SPDXID'])
+    result['packages'] = [p for p in result['packages'] if p['SPDXID'] not in replaced]
+    result['relationships'] = [r for r in result.get('relationships', [])
+                              if r['spdxElementId'] not in replaced and r['relatedSpdxElement'] not in replaced]
     scope = ('Package inventory follows Debian DuckDB 2.0.0+dfsg2 package boundaries. '
              'Internal bundled code and generated data are covered by their containing '
              'package and original notice files, not separate package records. '
-             'Separately listed source-built libraries retain upstream identities; '
-             'they are not Debian-installed packages. This is not an exhaustive '
+             'Eight source-built components use Debian package identities for scanner '
+             'matching, with compiled upstream versions and no Debian revision. '
+             'These are not dpkg-installed or Debian-patched binaries. This is not an exhaustive '
              'embedded-component inventory.')
     result['comment'] = (result.get('comment', '') + '\n' + scope).strip()
     ids = {}
@@ -55,8 +70,9 @@ def augment_spdx(document, context):
                        filesAnalyzed=False, licenseConcluded=component['license'], licenseDeclared=component['license'],
                        copyrightText=component['copyright'], sourceInfo='Selected source: ' + source_url)
         if component.get('debian_package'):
-            package['sourceInfo'] += ('; Debian packaging counterpart: ' + component['debian_package']
-                                      + '; this component is built from upstream source, not installed by dpkg')
+            package['sourceInfo'] += ('; Debian scanner mapping: ' + component['debian_package']
+                                      + '; compiled upstream version: ' + component['version']
+                                      + '; built from upstream source, not installed by dpkg; no Debian patch-level claim')
         if component['version'] is not None:
             package['versionInfo'] = component['version']
         if component['license'].startswith('LicenseRef-'):
@@ -75,5 +91,5 @@ def augment_spdx(document, context):
     relationships.append(dict(spdxElementId=files['lib/pg_duckdb.so']['SPDXID'], relationshipType='GENERATED_FROM', relatedSpdxElement=ids['pg_duckdb']))
     for path, file in files.items():
         if Path(path).name == 'libduckdb.so' or Path(path).name.startswith('libduckdb.so.'):
-            relationships.append(dict(spdxElementId=file['SPDXID'], relationshipType='GENERATED_FROM', relatedSpdxElement=ids['duckdb']))
+            relationships.append(dict(spdxElementId=file['SPDXID'], relationshipType='GENERATED_FROM', relatedSpdxElement=ids.get('libduckdb2.0', ids.get('duckdb'))))
     return result

@@ -13,129 +13,91 @@ server.
 
 ## SBOM contents
 
-The shared generator records shipped files and actual Debian package ownership.
-The recipe hook uses the package boundaries of Debian DuckDB 2.0.0+dfsg2-1,
-so the source-built image and a future Debian-package image expose comparable
-library identities. This is a package-level inventory, not a separate record
-for every embedded source component.
+The recipe follows Debian DuckDB's package boundaries: one `libduckdb2.0`
+record, seven library records and a separate upstream pg_duckdb record. Internal
+components such as RE2, jemalloc, fmt, miniz and Parquet remain covered by DuckDB.
+The eight library records use Debian unstable's binary and source package names,
+with `pkg:deb/debian` identifiers, to enable Debian vulnerability matching.
 
-- Keep pg_duckdb and DuckDB as source-built packages.
-- Keep separate source-built records for the seven libraries Debian DuckDB uses
-  as system packages: yyjson (`libyyjson0`), LZ4 (`liblz4-1`), Zstandard
-  (`libzstd1`), Brotli (`libbrotli1`), Mbed TLS crypto (`libmbedcrypto16`),
-  Snappy (`libsnappy1v5`) and xxHash (`libxxhash0`). This is a fixed inventory
-  reviewed against the supported source revision and default build. xxHash is
-  nested inside the vendored Zstandard tree but remains a separate record.
-- Preserve their real upstream/source identities. A source-built Brotli is not
-  a Debian-installed `libbrotli1`; the Debian name is explanatory `sourceInfo`,
-  never a fabricated `pkg:deb` identifier. A system LZ4 and a vendored LZ4 may
-  coexist and must not be deduplicated merely because they implement the same
-  library.
-- Fold code Debian leaves internal, such as RE2, jemalloc, fmt, miniz and Parquet
-  format code, into DuckDB's package record. Fold vendored PostgreSQL/PgBouncer
-  code into pg_duckdb. Generated Unicode, CLDR and time-zone data are covered by
-  DuckDB rather than separate data-package records.
+**Versions describe the upstream code actually compiled.** They do not use the
+current unstable binary versions, invent Debian revision suffixes, or claim
+Debian security patches were applied. The compiled Clang configuration selects
+Snappy 1.2.1; GCC would select a different bundled Snappy version and requires
+an inventory review. Source URLs and the fact that these are source-built
+scanner mappings, not dpkg-installed binaries, are retained in `sourceInfo`.
 
-The boundary follows what Debian's DuckDB build actually separates, not every
-library available somewhere in the Debian archive. For example, Debian packages
-RE2 and jemalloc independently, but the inspected DuckDB package still embeds
-its modified copies. Reassess this recipe mapping when Debian changes that
-choice. Do not infer new entries from the builder's installed development tools.
+### Copyright snapshot and version mapping
 
-### Copyright files and release review
+The following copyright files were copied once from Debian unstable source
+packages on 2026-11-15. Source archives were checked against the archive index's
+SHA256 values. The copyright files are checked in verbatim and copied to
+`/licenses/<Debian-binary-package>/copyright`, matching the system-library
+helper's directory layout. The copyright source version is provenance for the
+notice document, **not** the version reported for our compiled library.
 
-Like Debian's [copyright packaging](https://www.debian.org/doc/debian-policy/ch-docs.html#copyright-information),
-this recipe assembles consolidated copyright files from reviewed source
-locations. [The extraction script](licenses.sh) reads standalone license files
-directly and uses explicit `sed` ranges for embedded notices. It downloads Debian
-DuckDB 2.0.0+dfsg2-1's source-package copyright document as the baseline and
-includes supplemental original notices from the reviewed source snapshot.
-The other copyright files cover pg_duckdb and the
-seven library counterparts that Debian packages separately. They preserve the
-actual bundled versions' terms, rather than substituting copyright files from
-possibly different installed Debian versions.
+| Package / checked-in copyright | Compiled version in SBOM | Copyright source package |
+|---|---|---|
+| [libduckdb2.0](licenses/libduckdb2.0/copyright) | 2.0.0 | [duckdb 2.0.0+dfsg2-1](https://deb.debian.org/debian/pool/main/d/duckdb/duckdb_2.0.0+dfsg2-1.debian.tar.xz) |
+| [libbrotli1](licenses/libbrotli1/copyright) | 1.1.0 | [brotli 1.2.0-4.1](https://deb.debian.org/debian/pool/main/b/brotli/brotli_1.2.0-4.1.debian.tar.xz) |
+| [liblz4-1](licenses/liblz4-1/copyright) | 1.9.4 | [lz4 1.10.0-10](https://deb.debian.org/debian/pool/main/l/lz4/lz4_1.10.0-10.debian.tar.xz) |
+| [libmbedcrypto16](licenses/libmbedcrypto16/copyright) | 3.6.7 | [mbedtls 3.6.7-3](https://deb.debian.org/debian/pool/main/m/mbedtls/mbedtls_3.6.7-3.debian.tar.xz) |
+| [libsnappy1v5](licenses/libsnappy1v5/copyright) | 1.2.1 | [snappy 1.3.1-4](https://deb.debian.org/debian/pool/main/s/snappy/snappy_1.3.1-4.debian.tar.xz) |
+| [libyyjson0](licenses/libyyjson0/copyright) | 0.9.0 | [yyjson 0.12.0+ds-2](https://deb.debian.org/debian/pool/main/y/yyjson/yyjson_0.12.0+ds-2.debian.tar.xz) |
+| [libzstd1](licenses/libzstd1/copyright) | 1.5.6 | [libzstd 1.5.7+dfsg-4](https://deb.debian.org/debian/pool/main/libz/libzstd/libzstd_1.5.7+dfsg-4.debian.tar.xz) |
+| [libxxhash0](licenses/libxxhash0/copyright) | 0.6.2 | [xxhash 0.8.3-2](https://deb.debian.org/debian/pool/main/x/xxhash/xxhash_0.8.3-2.debian.tar.xz) |
 
-The build writes nine files to `/licenses/<name>/copyright`; the Dockerfile
-copies that directory into the final image. License text is not duplicated in
-this repository.
-Common-license texts referenced by the source documents are included so the
-extension's attribution does not depend on `/usr/share/common-licenses` existing
-in another image. Source paths and supplemental notice URLs remain in the files.
-The SBOM associates them with their containing packages; composite terms use
-`LicenseRef` and extracted licensing information. Internal components remain
-covered by DuckDB, not extra package records.
+The build copies pg_duckdb's own LICENSE and NOTICE into
+`/licenses/pg_duckdb/copyright`. Referenced Debian common-license texts are
+included alongside the relevant copyright files. These source-package copyright
+files can describe tests, tools and documentation beyond the shipped library;
+they are not an inventory of additional runtime components.
 
-`evidence.py` has one static library table containing upstream versions,
-identities, Debian counterparts and vendor paths. There is no Ninja dependency
-traversal, header-version parser or general-purpose comment parser. Notice
-locations, marker ranges and line ranges are explicitly reviewed for the pinned
-sources. Missing supplemental documents are fetched from explicit upstream URLs.
-Both source revision checks ensure changed sources receive a release review.
-When updating the sources or build settings, review the dependency inventory,
-Debian's packaging boundary and all copyright files together. Unknown snapshot
-versions, such as this Snappy copy, remain omitted rather than guessed.
+There is no license extraction script, build-time copyright download, dependency
+discovery or comment parser. `evidence.py` has one static package table. Both
+source-revision guards require the inventory and copyright snapshot to be
+reviewed when sources or build settings change.
 
-The SPDX document states its scope explicitly. Absence of an internal component
-record is not evidence that its code is absent or unaffected by an advisory.
+### Scanner interpretation and file ownership
 
-The shared system-library helper stages additional runtime libraries under
-`/system`, excluding libraries supplied by the PostgreSQL base image, and preserves
-their notices. Consequently, a Debian library used from the base image belongs
-in the base image's inventory; installing its development package in the builder
-does not create a shipped dependency record in the extension image.
-Upstream's default build does not ship its loadable httpfs here;
-its curl/OpenSSL build dependencies must not be counted merely because apt
-installed them.
+Each Debian PURL records architecture, `distro=debian-unstable` and the Debian source
+package name (`upstream`), including mappings such as `libzstd1` to `libzstd`.
+Scanners must support that Debian distribution and source-package mapping.
+Debian advisory results are comparisons against Debian's version rules, not
+proof that an upstream-built binary has Debian's patch set or that every
+embedded component has been independently scanned. In particular, a bare upstream
+version can compare earlier than a Debian revision containing that same upstream
+release, and a source-package advisory can concern code this library does not
+include. Matches require applicability review.
 
-### Measured native amd64 payload
+The shared generator still inventories every shipped file. Copied copyright or
+common-license files can cause it to select an installed builder package even
+when none of that package's binary files ship. The hook replaces only records
+whose entire shipped-file ownership consists of these mapped notices. Packages
+owning actual shipped binaries remain intact, including distinct system and
+embedded copies of the same library. Notice relationships and complete extracted
+license text are retained under the explicit compiled-version records.
 
-A local build of pg_duckdb 1.2.0 on the PostgreSQL 18 minimal Trixie base
-confirmed the following boundary (2026-11-15):
+The PostgreSQL 18/Trixie amd64 build uses five Debian library packages from its
+base image: libc6, libgcc-s1, libstdc++6, liblz4-1 and libxxhash0. pg_duckdb links
+to system LZ4, which links to system xxHash; the source-built DuckDB library
+contains separate embedded copies. Only source-built libduckdb.so is staged as
+an additional shared library. Thus the eight Debian-style SBOM identities do
+not mean that eight Debian binary packages were installed into this payload.
+Upstream's loadable httpfs is not shipped here; its curl/OpenSSL build
+requirements must not become runtime inventory entries just because apt
+installed them in the builder.
 
-| Category | Count | Treatment |
-|---|---:|---|
-| Debian shared-library packages supplying resolved runtime dependencies | 5 | `libc6`, `libgcc-s1`, `libstdc++6`, `liblz4-1`, `libxxhash0`; all supplied by the base image |
-| Additional Debian-owned shared-library packages shipped in this extension payload | 0 | No additional `pkg:deb` records should be invented |
-| Source-built DuckDB engine | 1 | `libduckdb.so` in `/system`, with its upstream source identity |
-| Source-built library counterparts Debian packages separately | 7 | Brotli, LZ4, Mbed TLS, Snappy, yyjson, Zstandard and xxHash, embedded in DuckDB |
-
-Together with pg_duckdb, this produces nine source-package records. LZ4 and
-xxHash occur both as base-image shared libraries and as DuckDB's embedded
-copies; reporting one does not account for the other.
-
-The original native build passed PostgreSQL 18 preload, `CREATE EXTENSION` and
-a forced `DuckDBScan` query. Follow-up notice validation reuses that compiled
-builder with the current evidence recorder and the Dockerfile's individual
-COPY operations. All 41 shared tests passed. The generated SPDX has nine source
-packages and nine consolidated copyright files. Artifact checks verified that
-the contents of all 406 previously collected notice files remain present, with
-containing-package relationships and extracted license text.
-This does not claim a new compilation or native ARM64 coverage.
-
-These are measured counts for this version, platform and base, not assertions
-that future recipes must keep a fixed inventory. The native build needed
-`libicu-dev` for PostgreSQL locale headers; a build dependency alone is not
-evidence that its library is shipped. Bookworm and native ARM64 builds and
-hosted signing/SLSA acceptance are not covered by this local measurement.
-
-`evidence.py` records package identities and the actual files copied by the
-Dockerfile. The final image copies the installed extension into `/lib` and
-`/share`, plus `/system` and `/licenses`; there is no intermediate `/payload`.
-The extraction commands cover the nested and later-source notices found
-in the audit, including ALP/ALPRD, Salesforce, Martin Ankerl, ADBC/nanoarrow,
-Preshing's semaphore, miniz, Brotli and public-domain statements.
-
-`augment_spdx.py` preserves the generator's existing records and adds source
-packages through its hook interface. Builder reports are private validation
-inputs; consumers use the standard SPDX document described in the
+The final image copies the installed extension into `/lib` and `/share`, plus
+`/system` and `/licenses`; there is no intermediate `/payload`. Consumers use
+the standard SPDX document described in the
 [shared dependency guidance](../../source-build/README.md#dependency-evidence-in-the-sbom).
-Neither helper is a generic Universe dependency or license framework. Build-input
-relationships do not prove that every object survives linker dead-code elimination.
-
-Review component boundaries, identities, notice sources and applicable obligations
-when updating the release. Missing or unresolved license information does not
-itself establish compliance with the
-[Open Source Licensing Policy](../../README.md#open-source-licensing-policy).
+The original native build passed PostgreSQL preload, `CREATE EXTENSION` and a
+forced `DuckDBScan` query. Follow-up SBOM checks reuse that compiled amd64 builder;
+they do not establish fresh compilation, ARM64 or hosted signing/SLSA acceptance.
+The local checks passed 43 shared tests, verified all eight copyright copies
+against their Debian source archives, and exercised the actual BuildKit SPDX
+through Grype. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
+matching; scanner matches on the real document still require applicability review.
 
 ## Source acquisition
 
