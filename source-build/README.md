@@ -42,9 +42,7 @@ For PGRX, the obstacle is the shared build toolchain. `cargo-pgrx` itself
 has not yet been accepted into Debian. Packaging has been discussed, but we
 cannot plan on near-term availability. This shared toolchain obstacle justifies
 building PGRX extensions from source without requiring each extension to solve
-Debian packaging independently. PGRX extensions use the PGRX path rather than
-the generic Universe path; revisit this approach as Debian tooling becomes
-available.
+Debian packaging independently.
 
 The PGRX framework automates Rust dependency selection, package identities and
 versions, license evidence and notice collection, and integration with the shared
