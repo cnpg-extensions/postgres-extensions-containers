@@ -49,13 +49,9 @@ def augment_spdx(document, context):
     result['packages'] = [p for p in result['packages'] if p['SPDXID'] not in replaced]
     result['relationships'] = [r for r in result.get('relationships', [])
                               if r['spdxElementId'] not in replaced and r['relatedSpdxElement'] not in replaced]
-    scope = ('Package inventory follows Debian DuckDB 2.0.0+dfsg2 package boundaries. '
-             'Internal bundled code and generated data are covered by their containing '
-             'package and original notice files, not separate package records. '
-             'Eight source-built components use Debian package identities for scanner '
-             'matching, with compiled upstream versions and no Debian revision. '
-             'These are not dpkg-installed or Debian-patched binaries. This is not an exhaustive '
-             'embedded-component inventory.')
+    scope = ('Uses Debian DuckDB package boundaries, not an exhaustive bundled inventory. '
+             'Debian identities map source-built upstream versions for scanning; '
+             'they do not imply dpkg installation or Debian patches.')
     result['comment'] = (result.get('comment', '') + '\n' + scope).strip()
     relationships = result['relationships']
 
