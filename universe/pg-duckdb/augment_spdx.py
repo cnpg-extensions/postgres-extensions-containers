@@ -28,35 +28,12 @@ def debian_purl(name, source, version, arch):
     return 'pkg:deb/debian/' + name + '@' + version + '?' + qualifiers
 
 
-
 def augment_spdx(document, context):
     if context.api_version != 1:
         raise ValueError('unsupported hook API')
-    builder, final = Path(context.builder_path), Path(context.final_path)
+    final = Path(context.final_path)
     result = deepcopy(document)
     files = {p['fileName'].removeprefix('./'): p for p in result['files']}
-    # Bind executable/runtime payloads to the shared inventory. Docker COPY
-    # handles notice staging; read those directly from the final image below.
-    libraries = list((builder / 'install/usr/lib/postgresql').glob('*/lib/pg_duckdb.so'))
-    if len(libraries) != 1:
-        raise ValueError('expected one installed pg_duckdb library')
-    pg = libraries[0].parent.parent.name
-    roots = [(libraries[0], Path('lib/pg_duckdb.so')),
-             (builder / f'install/usr/share/postgresql/{pg}/extension', Path('share/extension')),
-             (builder / 'system', Path('system'))]
-    for source, destination in roots:
-        for path in sorted(source.rglob('*')) if source.is_dir() else [source]:
-            if not path.is_file():
-                continue
-            target = str(destination / path.relative_to(source) if source.is_dir() else destination)
-            if target not in files:
-                raise ValueError('payload missing from shared inventory: ' + target)
-            data = (final / target).read_bytes()
-            if path.read_bytes() != data:
-                raise ValueError('builder/final payload mismatch: ' + target)
-            if not any(c['algorithm'] == 'SHA256' and c['checksumValue'].lower() == hashlib.sha256(data).hexdigest()
-                       for c in files[target].get('checksums', [])):
-                raise ValueError('shared inventory hash mismatch: ' + target)
     # Copied Debian copyright/common-license files can make the shared scan
     # select builder packages that contribute no binary here. Replace only
     # those notice-only records with the explicit compiled-version mappings.
@@ -85,17 +62,12 @@ def augment_spdx(document, context):
     def relate(parent, kind, child):
         relationships.append(dict(spdxElementId=parent, relationshipType=kind, relatedSpdxElement=child))
 
-    def add_package(name, version, purl, source_url, parent, debian=False):
+    def add_package(name, version, purl, source_url, source_info):
         notice_dir = final / 'licenses' / name
         notices = sorted(p for p in notice_dir.rglob('*') if p.is_file())
         text = '\n\n'.join(p.read_text() for p in notices)
-        license_id = 'LicenseRef-Universe-' + hashlib.sha256(text.encode()).hexdigest()[:24]
-        sid = 'SPDXRef-Universe-' + hashlib.sha256(purl.encode()).hexdigest()[:24]
-        source_info = 'Selected source: ' + source_url
-        if debian:
-            source_info += ('; Debian scanner mapping: ' + name
-                            + '; compiled upstream version: ' + version
-                            + '; built from upstream source, not installed by dpkg; no Debian patch-level claim')
+        license_id = 'LicenseRef-Notices-' + hashlib.sha256(text.encode()).hexdigest()[:24]
+        sid = 'SPDXRef-Source-' + name.replace('_', '-')
         result['packages'].append(dict(
             SPDXID=sid, name=name, versionInfo=version, downloadLocation=source_url,
             filesAnalyzed=False, licenseConcluded=license_id, licenseDeclared=license_id,
@@ -106,20 +78,26 @@ def augment_spdx(document, context):
             extracted.append(dict(licenseId=license_id, extractedText=text, name=name + ' bundled notices'))
         for notice in notices:
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
-        relate(parent, 'DESCRIBES' if parent == result['SPDXID'] else 'DEPENDS_ON', sid)
         return sid
 
+    pg_url = 'https://github.com/duckdb/pg_duckdb/tree/' + PG_REVISION
     pg_id = add_package('pg_duckdb', '1.2.0', 'pkg:github/duckdb/pg_duckdb@v1.2.0',
-                        'https://github.com/duckdb/pg_duckdb/tree/' + PG_REVISION, result['SPDXID'])
+                        pg_url, 'Selected source: ' + pg_url)
     ids = {}
     arch = {'linux/amd64': 'amd64', 'linux/arm64': 'arm64'}[context.platform]
     for name, (source, version, vendor) in DEBIAN_PACKAGES.items():
-        parent = pg_id if name == 'libduckdb2.0' else ids['libzstd1' if name == 'libxxhash0' else 'libduckdb2.0']
-        ids[name] = add_package(name, version, debian_purl(name, source, version, arch),
-            'https://github.com/duckdb/duckdb/tree/' + DUCK_REVISION + ('/' + vendor if vendor else ''),
-            parent, debian=True)
+        url = 'https://github.com/duckdb/duckdb/tree/' + DUCK_REVISION + ('/' + vendor if vendor else '')
+        source_info = ('Selected source: ' + url + '; Debian scanner mapping: ' + name
+                       + '; compiled upstream version: ' + version
+                       + '; built from upstream source, not installed by dpkg; no Debian patch-level claim')
+        ids[name] = add_package(name, version, debian_purl(name, source, version, arch), url, source_info)
+
+    relate(result['SPDXID'], 'DESCRIBES', pg_id)
+    relate(pg_id, 'DEPENDS_ON', ids['libduckdb2.0'])
+    relate(ids['libzstd1'], 'DEPENDS_ON', ids['libxxhash0'])
+    for name in DEBIAN_PACKAGES:
+        if name not in ('libduckdb2.0', 'libxxhash0'):
+            relate(ids['libduckdb2.0'], 'DEPENDS_ON', ids[name])
     relate(files['lib/pg_duckdb.so']['SPDXID'], 'GENERATED_FROM', pg_id)
-    for path, file in files.items():
-        if Path(path).name == 'libduckdb.so' or Path(path).name.startswith('libduckdb.so.'):
-            relate(file['SPDXID'], 'GENERATED_FROM', ids['libduckdb2.0'])
+    relate(files['system/libduckdb.so']['SPDXID'], 'GENERATED_FROM', ids['libduckdb2.0'])
     return result

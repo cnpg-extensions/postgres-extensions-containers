@@ -20,24 +20,21 @@ class HookComposition(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
-        self.builder, self.final = self.root / 'builder', self.root / 'final'
+        self.final = self.root / 'final'
         self.document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[], files=[], relationships=[])
-        self.context = SimpleNamespace(api_version=1, builder_path=self.builder,
-                                       final_path=self.final, platform='linux/arm64')
-        self.add_file('install/usr/lib/postgresql/18/lib/pg_duckdb.so', 'lib/pg_duckdb.so', 'extension binary')
-        self.add_file('system/libduckdb.so', 'system/libduckdb.so', 'engine binary')
-        self.add_file('install/usr/share/postgresql/18/extension/pg_duckdb.control',
-                      'share/extension/pg_duckdb.control', 'control')
+        self.context = SimpleNamespace(api_version=1, final_path=self.final, platform='linux/arm64')
+        self.add_file('lib/pg_duckdb.so', 'extension binary')
+        self.add_file('system/libduckdb.so', 'engine binary')
+        self.add_file('share/extension/pg_duckdb.control', 'control')
         for name in ['pg_duckdb', *self.hook.DEBIAN_PACKAGES]:
             path = 'licenses/' + name + '/copyright'
-            self.add_file(path, path, 'Copyright authors of ' + name + '\nOriginal combined license terms')
-        self.add_file('licenses/libduckdb2.0/Apache-2.0', 'licenses/libduckdb2.0/Apache-2.0', 'Full Apache terms')
+            self.add_file(path, 'Copyright authors of ' + name + '\nOriginal combined license terms')
+        self.add_file('licenses/libduckdb2.0/Apache-2.0', 'Full Apache terms')
 
-    def add_file(self, source, target, text):
-        for root, path in [(self.builder, source), (self.final, target)]:
-            file = root / path
-            file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text(text)
+    def add_file(self, target, text):
+        file = self.final / target
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(text)
         self.document['files'].append(dict(SPDXID='SPDXRef-file-' + str(len(self.document['files'])),
             fileName='./' + target, checksums=[dict(algorithm='SHA256',
             checksumValue=hashlib.sha256(text.encode()).hexdigest())]))
@@ -59,26 +56,22 @@ class HookComposition(unittest.TestCase):
         packages = {p['name']: p for p in result['packages']}
         self.assertEqual(set(packages), {'libc6', 'pg_duckdb', *self.hook.DEBIAN_PACKAGES})
         self.assertEqual(packages['libduckdb2.0']['versionInfo'], '2.0.0')
+        self.assertEqual(packages['pg_duckdb']['SPDXID'], 'SPDXRef-Source-pg-duckdb')
+        self.assertEqual(packages['libduckdb2.0']['SPDXID'], 'SPDXRef-Source-libduckdb2.0')
+        self.assertIn(dict(spdxElementId=packages['pg_duckdb']['SPDXID'], relationshipType='DEPENDS_ON',
+                           relatedSpdxElement=packages['libduckdb2.0']['SPDXID']), result['relationships'])
+        for name in self.hook.DEBIAN_PACKAGES:
+            if name not in ('libduckdb2.0', 'libxxhash0'):
+                self.assertIn(dict(spdxElementId=packages['libduckdb2.0']['SPDXID'], relationshipType='DEPENDS_ON',
+                                   relatedSpdxElement=packages[name]['SPDXID']), result['relationships'])
+        self.assertEqual(len({p['SPDXID'] for p in result['packages']}), len(result['packages']))
         self.assertIn(dict(spdxElementId=packages['libzstd1']['SPDXID'], relationshipType='DEPENDS_ON',
                            relatedSpdxElement=packages['libxxhash0']['SPDXID']), result['relationships'])
         self.assertIn(dict(spdxElementId=self.file_id('system/libduckdb.so'), relationshipType='GENERATED_FROM',
                            relatedSpdxElement=packages['libduckdb2.0']['SPDXID']), result['relationships'])
 
-    def test_payload_and_shared_inventory_binding(self):
-        path = self.final / 'lib/pg_duckdb.so'
-        path.write_text('binary changed')
-        with self.assertRaisesRegex(ValueError, 'builder/final payload mismatch'):
-            self.run_hook()
-        path.write_bytes((self.builder / 'install/usr/lib/postgresql/18/lib/pg_duckdb.so').read_bytes())
-        self.document['files'][0]['checksums'][0]['checksumValue'] = '0' * 64
-        with self.assertRaisesRegex(ValueError, 'shared inventory hash mismatch'):
-            self.run_hook()
-        self.document['files'].pop(0)
-        with self.assertRaisesRegex(ValueError, 'payload missing from shared inventory'):
-            self.run_hook()
-
     def test_notice_only_builder_records_are_replaced_but_binaries_retained(self):
-        self.add_file('system/liblz4.so.1', 'system/liblz4.so.1', 'system binary')
+        self.add_file('system/liblz4.so.1', 'system binary')
         installed = dict(SPDXID='SPDXRef-installed', name='liblz4-1', versionInfo='1.10.0-4')
         notice_only = dict(SPDXID='SPDXRef-notice-only', name='liblz4-1', versionInfo='1.10.0-4')
         self.document['packages'] = [installed, notice_only]

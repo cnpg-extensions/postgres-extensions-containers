@@ -54,9 +54,11 @@ they are not an inventory of additional runtime components.
 
 There is no license extraction script, build-time copyright download, dependency
 discovery or comment parser. `augment_spdx.py` has one static package table and
-reads runtime files directly from the builder and final image, without an
-intermediate JSON manifest. License texts are read directly from the final image;
-Docker COPY handles their staging without a second builder-to-final comparison.
+emits records directly, without an intermediate JSON manifest. License texts are
+read from the final image. Docker COPY handles staging, and the shared generator
+inventories shipped files; the hook does not repeat builder-to-final comparisons.
+Readable source-package SPDX IDs and explicit relationships associate the two
+known binaries with pg_duckdb and DuckDB.
 The Dockerfile copies the explicitly listed common-license texts. Maintain the
 static inventory and copyright snapshot when sources or build settings change;
 source revisions are not enforced by the build.
@@ -98,7 +100,7 @@ the standard SPDX document described in the
 The original native build passed PostgreSQL preload, `CREATE EXTENSION` and a
 forced `DuckDBScan` query. Follow-up SBOM checks reuse that compiled amd64 builder;
 they do not establish fresh compilation, ARM64 or hosted signing/SLSA acceptance.
-The local checks passed 42 shared tests, verified all eight copyright copies
+The local checks passed 41 shared tests, verified all eight copyright copies
 against their Debian source archives, and exercised the actual BuildKit SPDX
 through Grype. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
 matching; scanner matches on the real document still require applicability review.
