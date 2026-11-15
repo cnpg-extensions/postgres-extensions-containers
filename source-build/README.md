@@ -369,7 +369,6 @@ listed last.
 | [`prepare.py`](prepare.py) | Turns metadata into native build rows and Bake definitions. |
 | [`build.py`](build.py) | Checks native host, daemon and BuildKit-worker architecture. |
 | [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
-| [`source.py`](source.py) | Source-resolution helper; currently used only by `tests/test_inputs.py`, not by workflows or recipes. |
 | [`pgrx/`](pgrx/README.md) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
 | [`universe/`](universe/README.md) | Recipe-authoring guide and templates for Universe builds. |
 | [`tests/`](tests/) | Shared tooling and recipe-hook tests. |
@@ -385,7 +384,7 @@ per-extension builds after discovery.
 | Test file | Implementation tested | Coverage |
 | --- | --- | --- |
 | [`tests/test_discovery.py`](tests/test_discovery.py) | [`workflow.py`](workflow.py) | Location-derived families, recipe boundaries, duplicate names and wrong-family selections. |
-| [`tests/test_inputs.py`](tests/test_inputs.py) | [`source.py`](source.py), [`prepare.py`](prepare.py) | GitLab source resolution and architecture-specific base-image selection. |
+| [`tests/test_inputs.py`](tests/test_inputs.py) | [`prepare.py`](prepare.py) | Architecture-specific base-image selection. |
 | [`tests/test_native_builds.py`](tests/test_native_builds.py) | [`prepare.py`](prepare.py), [`build.py`](build.py) | Separate native-platform build definitions and rejection of mismatched host, daemon or worker architectures. |
 | [`tests/test_assembly.py`](tests/test_assembly.py) | [`assemble.py`](assemble.py) | Complete platform coverage and preservation of image and attestation descriptors during assembly. |
 | [`tests/test_registry.py`](tests/test_registry.py) | [`assemble.py`](assemble.py) | Waiting for the expected registry index digest and rejecting stale or different index contents. |
