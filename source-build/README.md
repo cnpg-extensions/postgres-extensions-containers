@@ -360,18 +360,18 @@ recipe-specific and must be reviewed when upstream components change.
 Files follow discovery, preparation, native build and assembly in
 [`source-build.yml`](../.github/workflows/source-build.yml) and its
 [per-extension workflow](../.github/workflows/source-build-targets.yml).
-Source helpers and family tooling appear at the build stage; test infrastructure
-is listed last.
+Helpers without a workflow call follow the workflow scripts; directories are
+listed last.
 
 | File or directory | Purpose |
 | --- | --- |
 | [`workflow.py`](workflow.py) | Discovers source recipes and their location-derived families. |
 | [`prepare.py`](prepare.py) | Turns metadata into native build rows and Bake definitions. |
 | [`build.py`](build.py) | Checks native host, daemon and BuildKit-worker architecture. |
-| [`source.py`](source.py) | Shared source-resolution helpers. |
+| [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
+| [`source.py`](source.py) | Source-resolution helper; currently used only by `tests/test_inputs.py`, not by workflows or recipes. |
 | [`pgrx/`](pgrx/README.md) | Rust installers, Cargo evidence, SBOM hook, templates and tests. |
 | [`universe/`](universe/README.md) | Recipe-authoring guide and templates for Universe builds. |
-| [`assemble.py`](assemble.py) | Combines platform images and preserves attestations. |
 | [`tests/`](tests/) | Shared tooling and recipe-hook tests. |
 
 ### Test files
@@ -387,7 +387,7 @@ per-extension builds after discovery.
 | [`tests/test_discovery.py`](tests/test_discovery.py) | [`workflow.py`](workflow.py) | Location-derived families, recipe boundaries, duplicate names and wrong-family selections. |
 | [`tests/test_inputs.py`](tests/test_inputs.py) | [`source.py`](source.py), [`prepare.py`](prepare.py) | GitLab source resolution and architecture-specific base-image selection. |
 | [`tests/test_native_builds.py`](tests/test_native_builds.py) | [`prepare.py`](prepare.py), [`build.py`](build.py) | Separate native-platform build definitions and rejection of mismatched host, daemon or worker architectures. |
-| [`tests/test_universe_hook.py`](tests/test_universe_hook.py) | [`pg-duckdb/augment_spdx.py`](../universe/pg-duckdb/augment_spdx.py) | pg-duckdb dependency identities, vendor versions, notice preservation, binary associations and preservation of existing SBOM records. |
 | [`tests/test_assembly.py`](tests/test_assembly.py) | [`assemble.py`](assemble.py) | Complete platform coverage and preservation of image and attestation descriptors during assembly. |
 | [`tests/test_registry.py`](tests/test_registry.py) | [`assemble.py`](assemble.py) | Waiting for the expected registry index digest and rejecting stale or different index contents. |
+| [`tests/test_universe_hook.py`](tests/test_universe_hook.py) | [`pg-duckdb/augment_spdx.py`](../universe/pg-duckdb/augment_spdx.py) | pg-duckdb dependency identities, vendor versions, notice preservation, binary associations and preservation of existing SBOM records. |
 | [`test.py`](test.py) | Runs [`tests/`](tests/) and [`pgrx/tests/`](pgrx/tests/) | Shared entrypoint: discovers both suites, rejects empty PGRX discovery and exits unsuccessfully if any test fails. |
