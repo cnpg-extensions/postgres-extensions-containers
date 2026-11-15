@@ -1,7 +1,7 @@
 # PGRX extension builds
 
 This project builds Rust-based PostgreSQL extensions from source using PGRX.
-For image verification, native build/release stages, shared smoke tests and local
+For image verification, native build utilities, shared smoke tests and local
 validation, see the [shared source-build guide](../source-build/README.md).
 Start with the extension's README for installation, SQL names and preload settings.
 
@@ -35,7 +35,7 @@ ships a different SQL version, investigate the release before merging.
 ### Add or update an extension recipe
 
 PGRX recipes are discovered from `pgrx/<extension>/metadata.hcl`. See the shared
-[discovery guide](../source-build/README.md#discovery-and-catalogs) for selection.
+[discovery guide](../source-build/README.md) for selection.
 
 **Start from the [PGRX templates](../source-build/pgrx/templates/) and follow their structure.**
 The [Dockerfile template](../source-build/pgrx/templates/Dockerfile.tmpl) contains the integration
@@ -74,7 +74,7 @@ For a new extension:
    files, as the template shows.
 6. Declare supported distribution/PostgreSQL combinations in metadata;
    preparation creates their native build jobs automatically. Run the shared
-   [local checks and full extension acceptance](../source-build/README.md#development). Use the existing SBOM generator
+   [local builds and checks](../source-build/README.md#local-builds). Use the existing SBOM generator
    and hook; do not add a second composer or a build-system-specific consumer
    interface.
 

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+# SPDX-License-Identifier: Apache-2.0
+metadata = {
+  name                     = "{{ .Name }}"
+  sql_name                 = "{{ replaceAll .Name "-" "_" }}"
+  image_name               = "{{ .Name }}"
+  # TODO: Set the upstream repository and SPDX license identifiers.
+  source_repository        = "https://github.com/<owner>/<repo>"
+  licenses                 = ["<SPDX-identifier>"]
+
+  # TODO: Declare only required runtime settings; mirror them in the README.
+  shared_preload_libraries = []
+  postgresql_parameters    = {}
+  extension_control_path   = []
+  dynamic_library_path     = []
+  ld_library_path          = []
+  bin_path                 = []
+  env                      = {}
+  auto_update_os_libs      = false
+  required_extensions      = []
+  create_extension         = true
+
+  versions = {
+    {{- range $distro := .Distros}}
+    {{ $distro }} = {
+      {{- range $version := $.Versions}}
+      "{{ $version }}" = {
+        # TODO: Set the release source and literal tag, including any leading v.
+        # Verify SQL versions from control/upgrade files; do not infer a mapping.
+        # Root Renovate rules own update behavior for the selected repository.
+        # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver
+        package = "<release-tag>"
+        sql     = "<sql-version>"
+      }
+      {{- end}}
+    }
+    {{- end}}
+  }
+}

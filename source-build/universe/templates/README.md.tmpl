@@ -1,0 +1,88 @@
+# {{ replaceAll .Name "-" "_" }}
+<!--
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+[{{ replaceAll .Name "-" "_" }}](https://github.com/<owner>/<repo>) is a PostgreSQL
+extension that provides [describe its user-facing functionality]. This image
+supports PostgreSQL {{ .DefaultVersion }} on Debian {{ .DefaultDistro }}.
+
+<!-- TODO: Document all supported targets. Keep build commands, source revisions,
+SBOM implementation details and Debian packaging rationale out of this README.
+Put a short technical overview in PACKAGING.md instead. -->
+
+## Usage
+
+### 1. Add the {{ .Name }} extension image to your Cluster
+
+Define the extension under `postgresql.extensions` in your `Cluster` resource:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-{{ .Name }}
+spec:
+  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
+  instances: 1
+
+  storage:
+    size: 1Gi
+
+  postgresql:
+    # TODO: Add required preload libraries and parameters from metadata.hcl.
+    extensions:
+    - name: {{ .Name }}
+      image:
+        # TODO: Use the source package version without its leading v.
+        reference: ghcr.io/cnpg-extensions/{{ .Name }}:<image-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
+      # TODO: Set required runtime paths from metadata.hcl, or omit if empty.
+      ld_library_path: []
+```
+
+### 2. Enable the extension in a database
+
+Create or update a `Database` resource to install the extension in `app`:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: cluster-{{ .Name }}-app
+spec:
+  name: app
+  owner: app
+  cluster:
+    name: cluster-{{ .Name }}
+  extensions:
+  - name: {{ replaceAll .Name "-" "_" }}
+    # TODO: Use the SQL version from metadata.hcl.
+    version: '<sql-version>'
+```
+
+Alternatively, run the following SQL with the required privileges:
+
+```sql
+CREATE EXTENSION {{ replaceAll .Name "-" "_" }};
+```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run:
+
+```sql
+\dx
+```
+
+You should see `{{ replaceAll .Name "-" "_" }}` listed among the installed extensions.
+
+## Known Caveats
+
+<!-- TODO: Describe required preloads, restart behavior, privileges and writable
+paths. Remove this section if there are no user-facing caveats. -->
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.
