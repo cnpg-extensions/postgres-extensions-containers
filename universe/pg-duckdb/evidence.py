@@ -88,7 +88,7 @@ def vendor_identity(directory, revision):
         version = (directory / 'VERSION').read_text().strip()
         return 'mbedtls', version, 'pkg:github/Mbed-TLS/mbedtls@' + version
     if directory.name not in VENDORS:
-        return SOURCE_NAMES[directory.name], revision + ':third_party/' + directory.name, None
+        return SOURCE_NAMES[directory.name], None, None
     name, repo, filename, macros = VENDORS[directory.name]
     text = (directory / filename).read_text()
     values = [re.search(r'^#define\s+' + macro + r'\s+"?([0-9.]+)', text, re.M)[1]
@@ -175,7 +175,7 @@ def main():
 
     component('pg_duckdb', evidence['version'].removeprefix('v'), evidence['repository'], evidence['revision'], BUILD, None,
               'pkg:github/duckdb/pg_duckdb@' + evidence['version'])
-    component('PostgreSQL', evidence['revision'] + ':src/vendor',
+    component('PostgreSQL', None,
               evidence['repository'], evidence['revision'] + ':src/vendor',
               BUILD / 'src/vendor', 'pg_duckdb')
     # Vendored ruleutils and numeric/list headers carry PostgreSQL copyright.

@@ -82,12 +82,19 @@ For a new extension:
 Keep the upstream archive URL in the Dockerfile's `ADD` instruction. BuildKit
 provenance records that URL and the archive digest; the build recipe provides
 repository attribution. The PGRX SBOM does not duplicate the repository URL.
-The installer records the commit embedded in
-the downloaded Git archive and its SHA-256; a missing or invalid commit header
-fails the build. Preparation does not resolve tags. A moved upstream tag can
-therefore select different commits in separate builds, but evidence describes
-each actual archive rather than a later tag lookup. There is no cross-platform
-source-consistency gate.
+Preparation does not resolve tags, and the installer does not require recovering
+an archive's Git commit. A moved tag can select different sources in separate
+builds; cached acquisition can retain earlier source. A build timestamp or later
+tag lookup cannot reliably reconstruct the original commit. There is no
+cross-platform source-consistency gate or guarantee of exact commit recovery.
+
+The hook emits standard SPDX packages, dependency relationships, license
+expressions and actual notice text. Published crates.io dependencies have Cargo
+PURLs. Workspace, unpublished and Git-sourced packages retain their Cargo names
+and versions without a guessed registry PURL. Builder reports are private build
+validation inputs, not an image-consumer API; the SBOM has no PGRX JSON annotation.
+SPDX identifiers are opaque and `sourceInfo`, when present, is human-readable.
+
 
 In the extension README, explain SQL and catalog names, preload requirements,
 and any initialization steps.

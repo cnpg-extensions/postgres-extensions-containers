@@ -102,7 +102,6 @@ def main():
     # PostgreSQL layout, and BuildKit TARGETPLATFORM identifies the OCI platform.
     extension = os.environ["PGRX_EXTENSION"]
     recipe = RECIPES[extension]
-    source = json.loads((directory / "source.json").read_text())
     major = os.environ["PG_MAJOR"]
     platform = os.environ["TARGETPLATFORM"]
     common = [
@@ -256,10 +255,8 @@ def main():
     identity = {
         "extension": extension,
         "sql_name": sql_name,
-        "source_version": source["version"],
+        "source_version": os.environ["EXT_VERSION"],
         "sql_version": sql_version,
-        "revision": source["revision"],
-        "archive_sha256": source["archive_sha256"],
     }
     manifest = {
         "schema_version": 2,

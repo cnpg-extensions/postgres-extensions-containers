@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""Resolve release identity and record downloaded source archives."""
+"""Resolve source releases for recipes that acquire nested dependencies."""
 
-import hashlib
-import io
 import json
 import re
-import tarfile
 from urllib.parse import quote, urlsplit
 import urllib.request
 
@@ -89,21 +86,4 @@ def resolve_source(repository_url, version):
         "version": version,
         "revision": source_revision(host, repository, version),
         "url": url,
-    }
-
-
-def archive_identity(archive):
-    """Record the downloaded Git archive without consulting a mutable tag."""
-    if not isinstance(archive, bytes):
-        raise ValueError("source archive must be bytes")
-    # GitHub and GitLab Git archives embed the actual commit in a global
-    # PAX header. Repository attribution is available through build provenance
-    # and the recipe's ADD URL, rather than a duplicate installer input.
-    with tarfile.open(fileobj=io.BytesIO(archive), mode="r:gz") as tar:
-        revision = tar.pax_headers.get("comment")
-    if not isinstance(revision, str) or not re.fullmatch(r"[a-fA-F0-9]{40}", revision):
-        raise ValueError("source archive must identify its Git commit")
-    return {
-        "revision": revision.lower(),
-        "archive_sha256": hashlib.sha256(archive).hexdigest(),
     }

@@ -12,7 +12,6 @@ import re
 import subprocess
 from urllib.parse import quote
 
-NAMESPACE = "https://github.com/cnpg-extensions/postgres-extensions-containers/pgrx-enrichment/v1"
 TARGETS = {
     "linux/amd64": ("x86_64-unknown-linux-gnu", 62),
     "linux/arm64": ("aarch64-unknown-linux-gnu", 183),
@@ -260,7 +259,7 @@ def selected_graph(
     return {key: packages[key] for key in sorted(features)}, sorted(edges)
 
 
-def cargo_purl(package, revision):
+def cargo_purl(package):
     base = (
         "pkg:cargo/"
         + quote(package["name"], safe="")
@@ -273,19 +272,9 @@ def cargo_purl(package, revision):
         "registry+https://index.crates.io/",
     ):
         return base
-    # Preserve registry/git/path identity, without exposing local build paths.
-    if source is None:
-        manifest = PurePosixPath(package["manifest_path"])
-        try:
-            relative = manifest.relative_to("/build")
-        except ValueError as error:
-            raise ValueError("workspace manifest is outside the source tree") from error
-        require(".." not in relative.parts, "unsafe workspace manifest path")
-        source = "workspace:" + revision + ":" + str(relative)
-    require(
-        "@" not in source.split("://")[-1].split("/")[0], "credentials in Cargo source"
-    )
-    return base + "?repository_url=" + quote(source, safe="")
+    # Cargo PURLs identify published registry packages. A local or Git source
+    # does not establish that it is the crates.io release of the same version.
+    return None
 
 
 # Conservative SPDX expression parser. Unsupported conclusions stay NOASSERTION;
@@ -529,8 +518,8 @@ def cargo_about_license_expressions(packages, report):
 # The unchanged, digest-pinned generator owns the Syft version. Use only its
 # rust-cargo-lock-cataloger on a file: source containing the hash-verified extension
 # Cargo.lock, never cargo-about/cargo-pgrx/cached registry lockfiles elsewhere in
-# the builder. Record the Syft version, output hash and inventory count in the
-# augmentation annotation. Match selected runtime crates by name, version and
+# the builder. Validate the cataloger and match selected runtime crates by name,
+# version and
 # source to this inventory, emitting only the selected entries.
 def scan_cargo_lock(lock_path):
     """Use the generator's Syft binary, scoped to one verified lockfile.
@@ -574,13 +563,7 @@ def scan_cargo_lock(lock_path):
         require(key not in packages, "duplicate Syft Cargo identity")
         packages[key] = artifact
     require(packages, "empty Syft Cargo inventory")
-    evidence = {
-        "version": descriptor["version"],
-        "cataloger": "rust-cargo-lock-cataloger",
-        "sha256": sha256(completed.stdout),
-        "package_count": len(packages),
-    }
-    return packages, evidence
+    return packages
 
 
 # API-v1 composition contract: read hash-verified builder reports, verify source
@@ -620,20 +603,11 @@ def augment_spdx(document, context):
         "sql_name",
         "source_version",
         "sql_version",
-        "revision",
-        "archive_sha256",
     ):
         require(
             isinstance(identity.get(key), str) and identity[key],
             f"missing identity: {key}",
         )
-    require(
-        re.fullmatch("[a-f0-9]{40}", identity["revision"]), "invalid source revision"
-    )
-    require(
-        re.fullmatch("[a-f0-9]{64}", identity["archive_sha256"]),
-        "invalid source archive hash",
-    )
     require(
         context.extension_name in ("extension", identity["extension"]),
         "extension identity mismatch",
@@ -694,7 +668,7 @@ def augment_spdx(document, context):
     )
     about_licenses = cargo_about_license_expressions(packages, reports["cargo-about"])
     root_component = packages[build["root_id"]]
-    syft_packages, syft_evidence = scan_cargo_lock(
+    syft_packages = scan_cargo_lock(
         safe_file(context.builder_path, "build/Cargo.lock")
     )
     selected_syft = {}
@@ -755,9 +729,9 @@ def augment_spdx(document, context):
     require(has_library, "missing compiled library binding")
     ids = {}
     for key, component in packages.items():
-        purl = cargo_purl(component, identity["revision"])
+        purl = cargo_purl(component)
         package = {
-            "SPDXID": "SPDXRef-Cargo-" + sha256(purl.encode())[:32],
+            "SPDXID": "SPDXRef-Cargo-" + sha256(key.encode())[:32],
             "filesAnalyzed": False,
             "downloadLocation": "NOASSERTION",
             "copyrightText": "NOASSERTION",
@@ -775,8 +749,8 @@ def augment_spdx(document, context):
             "referenceType": "purl",
             "referenceLocator": purl,
         }
-        if ref not in package.setdefault("externalRefs", []):
-            package["externalRefs"].append(ref)
+        if purl:
+            package["externalRefs"] = [ref]
         ids[key] = package["SPDXID"]
     relationships = result.setdefault("relationships", [])
     # The root crate represents the shipped extension. Individual file records
@@ -818,42 +792,14 @@ def augment_spdx(document, context):
             "license association does not match cargo-about evidence",
         )
         licensed.add(key)
-        license_id = "LicenseRef-Cargo-" + sha256(text.encode())[:32]
-        extracted = {
-            "licenseId": license_id,
-            "extractedText": text,
-            "name": evidence_license["name"],
-        }
-        infos = result.setdefault("hasExtractedLicensingInfos", [])
-        if not any(info["licenseId"] == license_id for info in infos):
-            infos.append(extracted)
         package = next(p for p in result["packages"] if p["SPDXID"] == ids[key])
-        package.setdefault("attributionTexts", []).append(
-            "Cargo license text: " + license_id
-        )
+        # SPDX attributionTexts carries the actual notice, not a private link
+        # grammar. Standard SPDX license expressions remain licenseDeclared.
+        if text not in package.setdefault("attributionTexts", []):
+            package["attributionTexts"].append(text)
     require(
         licensed == set(packages),
         "selected dependencies missing shipped license evidence",
-    )
-    annotation = {
-        "namespace": NAMESPACE,
-        "schema_version": 1,
-        "identity": identity,
-        "target": target,
-        "build": {k: v for k, v in build.items() if k != "root_id"},
-        "root_purl": cargo_purl(root_component, identity["revision"]),
-        "syft_cargo_lock": syft_evidence,
-        "reports": {k: v["sha256"] for k, v in manifest["reports"].items()},
-        "payload": manifest["payload"],
-        "lock_sha256": manifest["inputs"]["lock_sha256"],
-    }
-    result.setdefault("annotations", []).append(
-        {
-            "annotationType": "OTHER",
-            "annotator": "Tool: cnpg-pgrx-hook-v1",
-            "annotationDate": result["creationInfo"]["created"],
-            "comment": json.dumps(annotation, sort_keys=True, separators=(",", ":")),
-        }
     )
     result["relationships"] = sorted(
         {json.dumps(r, sort_keys=True): r for r in relationships}.values(),

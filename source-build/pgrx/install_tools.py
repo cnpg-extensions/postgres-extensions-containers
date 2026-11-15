@@ -12,8 +12,6 @@ import tomllib
 import urllib.request
 
 from build_config import RECIPES, effective_features
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from source import archive_identity
 
 PGRX = Path("/source-build/pgrx")
 BUILD = Path("/build")
@@ -188,13 +186,6 @@ def main():
     config["patches"] = []
     config["lock_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
     (report / "build-config.json").write_text(json.dumps(config, indent=2) + "\n")
-    # The downloaded archive supplies its actual commit and hash. Its URL is
-    # already recorded by BuildKit for the recipe's ADD instruction.
-    source_record = {
-        "version": os.environ["EXT_VERSION"],
-        **archive_identity(Path("/tmp/source.tar.gz").read_bytes()),
-    }
-    (report / "source.json").write_text(json.dumps(source_record, indent=2) + "\n")
     # cargo-about queries the full metadata graph before filtering the target.
     # Fetch all locked source archives so that reporting stays offline. This
     # does not compile foreign targets or include them in the runtime SBOM.
