@@ -129,8 +129,15 @@ def license_evidence(text, name):
 
 
 def main():
-    evidence = json.loads((BUILD / 'source-evidence.json').read_text())
-    evidence['timestamp'] = os.environ['BUILD_TIMESTAMP']
+    # CMake FetchContent checks out the httpfs revision pinned by pg_duckdb.
+    builddir = DUCK / 'build/release'
+    http = builddir / '_deps/httpfs_extension_fc-src'
+    def revision(directory):
+        return subprocess.check_output(['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
+    evidence = dict(repository='https://github.com/duckdb/pg_duckdb',
+                    version=os.environ['EXT_VERSION'], revision=revision(BUILD),
+                    duckdb_revision=revision(DUCK), httpfs_revision=revision(http),
+                    timestamp=os.environ['BUILD_TIMESTAMP'])
     pg = os.environ['PG_MAJOR']
     copy(Path(f'/install/usr/lib/postgresql/{pg}/lib/pg_duckdb.so'), PAYLOAD / 'lib/pg_duckdb.so')
     for path in Path(f'/install/usr/share/postgresql/{pg}/extension').glob('pg_duckdb*'):
@@ -190,13 +197,11 @@ def main():
     component('duckdb', duckver.removeprefix('v'), 'https://github.com/duckdb/duckdb', evidence['duckdb_revision'], DUCK, 'pg_duckdb',
               'pkg:github/duckdb/duckdb@' + evidence['duckdb_revision'])
     # FetchContent records the actual checked-out httpfs, not the current branch.
-    http = BUILD / 'third_party/httpfs'
     httprev = evidence['httpfs_revision']
     component('duckdb-httpfs', httprev, 'https://github.com/duckdb/duckdb-httpfs', httprev, http, 'duckdb',
               'pkg:github/duckdb/duckdb-httpfs@' + httprev)
     # Only library compilation units and their header dependencies: compiler/test
     # executables in the same build tree must not become shipped packages.
-    builddir = DUCK / 'build/release'
     selected = runtime_inputs(builddir)
     if evidence['revision'] != '8756099e267c47f0b86c24de4cf995327f1f4279':
         raise ValueError('Review vendor source identities and generated-data notice URLs for updated source')

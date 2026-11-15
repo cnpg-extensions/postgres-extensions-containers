@@ -47,12 +47,12 @@ unresolved license information does not itself establish compliance with the
 
 ## Source acquisition
 
-The Dockerfile downloads the source archives with `curl` and extracts them with
-`tar`. It resolves `EXT_VERSION` once, reads the DuckDB gitlink from that commit
-and the httpfs pin from its CMake configuration, and downloads matching nested
-sources. It records the selected revisions for the recipe-owned evidence step. Preparation does not
-freeze tags across platforms: a moved tag can select different commits in
-separate builds. BuildKit can reuse a cached acquisition for an unchanged recipe
-and version; invalidate that cache when a fresh tag lookup is needed. This recipe
-needs private revision resolution for correct nested acquisition, without adding
-a public source-identity schema or a cross-platform consistency gate.
+The Dockerfile clones the release named by `EXT_VERSION` and initializes its Git
+submodules recursively, following upstream's checkout instructions. The upstream
+CMake configuration fetches the matching pinned httpfs revision. The evidence
+step reads the actual pg_duckdb, DuckDB and httpfs checkout revisions after the
+build. No GitHub API lookup or archive-specific build patch is needed.
+
+BuildKit can reuse a cached checkout for an unchanged recipe and version; invalidate
+that cache when a fresh checkout is needed. Release tags are not frozen across
+separate architecture builds.
