@@ -2,19 +2,17 @@
 
 ## Inclusion policy: Debian packaging first
 
-Universe is an exception for complex dependency packaging and delivery obstacles,
-not a general alternative to contributing Debian packages. A technically feasible
-local build does not settle package ownership, archive acceptance or dependency
-backport publication for the required distributions. For pg_duckdb, those
-unresolved Debian/PGDG decisions justify an interim source build while the
-Debian path is pursued.
+Building from source is an exception for toolchain, dependency packaging and
+delivery obstacles, not a general alternative to contributing Debian packages.
+A technically feasible local build does not settle package ownership, archive
+acceptance or dependency backport publication for the required distributions.
 
-For simple extensions with few dependencies, or dependencies already available
+For extensions whose build tools and dependencies are readily available
 in the Debian ecosystem, contributors are expected to package the extension for
 Debian, including the established PostgreSQL Debian packaging ecosystem where
 appropriate. Once packaged, the extension can use this repository's Debian build
 path. Absence of a package today, convenience, faster onboarding, or a preference
-for Dockerfiles is not sufficient justification for a Universe source build.
+for Dockerfiles is not sufficient justification for a source build.
 
 The Debian-first policy serves two equally important purposes.
 
@@ -44,8 +42,27 @@ Proposals must distinguish packaging or delivery obstacles that a source build
 can address from unresolved licensing or dependency-management work that still
 has to be completed.
 
-Universe has a second mandatory acceptance criterion: the complex dependencies
-that justify its source build must be exposed at the recipe's documented package
+For PGRX, the obstacle is the shared build toolchain. `cargo-pgrx` itself
+has not yet been accepted into Debian. Packaging has been discussed, but we
+cannot plan on near-term availability. This shared toolchain obstacle justifies
+building PGRX extensions from source without requiring each extension to solve
+Debian packaging independently. PGRX extensions use the PGRX path rather than
+the generic Universe path; revisit this approach as Debian tooling becomes
+available.
+
+The PGRX framework automates Rust dependency selection, package identities and
+versions, license evidence and notice collection, and integration with the shared
+SBOM generator. This makes the compliance and dependency-management work
+repeatable across PGRX extensions; maintainers still review licensing decisions,
+evidence completeness and exceptional dependencies. Automation does not itself
+establish legal compliance.
+
+Universe covers other source builds with complex dependency packaging or
+delivery obstacles. For pg_duckdb, unresolved Debian/PGDG package ownership,
+archive acceptance and backport publication justify an interim source build
+while the Debian path is pursued.
+
+The complex dependencies that justify a Universe source build must be exposed at the recipe's documented package
 boundaries, with established upstream/ecosystem identities and actual versions.
 The pg_duckdb boundary follows Debian DuckDB packaging, including explicit
 Debian scanner mappings for source-built counterparts of separately packaged
@@ -65,21 +82,6 @@ the packaging rationale and SBOM overview self-contained in a short `PACKAGING.m
 beside the recipe. Keep the extension README focused on installation and use. If the obstacles are resolved, prefer
 transitioning to the Debian path while preserving consumer identities where
 possible.
-
-The same policy supports the PGRX source-build framework. `cargo-pgrx` itself
-has not yet been accepted into Debian. Packaging has been discussed, but we
-cannot plan on near-term availability. This shared toolchain obstacle justifies
-building PGRX extensions from source without requiring each extension to solve
-Debian packaging independently. PGRX extensions use the PGRX path rather than
-the generic Universe path; revisit this approach as Debian tooling becomes
-available.
-
-The PGRX framework automates Rust dependency selection, package identities and
-versions, license evidence and notice collection, and integration with the shared
-SBOM generator. This makes the compliance and dependency-management work
-repeatable across PGRX extensions; maintainers still review licensing decisions,
-evidence completeness and exceptional dependencies. Automation does not itself
-establish legal compliance.
 
 Universe recipes have no equivalent common language toolchain to supply that
 evidence. Each recipe requires careful individual review and implementation of
