@@ -1,5 +1,98 @@
 # Source builds
 
+## Inclusion policy: Debian packaging first
+
+Universe is an exception for complex dependency packaging and delivery obstacles,
+not a general alternative to contributing Debian packages. A technically feasible
+local build does not settle package ownership, archive acceptance or dependency
+backport publication for the required distributions. For pg_duckdb, those
+unresolved Debian/PGDG decisions justify an interim source build while the
+Debian path is pursued.
+
+For simple extensions with few dependencies, or dependencies already available
+in the Debian ecosystem, contributors are expected to package the extension for
+Debian, including the established PostgreSQL Debian packaging ecosystem where
+appropriate. Once packaged, the extension can use this repository's Debian build
+path. Absence of a package today, convenience, faster onboarding, or a preference
+for Dockerfiles is not sufficient justification for a Universe source build.
+
+The Debian-first policy serves two equally important purposes.
+
+First, community benefit: Debian packaging makes an extension available to a
+much wider audience of PostgreSQL users, beyond CloudNativePG. Contributing to
+that shared ecosystem is part of being a good citizen of the PostgreSQL
+community, and takes precedence over making inclusion here more convenient.
+
+Second, legal compliance and security: preparing software for acceptance in
+Debian requires substantial work to identify applicable licenses, collect
+copyright and redistribution notices, and untangle dependencies, including
+bundled or statically linked components. Dependency identities and versions
+must be understood so that maintainers can assess security advisories and
+deliver fixes. Our distribution has the same general legal-compliance and
+security requirements. A working binary or a custom-built `.deb` alone does not
+establish that this work has been done; license identifiers cannot replace
+required license texts and notices, and successful installation cannot replace
+an inventory of the dependencies actually shipped.
+
+Our experience is that when licensing and dependencies are straightforward to
+manage, getting the software packaged for Debian is generally straightforward
+too. When Debian packaging is difficult, we commonly discover that the same
+underlying blockers also affect our own distribution and adoption in Kubernetes
+environments. Source builds change how software is built and delivered; they do
+not remove those blockers or reduce our compliance and security obligations.
+Proposals must distinguish packaging or delivery obstacles that a source build
+can address from unresolved licensing or dependency-management work that still
+has to be completed.
+
+Universe has a second mandatory acceptance criterion: the complex dependencies
+that justify its source build must be exposed at the recipe's documented package
+boundaries, with established upstream/ecosystem identities and actual versions.
+The pg_duckdb boundary follows Debian DuckDB packaging, including explicit
+Debian scanner mappings for source-built counterparts of separately packaged
+libraries; it is not an inventory of every internal bundled component.
+Where a dependency has standard names or identifiers used to associate CVEs and
+other advisories with it, reflect those in the SBOM so future vulnerability records
+can be correlated. Use the shared generator's augmentation hook for source-built,
+bundled, or statically linked dependency evidence that automatic discovery misses.
+The [dependency evidence requirements](#dependency-evidence-in-the-sbom) apply;
+an existing CVE is not required.
+
+A Universe proposal must identify the problematic dependencies, their availability
+in the relevant Debian ecosystem, and the concrete packaging, maintenance or delivery obstacles that prevent
+an installable package set for the required targets. Project maintainers review that rationale in
+the proposal/PR; a working Dockerfile alone does not establish eligibility. Keep
+the packaging rationale and SBOM overview self-contained in a short `PACKAGING.md`
+beside the recipe. Keep the extension README focused on installation and use. If the obstacles are resolved, prefer
+transitioning to the Debian path while preserving consumer identities where
+possible.
+
+The same policy supports the PGRX source-build framework. `cargo-pgrx` itself
+has not yet been accepted into Debian. Packaging has been discussed, but we
+cannot plan on near-term availability. This shared toolchain obstacle justifies
+building PGRX extensions from source without requiring each extension to solve
+Debian packaging independently. PGRX extensions use the PGRX path rather than
+the generic Universe path; revisit this approach as Debian tooling becomes
+available.
+
+The PGRX framework automates Rust dependency selection, package identities and
+versions, license evidence and notice collection, and integration with the shared
+SBOM generator. This makes the compliance and dependency-management work
+repeatable across PGRX extensions; maintainers still review licensing decisions,
+evidence completeness and exceptional dependencies. Automation does not itself
+establish legal compliance.
+
+Universe recipes have no equivalent common language toolchain to supply that
+evidence. Each recipe requires careful individual review and implementation of
+dependency boundaries, actual versions, applicable licenses, attribution and
+redistribution notices, and security-relevant identities. Use the shared SBOM
+generator and its extension hook for this work, not a separate composer.
+
+The intended selection is Debian packaging for ordinary extensions, the PGRX
+toolchain for PGRX extensions, and Universe source builds only for other
+extensions with documented complex dependency packaging or delivery obstacles.
+
+## Shared build infrastructure
+
 These utilities prepare and assemble native PostgreSQL extension builds. Recipes
 live under `pgrx/<name>` and `universe/<name>`; directory location determines the
 build family. Shared tools live here, while Rust-specific tools live in `pgrx/`.
