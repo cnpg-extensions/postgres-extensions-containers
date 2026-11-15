@@ -43,10 +43,14 @@ RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}
 
 # Debian source-package copyright files, in the shared helper's layout.
 COPY universe/pg-duckdb/licenses/ /licenses/
-COPY universe/pg-duckdb/evidence.py universe/pg-duckdb/augment_spdx.py /recipe/
+COPY universe/pg-duckdb/augment_spdx.py /recipe/
 RUN mkdir -p /licenses/pg_duckdb \
     && cat /build/LICENSE /build/NOTICE > /licenses/pg_duckdb/copyright \
-    && python3 /recipe/evidence.py \
+    && for package in libduckdb2.0 liblz4-1 libmbedcrypto16 libzstd1 libxxhash0; do \
+         cp /usr/share/common-licenses/GPL-2 /licenses/$package/; done \
+    && for package in libduckdb2.0 libmbedcrypto16 libyyjson0; do \
+         cp /usr/share/common-licenses/Apache-2.0 /licenses/$package/; done \
+    && python3 /recipe/augment_spdx.py \
     && install -D -m 0644 /recipe/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
 
 FROM scratch

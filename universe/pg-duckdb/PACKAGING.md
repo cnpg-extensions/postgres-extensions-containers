@@ -53,7 +53,11 @@ files can describe tests, tools and documentation beyond the shipped library;
 they are not an inventory of additional runtime components.
 
 There is no license extraction script, build-time copyright download, dependency
-discovery or comment parser. `evidence.py` has one static package table. Both
+discovery or comment parser. `augment_spdx.py` has one static package table and
+reads runtime files directly from the builder and final image, without an
+intermediate JSON manifest. License texts are read directly from the final image;
+Docker COPY handles their staging without a second builder-to-final comparison.
+The Dockerfile copies the explicitly listed common-license texts. Both
 source-revision guards require the inventory and copyright snapshot to be
 reviewed when sources or build settings change.
 
@@ -103,8 +107,9 @@ matching; scanner matches on the real document still require applicability revie
 
 The Dockerfile clones the release named by `EXT_VERSION` and initializes its Git
 submodules recursively, following upstream's checkout instructions. The upstream
-CMake configuration fetches the matching pinned httpfs revision. The evidence
-step reads the actual pg_duckdb and DuckDB checkout revisions after the build.
+CMake configuration fetches the matching pinned httpfs revision. The hook script
+runs a build-time source guard that reads the actual pg_duckdb and DuckDB checkout
+revisions after the build.
 Loadable httpfs is not installed in the image, matching upstream; downloaded
 extensions are outside the image SBOM. No GitHub API lookup or archive-specific build patch is needed.
 
