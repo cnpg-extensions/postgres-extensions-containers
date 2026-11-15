@@ -56,9 +56,6 @@ delivery obstacles.
 
 The complex dependencies that justify a Universe source build must be exposed at the recipe's documented package
 boundaries, with established upstream/ecosystem identities and actual versions.
-The pg_duckdb boundary follows Debian DuckDB packaging, including explicit
-Debian scanner mappings for source-built counterparts of separately packaged
-libraries; it is not an inventory of every internal bundled component.
 Where a dependency has standard names or identifiers used to associate CVEs and
 other advisories with it, reflect those in the SBOM so future vulnerability records
 can be correlated. Use the shared generator's augmentation hook for source-built,
