@@ -55,7 +55,7 @@ following scaffolded files:
 > see [`CONTRIBUTING_NEW_EXTENSION.md`](./CONTRIBUTING_NEW_EXTENSION.md).
 
 For Universe source builds, use the [source-build templates](source-build/README.md#add-a-universe-recipe).
-For Rust extensions, follow the [PGRX template guide](pgrx/README.md#add-or-update-an-extension-recipe).
+For Rust extensions, follow the [PGRX template guide](source-build/README.md#add-a-pgrx-recipe).
 
 ### Advanced Scaffolding
 

@@ -1,20 +1,26 @@
-# Universe source builds
+# Universe extensions
 
-Recipes whose dependency burden makes Debian packaging prohibitive live here.
-Ordinary extensions should use Debian packaging; Rust extensions use the PGRX path.
-Inclusion requires a concrete dependency-packaging rationale, accurate shipped
-component identities in the SBOM, and the shared acceptance checks.
+Universe contains PostgreSQL extension images with complex bundled dependencies.
+These images use the same CloudNativePG installation mechanism as the other
+extensions in this repository.
 
-For published images, use the shared [image verification and SBOM inspection
-guide](../source-build/README.md#verify-images).
+## Available extensions
 
-Start with the [source-build templates and utility guide](../source-build/README.md#add-a-universe-recipe).
-Each recipe supplies its own compilation, runtime dependency and license evidence
-handling. Universe has no equivalent of the automatic PGRX Cargo helpers.
+| Extension | Purpose |
+| --- | --- |
+| [pg_duckdb](pg-duckdb/README.md) | DuckDB analytics from PostgreSQL. |
 
-The extension README documents installation and use. A separate `PACKAGING.md`
-explains the Debian packaging obstacles and summarizes SBOM contents; see
-[pg-duckdb](pg-duckdb/PACKAGING.md) for an example.
+Follow the extension's README for supported versions, Cluster and Database
+configuration, preload requirements and runtime caveats.
 
-For dependency identities, versions, licenses and source attribution, follow the
-shared [dependency evidence guidance](../source-build/README.md#dependency-evidence-in-the-sbom).
+## Image information
+
+Images include an SBOM, provenance and original license notices under `/licenses`.
+See [image verification and SBOM inspection](../source-build/README.md#verify-images)
+for consumer instructions. The [pg_duckdb packaging notes](pg-duckdb/PACKAGING.md)
+summarize its bundled components and Debian packaging rationale.
+
+## Contributing
+
+For recipe development and local builds, see the
+[source-build guide](../source-build/README.md#add-a-universe-recipe).
