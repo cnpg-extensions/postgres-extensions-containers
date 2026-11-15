@@ -63,10 +63,8 @@ The shared system-library helper stages additional runtime libraries under
 `/system`, excluding libraries supplied by the PostgreSQL base image, and preserves
 their notices. Consequently, a Debian library used from the base image belongs
 in the base image's inventory; installing its development package in the builder
-does not create a shipped dependency record in the extension image. The local
-`SHARED_LIBRARIES.md` investigation includes the whole PostgreSQL installation
-and Debian's five packaged DuckDB connectors, a broader scope than this image.
-In particular, upstream's default build does not ship its loadable httpfs here;
+does not create a shipped dependency record in the extension image.
+Upstream's default build does not ship its loadable httpfs here;
 its curl/OpenSSL build dependencies must not be counted merely because apt
 installed them.
 
@@ -84,10 +82,7 @@ confirmed the following boundary (2026-11-15):
 
 Together with pg_duckdb, this produces nine source-package records. LZ4 and
 xxHash occur both as base-image shared libraries and as DuckDB's embedded
-copies; reporting one does not account for the other. The broader local
-`SHARED_LIBRARIES.md` lists 85 Bookworm and 83 Trixie shared-object package
-owners for its PostgreSQL/connector scope, not libraries all used by this
-extension. Its Trixie inventory also predates a complete DuckDB installation.
+copies; reporting one does not account for the other.
 
 The original native build passed PostgreSQL 18 preload, `CREATE EXTENSION` and
 a forced `DuckDBScan` query. Follow-up notice validation reuses that compiled
