@@ -1,18 +1,69 @@
 # pg_duckdb packaging notes
 
-## Debian packaging obstacles
+## Path to Debian and PGDG packages
 
-The recipe follows the selected release's upstream Docker image build: pg_duckdb
-links dynamically to its pinned DuckDB fork. A stock DuckDB development package
-does not establish compatibility with that fork's interfaces. Debian packaging
-would require coordinated packaging of the fork and its bundled dependencies,
-or unbundling patches. Namespace-modified code, such as DuckDB's LZ4, adds to
-that work. Ordinary dependencies use Debian packages.
+The goal is pg_duckdb available through PGDG for Bookworm and Trixie, with an
+installable dependency chain, before adopting those packages in CNPG Extensions.
+The remaining packaging, maintenance and archive decisions justify keeping the
+CNPG Extensions source-build recipe while that work is unresolved. Revisit the
+recipe when the required packages are published and pass the shared integration
+checks.
 
-The build uses upstream's default release settings, Clang for DuckDB and GCC for
-pg_duckdb, with the Clang version supplied by Trixie. The final CNPG extension
-image contains the extension payload rather than a complete PostgreSQL server.
-Revisit Debian packaging when the fork and bundled-dependency burden is resolved.
+A separate native amd64 investigation demonstrated that pg_duckdb 1.2.0 builds
+and runs against Debian unstable's shared DuckDB 2.0 with build-system changes
+and the missing development headers supplied, without pg_duckdb C++ changes.
+DuckDB itself also built and passed all nine existing Debian smoke tests in a
+clean Bookworm runtime environment. The combined Bookworm pg_duckdb stack,
+Trixie builds and native ARM64 validation remain outstanding. These experiments
+do not validate this recipe's current build or hosted release pipeline.
+
+Using a system DuckDB library is therefore technically feasible; a required
+DuckDB fork or wholesale unbundling is not an established blocker for that
+version pair. Upstream's [system-library discussion](https://github.com/duckdb/pg_duckdb/issues/554)
+describes the remaining version coupling. Existing Debian packaging does not,
+however, settle publication and maintenance for both target suites.
+
+### 1. DuckDB Debian maintainers
+
+- **Unresolved decisions:** acceptance of development-package fixes; supported
+  ABI compatibility; maintenance expectations for remaining bundled components.
+- **Technical work:** complete `libduckdb-dev` with the required namespaced fmt
+  and RE2 headers; review patches and test pg_duckdb compatibility.
+
+### 2. pg_duckdb packaging contributor and Debian PostgreSQL reviewers
+
+- **Unresolved decisions:** ongoing package ownership, sponsorship, and Debian
+  archive acceptance.
+- **Technical work:** create PGXS/`pg_buildext` packaging; use system DuckDB;
+  declare version constraints; configure packaged extensions; complete copyright
+  review and offline tests.
+
+### 3. Backport contributors and archive maintainers
+
+- **Unresolved decisions:** which dependencies need backporting on each suite;
+  whether they are published through Debian Backports, PGDG, or a combination;
+  maintenance ownership and PGDG acceptance of the resulting package set.
+- **Technical work:** prepare Bookworm's demonstrated yyjson and Mbed TLS
+  backports and DuckDB compatibility patches, using PGDG's libpq18; validate
+  Trixie independently; test the complete stack on amd64 and arm64; publish
+  pg_duckdb in PGDG for both suites and the required PostgreSQL versions.
+
+Dependency publication need not all happen in PGDG. The requirement is an
+installable package set from the agreed repositories. PGDG's
+[packaging policy](https://wiki.postgresql.org/wiki/Apt/Packages) favors alignment
+with Debian unstable; successful local builds do not replace archive acceptance
+and publication.
+
+### 4. CNPG Extensions maintainers
+
+- **Technical work:** once published in PGDG, configure the required repositories,
+  integrate through the existing Debian build infrastructure, and run runtime,
+  SBOM, security and release checks.
+
+The current source build follows upstream's default release settings, with
+Clang for DuckDB and GCC for pg_duckdb; Trixie supplies Clang. The final CNPG
+extension image contains the extension payload rather than a complete PostgreSQL
+server.
 
 ## SBOM contents
 
