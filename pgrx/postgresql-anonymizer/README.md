@@ -29,6 +29,7 @@ spec:
     extensions:
     - name: postgresql-anonymizer
       image:
+        # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/postgresql-anonymizer:3.3.2-18-trixie
 ```
 
@@ -61,6 +62,7 @@ spec:
     name: cluster-anonymizer
   extensions:
   - name: anon
+    # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver depType=pgrx-source
     version: '3.3.2'
 ```
 

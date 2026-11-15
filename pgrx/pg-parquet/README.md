@@ -37,6 +37,7 @@ spec:
     extensions:
     - name: pg-parquet
       image:
+        # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pg-parquet:0.5.1-18-trixie
 ```
 
@@ -57,6 +58,7 @@ spec:
     name: cluster-pg-parquet
   extensions:
   - name: pg_parquet
+    # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
     version: '0.5.1'
 ```
 

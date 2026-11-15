@@ -38,6 +38,7 @@ spec:
     extensions:
     - name: pg-durable
       image:
+        # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pg-durable:0.2.9-18-trixie
 ```
 
@@ -59,6 +60,7 @@ spec:
     name: cluster-pg-durable
   extensions:
   - name: pg_durable
+    # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
     version: '0.2.9'
 ```
 

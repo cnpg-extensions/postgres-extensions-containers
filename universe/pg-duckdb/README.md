@@ -34,6 +34,7 @@ spec:
     extensions:
     - name: pg-duckdb
       image:
+        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
         reference: ghcr.io/cnpg-extensions/pg-duckdb:1.2.0-18-trixie
       ld_library_path: [system]
 ```
@@ -54,6 +55,7 @@ spec:
     name: cluster-pg-duckdb
   extensions:
   - name: pg_duckdb
+    # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
     version: '1.2.0'
 ```
 

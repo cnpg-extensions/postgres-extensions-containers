@@ -43,3 +43,9 @@ Build-only dependencies must not be reported as part of the distributed payload.
 
 See the [shared source-build guide](../README.md) for dependency evidence,
 local builds, tooling tests and image verification.
+
+README image and SQL examples use Renovate annotations matching metadata
+(`datasource`, `depName`, and `versioning`), with `depType=universe-source`.
+The shared README rule removes a leading `v` from release versions and preserves
+the image's PostgreSQL/distribution suffix. Annotate SQL examples only when their
+release-version mapping is verified. Keep historical investigation versions fixed.

@@ -32,6 +32,7 @@ spec:
     extensions:
     - name: pglinter
       image:
+        # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pglinter:2.0.0-18-trixie
 ```
 
@@ -53,6 +54,7 @@ spec:
     name: cluster-pglinter
   extensions:
   - name: pglinter
+    # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
     version: '2.0.0'
 ```
 

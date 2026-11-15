@@ -13,6 +13,9 @@ PostgreSQL versions and Debian distributions.
 [{{ replaceAll .Name "-" "_" }}](https://github.com/<owner>/<repo>) is a
 PostgreSQL extension that provides [describe the main functionality here].
 
+<!-- TODO: Match Renovate datasource and depName to metadata.hcl. Only annotate
+SQL versions when their mapping from the release tag is verified. -->
+
 ## Usage
 
 <!--
@@ -45,6 +48,7 @@ spec:
     - name: {{ .Name }}
       image:
         # TODO: Keep this image tag synchronized with metadata.hcl.
+        # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/{{ .Name }}:<package-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
 ```
 
@@ -67,6 +71,7 @@ spec:
   extensions:
   - name: {{ replaceAll .Name "-" "_" }}
     # TODO: Set this to the extension's SQL default_version.
+    # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver depType=pgrx-source
     version: '<sql-version>'
 ```
 

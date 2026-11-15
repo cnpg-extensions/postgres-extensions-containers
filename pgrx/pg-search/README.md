@@ -35,6 +35,7 @@ spec:
     extensions:
     - name: pg-search
       image:
+        # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pg-search:0.26.6-18-trixie
 ```
 
@@ -59,6 +60,7 @@ spec:
     name: cluster-pg-search
   extensions:
   - name: pg_search
+    # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
     version: '0.26.6'
 ```
 

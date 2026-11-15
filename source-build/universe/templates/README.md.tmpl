@@ -12,6 +12,9 @@ supports PostgreSQL {{ .DefaultVersion }} on Debian {{ .DefaultDistro }}.
 SBOM implementation details and Debian packaging rationale out of this README.
 Put a short technical overview in PACKAGING.md instead. -->
 
+<!-- TODO: Match Renovate datasource and depName to metadata.hcl. Only annotate
+SQL versions when their mapping from the release tag is verified. -->
+
 ## Usage
 
 ### 1. Add the {{ .Name }} extension image to your Cluster
@@ -36,6 +39,7 @@ spec:
     - name: {{ .Name }}
       image:
         # TODO: Use the source package version without its leading v.
+        # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
         reference: ghcr.io/cnpg-extensions/{{ .Name }}:<image-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
       # TODO: Set required runtime paths from metadata.hcl, or omit if empty.
       ld_library_path: []
@@ -58,6 +62,7 @@ spec:
   extensions:
   - name: {{ replaceAll .Name "-" "_" }}
     # TODO: Use the SQL version from metadata.hcl.
+    # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
     version: '<sql-version>'
 ```
 

@@ -33,6 +33,7 @@ spec:
     extensions:
     - name: pg-session-jwt
       image:
+        # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pg-session-jwt:0.5.0-18-trixie
 ```
 
@@ -54,6 +55,7 @@ spec:
     name: cluster-pg-session-jwt
   extensions:
   - name: pg_session_jwt
+    # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
     version: '0.5.0'
 ```
 

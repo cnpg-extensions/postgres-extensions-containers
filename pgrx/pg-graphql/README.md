@@ -33,6 +33,7 @@ spec:
     extensions:
     - name: pg-graphql
       image:
+        # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
         reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.3-18-trixie
 ```
 
@@ -54,6 +55,7 @@ spec:
     name: cluster-pg-graphql
   extensions:
   - name: pg_graphql
+    # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
     version: '1.6.3'
 ```
 

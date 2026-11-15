@@ -149,6 +149,17 @@
       ],
       "depTypeTemplate": "universe-source",
       "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}package = \"{{{newValue}}}\"\n{{{indentation}}}sql     = \"{{{replace '^v' '' newValue}}}\""
+    },
+    {
+      "description": "Synchronize source-recipe README image and SQL examples",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^(?:pgrx|universe)/[^/]+/README\\.md$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags|git-tags|github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+depType=(?<depType>pgrx-source|universe-source)[ \\t]*\\r?\\n[ \\t]*(?:reference: ghcr\\.io/cnpg-extensions/[A-Za-z0-9_-]+:|version: \\x27)(?<currentValue>\\d+\\.\\d+\\.\\d+)(?:-[0-9]+-[a-z]+|\\x27)"
+      ],
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
     }
   ],
   "packageRules": [
