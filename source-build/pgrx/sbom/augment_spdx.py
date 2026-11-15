@@ -259,7 +259,7 @@ def selected_graph(
     return {key: packages[key] for key in sorted(features)}, sorted(edges)
 
 
-def cargo_purl(package):
+def cargo_purl(package, published=()):
     base = (
         "pkg:cargo/"
         + quote(package["name"], safe="")
@@ -272,8 +272,12 @@ def cargo_purl(package):
         "registry+https://index.crates.io/",
     ):
         return base
-    # Cargo PURLs identify published registry packages. A local or Git source
-    # does not establish that it is the crates.io release of the same version.
+    # Git forks use the declared Cargo identity for advisory matching.
+    # Publication confirms the identity, not equivalence to released source.
+    if (source or "").startswith("git+") and (
+        package["name"], package["version"]
+    ) in published:
+        return base
     return None
 
 
@@ -633,7 +637,7 @@ def augment_spdx(document, context):
         context.builder_path, "build/Cargo.lock", manifest["inputs"]["lock_sha256"]
     )
     reports = {}
-    for name in ("cargo-metadata", "cargo-about"):
+    for name in ("cargo-metadata", "cargo-about", "cargo-published"):
         entry = manifest["reports"][name]
         reports[name] = parse_json(
             checked_bytes(evidence, entry["path"], entry["sha256"])
@@ -727,9 +731,10 @@ def augment_spdx(document, context):
                 "ELF architecture mismatch",
             )
     require(has_library, "missing compiled library binding")
+    published = {(p["crate"], p["num"]) for p in reports["cargo-published"]["versions"]}
     ids = {}
     for key, component in packages.items():
-        purl = cargo_purl(component)
+        purl = cargo_purl(component, published)
         package = {
             "SPDXID": "SPDXRef-Cargo-" + sha256(key.encode())[:32],
             "filesAnalyzed": False,

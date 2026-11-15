@@ -77,6 +77,15 @@ arguments. The shared [local smoke-test instructions](../BUILD.md#local-testing-
 accept logical names such as `pg-duckdb`. Universe uses the ordinary installation
 and version checks; no separate extension-specific runtime suite is required.
 
+PGRX dependencies use Cargo's resolved package name and declared version for
+standard Cargo PURLs. Git dependencies receive a PURL when that exact crate and
+version exist on crates.io; this is an approximation for advisory matching, not
+an assertion that a fork matches the published release. Build-time registry
+lookups retain crates.io version records as internal evidence; the SBOM hook
+runs offline. Missing releases remain named and versioned without a crates.io
+PURL. Registry service errors fail the build instead of silently losing PURLs.
+Workspace packages and alternate registries are not mapped to crates.io.
+
 ## Tooling tests
 
 Run the existing suite in the pinned generator image so its Syft, SPDX validator

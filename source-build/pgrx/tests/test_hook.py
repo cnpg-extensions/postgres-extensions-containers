@@ -45,6 +45,7 @@ class HookTest(unittest.TestCase):
             'reports': {}, 'licenses': [],
             'payload': [{'builder': 'build/demo.so', 'final': 'lib/demo.so', 'kind': 'library', 'sha256': digest(elf)}]}
         self.write_report('cargo-metadata', self.metadata)
+        self.write_report('cargo-published', {'versions': []})
         self.manifest['build']['target_cfg'] = ['target_arch="x86_64"', 'target_os="linux"', 'target_env="gnu"', 'target_pointer_width="64"']
         license_text='MIT fixture license text'
         path=self.final/'licenses/rust/license.txt';path.parent.mkdir(parents=True);path.write_text(license_text)
@@ -172,11 +173,23 @@ class HookTest(unittest.TestCase):
         self.assertNotIn('macro',selected)
         a={'name':'same','version':'1.0','source':'registry+https://github.com/rust-lang/crates.io-index'}
         b={**a,'source':'git+https://example.test/repo#'+'a'*40}
-        self.assertNotEqual(cargo_purl(a),cargo_purl(b))
+        self.assertEqual(cargo_purl(a),cargo_purl(b, {('same', '1.0')}))
+        self.assertIsNone(cargo_purl(b))
         a.update(source=None,manifest_path='/build/one/Cargo.toml')
         b.update(source=None,manifest_path='/build/two/Cargo.toml')
         self.assertIsNone(cargo_purl(a))
         self.assertIsNone(cargo_purl(b))
+
+    def test_git_dependency_uses_package_name_and_declared_version(self):
+        git_source = 'git+https://example.test/different-repository#' + 'a' * 40
+        self.metadata['packages'][1].update(source=git_source)
+        self.metadata['resolve']['nodes'][0]['deps'][0]['name'] = 'dependency_alias'
+        self.write_report('cargo-metadata', self.metadata)
+        self.write_report('cargo-published', {'versions': [{'crate': 'runtime', 'num': '1.0'}]})
+        self.write_lock({'runtime': {'source': git_source}})
+        packages = {p['name']: p for p in self.run_hook()['packages']}
+        self.assertEqual(packages['runtime']['versionInfo'], '1.0')
+        self.assertEqual(packages['runtime']['externalRefs'][0]['referenceLocator'], 'pkg:cargo/runtime@1.0')
 
     def test_same_name_and_version_from_distinct_sources_remain_distinct(self):
         git_source = 'git+https://example.test/demo#' + 'a' * 40
@@ -193,6 +206,13 @@ class HookTest(unittest.TestCase):
         ids = {p['SPDXID'] for p in packages}
         self.assertEqual(2, len(ids))
         self.assertTrue(all('externalRefs' not in p for p in packages))
+        self.metadata['packages'][0]['source'] = git_source + 'b'
+        self.write_report('cargo-metadata', self.metadata)
+        self.write_report('cargo-published', {'versions': [{'crate': 'demo', 'num': '1.0'}]})
+        self.write_lock({'demo': {'source': git_source + 'b'}, 'runtime': {'name': 'demo', 'source': git_source}})
+        forks = [p for p in self.run_hook()['packages'] if p['name'] == 'demo']
+        self.assertEqual(len({p['SPDXID'] for p in forks}), 2)
+        self.assertEqual({p['externalRefs'][0]['referenceLocator'] for p in forks}, {'pkg:cargo/demo@1.0'})
         self.assertTrue(any(r['relationshipType'] == 'DEPENDS_ON'
                             and {r['spdxElementId'], r['relatedSpdxElement']} == ids
                             for r in result['relationships']))
