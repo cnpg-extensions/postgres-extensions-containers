@@ -235,7 +235,7 @@ jobs:
       ref: ${{ needs.discover.outputs.ref }}
       cnpg_version: ${{ inputs.cnpg_version }}
   gate:
-    name: Source-build automerge gate
+    name: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && 'Source-build automerge gate (fork preview)' || 'Source-build automerge gate' }}
     if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     needs:
     - discover
