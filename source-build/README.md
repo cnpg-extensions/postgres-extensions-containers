@@ -4,8 +4,6 @@
 
 Building from source is an exception for toolchain, dependency packaging and
 delivery obstacles, not a general alternative to contributing Debian packages.
-A technically feasible local build does not settle package ownership, archive
-acceptance or dependency backport publication for the required distributions.
 
 For extensions whose build tools and dependencies are readily available
 in the Debian ecosystem, contributors are expected to package the extension for
