@@ -96,6 +96,19 @@ tools live under `source-build/pgrx/`:
 | [`dependencies/`](dependencies/) | Rust, rustup, and cargo-about version configuration for extension builders. |
 | [`tests/`](tests/) | PGRX tests, run with `python3 source-build/test.py`. |
 
+### Test files
+
+Tests follow recipe configuration, evidence collection and SBOM generation.
+Run them through the shared runner with `python3 source-build/test.py`.
+
+| Test file | Implementation tested | Coverage |
+| --- | --- | --- |
+| [`tests/test_build_config.py`](tests/test_build_config.py) | [`build_config.py`](build_config.py) | Cargo default features, PostgreSQL feature replacement and explicit feature selection. |
+| [`tests/test_evidence.py`](tests/test_evidence.py) | [`evidence.py`](evidence.py) | Runtime payload paths and hashes, registry identity checks for Git dependencies and registry lookup failures. |
+| [`tests/test_cargo_graph.py`](tests/test_cargo_graph.py) | [`sbom/augment_spdx.py`](sbom/augment_spdx.py) | Optional and renamed dependencies, transitive feature activation and platform-specific dependency selection. |
+| [`tests/test_hook.py`](tests/test_hook.py) | [`sbom/augment_spdx.py`](sbom/augment_spdx.py) | Runtime dependency selection, crate identities, license expressions and notices, scanner input filtering and preservation of generator records. |
+| [`tests/test_spdx_conformance.py`](tests/test_spdx_conformance.py) | [`sbom/augment_spdx.py`](sbom/augment_spdx.py) and the shared SBOM composer | Composed SPDX validity, shipped system-library selection and preservation of file inventory, ownership and license records. |
+
 See the [shared source-build guide](../README.md) for dependency evidence,
 local builds, tooling tests and image verification.
 
