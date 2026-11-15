@@ -63,15 +63,6 @@ bundled, or statically linked dependency evidence that automatic discovery misse
 The [dependency evidence requirements](#dependency-evidence-in-the-sbom) apply;
 an existing CVE is not required.
 
-A Universe proposal must identify the problematic dependencies, their availability
-in the relevant Debian ecosystem, and the concrete packaging, maintenance or delivery obstacles that prevent
-an installable package set for the required targets. Project maintainers review that rationale in
-the proposal/PR; a working Dockerfile alone does not establish eligibility. Keep
-the packaging rationale and SBOM overview self-contained in a short `PACKAGING.md`
-beside the recipe. Keep the extension README focused on installation and use. If the obstacles are resolved, prefer
-transitioning to the Debian path while preserving consumer identities where
-possible.
-
 Universe recipes have no equivalent common language toolchain to supply that
 evidence. Each recipe requires careful individual review and implementation of
 dependency boundaries, actual versions, applicable licenses, attribution and
