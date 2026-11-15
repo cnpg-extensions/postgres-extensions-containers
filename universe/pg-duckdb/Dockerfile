@@ -37,6 +37,9 @@ RUN make clean-all \
     && make install \
     && DESTDIR=/install make install
 
+# Resolve Snappy's compiler-selected version for the SBOM hook.
+RUN "${DUCKDB_CXX}" -dM -E -x c++ third_party/duckdb/third_party/snappy/snappy-stubs-public.h > /build/snappy-version.h
+
 # Stage additional system libraries and their notices using the shared helper.
 COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh
 RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so"

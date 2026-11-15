@@ -21,9 +21,11 @@ with `pkg:deb/debian` identifiers, to enable Debian vulnerability matching.
 
 **Versions describe the upstream code actually compiled.** They do not use the
 current unstable binary versions, invent Debian revision suffixes, or claim
-Debian security patches were applied. The compiled Clang configuration selects
-Snappy 1.2.1; GCC would select a different bundled Snappy version and requires
-an inventory review. Source URLs are recorded in `downloadLocation`; the document
+Debian security patches were applied. The hook reads pg_duckdb's control file,
+DuckDB's generated CMake version file and the bundled libraries' version macros.
+For Snappy, the Dockerfile preprocesses its header with the build compiler so
+the hook reads the selected Clang/GCC variant. Missing or ambiguous version
+definitions fail SBOM generation instead of silently retaining an old version. Source URLs are recorded in `downloadLocation`; the document
 scope explains that the Debian identities are source-built scanner mappings.
 
 ### Copyright snapshot and version mapping
@@ -60,7 +62,7 @@ inventories shipped files; the hook does not repeat builder-to-final comparisons
 Readable source-package SPDX IDs and explicit relationships associate the two
 known binaries with pg_duckdb and DuckDB.
 The Dockerfile copies the explicitly listed common-license texts. Maintain the
-static inventory and copyright snapshot when sources or build settings change;
+package mappings and copyright snapshot when sources or build settings change;
 source revisions are not enforced by the build.
 
 ### Scanner interpretation and file ownership
@@ -100,10 +102,18 @@ the standard SPDX document described in the
 The original native build passed PostgreSQL preload, `CREATE EXTENSION` and a
 forced `DuckDBScan` query. Follow-up SBOM checks reuse that compiled amd64 builder;
 they do not establish fresh compilation, ARM64 or hosted signing/SLSA acceptance.
-The local checks passed 41 shared tests, verified all eight copyright copies
+The local checks passed 43 shared tests, verified all eight copyright copies
 against their Debian source archives, and exercised the actual BuildKit SPDX
 through Grype. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
 matching; scanner matches on the real document still require applicability review.
+
+## Release updates
+
+Renovate tracks production GitHub releases of pg_duckdb and updates the source
+tag and SQL version together. Alpha, beta, RC and GitHub-marked prereleases are
+excluded. Updates remain reviewable PRs under the existing Universe policy.
+Bundled versions are read from the build, but SQL compatibility, Debian package
+names and the checked-in copyright snapshots still need release review.
 
 ## Source acquisition
 

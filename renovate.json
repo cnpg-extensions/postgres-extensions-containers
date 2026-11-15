@@ -131,12 +131,24 @@
       "description": "Track Universe source releases; SQL versions require release review",
       "customType": "regex",
       "managerFilePatterns": [
-        "/^universe/[^/]+/metadata\\.hcl$/"
+        "universe/!(pg-duckdb)/metadata.hcl"
       ],
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "depTypeTemplate": "universe-source"
+    },
+    {
+      "description": "Synchronize pg_duckdb production release and SQL versions",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^universe/pg-duckdb/metadata\\.hcl$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
+      ],
+      "depTypeTemplate": "universe-source",
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}package = \"{{{newValue}}}\"\n{{{indentation}}}sql     = \"{{{replace '^v' '' newValue}}}\""
     }
   ],
   "packageRules": [
@@ -250,6 +262,20 @@
       "ignoreUnstable": true,
       "prBodyNotes": [
         "Verify shipped control/upgrade SQL and bundled dependency evidence before accepting a source release. Source version updates do not establish SQL or embedded dependency versions."
+      ]
+    },
+    {
+      "description": "Track only production pg_duckdb releases",
+      "matchDepTypes": [
+        "universe-source"
+      ],
+      "matchPackageNames": [
+        "duckdb/pg_duckdb"
+      ],
+      "ignoreUnstable": true,
+      "allowedVersions": "/^v?\\d+\\.\\d+\\.\\d+$/",
+      "prBodyNotes": [
+        "The source tag and SQL version update together. Bundled versions are read from the build sources; review SQL compatibility, Debian package mappings and maintained copyright snapshots before merging."
       ]
     }
   ]

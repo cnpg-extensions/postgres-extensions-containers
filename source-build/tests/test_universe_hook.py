@@ -21,8 +21,27 @@ class HookComposition(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         self.final = self.root / 'final'
+        self.builder = self.root / 'builder'
+        self.build = self.builder / 'build'
+        duck = self.build / 'third_party/duckdb'
+        def write(path, text):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        write(self.build / 'pg_duckdb.control', "default_version = '1.2.0'\n")
+        write(duck / 'build/release/DuckDBConfigVersion.cmake', 'set(PACKAGE_VERSION "v2.0.0")\n')
+        for path, prefix, parts, version in [
+            ('brotli/common/version.h', 'BROTLI_VERSION_', ('MAJOR', 'MINOR', 'PATCH'), (1, 1, 0)),
+            ('lz4/lz4.hpp', 'LZ4_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'), (1, 9, 4)),
+            ('mbedtls/include/mbedtls/build_info.h', 'MBEDTLS_VERSION_', ('MAJOR', 'MINOR', 'PATCH'), (3, 6, 7)),
+            ('yyjson/include/yyjson.hpp', 'YYJSON_VERSION_', ('MAJOR', 'MINOR', 'PATCH'), (0, 9, 0)),
+            ('zstd/include/zstd.h', 'ZSTD_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'), (1, 5, 6)),
+            ('zstd/include/zstd/common/xxhash.hpp', 'XXH_VERSION_', ('MAJOR', 'MINOR', 'RELEASE'), (0, 6, 2)),
+        ]:
+            write(duck / 'third_party' / path, ''.join(f'#define {prefix}{part} {value} /* upstream */\n'
+                                                     for part, value in zip(parts, version)))
+        write(self.build / 'snappy-version.h', '#define SNAPPY_MAJOR 1\n#define SNAPPY_MINOR 2\n#define SNAPPY_PATCHLEVEL 1\n')
         self.document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[], files=[], relationships=[])
-        self.context = SimpleNamespace(api_version=1, final_path=self.final, platform='linux/arm64')
+        self.context = SimpleNamespace(api_version=1, builder_path=self.builder, final_path=self.final, platform='linux/arm64')
         self.add_file('lib/pg_duckdb.so', 'extension binary')
         self.add_file('system/libduckdb.so', 'engine binary')
         self.add_file('share/extension/pg_duckdb.control', 'control')
@@ -93,6 +112,29 @@ class HookComposition(unittest.TestCase):
         self.assertEqual(urlsplit(purl).path, 'deb/debian/libzstd1@1.5.6')
         self.assertEqual(parse_qs(urlsplit(purl).query),
                          dict(arch=['arm64'], distro=['debian-unstable'], upstream=['libzstd']))
+
+    def test_versions_follow_source_updates(self):
+        (self.build / 'pg_duckdb.control').write_text("default_version = '1.3.0'\n")
+        header = self.build / 'third_party/duckdb/third_party/zstd/include/zstd.h'
+        header.write_text(header.read_text().replace('RELEASE 6', 'RELEASE 8'))
+        # Represents the older Snappy branch selected by GCC.
+        (self.build / 'snappy-version.h').write_text(
+            '#define SNAPPY_MAJOR 1\n#define SNAPPY_MINOR 1\n#define SNAPPY_PATCHLEVEL 7\n')
+        result = self.run_hook()
+        packages = {p['name']: p for p in result['packages']}
+        self.assertEqual(packages['pg_duckdb']['versionInfo'], '1.3.0')
+        self.assertTrue(packages['pg_duckdb']['downloadLocation'].endswith('/v1.3.0'))
+        self.assertEqual(packages['libsnappy1v5']['versionInfo'], '1.1.7')
+        self.assertIn('libzstd1@1.5.8?', packages['libzstd1']['externalRefs'][0]['referenceLocator'])
+
+    def test_missing_or_ambiguous_version_fails(self):
+        header = self.build / 'snappy-version.h'
+        header.write_text(header.read_text() + '#define SNAPPY_MAJOR 2\n')
+        with self.assertRaisesRegex(ValueError, 'expected one version'):
+            self.run_hook()
+        header.write_text('')
+        with self.assertRaisesRegex(ValueError, 'expected one version'):
+            self.run_hook()
 
     def test_consolidated_notices_preserved_by_hook(self):
         result = self.run_hook()

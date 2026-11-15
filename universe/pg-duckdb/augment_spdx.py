@@ -1,23 +1,54 @@
 """Shared cnpg-sbom-generator augment_spdx API v1; no intermediate manifest."""
 from copy import deepcopy
 import hashlib
+import re
 from pathlib import Path
 from urllib.parse import urlencode
 
 # Debian unstable package names; versions are the upstream code actually built,
 # without Debian revisions or a claim that Debian patches were applied.
-# binary name: (Debian source name, compiled version, vendor path)
+# binary name: (Debian source name, vendor path)
 DEBIAN_PACKAGES = {
-    'libduckdb2.0': ('duckdb', '2.0.0', ''),
-    'libbrotli1': ('brotli', '1.1.0', 'third_party/brotli'),
-    'liblz4-1': ('lz4', '1.9.4', 'third_party/lz4'),
-    'libmbedcrypto16': ('mbedtls', '3.6.7', 'third_party/mbedtls'),
-    # The default Clang build selects SNAPPY_NEW_VERSION (1.2.1).
-    'libsnappy1v5': ('snappy', '1.2.1', 'third_party/snappy'),
-    'libyyjson0': ('yyjson', '0.9.0', 'third_party/yyjson'),
-    'libzstd1': ('libzstd', '1.5.6', 'third_party/zstd'),
-    'libxxhash0': ('xxhash', '0.6.2', 'third_party/zstd'),
+    'libduckdb2.0': ('duckdb', ''),
+    'libbrotli1': ('brotli', 'third_party/brotli'),
+    'liblz4-1': ('lz4', 'third_party/lz4'),
+    'libmbedcrypto16': ('mbedtls', 'third_party/mbedtls'),
+    'libsnappy1v5': ('snappy', 'third_party/snappy'),
+    'libyyjson0': ('yyjson', 'third_party/yyjson'),
+    'libzstd1': ('libzstd', 'third_party/zstd'),
+    'libxxhash0': ('xxhash', 'third_party/zstd'),
 }
+
+
+def read_version(path, pattern):
+    matches = re.findall(pattern, path.read_text(), re.MULTILINE)
+    if len(matches) != 1:
+        raise ValueError('expected one version in ' + str(path))
+    return matches[0]
+
+
+def header_version(path, prefix, parts=('MAJOR', 'MINOR', 'PATCH')):
+    return '.'.join(read_version(path, r'^#define\s+' + prefix + part + r'\s+(\d+)\b')
+                    for part in parts)
+
+
+def source_versions(builder):
+    build = Path(builder) / 'build'
+    duck = build / 'third_party/duckdb'
+    vendor = duck / 'third_party'
+    return {
+        'pg_duckdb': read_version(build / 'pg_duckdb.control', r"^default_version\s*=\s*'([^']+)'"),
+        'libduckdb2.0': read_version(duck / 'build/release/DuckDBConfigVersion.cmake',
+                                   r'^set\(PACKAGE_VERSION "v?([^"]+)"\)'),
+        'libbrotli1': header_version(vendor / 'brotli/common/version.h', 'BROTLI_VERSION_'),
+        'liblz4-1': header_version(vendor / 'lz4/lz4.hpp', 'LZ4_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
+        'libmbedcrypto16': header_version(vendor / 'mbedtls/include/mbedtls/build_info.h', 'MBEDTLS_VERSION_'),
+        # Preprocessed by the build compiler: Snappy selects Clang/GCC variants.
+        'libsnappy1v5': header_version(build / 'snappy-version.h', 'SNAPPY_', ('MAJOR', 'MINOR', 'PATCHLEVEL')),
+        'libyyjson0': header_version(vendor / 'yyjson/include/yyjson.hpp', 'YYJSON_VERSION_'),
+        'libzstd1': header_version(vendor / 'zstd/include/zstd.h', 'ZSTD_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
+        'libxxhash0': header_version(vendor / 'zstd/include/zstd/common/xxhash.hpp', 'XXH_VERSION_', ('MAJOR', 'MINOR', 'RELEASE')),
+    }
 
 
 def debian_purl(name, source, version, arch):
@@ -29,6 +60,7 @@ def augment_spdx(document, context):
     if context.api_version != 1:
         raise ValueError('unsupported hook API')
     final = Path(context.final_path)
+    versions = source_versions(context.builder_path)
     result = deepcopy(document)
     files = {p['fileName'].removeprefix('./'): p for p in result['files']}
     # Copied Debian copyright/common-license files can make the shared scan
@@ -73,12 +105,14 @@ def augment_spdx(document, context):
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
         return sid
 
-    pg_id = add_package('pg_duckdb', '1.2.0', 'pkg:github/duckdb/pg_duckdb@v1.2.0',
-                        'https://github.com/duckdb/pg_duckdb/tree/v1.2.0')
+    pg_version = versions['pg_duckdb']
+    pg_id = add_package('pg_duckdb', pg_version, 'pkg:github/duckdb/pg_duckdb@v' + pg_version,
+                        'https://github.com/duckdb/pg_duckdb/tree/v' + pg_version)
     ids = {}
     arch = {'linux/amd64': 'amd64', 'linux/arm64': 'arm64'}[context.platform]
-    for name, (source, version, vendor) in DEBIAN_PACKAGES.items():
-        url = 'https://github.com/duckdb/duckdb/tree/v' + DEBIAN_PACKAGES['libduckdb2.0'][1] + ('/' + vendor if vendor else '')
+    for name, (source, vendor) in DEBIAN_PACKAGES.items():
+        version = versions[name]
+        url = 'https://github.com/duckdb/duckdb/tree/v' + versions['libduckdb2.0'] + ('/' + vendor if vendor else '')
         ids[name] = add_package(name, version, debian_purl(name, source, version, arch), url)
 
     relate(result['SPDXID'], 'DESCRIBES', pg_id)
