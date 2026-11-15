@@ -129,7 +129,7 @@ jobs:
           filters: |
             _shared:
               - 'docker-bake.hcl'
-              - 'docker-bake-source.hcl'
+              - 'docker-bake-universe.hcl'
               - 'source-build/**'
               - '!source-build/pgrx/**'
               - '!source-build/universe/**'
