@@ -235,8 +235,7 @@ Use established SPDX fields and Package URL types:
 
 Use the shared generator's existing augmentation hook for missing source-built
 components. Evidence must describe the selected sources and final payload;
-use recipe build steps and the shared shipped-file inventory to associate them. Builder reports and recipe helpers are
-private implementation details, not a second consumer schema. Do not publish
+use recipe build steps and the shared shipped-file inventory to associate them. Do not publish
 custom JSON annotations, identifier qualifiers, sidecars or attestations as an
 alternative API. SPDX identifiers and document namespaces are opaque;
 `sourceInfo` is optional human-readable context, not a parseable contract.
