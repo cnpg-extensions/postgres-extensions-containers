@@ -86,6 +86,17 @@ setting, matching the image's catalog metadata.
 
 - `pg_search` requires `vector` from [pgvector](https://github.com/pgvector/pgvector).
   Install or mount pgvector before creating `pg_search`.
+- With pg_search 0.26.6 preloaded, creating pg_duckdb 1.2.0 before
+  pg_search in the same connection can make `CREATE INDEX ... USING paradedb`
+  fail with `XX000: relation is not a ParadeDB index`, even with
+  `duckdb.force_execution = off`. On native AMD64 PostgreSQL 18 / Trixie /
+  CNPG 1.30.1, creating pg_search before pg_duckdb or reconnecting after
+  extension installation passed the BM25 match, ranking, and index-maintenance
+  assertions. An eleven-extension composition plus pgvector passed
+  with that connection boundary and the original preload order. `DISCARD ALL`
+  did not resolve the same-session failure. This is an installation-session
+  limitation; reconnecting avoids it without disabling extension hooks or
+  weakening the search checks. Other platforms were not tested for this issue.
 
 ## Contributors
 
