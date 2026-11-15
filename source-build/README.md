@@ -384,10 +384,10 @@ per-extension builds after discovery.
 
 | Test file | Implementation tested | Coverage |
 | --- | --- | --- |
-| [`test_discovery.py`](tests/test_discovery.py) | [`workflow.py`](workflow.py) | Location-derived families, recipe boundaries, duplicate names and wrong-family selections. |
-| [`test_inputs.py`](tests/test_inputs.py) | [`source.py`](source.py), [`prepare.py`](prepare.py) | GitLab source resolution and architecture-specific base-image selection. |
-| [`test_native_builds.py`](tests/test_native_builds.py) | [`prepare.py`](prepare.py), [`build.py`](build.py) | Separate native-platform build definitions and rejection of mismatched host, daemon or worker architectures. |
-| [`test_universe_hook.py`](tests/test_universe_hook.py) | [`pg-duckdb/augment_spdx.py`](../universe/pg-duckdb/augment_spdx.py) | pg-duckdb dependency identities, vendor versions, notice preservation, binary associations and preservation of existing SBOM records. |
-| [`test_assembly.py`](tests/test_assembly.py) | [`assemble.py`](assemble.py) | Complete platform coverage and preservation of image and attestation descriptors during assembly. |
-| [`test_registry.py`](tests/test_registry.py) | [`assemble.py`](assemble.py) | Waiting for the expected registry index digest and rejecting stale or different index contents. |
+| [`tests/test_discovery.py`](tests/test_discovery.py) | [`workflow.py`](workflow.py) | Location-derived families, recipe boundaries, duplicate names and wrong-family selections. |
+| [`tests/test_inputs.py`](tests/test_inputs.py) | [`source.py`](source.py), [`prepare.py`](prepare.py) | GitLab source resolution and architecture-specific base-image selection. |
+| [`tests/test_native_builds.py`](tests/test_native_builds.py) | [`prepare.py`](prepare.py), [`build.py`](build.py) | Separate native-platform build definitions and rejection of mismatched host, daemon or worker architectures. |
+| [`tests/test_universe_hook.py`](tests/test_universe_hook.py) | [`pg-duckdb/augment_spdx.py`](../universe/pg-duckdb/augment_spdx.py) | pg-duckdb dependency identities, vendor versions, notice preservation, binary associations and preservation of existing SBOM records. |
+| [`tests/test_assembly.py`](tests/test_assembly.py) | [`assemble.py`](assemble.py) | Complete platform coverage and preservation of image and attestation descriptors during assembly. |
+| [`tests/test_registry.py`](tests/test_registry.py) | [`assemble.py`](assemble.py) | Waiting for the expected registry index digest and rejecting stale or different index contents. |
 | [`test.py`](test.py) | Runs [`tests/`](tests/) and [`pgrx/tests/`](pgrx/tests/) | Shared entrypoint: discovers both suites, rejects empty PGRX discovery and exits unsuccessfully if any test fails. |
