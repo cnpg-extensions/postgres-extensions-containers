@@ -50,7 +50,9 @@ class HookComposition(unittest.TestCase):
             duck = next(p for p in result['packages'] if p['name'] == 'duckdb')
             self.assertEqual(duck['versionInfo'], '2.0.0')
             self.assertEqual(duck['externalRefs'][0]['referenceLocator'], 'pkg:github/duckdb/duckdb@duck-sha')
-            self.assertEqual(duck['licenseDeclared'], 'MIT')
+            self.assertTrue(duck['licenseDeclared'].startswith('LicenseRef-'))
+            self.assertNotIn('cldr', [p['name'] for p in result['packages']])
+            self.assertNotIn('Unicode Character Database', [p['name'] for p in result['packages']])
 
     def test_revision_notices_and_payload_binding(self):
         hook = load('augment_spdx')
@@ -85,6 +87,58 @@ class HookComposition(unittest.TestCase):
             (root / 'final' / path).write_text('notice lost during staging')
             with self.assertRaisesRegex(ValueError, 'builder/final payload mismatch'):
                 hook.augment_spdx(document, context)
+
+    def test_debian_boundaries_preserve_notices_and_real_package_origins(self):
+        hook = load('augment_spdx')
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'build').mkdir()
+            components = []
+            for name, parent, counterpart in [
+                ('pg_duckdb', None, None), ('PostgreSQL', 'pg_duckdb', None),
+                ('duckdb', 'pg_duckdb', None), ('re2', 'duckdb', None),
+                ('jemalloc', 'duckdb', None), ('cldr', 'duckdb', None),
+                ('lz4', 'duckdb', 'liblz4-1'), ('zstd', 'duckdb', 'libzstd1'),
+                ('xxhash', 'zstd', 'libxxhash0'),
+            ]:
+                components.append(dict(name=name, version='1.0', revision='sha',
+                    parent=parent, debian_package=counterpart,
+                    repository='https://github.com/example/' + name,
+                    purl='pkg:github/example/' + name + '@1.0',
+                    notices=['licenses/' + name + '/LICENSE'],
+                    license='MIT', copyright='Copyright ' + name,
+                    license_text='Original terms for ' + name))
+            files = [dict(SPDXID='SPDXRef-file-' + c['name'],
+                          fileName='./' + c['notices'][0]) for c in components]
+            files += [dict(SPDXID='SPDXRef-pg-so', fileName='./lib/pg_duckdb.so'),
+                      dict(SPDXID='SPDXRef-duck-so', fileName='./system/libduckdb.so')]
+            debian = dict(SPDXID='SPDXRef-debian-lz4', name='liblz4-1',
+                          externalRefs=[dict(referenceType='purl',
+                                             referenceLocator='pkg:deb/debian/liblz4-1@1.10')])
+            document = dict(SPDXID='SPDXRef-DOCUMENT', packages=[debian], files=files,
+                            relationships=[], comment='Existing generator scope')
+            (root / 'build/universe-evidence.json').write_text(json.dumps(
+                dict(components=components, payload=[])))
+            result = hook.augment_spdx(document, SimpleNamespace(api_version=1, builder_path=root))
+            packages = {p['name']: p for p in result['packages']}
+            self.assertEqual(set(packages), {'liblz4-1', 'pg_duckdb', 'duckdb', 'lz4', 'zstd', 'xxhash'})
+            self.assertEqual(packages['liblz4-1'], debian)
+            self.assertEqual(packages['lz4']['externalRefs'][0]['referenceLocator'],
+                             'pkg:github/example/lz4@1.0')
+            self.assertIn('not installed by dpkg', packages['lz4']['sourceInfo'])
+            licenses = {p['licenseId']: p['extractedText'] for p in result['hasExtractedLicensingInfos']}
+            for parent, children in [('pg_duckdb', ['PostgreSQL']), ('duckdb', ['re2', 'jemalloc', 'cldr'])]:
+                for name in [parent] + children:
+                    self.assertIn('Original terms for ' + name, licenses[packages[parent]['licenseDeclared']])
+                    self.assertIn(dict(spdxElementId=packages[parent]['SPDXID'],
+                        relationshipType='DISTRIBUTION_ARTIFACT', relatedSpdxElement='SPDXRef-file-' + name),
+                        result['relationships'])
+            self.assertIn(dict(spdxElementId=packages['zstd']['SPDXID'], relationshipType='DEPENDS_ON',
+                               relatedSpdxElement=packages['xxhash']['SPDXID']), result['relationships'])
+            self.assertIn(dict(spdxElementId='SPDXRef-duck-so', relationshipType='GENERATED_FROM',
+                               relatedSpdxElement=packages['duckdb']['SPDXID']), result['relationships'])
+            self.assertTrue(result['comment'].startswith('Existing generator scope'))
+            self.assertIn('not an exhaustive', result['comment'])
 
     def test_miniz_source_version_is_not_its_compatibility_version(self):
         evidence = load('evidence')

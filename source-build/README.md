@@ -130,9 +130,16 @@ makes shared tools and resources available inside both families' builders.
 
 ## Dependency evidence in the SBOM
 
-The final SPDX SBOM must include shipped dependencies, including bundled and
-statically linked components that automatic scanning misses. Each dependency
-must use its canonical upstream or ecosystem package name, including the name
+The final SPDX SBOM must include shipped dependencies at the recipe's documented
+package boundaries, including source-built counterparts of separately packaged
+Debian libraries that automatic scanning misses. The
+[pg_duckdb boundary](../universe/pg-duckdb/PACKAGING.md#sbom-contents) follows
+Debian DuckDB packaging: internal bundled code remains covered by its containing
+package, complete notices and aggregated license terms. It is not a separate
+package inventory of every embedded component. Never suppress actual shipped
+Debian package records or invent Debian ownership for source-built copies.
+Each separately reported dependency must use its canonical upstream or ecosystem
+package name, including the name
 used by vulnerability advisories where applicable. This matters even when no CVE
 exists today: future advisories should be matchable to the shipped component.
 Do not substitute a recipe-local nickname for an established package identity.

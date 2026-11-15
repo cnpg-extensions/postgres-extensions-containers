@@ -49,6 +49,15 @@ SOURCE_NAMES = {
 }
 
 
+# Debian DuckDB 2.0.0+dfsg2 uses these as separate system-library packages.
+# This is an SBOM reporting boundary, not a claim that our copies came from dpkg.
+DEBIAN_LIBRARY_PACKAGES = {
+    'yyjson': 'libyyjson0', 'lz4': 'liblz4-1', 'zstd': 'libzstd1',
+    'brotli': 'libbrotli1', 'mbedtls': 'libmbedcrypto16',
+    'snappy': 'libsnappy1v5', 'xxhash': 'libxxhash0',
+}
+
+
 def runtime_inputs(builddir):
     # Follow only the shipped shared library's build graph, excluding loadable
     # extensions that upstream builds but does not install into its Docker image.
@@ -141,16 +150,17 @@ def main():
     assert 'not found' not in listing, listing
     components = []
 
-    def component(name, version, repo, revision, directory, parent, purl=None):
+    def component(name, version, repo, revision, directory, parent, purl=None, source_files=None):
         notices = []
-        candidates = directory.iterdir() if name in {'pg_duckdb', 'duckdb'} else directory.rglob('*')
+        candidates = source_files if source_files is not None else (
+            directory.iterdir() if name in {'pg_duckdb', 'duckdb'} else directory.rglob('*'))
         for path in sorted(candidates):
             if path.is_file() and re.match(r'^(LICENSE|COPYING|NOTICE|COPYRIGHT)', path.name, re.I):
                 target = PAYLOAD / 'licenses' / name / path.relative_to(directory)
                 copy(path, target)
                 notices.append(str(target.relative_to(PAYLOAD)))
         if name not in {'pg_duckdb', 'duckdb'}:
-            for path in sorted(directory.rglob('*')):
+            for path in sorted(source_files if source_files is not None else directory.rglob('*')):
                 if path.suffix not in {'.h', '.hpp', '.c', '.cpp', '.cc'}:
                     continue
                 text = path.read_text(errors='replace')
@@ -164,7 +174,8 @@ def main():
         notice_text = '\n\n'.join((PAYLOAD / notice).read_text(errors='replace') for notice in notices)
         license_id, copyright = license_evidence(notice_text, name) if notice_text else ('NOASSERTION', 'NOASSERTION')
         components.append(dict(license=license_id, copyright=copyright, license_text=notice_text,name=name, version=version, repository=repo, revision=revision,
-                               parent=parent, purl=purl, notices=notices))
+                               parent=parent, purl=purl, notices=notices,
+                               debian_package=DEBIAN_LIBRARY_PACKAGES.get(name)))
 
     component('pg_duckdb', evidence['version'].removeprefix('v'), evidence['repository'], evidence['revision'], BUILD, None,
               'pkg:github/duckdb/pg_duckdb@' + evidence['version'])
@@ -198,6 +209,23 @@ def main():
             component(name, version, repo, revision + ':third_party/' + directory.name,
                       directory, parent, purl)
             components[-1]['source_url'] = ('https://github.com/duckdb/duckdb/tree/' + revision + '/third_party/' + directory.name)
+    # xxHash is nested in Zstandard's source tree but Debian links libxxhash0
+    # separately. Do not lose this boundary merely because it has no top-level
+    # third_party directory. Preserve its own source notices and real version.
+    xxhash = DUCK / 'third_party/zstd/include/zstd/common/xxhash.hpp'
+    xxhash_source = DUCK / 'third_party/zstd/common/xxhash.cpp'
+    if str(xxhash_source) in selected or str(xxhash) in selected:
+        text = xxhash.read_text()
+        version = '.'.join(re.search(r'^#define\s+XXH_VERSION_' + part + r'\s+(\d+)', text, re.M)[1]
+                           for part in ('MAJOR', 'MINOR', 'RELEASE'))
+        component('xxhash', version, 'https://github.com/Cyan4973/xxHash',
+                  evidence['duckdb_revision'] + ':third_party/zstd',
+                  DUCK / 'third_party/zstd', 'zstd',
+                  'pkg:github/Cyan4973/xxHash@' + version,
+                  source_files=[xxhash, xxhash_source])
+        components[-1]['source_url'] = ('https://github.com/duckdb/duckdb/blob/'
+                                       + evidence['duckdb_revision']
+                                       + '/third_party/zstd/include/zstd/common/xxhash.hpp')
     icu = DUCK / 'extension/icu'
     for filename, patterns in [
         ('datetime/generated/tz_data.cpp', [('tzdata', r'IANA release ([0-9]+[a-z]+)')]),

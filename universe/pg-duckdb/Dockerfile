@@ -20,7 +20,7 @@ RUN /usr/local/bin/capture_base_image_libs.sh
 # Build tools and system development libraries.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential ca-certificates curl git cmake ninja-build python3 pkg-config clang ccache \
-    libssl-dev libcurl4-openssl-dev liblz4-dev postgresql-server-dev-${PG_MAJOR} \
+    libssl-dev libcurl4-openssl-dev liblz4-dev libicu-dev postgresql-server-dev-${PG_MAJOR} \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /build
 # Follow upstream's checkout procedure at the release selected by metadata.
