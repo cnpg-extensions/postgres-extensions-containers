@@ -32,7 +32,8 @@ Closes #<!-- proposal issue id -->
       issue exists and is referenced via `Closes #<id>` above.
 - [ ] The commit message follows the format:
       ``feat: add `<extension-name>` container image``.
-- [ ] The Debian package was verified in `main` on the supported distributions,
+- [ ] For a Debian recipe, the package was verified in `main` on both Debian
+      `stable` (`trixie`) and `oldstable` (`bookworm`),
       or the proposal documents the reason for a PGRX/Universe source build.
 - [ ] The extension follows its family templates (Debian, PGRX or Universe),
       and all generated `TODO` comments were resolved.

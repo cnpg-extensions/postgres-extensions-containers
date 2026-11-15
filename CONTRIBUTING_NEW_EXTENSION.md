@@ -34,10 +34,11 @@ Before proposing a change, ensure your local machine is compatible with the
 
 To maintain high standards and avoid duplicated effort or architectural
 conflicts, every new extension begins with a formal proposal.
-Prefer an extension available as a
-Debian package in the `main` component (which by definition complies with
+For the Debian framework, the extension must be available as a Debian package
+on both current `stable` and `oldstable`, in the `main` component (which by definition complies with
 the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
-from a trusted, auditable repository, and identify its versioning logic. The PGDG (PostgreSQL Global Development Group) repository is the
+from a trusted, auditable repository. Identify its versioning logic.
+The PGDG (PostgreSQL Global Development Group) repository is the
 recommended source; other Debian repositories are acceptable provided they meet
 the same standards. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
 Other source builds must justify their dependency-packaging obstacles under the

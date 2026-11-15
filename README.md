@@ -168,7 +168,8 @@ When proposing a new extension, the following criteria must be met:
 - **Structure:** only one extension can be included within an extension folder.
 - **Debian Packages:** Prefer extensions available as Debian packages in the `main` component (which by definition complies with
   the [DFSG](https://www.debian.org/social_contract#guidelines)), sourced from
-  a trusted, auditable repository.
+  a trusted, auditable repository. Extensions added through the Debian framework
+  must have packages available for both current Debian `stable` and `oldstable`.
   The [PostgreSQL Global Development Group (PGDG)](https://wiki.postgresql.org/wiki/Apt)
   is the recommended source, but other Debian repositories are acceptable
   provided they meet the same standards. Rust extensions use the [PGRX path](pgrx/README.md);
