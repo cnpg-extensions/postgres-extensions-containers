@@ -28,10 +28,11 @@ by the extension, and configure root Renovate rules for verified mappings.
 Unlike PGRX's Cargo helpers, Universe has no general dependency-discovery or
 license-collection helper. Each recipe must identify its bundled/static runtime
 components, stage required libraries and original notices, and provide evidence
-for the shared generator. The template's `acquire.py`, `evidence.py` and
-`augment_spdx.py` names are examples of recipe-owned files, not supplied utilities.
-Use inline Dockerfile commands where sufficient; do not create scripts just to
-match the example names.
+for the shared generator. Download source archives directly in the Dockerfile,
+including any nested dependencies pinned by the selected release. The template's
+`evidence.py` and `augment_spdx.py` names are examples of recipe-owned files, not
+supplied utilities. Use inline commands where sufficient; do not create scripts
+just to match the example names.
 
 Preserve the generator's OS package ownership and shipped-file inventory. A hook
 adds source-built packages with accurate names, versions or revisions, dependency

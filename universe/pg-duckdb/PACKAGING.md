@@ -47,8 +47,10 @@ unresolved license information does not itself establish compliance with the
 
 ## Source acquisition
 
-`acquire.py` owns the repository URL, resolves `EXT_VERSION` during acquisition,
-and downloads that commit and its matching nested sources. Preparation does not
+The Dockerfile downloads the source archives with `curl` and extracts them with
+`tar`. It resolves `EXT_VERSION` once, reads the DuckDB gitlink from that commit
+and the httpfs pin from its CMake configuration, and downloads matching nested
+sources. It records the selected revisions for the recipe-owned evidence step. Preparation does not
 freeze tags across platforms: a moved tag can select different commits in
 separate builds. BuildKit can reuse a cached acquisition for an unchanged recipe
 and version; invalidate that cache when a fresh tag lookup is needed. This recipe
