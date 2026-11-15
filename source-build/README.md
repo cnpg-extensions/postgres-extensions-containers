@@ -47,9 +47,7 @@ Debian packaging independently.
 The PGRX framework automates Rust dependency selection, package identities and
 versions, license evidence and notice collection, and integration with the shared
 SBOM generator. This makes the compliance and dependency-management work
-repeatable across PGRX extensions; maintainers still review licensing decisions,
-evidence completeness and exceptional dependencies. Automation does not itself
-establish legal compliance.
+repeatable across PGRX extensions.
 
 Universe covers other source builds with complex dependency packaging or
 delivery obstacles. For pg_duckdb, unresolved Debian/PGDG package ownership,
