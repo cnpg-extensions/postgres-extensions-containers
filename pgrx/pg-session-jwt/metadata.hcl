@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
-  source_repository        = "https://github.com/neondatabase/pg_session_jwt"
   name                     = "pg-session-jwt"
   sql_name                 = "pg_session_jwt"
   image_name               = "pg-session-jwt"

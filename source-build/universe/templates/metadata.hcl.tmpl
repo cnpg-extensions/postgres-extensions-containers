@@ -4,8 +4,7 @@ metadata = {
   name                     = "{{ .Name }}"
   sql_name                 = "{{ replaceAll .Name "-" "_" }}"
   image_name               = "{{ .Name }}"
-  # TODO: Set the upstream repository and SPDX license identifiers.
-  source_repository        = "https://github.com/<owner>/<repo>"
+  # TODO: Set SPDX license identifiers; the recipe owns its source URL.
   licenses                 = ["<SPDX-identifier>"]
 
   # TODO: Declare only required runtime settings; mirror them in the README.

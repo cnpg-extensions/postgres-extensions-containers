@@ -8,11 +8,39 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+from urllib.error import HTTPError
+from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 from build_config import RECIPES
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "sbom"))
 from augment_spdx import cargo_about_license_expressions, selected_graph
+
+
+def published_git_versions(packages):
+    """Keep crates.io's version records as internal evidence for Git identities."""
+    versions = []
+    identities = sorted(
+        {(p["name"], p["version"]) for p in packages.values()
+         if (p.get("source") or "").startswith("git+")}
+    )
+    for name, version in identities:
+        url = "https://crates.io/api/v1/crates/{}/{}".format(
+            quote(name, safe=""), quote(version, safe="")
+        )
+        try:
+            request = Request(url, headers={"User-Agent": "cnpg-extensions-sbom"})
+            with urlopen(request, timeout=60) as response:
+                record = json.load(response)["version"]
+        except HTTPError as error:
+            if error.code != 404:
+                raise
+            continue
+        if record["crate"] != name or record["num"] != version:
+            raise ValueError("crates.io returned a different package identity")
+        versions.append(record)
+    return {"versions": versions}
 
 
 def normalize_about(data):
@@ -102,7 +130,6 @@ def main():
     # PostgreSQL layout, and BuildKit TARGETPLATFORM identifies the OCI platform.
     extension = os.environ["PGRX_EXTENSION"]
     recipe = RECIPES[extension]
-    source = json.loads((directory / "source.json").read_text())
     major = os.environ["PG_MAJOR"]
     platform = os.environ["TARGETPLATFORM"]
     common = [
@@ -150,6 +177,9 @@ def main():
         config["features"],
         config["target_cfg"],
         config["rust_target"],
+    )
+    (directory / "cargo-published.json").write_text(
+        json.dumps(published_git_versions(packages), sort_keys=True) + "\n"
     )
     run(
         [
@@ -253,16 +283,15 @@ def main():
         }
         for name in ["cargo-metadata", "cargo-about"]
     }
+    reports["cargo-published"] = {
+        "path": "cargo-published.json",
+        "sha256": digest(directory / "cargo-published.json"),
+    }
     identity = {
         "extension": extension,
         "sql_name": sql_name,
-        "source_version": source["version"],
+        "source_version": os.environ["EXT_VERSION"],
         "sql_version": sql_version,
-        "repository": source["repository"],
-        "source_host": source["host"],
-        "source_url": source["url"],
-        "revision": source["revision"],
-        "archive_sha256": source["archive_sha256"],
     }
     manifest = {
         "schema_version": 2,

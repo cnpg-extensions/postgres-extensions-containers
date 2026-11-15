@@ -15,3 +15,6 @@ handling. Universe has no equivalent of the automatic PGRX Cargo helpers.
 The extension README documents installation and use. A separate `PACKAGING.md`
 explains the Debian packaging obstacles and summarizes SBOM contents; see
 [pg-duckdb](pg-duckdb/PACKAGING.md) for an example.
+
+For dependency identities, versions, licenses and source attribution, follow the
+shared [dependency evidence guidance](../source-build/README.md#dependency-evidence-in-the-sbom).

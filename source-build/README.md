@@ -44,6 +44,95 @@ relationships and licenses; it does not replace the generator. Runtime component
 and bundled data must meet the [licensing policy](../README.md#open-source-licensing-policy).
 Build-only dependencies must not be reported as part of the distributed payload.
 
+## Dependency evidence in the SBOM
+
+The final SPDX SBOM must include shipped dependencies, including bundled and
+statically linked components that automatic scanning misses. Each dependency
+must use its canonical upstream or ecosystem package name, including the name
+used by vulnerability advisories where applicable. This matters even when no CVE
+exists today: future advisories should be matchable to the shipped component.
+Do not substitute a recipe-local nickname for an established package identity.
+Matching still depends on scanner and advisory support. Unknown versions can
+broaden scanner matches as well as reduce coverage; missing identifiers can also
+limit automated matching.
+
+Use established SPDX fields and Package URL types:
+
+- Record the actual upstream version when known. A source-declared version can
+  be a useful, explicit approximation for a fork, as in the PGRX example below.
+  When no defensible version is available, omit optional `versionInfo`; do not
+  invent versions from repository commits and source paths. Distinguish source
+  versions from API compatibility macros.
+- Include an accurate standard PURL when the component's ecosystem and source
+  support one. Do not guess registry membership, CPEs, versions or identifiers
+  merely to satisfy a scanner. Preserve canonical names when a reliable PURL is
+  unavailable, and explain unresolved identity evidence in the recipe's packaging notes.
+- Express dependency relationships using standard SPDX relationships. Keep
+  distinct components distinct, including forks with the same name and version.
+- Preserve shipped-file inventory, runtime package ownership, checksums, license
+  expressions and original attribution/notices. Use SPDX `LicenseRef` and
+  extracted licensing information for terms without an applicable SPDX license
+  identifier. Associate required redistribution notices with the standard
+  `DISTRIBUTION_ARTIFACT` relationship.
+
+Use the shared generator's existing augmentation hook for missing source-built
+components. Evidence must describe the selected sources and final payload;
+validate their binding during the build. Builder reports and recipe helpers are
+private implementation details, not a second consumer schema. Do not publish
+custom JSON annotations, identifier qualifiers, sidecars or attestations as an
+alternative API. SPDX identifiers and document namespaces are opaque;
+`sourceInfo` is optional human-readable context, not a parseable contract.
+
+Source attribution remains available through recipes, standard source links and
+ordinary build provenance where captured. Exact source commit recovery is not a
+prerequisite for every build. Tags may move and acquisition may be cached; a
+build timestamp alone does not prove which commit a tag selected. Recipes may
+resolve commits privately when required to acquire matching nested dependencies.
+This does not introduce a new public source-identity contract.
+
+
+### Example: pg-search's Rust dependencies
+
+The pg-search 0.26.6 dependency graph includes Git forks of published Rust crates.
+Their Cargo package names are the identities used by RustSec and OSV advisories;
+repository names and dependency aliases are not substitutes. For example, the
+pinned Tantivy source declares package `tantivy` version `0.27.0`, so its standard
+PURL is `pkg:cargo/tantivy@0.27.0`. The fact that the source comes from ParadeDB's
+fork does not change the canonical crate name used for vulnerability matching.
+
+We intentionally use the version declared by the selected source as an
+approximation. A fork may include unreleased fixes or changes, so this can yield
+false positives or false negatives. Searching Git history for the latest
+published ancestor is not necessarily a better approximation: the inspected
+Tantivy fork declares `0.27.0`, but the highest stable, non-yanked release with an
+ancestor publication commit was `0.19.0`, because later release commits were on
+other branches. We preserve useful ecosystem identity without claiming exact
+release equivalence or inventing commit-based versions and PURL qualifiers.
+
+The PGRX helpers implement this policy deliberately:
+
+- [`evidence.py`](pgrx/evidence.py) obtains resolved package names and declared
+  versions from `cargo metadata`. For selected Git dependencies, it checks that
+  the exact name/version exists on crates.io and retains the registry's version
+  records as private build evidence. Repeated identities share a lookup. A
+  missing release is omitted from these records; registry service errors fail
+  the build rather than silently removing PURLs.
+- [`augment_spdx.py`](pgrx/sbom/augment_spdx.py) runs offline and emits standard
+  Cargo PURLs for crates.io dependencies and the confirmed Git identities.
+  Package identity comes from Cargo's package fields, not an alias or repository
+  basename. Registry membership confirms an identity, not source equivalence.
+- The two Git copies of `superkmeans-rs` both declare `0.3.0`, so both use
+  `pkg:cargo/superkmeans-rs@0.3.0`, while retaining separate SPDX components and
+  dependency relationships. Unpublished `tantivy-quant` remains named and
+  versioned without claiming a crates.io PURL. Workspace packages and alternate
+  registries are not automatically mapped to crates.io.
+
+This is PGRX's automatic implementation of the shared evidence principle.
+Universe recipes must establish their own ecosystem identities and defensible
+versions; the Cargo lookup policy does not apply to DuckDB's dependencies. The
+published output remains ordinary SPDX and Package URLs, with no additional
+consumer schema or API.
+
 ## Local builds
 
 Run from the repository root with Docker/Buildx and Python 3. Use a local registry

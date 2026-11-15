@@ -27,9 +27,8 @@ def fetch(repo, revision, destination):
 
 
 if __name__ == "__main__":
-    repo = os.environ["SOURCE_REPOSITORY"].removesuffix(".git")
-    revision = os.environ.get("SOURCE_REVISION") or resolve_source(repo, os.environ["EXT_VERSION"])["revision"]
-    assert repo == "https://github.com/duckdb/pg_duckdb"
+    repo = "https://github.com/duckdb/pg_duckdb"
+    revision = resolve_source(repo, os.environ["EXT_VERSION"])["revision"]
     assert len(revision) == 40 and all(c in "0123456789abcdef" for c in revision)
     fetch(repo, revision, Path("/build"))
     # GitHub's tree API resolves the gitlink from the actual selected parent.

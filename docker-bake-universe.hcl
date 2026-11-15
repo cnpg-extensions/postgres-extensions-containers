@@ -16,7 +16,6 @@ target "default" {
   name = getBuildName(metadata.name, build.distro, build.pgVersion)
   dockerfile = "universe/${metadata.name}/Dockerfile"
   args = {
-    SOURCE_REPOSITORY = metadata.source_repository
     BUILD_TIMESTAMP = build_timestamp
   }
 }

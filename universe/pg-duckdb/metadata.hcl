@@ -4,7 +4,6 @@ metadata = {
   name                     = "pg-duckdb"
   sql_name                 = "pg_duckdb"
   image_name               = "pg-duckdb"
-  source_repository        = "https://github.com/duckdb/pg_duckdb"
   licenses                 = ["MIT"]
 
   shared_preload_libraries = ["pg_duckdb"]

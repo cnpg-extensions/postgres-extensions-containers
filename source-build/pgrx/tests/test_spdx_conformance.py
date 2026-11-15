@@ -138,7 +138,7 @@ class SPDXConformanceTest(unittest.TestCase):
             and relation.get('relationshipType') == 'CONTAINS'
             for relation in output['relationships']
         ))
-        self.assertTrue(any(
+        self.assertFalse(any(
             annotation.get('annotator') == 'Tool: cnpg-pgrx-hook-v1'
-            for annotation in output['annotations']
+            for annotation in output.get('annotations', [])
         ))

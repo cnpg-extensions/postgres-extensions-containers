@@ -39,14 +39,17 @@ def augment_spdx(document, context):
         sid = 'SPDXRef-Universe-' + hashlib.sha256(identity.encode()).hexdigest()[:24]
         ids[component['name']] = sid
         component_ids.append(sid)
-        package = dict(SPDXID=sid, name=component['name'], versionInfo=component['version'],
-                       downloadLocation=component.get('source_url') or (component['repository'] + '/tree/' + component['revision'].replace(':', '/', 1)
-                                         if component['repository'].startswith('https://github.com/') and ':' in component['revision']
-                                         else component['repository'] + '/tree/' + component['revision']
-                                         if component['repository'].startswith('https://github.com/') else component['repository']),
+        source_url = component.get('source_url') or (
+            component['repository'] + '/tree/' + component['revision'].replace(':', '/', 1)
+            if component['repository'].startswith('https://github.com/')
+            else component['repository'])
+        package = dict(SPDXID=sid, name=component['name'], downloadLocation=source_url,
                        filesAnalyzed=False, licenseConcluded=component['license'], licenseDeclared=component['license'],
-                       copyrightText=component['copyright'], sourceInfo='Selected source: ' + (component.get('source_url') or component['repository'] + '@' + component['revision'])
-                       + ('; original notice: ' + component['notice_source'] if component.get('notice_source') else '') + ('; ' + component['unresolved'] if component.get('unresolved') else ''))
+                       copyrightText=component['copyright'], sourceInfo='Selected source: ' + source_url
+                       + ('; original notice: ' + component['notice_source'] if component.get('notice_source') else '')
+                       + ('; ' + component['unresolved'] if component.get('unresolved') else ''))
+        if component['version'] is not None:
+            package['versionInfo'] = component['version']
         if component['license'].startswith('LicenseRef-'):
             extracted = result.setdefault('hasExtractedLicensingInfos', [])
             if not any(item['licenseId'] == component['license'] for item in extracted):
@@ -55,7 +58,7 @@ def augment_spdx(document, context):
             package['externalRefs'] = [dict(referenceCategory='PACKAGE-MANAGER', referenceType='purl', referenceLocator=component['purl'])]
         result['packages'].append(package)
         for notice in component['notices']:
-            relationships.append(dict(spdxElementId=sid, relationshipType='OTHER', relatedSpdxElement=files[notice]['SPDXID'], comment='Redistribution notice for this source component'))
+            relationships.append(dict(spdxElementId=sid, relationshipType='DISTRIBUTION_ARTIFACT', relatedSpdxElement=files[notice]['SPDXID']))
     for component, sid in zip(evidence['components'], component_ids):
         parent = component['parent']
         relationships.append(dict(spdxElementId=ids[parent] if parent else result['SPDXID'],

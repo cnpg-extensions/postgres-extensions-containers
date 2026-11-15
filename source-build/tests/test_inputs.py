@@ -1,4 +1,3 @@
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -7,7 +6,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from prepare import platform_base
-from source import resolve_source, source_archive_url
+from source import resolve_source
 
 
 class SourceResolutionTest(unittest.TestCase):
@@ -48,26 +47,6 @@ class SourceResolutionTest(unittest.TestCase):
             },
         )
 
-    def test_supplied_archive_and_revision_avoid_source_requests(self):
-        archive = b"already downloaded"
-        revision = "abcdef0123456789abcdef0123456789abcdef01"
-        with patch("source.fetch", side_effect=AssertionError("unexpected fetch")):
-            result = resolve_source(
-                "https://github.com/owner/project",
-                "v1.2.3",
-                archive=archive,
-                revision=revision,
-            )
-        self.assertEqual(result["host"], "github.com")
-        self.assertEqual(result["repository"], "owner/project")
-        self.assertEqual(result["revision"], revision)
-        self.assertEqual(
-            result["url"],
-            source_archive_url("https://github.com/owner/project", "v1.2.3"),
-        )
-        self.assertEqual(
-            result["archive_sha256"], hashlib.sha256(archive).hexdigest()
-        )
 
 
 class BaseResolutionTest(unittest.TestCase):

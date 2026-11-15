@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
-  source_repository        = "https://github.com/supabase/pg_jsonschema"
   name                     = "pg-jsonschema"
   sql_name                 = "pg_jsonschema"
   image_name               = "pg-jsonschema"

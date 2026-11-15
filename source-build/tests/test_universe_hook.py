@@ -63,7 +63,7 @@ class HookComposition(unittest.TestCase):
                 notice.parent.mkdir(parents=True)
                 notice.write_text('Original combined MIT and BSD notices')
             text = (root / 'payload' / path).read_text()
-            component = dict(name='pg_duckdb', version='sha:third_party/hyperloglog',
+            component = dict(name='pg_duckdb', version=None,
                 revision='sha:third_party/hyperloglog', parent=None,
                 repository='https://github.com/duckdb/duckdb', purl=None,
                 notices=[path], license='LicenseRef-composite', copyright='Copyright authors', license_text=text)
@@ -77,10 +77,10 @@ class HookComposition(unittest.TestCase):
             context = SimpleNamespace(api_version=1, builder_path=root, final_path=root / 'final')
             result = hook.augment_spdx(document, context)
             package = result['packages'][0]
-            self.assertEqual(package['versionInfo'], component['version'])
+            self.assertNotIn('versionInfo', package)
             self.assertEqual(package['downloadLocation'], 'https://github.com/duckdb/duckdb/tree/sha/third_party/hyperloglog')
             self.assertEqual(result['hasExtractedLicensingInfos'][0]['extractedText'], text)
-            self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='OTHER', comment='Redistribution notice for this source component',
+            self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
                                relatedSpdxElement='SPDXRef-notice'), result['relationships'])
             (root / 'final' / path).write_text('notice lost during staging')
             with self.assertRaisesRegex(ValueError, 'builder/final payload mismatch'):

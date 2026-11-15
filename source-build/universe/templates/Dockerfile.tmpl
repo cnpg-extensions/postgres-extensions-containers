@@ -8,14 +8,13 @@ FROM ${BASE} AS builder
 
 ARG PG_MAJOR={{ .DefaultVersion }}
 ARG EXT_VERSION
-ARG SOURCE_REPOSITORY
-ARG SOURCE_REVISION
 ARG TARGETARCH
 
 USER 0
 COPY source-build/ /source-build/
 
-# TODO: Implement acquisition of the selected release and its pinned dependencies.
+# TODO: Define the source URL here or in acquire.py; metadata supplies EXT_VERSION.
+# Implement acquisition of the selected release and its pinned dependencies.
 # acquire.py is recipe-owned; replace with inline acquisition if sufficient.
 COPY universe/{{ .Name }}/acquire.py /recipe/acquire.py
 

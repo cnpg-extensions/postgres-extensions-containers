@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 metadata = {
   build_system             = "pgrx"
-  source_repository        = "https://gitlab.com/dalibo/postgresql_anonymizer"
   name                     = "postgresql-anonymizer"
   sql_name                 = "anon"
   image_name               = "postgresql-anonymizer"

@@ -10,7 +10,6 @@ from pathlib import Path
 import re
 import subprocess
 
-from source import resolve_source
 from workflow import discover, execute, select
 
 
@@ -71,12 +70,9 @@ def platform_base(reference, platform, manifests=None):
     return reference + "@" + child_digest, index_digest
 
 
-# Render the shared Debian Bake configuration with the PGRX overlay once per
-# run, selecting one timestamp, source revision and architecture-specific base
-# image for each build. Each target/platform row selects a matching native runner.
-# Source tags resolve to repository revisions and archive URLs here. The native
-# build downloads from upstream HTTPS and records the actual archive hash; there
-# is no preparation-time archive checksum comparison or separate committed lock.
+# Render the shared Bake configuration with the family overlay once per run,
+# selecting one timestamp and architecture-specific base image for each build.
+# Recipes acquire their source and record its identity inside the native build.
 def prepare(inputs, generator, output):
     if not re.fullmatch(r"[^\s]+@sha256:[a-f0-9]{64}", generator):
         raise ValueError("digest-qualified generator required")
@@ -85,11 +81,7 @@ def prepare(inputs, generator, output):
     extension = inputs["extension_name"]
     family = inventory[extension]["build_family"]
     recipe_path = inventory[extension]["recipe_path"]
-    repository_url = inventory[extension].get("source_repository")
-    if not repository_url:
-        raise ValueError("selected extension has no source_repository metadata")
     base_manifests = {}
-    sources = {}
     if output.exists():
         raise ValueError("fresh preparation directory required")
     output.mkdir(parents=True)
@@ -132,10 +124,6 @@ def prepare(inputs, generator, output):
         "rows": [],
     }
     for name, original in sorted(targets.items()):
-        version = original["args"]["EXT_VERSION"]
-        if version not in sources:
-            sources[version] = resolve_source(repository_url, version)
-        source = sources[version]
         distro = next(
             a.split("=", 1)[1]
             for a in original["annotations"]
@@ -168,14 +156,11 @@ def prepare(inputs, generator, output):
             if family == "pgrx":
                 frozen["args"].update(
                     PGRX_EXTENSION=extension, PGRX_DISTRO=distro,
-                    PGRX_SOURCE_REPOSITORY=repository_url,
-                    PGRX_SOURCE_REVISION=source["revision"],
                     PGRX_BUILD_TIMESTAMP=timestamp,
                 )
             else:
                 frozen["args"].update(
-                    SOURCE_REPOSITORY=repository_url,
-                    SOURCE_REVISION=source["revision"], BUILD_TIMESTAMP=timestamp,
+                    BUILD_TIMESTAMP=timestamp,
                 )
             frozen["output"] = [
                 "type=image,oci-mediatypes=true,oci-artifact=true,push=true"

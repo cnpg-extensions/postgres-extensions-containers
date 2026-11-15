@@ -4,7 +4,6 @@ metadata = {
   # TODO: Set the source repository and Cluster catalog name.
   # sql_name is the SQL extension name used by Database resources.
   build_system             = "pgrx"
-  source_repository        = "https://github.com/<owner>/<repo>"
   name                     = "{{ .Name }}"
   sql_name                 = "{{ replaceAll .Name "-" "_" }}"
 
