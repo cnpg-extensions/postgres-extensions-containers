@@ -262,7 +262,7 @@ and composer match the build environment:
 ```sh
 docker run --rm --entrypoint python3 \
   --volume "$PWD:/workspace:ro" --workdir /workspace \
-  "$SBOM_GENERATOR" source-build/pgrx/test.py
+  "$SBOM_GENERATOR" source-build/test.py
 ```
 
 The runner discovers both shared and PGRX tests, including preparation, native
@@ -270,11 +270,13 @@ assembly and generator/hook composition. Recipe evidence tests should cover lost
 packages, identifiers, notices and payload ownership. Universe's evidence is
 recipe-specific and must be reviewed when upstream components change.
 
-The files under `source-build/tests/` exercise the following implementations with
-fixtures and mocked external commands; they do not build extensions or run PostgreSQL.
+The shared runner and files under `source-build/tests/` are listed below. These
+checks use fixtures and mocked external commands; they do not build extensions
+or run PostgreSQL.
 
 | Test file | Implementation tested | Coverage |
 | --- | --- | --- |
+| [`test.py`](test.py) | Runs [`tests/`](tests/) and [`pgrx/tests/`](pgrx/tests/) | Shared entrypoint: discovers both suites, rejects empty PGRX discovery and exits unsuccessfully if any test fails. |
 | [`test_discovery.py`](tests/test_discovery.py) | [`workflow.py`](workflow.py) | Location-derived families, recipe boundaries, duplicate names and wrong-family selections. |
 | [`test_inputs.py`](tests/test_inputs.py) | [`source.py`](source.py), [`prepare.py`](prepare.py) | GitLab source resolution and architecture-specific base-image selection. |
 | [`test_native_builds.py`](tests/test_native_builds.py) | [`prepare.py`](prepare.py), [`build.py`](build.py) | Separate native-platform build definitions and rejection of mismatched host, daemon or worker architectures. |
@@ -343,4 +345,4 @@ tools live under `source-build/pgrx/`:
 | [`templates/`](pgrx/templates/) | Dockerfile, metadata, and README templates to follow for new extensions. |
 | [`sbom/`](pgrx/sbom/) | Hook that adds verified Rust dependencies and licenses to the shared generator's SPDX output. |
 | [`dependencies/`](pgrx/dependencies/) | Rust, rustup, and cargo-about version configuration for extension builders. |
-| [`tests/`](pgrx/tests/) | PGRX tests, run with `python3 source-build/pgrx/test.py`. |
+| [`tests/`](pgrx/tests/) | PGRX tests, run with `python3 source-build/test.py`. |

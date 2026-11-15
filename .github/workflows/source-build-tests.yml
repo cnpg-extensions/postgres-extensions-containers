@@ -31,4 +31,4 @@ jobs:
         run: |
           docker run --rm --entrypoint python3 \
             --volume "$PWD:/workspace:ro" --workdir /workspace \
-            "$SBOM_GENERATOR" source-build/pgrx/test.py
+            "$SBOM_GENERATOR" source-build/test.py
