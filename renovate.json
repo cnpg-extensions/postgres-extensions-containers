@@ -252,16 +252,15 @@
       "pinDigests": false
     },
     {
-      "description": "Review Universe SQL mapping and bundled-source evidence on release updates",
+      "description": "Keep Universe sources separate from GitHub Actions; inherit the shared automerge policy",
       "matchDepTypes": [
         "universe-source"
       ],
       "groupName": null,
       "pinDigests": false,
-      "automerge": false,
       "ignoreUnstable": true,
       "prBodyNotes": [
-        "Verify shipped control/upgrade SQL and bundled dependency evidence before accepting a source release. Source version updates do not establish SQL or embedded dependency versions."
+        "Minor and patch updates use the shared automerge policy with required acceptance checks. Add package-level automerge exceptions where SQL mappings or bundled dependencies require manual review. Major updates remain manual."
       ]
     },
     {
@@ -275,7 +274,7 @@
       "ignoreUnstable": true,
       "allowedVersions": "/^v?\\d+\\.\\d+\\.\\d+$/",
       "prBodyNotes": [
-        "The source tag and SQL version update together. Bundled versions are read from the build sources; review SQL compatibility, Debian package mappings and maintained copyright snapshots before merging."
+        "The source tag and SQL version update together. Bundled versions are read from the build sources. Keep Debian package mappings and copyright snapshots maintained as upstream changes."
       ]
     }
   ]

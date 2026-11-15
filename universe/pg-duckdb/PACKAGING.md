@@ -111,9 +111,10 @@ matching; scanner matches on the real document still require applicability revie
 
 Renovate tracks production GitHub releases of pg_duckdb and updates the source
 tag and SQL version together. Alpha, beta, RC and GitHub-marked prereleases are
-excluded. Updates remain reviewable PRs under the existing Universe policy.
-Bundled versions are read from the build, but SQL compatibility, Debian package
-names and the checked-in copyright snapshots still need release review.
+excluded. Minor and patch updates inherit the shared automerge policy and required
+acceptance checks; major updates remain manual. Universe exceptions are configured
+per package. Bundled versions are read from the build, while Debian package names
+and the checked-in copyright snapshots remain maintained explicitly.
 
 ## Source acquisition
 
