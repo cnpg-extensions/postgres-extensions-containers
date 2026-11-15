@@ -35,7 +35,7 @@ spec:
     - name: pg-duckdb
       image:
         reference: ghcr.io/cnpg-extensions/pg-duckdb:1.2.0-18-trixie
-      ld_library_path: [lib]
+      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -78,7 +78,7 @@ for querying with DuckDB and accessing external data.
 ## Known Caveats
 
 - `pg_duckdb` requires `shared_preload_libraries`; adding it to an existing
-  cluster requires PostgreSQL to restart. Keep `ld_library_path: [lib]` so the
+  cluster requires PostgreSQL to restart. Keep `ld_library_path: [system]` so the
   extension can load its bundled runtime libraries, including libcurl.
 - DuckDB execution defaults to superusers. Review upstream's role and secret
   access settings before granting access through `duckdb.allowed_role`.

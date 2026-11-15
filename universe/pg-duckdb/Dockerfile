@@ -13,6 +13,10 @@ ARG TARGETARCH
 USER 0
 COPY source-build/ /source-build/
 
+# Capture libraries supplied by the base image before adding build dependencies.
+COPY scripts/capture_base_image_libs.sh /usr/local/bin/capture_base_image_libs.sh
+RUN /usr/local/bin/capture_base_image_libs.sh
+
 # Build tools and system development libraries.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential ca-certificates curl git cmake ninja-build python3 pkg-config \
@@ -26,6 +30,12 @@ RUN git clone --branch "${EXT_VERSION}" --single-branch https://github.com/duckd
 # Upstream recipe: https://github.com/duckdb/pg_duckdb/blob/v1.2.0/docs/compilation.md
 RUN CMAKE_BUILD_PARALLEL_LEVEL=2 make -j2 DISABLE_UNITY=1 DUCKDB_BUILD=ReleaseStaticSystem PG_CONFIG=/usr/lib/postgresql/${PG_MAJOR}/bin/pg_config PG_DUCKDB_VERSION=${EXT_VERSION} \
     && CMAKE_BUILD_PARALLEL_LEVEL=2 make -j2 DISABLE_UNITY=1 install DESTDIR=/install DUCKDB_BUILD=ReleaseStaticSystem PG_CONFIG=/usr/lib/postgresql/${PG_MAJOR}/bin/pg_config
+
+# Stage additional system libraries and their notices using the shared helper.
+COPY scripts/stage_system_libs.sh /usr/local/bin/stage_system_libs.sh
+RUN /usr/local/bin/stage_system_libs.sh "/install/usr/lib/postgresql/${PG_MAJOR}/lib/pg_duckdb.so" \
+    && mkdir -p /payload \
+    && cp -a /system /licenses /payload/
 
 # Stage the payload and original notices; add recipe-owned SBOM evidence.
 ARG BUILD_TIMESTAMP

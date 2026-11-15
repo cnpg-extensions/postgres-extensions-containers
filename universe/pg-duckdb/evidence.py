@@ -142,17 +142,9 @@ def main():
     copy(Path(f'/install/usr/lib/postgresql/{pg}/lib/pg_duckdb.so'), PAYLOAD / 'lib/pg_duckdb.so')
     for path in Path(f'/install/usr/share/postgresql/{pg}/extension').glob('pg_duckdb*'):
         copy(path, PAYLOAD / 'share/extension' / path.name)
-    # Keep the complete ldd closure in the payload, with original paths available
-    # in the builder for the shared generator's dpkg ownership lookup.
+    # System libraries and their notices are staged by the shared shell helper.
     listing = subprocess.check_output(['ldd', str(PAYLOAD / 'lib/pg_duckdb.so')], text=True)
     assert 'not found' not in listing, listing
-    for path in re.findall(r'=> (/\S+)', listing):
-        library = Path(path)
-        copy(library, PAYLOAD / 'lib' / library.name)
-        # Keep the installed package's notice; ownership comes from the scanner.
-        owner = subprocess.check_output(['dpkg-query', '-S', str(library.resolve())], text=True).split(': ', 1)[0]
-        notice = Path('/usr/share/doc') / owner.split(':')[0] / 'copyright'
-        copy(notice, PAYLOAD / 'licenses' / owner.split(':')[0] / 'copyright')
     components = []
 
     def component(name, version, repo, revision, directory, parent, purl=None):

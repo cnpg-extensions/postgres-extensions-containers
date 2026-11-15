@@ -31,7 +31,9 @@ are not synthesized as versions. DuckDB's reported version override is recorded
 separately from its source identity. The attached SBOM contains these identities;
 this document does not duplicate their pins.
 
-`evidence.py` stages the library/SQL payload, required runtime libraries and
+The shared system-library helper stages additional runtime libraries under
+`/system`, excluding libraries supplied by the PostgreSQL base image, and preserves
+their notices. `evidence.py` stages the extension library/SQL payload and
 original notices. `augment_spdx.py` preserves the generator's existing records
 and adds source evidence through its hook interface. Builder reports are private
 validation inputs; consumers use the standard SPDX document described in the
