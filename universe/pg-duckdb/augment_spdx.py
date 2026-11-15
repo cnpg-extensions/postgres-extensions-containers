@@ -4,9 +4,6 @@ import hashlib
 from pathlib import Path
 from urllib.parse import urlencode
 
-PG_REVISION = '8756099e267c47f0b86c24de4cf995327f1f4279'
-DUCK_REVISION = 'd54cbbe3df17e8e5ce68312f483b4155836112aa'
-
 # Debian unstable package names; versions are the upstream code actually built,
 # without Debian revisions or a claim that Debian patches were applied.
 # binary name: (Debian source name, compiled version, vendor path)
@@ -76,13 +73,13 @@ def augment_spdx(document, context):
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
         return sid
 
-    pg_url = 'https://github.com/duckdb/pg_duckdb/tree/' + PG_REVISION
+    pg_url = 'https://github.com/duckdb/pg_duckdb/tree/v1.2.0'
     pg_id = add_package('pg_duckdb', '1.2.0', 'pkg:github/duckdb/pg_duckdb@v1.2.0',
                         pg_url, 'Selected source: ' + pg_url)
     ids = {}
     arch = {'linux/amd64': 'amd64', 'linux/arm64': 'arm64'}[context.platform]
     for name, (source, version, vendor) in DEBIAN_PACKAGES.items():
-        url = 'https://github.com/duckdb/duckdb/tree/' + DUCK_REVISION + ('/' + vendor if vendor else '')
+        url = 'https://github.com/duckdb/duckdb/tree/v' + DEBIAN_PACKAGES['libduckdb2.0'][1] + ('/' + vendor if vendor else '')
         source_info = ('Selected source: ' + url + '; Debian scanner mapping: ' + name
                        + '; compiled upstream version: ' + version
                        + '; built from upstream source, not installed by dpkg; no Debian patch-level claim')
