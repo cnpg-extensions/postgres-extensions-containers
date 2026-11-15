@@ -309,36 +309,62 @@ The PGRX helpers implement this policy deliberately:
 
 ## Local builds
 
-Run from the repository root with Docker/Buildx and Python 3. Use a local registry
-so pushed images retain their SBOM and provenance attestations. Select a native
-AMD64 or ARM64 Docker-container builder; host, daemon and worker must agree.
+Use the same Task/Dagger build and smoke-test workflow as Debian extensions,
+following the [shared build guide](../BUILD.md#prerequisites). Keep the contributor
+process aligned with upstream CloudNativePG wherever possible.
 
-Set `SBOM_GENERATOR` to the repository's current digest-qualified shared generator
-image. Preparation takes a recipe name and family:
+Run from the repository root. Source builds additionally require Python 3,
+the repository's current digest-qualified shared SBOM generator image and a
+native AMD64 or ARM64 Docker-container builder. The host, Docker daemon and
+BuildKit worker must agree; do not compile source recipes under emulation.
+
+Export the generator reference using the lowercase variable consumed by Bake:
+
+```sh
+export sbom_generator="<pinned generator image@sha256:digest>"
+```
+
+For a build only:
+
+```sh
+task bake TARGET=pg-duckdb BUILDER=<native-builder>
+```
+
+For the full local build and smoke-test flow:
+
+```sh
+task e2e:test:full TARGET=pg-duckdb BUILDER=<native-builder>
+```
+
+The full flow sets up the local registry and Kind/CloudNativePG environment,
+builds and pushes the extension, and runs the shared tests through Dagger and
+Chainsaw. Use the logical extension name for either PGRX or Universe; the shared
+tools select the recipe and build family. See the
+[local testing guide](../BUILD.md#local-testing-guide) for individual steps and
+cleanup. The `:all` tasks currently discover Debian recipes only.
+
+### Advanced: reproduce workflow preparation
+
+To inspect the build plan used by CI, invoke preparation directly with a recipe
+name and family. Use a fresh output directory:
 
 ```sh
 printf '%s\n' '{"extension_name":"pg-duckdb","build_family":"universe"}' > /tmp/source-inputs.json
 GITHUB_RUN_ID=local registry=localhost:5000 \
   python3 source-build/prepare.py --inputs /tmp/source-inputs.json \
-  --generator "$SBOM_GENERATOR" --output /tmp/source-prepared
+  --generator "$sbom_generator" --output /tmp/source-prepared
 python3 source-build/build.py --architecture amd64 --builder NAME
 ```
 
-`GITHUB_RUN_ID` is the preparation tool's build identifier; `local` is sufficient
-for a local run. Use a fresh output directory for each preparation. The resulting
-`preparation.json` lists each distribution/PostgreSQL/platform row and its Bake
-file. Choose the row matching the local architecture and intended target:
+Use `arm64` on an ARM64 host and `build_family=pgrx` for a PGRX recipe.
+The resulting `preparation.json` lists each distribution/PostgreSQL/platform row
+and its Bake file. Choose the row matching the local architecture and intended
+target:
 
 ```sh
 docker buildx bake --builder NAME \
   -f /tmp/source-prepared/ROW.json TARGET
 ```
-
-Use `arm64` for an ARM64 worker. Never compile a source recipe under emulation.
-For PGRX, select `build_family=pgrx`; the preparation tool supplies its Rust-specific
-arguments. The shared [local smoke-test instructions](../BUILD.md#local-testing-guide)
-accept logical names such as `pg-duckdb`. Universe uses the ordinary installation
-and version checks; no separate extension-specific runtime suite is required.
 
 ## Tooling tests
 
@@ -348,7 +374,7 @@ and composer match the build environment:
 ```sh
 docker run --rm --entrypoint python3 \
   --volume "$PWD:/workspace:ro" --workdir /workspace \
-  "$SBOM_GENERATOR" source-build/test.py
+  "$sbom_generator" source-build/test.py
 ```
 
 The runner discovers both shared and PGRX tests, including preparation, native
