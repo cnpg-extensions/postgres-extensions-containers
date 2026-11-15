@@ -154,10 +154,8 @@ The project adheres to the following frameworks:
 
 When proposing a new extension, the following criteria must be met:
 
-- **Licensing:** The extension must have been declined by the upstream
-  cloudnative-pg project solely due to a license not on the
-  [CNCF Allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md).
-  All other upstream quality requirements still apply.
+- **Licensing:** All distributed components must comply with the
+  [Open Source Licensing Policy](#open-source-licensing-policy).
 - **Structure:** only one extension can be included within an extension folder.
 - **Debian Packages:** Extension images must be built **exclusively** from
   Debian packages in the `main` component (which by definition complies with
@@ -183,24 +181,32 @@ naming.
 
 ### Submission Process
 
-1. **Request and commitment:** Open a new issue requesting the extension.
-   The contributor(s) must agree to become "component owners" and maintainers
-   for that extension.
-2. **Approval:** Maintainers review the proposal and either approve it or
-   request changes.
-3. **Submission:** Component owner(s) open a Pull Request (PR) to introduce
-   the new extension. The PR must include an entry in the `CODEOWNERS` file
-   adding the component owner(s) for the new extension folder. The PR is
-   reviewed, approved, and merged.
+1. **Proposal:** Open an issue requesting the extension and describing its
+   packaging and licensing requirements.
+2. **Approval:** Repository maintainers review the proposal and either approve it
+   or request changes.
+3. **Submission:** Contributors open a Pull Request (PR) to introduce the extension.
+   Repository maintainers review and maintain all extensions.
 4. **Naming:** The name of the extension is the registry name.
 
 ### Removal Policy
 
-If component owners decide to stop maintaining their extension, and no other
-contributors are found, the main project maintainers reserve the right to
-**unconditionally remove that extension**.
+Repository maintainers decide whether to retire or suspend an extension and
+record that decision in the relevant change and issue history.
 
 ---
+
+## Open Source Licensing Policy
+
+All software distributed in our PostgreSQL extension container images must be licensed under a license approved by the [Open Source Initiative (OSI)](https://opensource.org/licenses).
+
+This policy is informed by the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines), which served as the foundation for the OSI's Open Source Definition.
+
+This requirement applies to all components included in the final container images, including PostgreSQL extensions, libraries, dependencies, utilities, and bundled data files. Build-time dependencies that are not distributed in the final images are outside the scope of this policy.
+
+Software or other materials that do not meet these requirements may be included only through an explicitly approved and documented exception.
+
+All container images must comply with applicable license obligations, including copyright notices, attribution, source-code availability, and redistribution requirements.
 
 ## Naming & Tagging Convention
 

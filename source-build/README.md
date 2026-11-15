@@ -12,7 +12,9 @@ or [Universe guide](../universe/README.md).
 
 Published images include software bills of materials, build provenance and
 original license notices. They use the same consumer tools as Debian-built
-extensions. Scan the PostgreSQL base image separately using its own SBOM.
+extensions. All distributed components must meet the
+[Open Source Licensing Policy](../README.md#open-source-licensing-policy).
+Scan the PostgreSQL base image separately using its own SBOM.
 
 ## Verify images
 

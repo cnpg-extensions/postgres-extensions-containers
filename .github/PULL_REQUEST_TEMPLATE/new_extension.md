@@ -42,21 +42,17 @@ Closes #<!-- proposal issue id -->
       no `.control` file, verified with `dpkg -L`).
 - [ ] The `renovate:` annotations in `metadata.hcl` and `README.md` are present
       and intact (`suite=`, `depName=`, `extractVersion=`).
-- [ ] Every component in the image is covered by a license on the
-      [CNCF Allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md);
+- [ ] Every distributed component meets the
+      [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers#open-source-licensing-policy),
+      with any exceptions explicitly approved and documented;
       SPDX `licenses` in `metadata.hcl` are accurate.
 - [ ] `task checks:all` passes locally.
 - [ ] Full E2E passes: `task e2e:test:full TARGET="<extension-name>"`.
 - [ ] `README.md` is complete and includes a working `Cluster` example (plus a
       `Database` example with `CREATE EXTENSION` when `create_extension = true`).
-- [ ] An entry for the new extension folder was added to
-      [`CODEOWNERS`](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/CODEOWNERS)
-      with the component owner's GitHub handle(s).
 - [ ] A `distribution-points` entry for the new image was added under
       `repository.release` in
       [`SECURITY-INSIGHTS.yml`](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/SECURITY-INSIGHTS.yml).
-- [ ] I confirm my commitment to maintain this extension on behalf of the
-      CNPG Extensions project.
 
 ---
 
@@ -70,8 +66,10 @@ Closes #<!-- proposal issue id -->
       `pgVersions × distributions × {amd64, arm64}` matrix.
 - [ ] DCO check passes and history is a single clean commit with the required
       `feat: add ...` message format.
-- [ ] License compliance reviewed: all redistributed components (extension +
-      transitive/system libs) are on the CNCF Allowlist; SPDX `licenses` match.
+- [ ] License compliance reviewed: all distributed components, including bundled
+      data, meet the Open Source Licensing Policy or have an explicitly approved
+      and documented exception. Applicable notices, attribution, source availability
+      and redistribution obligations are satisfied; SPDX `licenses` match.
 - [ ] `metadata.hcl` reviewed: `package`/`sql` versions, `create_extension`,
       runtime settings (`shared_preload_libraries`, `*_path`, `env`,
       `required_extensions`) and behavior flags are correct.
@@ -85,8 +83,6 @@ Closes #<!-- proposal issue id -->
       mounted for preload-only modules.
 - [ ] `README.md` is clear and its `Cluster` example (and `Database` example
       when `create_extension = true`) are valid.
-- [ ] `CODEOWNERS` entry is present and the component owner(s) accept the
-      long-term maintenance commitment.
 - [ ] `SECURITY-INSIGHTS.yml` has a matching `distribution-points` entry for
       the new image.
 - [ ] PR targets `main` and is ready to merge.

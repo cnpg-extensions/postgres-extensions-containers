@@ -1,5 +1,5 @@
 name: New Extension Proposal
-description: Propose a new PostgreSQL extension to be included in the containers and commit to its maintenance.
+description: Propose a new PostgreSQL extension to be included in the containers.
 title: "[New Extension]: "
 labels: ["triage", "new-extension"]
 projects: ["cnpg-extensions/postgres-extensions-containers"]
@@ -9,7 +9,7 @@ body:
       value: |
         Thanks for proposing a new extension for the PostgreSQL Extensions Containers project!
 
-        The submission process requires the proposer to commit to becoming the **Component Owner** and taking on the long-term maintenance of the extension image. Please review the [governance document for the submission process](https://github.com/cnpg-extensions/postgres-extensions-containers?tab=readme-ov-file#submission-process).
+        Repository maintainers maintain all extensions. Contributions are welcome through the [submission process](https://github.com/cnpg-extensions/postgres-extensions-containers?tab=readme-ov-file#submission-process).
 
   - type: checkboxes
     id: search
@@ -86,12 +86,10 @@ body:
     attributes:
       label: Extension License (SPDX identifier)
       description: |
-        Select the SPDX license identifier for the extension. Only licenses on the
-        [CNCF Allowlist License Policy](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md)
-        are accepted for distribution through this project. If your extension is
-        licensed under something not listed here, select "Other": Allowlisted
-        licenses not in this dropdown will be accepted after manual triage;
-        non-Allowlisted licenses will not be accepted.
+        Select the SPDX license identifier for the extension. Distributed components
+        must meet the [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers#open-source-licensing-policy).
+        Select Other for a license not listed here and provide its identifier and
+        terms in Additional Notes. Any exception requires explicit approval and documentation.
       options:
         - PostgreSQL
         - MIT
@@ -99,7 +97,7 @@ body:
         - BSD-2-Clause
         - BSD-3-Clause
         - ISC
-        - Other (verify against the CNCF Allowlist)
+        - Other (provide license details)
     validations:
       required: true
 
@@ -108,12 +106,11 @@ body:
     attributes:
       label: License Compliance
       description: |
-        All components in the extension image (the extension itself and any
-        transitive dependencies) must be covered by a license on the
-        [CNCF Allowlist License Policy](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md).
-        Extensions that include any non-Allowlisted components will not be accepted.
+        The policy covers all distributed components, including libraries, utilities
+        and bundled data, and requires compliance with applicable license obligations.
+        Dependencies used only at build time and not distributed are outside its scope.
       options:
-        - label: To the best of my knowledge, the extension and its declared dependencies meet the CNCF Allowlist policy stated above.
+        - label: I have reviewed the Open Source Licensing Policy and identified any requested exceptions in Additional Notes.
           required: true
 
   - type: textarea
@@ -129,15 +126,6 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
-    id: maintenance-commitment
-    attributes:
-      label: Component Owner and Maintenance Commitment
-      description: By checking this box, you confirm your commitment to the long-term maintenance of the extension image. This includes providing updates for new upstream versions, responding to security issues, and ensuring compatibility with new PostgreSQL/OS versions.
-      options:
-        - label: I/My organization commit to becoming the Component Owner and maintaining the extension image in the future.
-          required: true
-
   - type: textarea
     id: additional-notes
     attributes:
@@ -146,15 +134,6 @@ body:
       placeholder: ex. This extension requires the 'openssl' library (OS package) to be installed.
     validations:
       required: false
-
-  - type: input
-    id: github-handles
-    attributes:
-      label: GitHub Handles of Component Owners
-      description: List the GitHub handles (e.g., `@user1`, `@org/team`) that will be responsible for maintaining the extension and should be added to the `CODEOWNERS` file.
-      placeholder: ex. @user1
-    validations:
-      required: true
 
   - type: checkboxes
     id: terms

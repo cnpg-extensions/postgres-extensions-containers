@@ -114,9 +114,9 @@ needed, preserve the original text and add a dated correction note.
    - Review and normally port upstream changes to shared workflows, Dagger
      maintenance code, `docker-bake.hcl`, `Taskfile.yml`, tests, and general
      documentation.
-   - Manually merge `README.md` and security metadata. `CODEOWNERS` is
-     downstream-owned: CNPG Extensions has its own ownership model, so never
-     copy upstream `CODEOWNERS` changes or component-owner assignments. Keep
+   - Manually merge `README.md` and security metadata. Repository maintainers
+     maintain all downstream extensions; do not import upstream `CODEOWNERS`
+     files or component-owner assignments. Keep
      downstream branding, custom image locations, and policy links.
    - Check repository and image identity values for accidental
      `cloudnative-pg` references before finalizing the merge.

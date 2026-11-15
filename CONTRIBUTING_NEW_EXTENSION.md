@@ -105,33 +105,22 @@ paths.
 
 ### Opening an Issue
 
-> [!IMPORTANT]
-> **Community Commitment:** By opening the issue, you are confirming your
-> intent to help maintain this extension on behalf of the CNPG Extensions
-> project.
+Repository maintainers maintain all extensions; contributions are welcome.
 
 After gathering the package details and verifying the extension's license,
 submit your proposal:
 
 1. Point your browser to ["New Extension Proposal"](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose).
 2. Provide the package name, versioning info, and a link to the upstream source.
-3. State the license clearly. Every component in the extension image must be
-   covered by a license on the
-   [CNCF Allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md)
-   (e.g., Apache-2.0, MIT, PostgreSQL License). CNCF policy requires a formal
-   exception for any component not covered by the Allowlist; the maintainers
-   do not intend to file exception requests for new extensions, so only
-   Allowlisted components will be accepted. This is a governance decision,
-   not a legal limitation; contributors whose extension cannot meet this
-   requirement are welcome to adopt the same build tooling and distribute
-   images independently.
+3. State the license clearly. All components distributed in the final image must
+   satisfy the [Open Source Licensing Policy](README.md#open-source-licensing-policy).
+   Identify any material requiring an explicitly approved and documented exception.
+   Include the notices, attribution, source availability and redistribution
+   obligations that apply to the payload. Build-only dependencies are outside
+   the policy's scope.
 
-> [!NOTE]
-> In most cases you may begin development before receiving maintainer
-> approval. However, if a fundamental problem (e.g., a non-Allowlisted
-> license) is discovered during the proposal review, your work will not be
-> mergeable. Verify license compliance before investing significant
-> development effort.
+Review licensing before investing significant development effort. A proposed
+exception requires explicit approval; submitting a proposal does not grant one.
 
 ---
 
@@ -303,9 +292,6 @@ Submission Requirements:
   that you have the right to submit the code under the project's license.
 - **Repository Target**: Ensure your Pull Request is targeting the `main` branch
   of the CNPG Extensions repository.
-- **CODEOWNERS**: The PR must add an entry to the [`CODEOWNERS`](./CODEOWNERS)
-  file listing the GitHub handles of the component owner(s) for the new
-  extension folder.
 - **SECURITY-INSIGHTS.yml**: The PR must add a `distribution-points` entry for
   the new image under `repository.release` in
   [`SECURITY-INSIGHTS.yml`](./SECURITY-INSIGHTS.yml), pointing to its GitHub
@@ -320,5 +306,4 @@ Submission Requirements:
 > For any other change (version bumps, fixes, tooling, docs), the default
 > template is applied automatically, so you can open the PR normally.
 
-By submitting, you confirm your commitment to maintain this extension on behalf
-of the CNPG Extensions project.
+Repository maintainers are responsible for maintaining all accepted extensions.
