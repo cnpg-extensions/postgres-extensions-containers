@@ -63,12 +63,6 @@ bundled, or statically linked dependency evidence that automatic discovery misse
 The [dependency evidence requirements](#dependency-evidence-in-the-sbom) apply;
 an existing CVE is not required.
 
-Universe recipes have no equivalent common language toolchain to supply that
-evidence. Each recipe requires careful individual review and implementation of
-dependency boundaries, actual versions, applicable licenses, attribution and
-redistribution notices, and security-relevant identities. Use the shared SBOM
-generator and its extension hook for this work, not a separate composer.
-
 The intended selection is Debian packaging for ordinary extensions, the PGRX
 toolchain for PGRX extensions, and Universe source builds only for other
 extensions with documented complex dependency packaging or delivery obstacles.
