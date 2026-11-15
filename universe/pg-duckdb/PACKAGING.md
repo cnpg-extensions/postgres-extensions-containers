@@ -45,16 +45,19 @@ choice. Do not infer new entries from the builder's installed development tools.
 ### Copyright files and release review
 
 Like Debian's [copyright packaging](https://www.debian.org/doc/debian-policy/ch-docs.html#copyright-information),
-this recipe maintains consolidated copyright files rather than rediscovering
-licenses during each build or shipping C++ files to carry their notices.
-[DuckDB's copyright file](licenses/duckdb/copyright) starts with Debian DuckDB
-2.0.0+dfsg2-1's copyright document and retains supplemental original notices from
-the reviewed source snapshot. The other copyright files cover pg_duckdb and the
+this recipe assembles consolidated copyright files from reviewed source
+locations. [The extraction script](licenses.sh) reads standalone license files
+directly and uses explicit `sed` ranges for embedded notices. It downloads Debian
+DuckDB 2.0.0+dfsg2-1's source-package copyright document as the baseline and
+includes supplemental original notices from the reviewed source snapshot.
+The other copyright files cover pg_duckdb and the
 seven library counterparts that Debian packages separately. They preserve the
 actual bundled versions' terms, rather than substituting copyright files from
 possibly different installed Debian versions.
 
-The Dockerfile copies these nine files into `/licenses/<name>/copyright`.
+The build writes nine files to `/licenses/<name>/copyright`; the Dockerfile
+copies that directory into the final image. License text is not duplicated in
+this repository.
 Common-license texts referenced by the source documents are included so the
 extension's attribution does not depend on `/usr/share/common-licenses` existing
 in another image. Source paths and supplemental notice URLs remain in the files.
@@ -64,7 +67,9 @@ covered by DuckDB, not extra package records.
 
 `evidence.py` has one static library table containing upstream versions,
 identities, Debian counterparts and vendor paths. There is no Ninja dependency
-traversal, header-version parser, comment parser or build-time license download.
+traversal, header-version parser or general-purpose comment parser. Notice
+locations, marker ranges and line ranges are explicitly reviewed for the pinned
+sources. Missing supplemental documents are fetched from explicit upstream URLs.
 Both source revision checks ensure changed sources receive a release review.
 When updating the sources or build settings, review the dependency inventory,
 Debian's packaging boundary and all copyright files together. Unknown snapshot
@@ -116,7 +121,7 @@ hosted signing/SLSA acceptance are not covered by this local measurement.
 `evidence.py` records package identities and the actual files copied by the
 Dockerfile. The final image copies the installed extension into `/lib` and
 `/share`, plus `/system` and `/licenses`; there is no intermediate `/payload`.
-The checked-in copyright files cover the nested and later-source notices found
+The extraction commands cover the nested and later-source notices found
 in the audit, including ALP/ALPRD, Salesforce, Martin Ankerl, ADBC/nanoarrow,
 Preshing's semaphore, miniz, Brotli and public-domain statements.
 
