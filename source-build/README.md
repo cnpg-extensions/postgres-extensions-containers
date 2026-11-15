@@ -307,12 +307,6 @@ The PGRX helpers implement this policy deliberately:
   versioned without claiming a crates.io PURL. Workspace packages and alternate
   registries are not automatically mapped to crates.io.
 
-This is PGRX's automatic implementation of the shared evidence principle.
-Universe recipes must establish their own ecosystem identities and defensible
-versions. The
-published output remains ordinary SPDX and Package URLs, with no additional
-consumer schema or API.
-
 ## Local builds
 
 Run from the repository root with Docker/Buildx and Python 3. Use a local registry
