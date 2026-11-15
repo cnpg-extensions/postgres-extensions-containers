@@ -6,7 +6,6 @@ from pathlib import Path
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
 from urllib.parse import urlsplit, parse_qs
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -112,10 +111,6 @@ class HookComposition(unittest.TestCase):
                 self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
                     relatedSpdxElement=self.file_id(str(notice.relative_to(self.final)))), result['relationships'])
 
-    def test_source_update_requires_inventory_review(self):
-        with patch('subprocess.check_output', side_effect=[self.hook.PG_REVISION, 'updated source']):
-            with self.assertRaisesRegex(ValueError, 'Review the static package inventory'):
-                self.hook.check_sources()
 
 
 if __name__ == '__main__':

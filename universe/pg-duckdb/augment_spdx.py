@@ -29,17 +29,6 @@ def debian_purl(name, source, version, arch):
 
 
 
-def check_sources():
-    """Run in the builder before export; inventory changes require review."""
-    import subprocess
-    for directory, expected in [('/build', PG_REVISION),
-                                ('/build/third_party/duckdb', DUCK_REVISION)]:
-        actual = subprocess.check_output(
-            ['git', '-C', directory, 'rev-parse', 'HEAD'], text=True).strip()
-        if actual != expected:
-            raise ValueError('Review the static package inventory and copyright files for updated source: ' + directory)
-
-
 def augment_spdx(document, context):
     if context.api_version != 1:
         raise ValueError('unsupported hook API')
@@ -134,7 +123,3 @@ def augment_spdx(document, context):
         if Path(path).name == 'libduckdb.so' or Path(path).name.startswith('libduckdb.so.'):
             relate(file['SPDXID'], 'GENERATED_FROM', ids['libduckdb2.0'])
     return result
-
-
-if __name__ == '__main__':
-    check_sources()

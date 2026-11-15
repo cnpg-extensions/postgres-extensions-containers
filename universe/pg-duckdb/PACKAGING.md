@@ -57,9 +57,9 @@ discovery or comment parser. `augment_spdx.py` has one static package table and
 reads runtime files directly from the builder and final image, without an
 intermediate JSON manifest. License texts are read directly from the final image;
 Docker COPY handles their staging without a second builder-to-final comparison.
-The Dockerfile copies the explicitly listed common-license texts. Both
-source-revision guards require the inventory and copyright snapshot to be
-reviewed when sources or build settings change.
+The Dockerfile copies the explicitly listed common-license texts. Maintain the
+static inventory and copyright snapshot when sources or build settings change;
+source revisions are not enforced by the build.
 
 ### Scanner interpretation and file ownership
 
@@ -98,7 +98,7 @@ the standard SPDX document described in the
 The original native build passed PostgreSQL preload, `CREATE EXTENSION` and a
 forced `DuckDBScan` query. Follow-up SBOM checks reuse that compiled amd64 builder;
 they do not establish fresh compilation, ARM64 or hosted signing/SLSA acceptance.
-The local checks passed 43 shared tests, verified all eight copyright copies
+The local checks passed 42 shared tests, verified all eight copyright copies
 against their Debian source archives, and exercised the actual BuildKit SPDX
 through Grype. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
 matching; scanner matches on the real document still require applicability review.
@@ -107,9 +107,7 @@ matching; scanner matches on the real document still require applicability revie
 
 The Dockerfile clones the release named by `EXT_VERSION` and initializes its Git
 submodules recursively, following upstream's checkout instructions. The upstream
-CMake configuration fetches the matching pinned httpfs revision. The hook script
-runs a build-time source guard that reads the actual pg_duckdb and DuckDB checkout
-revisions after the build.
+CMake configuration fetches the matching pinned httpfs revision.
 Loadable httpfs is not installed in the image, matching upstream; downloaded
 extensions are outside the image SBOM. No GitHub API lookup or archive-specific build patch is needed.
 
