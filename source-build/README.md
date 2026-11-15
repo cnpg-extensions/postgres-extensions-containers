@@ -1,4 +1,4 @@
-# Source-build utilities
+# Source builds
 
 These utilities prepare and assemble native PostgreSQL extension builds. Recipes
 live under `pgrx/<name>` and `universe/<name>`; directory location determines the
@@ -7,6 +7,126 @@ build family. Shared tools live here, while Rust-specific tools live in `pgrx/`.
 Use the [PGRX recipe instructions](pgrx/README.md) for Rust extensions and the
 [Universe recipe instructions](universe/README.md) for other source builds. The
 [repository build guide](../BUILD.md) covers the shared Task/Dagger commands.
+
+## How images are built
+
+[`source-build.yml`](../.github/workflows/source-build.yml) selects extensions and calls
+[`source-build-targets.yml`](../.github/workflows/source-build-targets.yml) for each one.
+`prepare.py` turns the extension's `metadata.hcl` into a build plan. Each
+**target** is one distribution/PostgreSQL combination; each target gets separate
+AMD64 and ARM64 jobs on matching native runners.
+
+The boxes below distinguish runner hosts from the containers they launch.
+Solid arrows show data flow or required completion. Dashed arrows show reusable
+workflow calls, positioned after the jobs they depend on; these calls are
+scheduled by GitHub Actions, not made by the Python scripts. Smoke and SLSA
+workflows manage their own jobs and runners.
+
+```mermaid
+flowchart TD
+    Entry["source-build.yml"] -. "calls source-build-targets.yml" .-> Prepare
+
+    subgraph PrepRunner["Preparation runner"]
+        Prepare["prepare.py"]
+    end
+
+    subgraph AMD["AMD64 runner — per target"]
+        AB["build.py + Docker Bake"]
+        subgraph AC["BuildKit-managed containers"]
+            AX["Build extension → finalize evidence"]
+            AG["SBOM generator + recipe hook"]
+            AX --> AG
+        end
+        AB --> AX
+    end
+
+    subgraph ARM["ARM64 runner — per target"]
+        RB["build.py + Docker Bake"]
+        subgraph RC["BuildKit-managed containers"]
+            RX["Build extension → finalize evidence"]
+            RG["SBOM generator + recipe hook"]
+            RX --> RG
+        end
+        RB --> RX
+    end
+
+    subgraph Assembly["Assembly runner"]
+        Assemble["assemble.py + Cosign<br/>Merge and sign"]
+    end
+
+    subgraph Security["Security runner — per image"]
+        Scan["Shared security-scans action<br/>Dockle + optional Snyk"]
+    end
+
+    Smoke["Reusable smoke.yml<br/>Jobs per image / CNPG version"]
+    SLSA["Reusable SLSA workflow<br/>Testing provenance"]
+
+    subgraph Promotion["Promotion runner — main only"]
+        Promote["copy-images action"]
+    end
+
+    ProdSLSA["Reusable SLSA workflow<br/>Production provenance"]
+
+    Prepare --> AB
+    Prepare --> RB
+    AG -->|"Image + digest metadata"| Assemble
+    RG -->|"Image + digest metadata"| Assemble
+    Assemble --> Scan
+    Assemble -. "workflow call" .-> Smoke
+    Assemble -. "workflow call" .-> SLSA
+    Scan -->|"Job must succeed"| Promote
+    Smoke -->|"Must pass"| Promote
+    SLSA -->|"Must pass"| Promote
+    Promote -. "workflow call" .-> ProdSLSA
+```
+
+On each native runner, `build.py` checks the architecture before Docker Bake
+starts the build. Inside the build containers, the extension's Dockerfile
+installs tools, runs the upstream build recipe, finalizes source and license
+evidence, and copies runtime files into a minimal `scratch` image. The shared
+[SBOM generator](https://github.com/cnpg-extensions/cnpg-sbom-generator#consumer-integration) runs in its own container;
+the family or recipe hook adds selected source-built packages and license
+information to its SPDX 2.3 document. BuildKit attaches the SBOM and build
+provenance to the platform image.
+
+The build jobs push their images to the registry and pass digest metadata through
+workflow artifacts. On a separate runner, `assemble.py` combines both platforms
+and checks that every image and attestation descriptor survives unchanged.
+Cosign signs the assembled index. Later jobs use its immutable digest.
+
+Security, smoke tests, and testing-image SLSA provenance can then run in parallel.
+Security uses the shared Dockle/optional-Snyk action. The attached platform SBOMs
+remain available for consumer vulnerability and license reports through the
+[verification guide](#verify-images).
+Build-time SPDX validation remains in place. The shared smoke workflow tests the
+extension in CloudNativePG, and the shared SLSA workflow separately attests the
+testing image's build provenance.
+
+Branch builds publish testing images. After all required checks succeed, trusted
+`main` push or dispatch events can run the shared `copy-images` action on the
+promotion runner. It copies the checked images to production and signs their
+digests. A final SLSA workflow call attests the production images in their
+destination repositories.
+
+The shared `Source-build automerge gate` aggregates discovery, tooling checks
+and selected recipe acceptance. Successful releases trigger the existing catalog
+refresh; the catalog retains its upstream-first precedence and includes all
+three recipe families.
+
+### Shared orchestration and family-specific recipes
+
+PGRX and Universe share metadata discovery, native build preparation, assembly
+and release stages. The recipe location determines the family; logical extension
+names remain independent of their filesystem paths. Each family has its own Bake
+overlay: `docker-bake-pgrx.hcl` or `docker-bake-universe.hcl`, loaded after the
+shared `docker-bake.hcl`. Debian keeps its existing packaging path.
+
+Recipes own acquisition, compilation and the final payload. PGRX's Cargo helpers
+collect Rust dependency and license evidence; Universe recipes supply their own
+component and notice handling. Both augment the same shared SBOM generator.
+Runtime libraries, SQL files and notices go into the minimal image, while
+build-only tools stay in the builder. The broad `COPY source-build/ /source-build/`
+makes shared tools and resources available inside both families' builders.
 
 ## Dependency evidence in the SBOM
 
