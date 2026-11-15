@@ -44,7 +44,7 @@ Closes #<!-- proposal issue id -->
 - [ ] Renovate annotations and rules match the recipe family and upstream
       version scheme, with a verified package-to-SQL-version mapping.
 - [ ] Every distributed component meets the
-      [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers#open-source-licensing-policy),
+      [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/source-build/README.md#open-source-licensing-policy),
       with any exceptions explicitly approved and documented;
       SPDX `licenses` in `metadata.hcl` are accurate.
 - [ ] `task checks TARGET="<extension-name>"` passes locally.

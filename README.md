@@ -164,7 +164,7 @@ The project adheres to the following frameworks:
 When proposing a new extension, the following criteria must be met:
 
 - **Licensing:** All distributed components must comply with the
-  [Open Source Licensing Policy](#open-source-licensing-policy).
+  [Open Source Licensing Policy](source-build/README.md#open-source-licensing-policy).
 - **Structure:** only one extension can be included within an extension folder.
 - **Debian Packages:** Prefer extensions available as Debian packages in the `main` component (which by definition complies with
   the [DFSG](https://www.debian.org/social_contract#guidelines)), sourced from
@@ -200,16 +200,6 @@ naming.
 4. **Naming:** The name of the extension is the registry name.
 
 ---
-
-## Open Source Licensing Policy
-
-All software and other materials distributed in our PostgreSQL extension container images must either be available under an [OSI-approved license](https://opensource.org/licenses) or have already been accepted and shipped in Debian’s `main` or `contrib` archive areas under the same applicable licensing terms.
-
-This requirement covers all distributed material: extensions, libraries, dependencies, utilities, and bundled data in final images. Where Debian acceptance is relied upon, it must cover that material. Build-time dependencies that are not distributed are outside this policy’s scope.
-
-Maintainers may explicitly approve and document an exception for a compelling reason, but exceptions face a high bar and are unlikely.
-
-All images must satisfy applicable license obligations, including copyright notices, attribution, source availability, license compatibility, and redistribution requirements.
 
 ## Naming & Tagging Convention
 

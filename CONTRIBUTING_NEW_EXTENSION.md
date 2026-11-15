@@ -119,7 +119,7 @@ submit your proposal:
 2. Provide the package name or proposed source-build family, versioning info,
    and a link to the upstream source.
 3. State the license clearly. All components distributed in the final image must
-   satisfy the [Open Source Licensing Policy](README.md#open-source-licensing-policy).
+   satisfy the [Open Source Licensing Policy](source-build/README.md#open-source-licensing-policy).
    Identify any material requiring an explicitly approved and documented exception.
    Include the notices, attribution, source availability and redistribution
    obligations that apply to the payload. Build-only dependencies are outside

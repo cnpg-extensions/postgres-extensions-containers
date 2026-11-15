@@ -87,7 +87,7 @@ body:
       label: Extension License (SPDX identifier)
       description: |
         Select the SPDX license identifier for the extension. Distributed components
-        must meet the [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers#open-source-licensing-policy).
+        must meet the [Open Source Licensing Policy](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/source-build/README.md#open-source-licensing-policy).
         Select Other for a license not listed here and provide its identifier and
         terms in Additional Notes. Any exception requires explicit approval and documentation.
       options:

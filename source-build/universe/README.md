@@ -38,7 +38,7 @@ sufficient; no separate evidence script is required.
 Preserve the generator's OS package ownership and shipped-file inventory. A hook
 adds source-built packages with accurate names, versions or revisions, dependency
 relationships and licenses; it does not replace the generator. Runtime components
-and bundled data must meet the [licensing policy](../../README.md#open-source-licensing-policy).
+and bundled data must meet the [licensing policy](../README.md#open-source-licensing-policy).
 Build-only dependencies must not be reported as part of the distributed payload.
 
 See the [shared source-build guide](../README.md) for dependency evidence,
