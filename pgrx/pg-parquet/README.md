@@ -82,6 +82,11 @@ You should see `pg_parquet` listed with version `0.5.1`.
 
 - `pg_parquet` must be loaded through `shared_preload_libraries`; the Cluster
   configuration above supplies this setting.
+- When also preloading `pg_duckdb`, place `pg_parquet` after it for the
+  [tested COPY behavior](../../universe/pg-duckdb/README.md#known-caveats).
+- Local `COPY TO` paths must be writable by PostgreSQL. CNPG's read-only root
+  filesystem rejected `/tmp` in runtime testing; a path under the writable
+  PostgreSQL data volume passed the write/read roundtrip.
 - To read from or write to an object store, grant the corresponding
   `parquet_object_store_read` or `parquet_object_store_write` role to the
   PostgreSQL user. Configure credentials using the methods described in the

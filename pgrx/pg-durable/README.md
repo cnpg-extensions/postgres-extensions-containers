@@ -72,6 +72,9 @@ CREATE EXTENSION pg_durable;
 
 ### 3. Verify installation
 
+The example installs the extension; worker database authentication also needs
+configuration before application workflows can run (see [Known Caveats](#known-caveats)).
+
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
@@ -90,6 +93,20 @@ You should see `pg_durable` listed among the installed extensions.
   access to application roles with `SELECT df.grant_usage('app_role')` after
   creating the extension. Superuser-submitted workflows are disabled by
   default; enable them only when explicitly required.
+
+- Workers open separate database connections for management and for the
+  submitting role. With CNPG's default local peer authentication, the worker
+  running as the PostgreSQL OS user cannot authenticate as `app`; granting
+  `df.grant_usage` alone does not resolve this. The upstream
+  [connection host setting](https://github.com/microsoft/pg_durable/blob/v0.2.9/USER_GUIDE.md#connection-host)
+  selects the connection endpoint, but authentication must work for both the
+  management role (`postgres` by default) and submitting roles. In the tested
+  CNPG 1.30.1 / PostgreSQL 18.7 setup, switching to TCP while allowing only
+  `app` left management initialization failing authentication as `postgres`.
+  A workflow completed with `pg_durable.host=127.0.0.1` and a disposable,
+  loopback-only trust rule for both roles. This does not validate a production
+  authentication configuration: a credential-based setup remains unverified,
+  and the test's trust rule is not a production recommendation.
 
 ## Contributors
 
