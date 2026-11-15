@@ -91,7 +91,7 @@
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?(?: currentValue=(?<currentValue>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_SHA\\s*:\\s*[\"']?(?<currentDigest>[a-f0-9]+?)[\"']?\\s",
-        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[^:]+\\s*:\\s*[\"']?(?:[a-zA-Z0-9._/-]+:)?(?<currentValue>[^@]+?)(@(?<currentDigest>sha256:[0-9a-f]+))?[\"']?\\s"
+        "# renovate: datasource=(?<datasource>[a-z-.]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[^:]+\\s*:\\s*[\"']?(?:[a-zA-Z0-9._\/-]+:)?(?<currentValue>[^@]+?)(@(?<currentDigest>sha256:[0-9a-f]+))?[\"']?\\s"
       ]
     },
     {
@@ -146,9 +146,7 @@
         "/^ghcr\\.io\\/[^/]+\\/cnpg-sbom-generator$/"
       ],
       "groupName": "cnpg-sbom-generator image digests",
-      "matchUpdateTypes": [
-        "digest"
-      ],
+      "matchUpdateTypes": ["digest"],
       "matchCurrentValue": "latest",
       "automerge": true,
       "platformAutomerge": true,
@@ -167,7 +165,7 @@
         "https://download.postgresql.org/pub/repos/apt*"
       ],
       "prBodyNotes": [
-        "\u26a0\ufe0f Before approving this PR, confirm that the new extension version is a stable release, not a beta or release candidate. The Automerge gate fails on added Renovate-tracked version lines containing `alpha`, `beta`, `rc`, or `~` (case-insensitive), except for the documented AGE naming exception. Manual approval alone does not clear a failed gate."
+        "⚠️ Before approving this PR, confirm that the new extension version is a stable release, not a beta or release candidate. The Automerge gate fails on added Renovate-tracked version lines containing `alpha`, `beta`, `rc`, or `~` (case-insensitive), except for the documented AGE naming exception. Manual approval alone does not clear a failed gate."
       ]
     },
     {
@@ -208,7 +206,7 @@
       ],
       "automerge": false,
       "prBodyNotes": [
-        "\u26a0\ufe0f SQL versions in this image cannot all be updated by a verified package-version extraction rule. Before merging, inspect every shipped extension control file and SQL upgrade script, including independently versioned bundled extensions. Update metadata.hcl, README.md and affected test expectations where needed. Do not infer SQL versions from the package version or approve solely because CI passed."
+        "⚠️ SQL versions in this image cannot all be updated by a verified package-version extraction rule. Before merging, inspect every shipped extension control file and SQL upgrade script, including independently versioned bundled extensions. Update metadata.hcl, README.md and affected test expectations where needed. Do not infer SQL versions from the package version or approve solely because CI passed."
       ]
     },
     {
