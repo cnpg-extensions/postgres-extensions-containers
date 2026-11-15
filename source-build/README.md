@@ -223,9 +223,6 @@ Use established SPDX fields and Package URL types:
 
 - Record the actual upstream version when known. A source-declared version can
   be a useful, explicit approximation for a fork, as in the PGRX example below.
-  When no defensible version is available, omit optional `versionInfo`; do not
-  invent versions from repository commits and source paths. Distinguish source
-  versions from API compatibility macros.
 - Include an accurate standard PURL when the component's ecosystem and source
   support one. Do not guess registry membership, CPEs, versions or identifiers
   merely to satisfy a scanner. Preserve canonical names when a reliable PURL is
