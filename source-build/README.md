@@ -284,11 +284,9 @@ fork does not change the canonical crate name used for vulnerability matching.
 
 We intentionally use the version declared by the selected source as an
 approximation. A fork may include unreleased fixes or changes, so this can yield
-false positives or false negatives. Searching Git history for the latest
-published ancestor is not necessarily a better approximation: the inspected
-Tantivy fork declares `0.27.0`, but the highest stable, non-yanked release with an
-ancestor publication commit was `0.19.0`, because later release commits were on
-other branches. We preserve useful ecosystem identity without claiming exact
+false positives or false negatives. False-positive CVE findings for vulnerabilities
+already patched in pg-search's fork of a dependency will be handled with
+documentation updates in cnpg-extensions. We preserve useful ecosystem identity without claiming exact
 release equivalence or inventing commit-based versions and PURL qualifiers.
 
 The PGRX helpers implement this policy deliberately:
