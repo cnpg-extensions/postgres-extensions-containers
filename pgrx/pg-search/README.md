@@ -9,11 +9,16 @@ PostgreSQL extension for fast full-text, faceted, and hybrid search over
 PostgreSQL tables using the BM25 algorithm and Tantivy. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+> [!WARNING]
+> Use this Community build only with `spec.instances: 1` (no replicas).
+> Physical replication of search indexes is unsupported and can stop standby
+> recovery. See [Replication and failover](#replication-and-failover).
+
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then use the CronJob to install and refresh the catalog. These
 examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+set `instances: 1`, and keep your storage settings.
 
 ## Usage
 
@@ -28,6 +33,7 @@ kind: Cluster
 metadata:
   name: cluster-pg-search
 spec:
+  instances: 1
   imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
@@ -70,6 +76,24 @@ Once the database is ready, connect to it with `psql` and run:
 You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
 setting explicitly because preloads are not inherited from the catalog.
+
+## Replication and failover
+
+This image builds **ParadeDB Community**, which does not support physical
+replication of its search indexes. Do not use it with more than one instance
+(`spec.instances: 1`). A normal CNPG multi-instance cluster uses physical
+replication; mounting this extension image on every pod does not add the
+Enterprise WAL implementation.
+
+With the packaged pg_search 0.26.6, indexed queries on a standby fail explicitly
+because serving standby reads requires ParadeDB Enterprise. Upstream also rejects
+replaying index-initialization WAL records in Community, which can stop recovery
+of the entire standby, including replication of ordinary tables.
+
+Use a single-instance Community deployment, or evaluate an upstream-supported
+Enterprise deployment for physical replication and HA. Upstream also supports
+Community as a logical-replication subscriber with locally maintained search
+indexes; that is a different deployment from a CNPG physical standby.
 
 ## Known Caveats
 
