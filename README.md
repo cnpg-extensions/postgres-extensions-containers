@@ -141,12 +141,11 @@ rollout and may need an explicit restart. See [CNPG runtime caveats](https://clo
 
 </details>
 
-For immediate installation, start a Job and wait for completion before using the
-catalog. Use a new Job name for later manual refreshes; scheduled runs continue.
+For immediate installation, start a Job from the CronJob. Use a new Job name for
+later manual refreshes; scheduled runs continue.
 
 ```sh
 kubectl create job --from=cronjob/update-catalog update-catalog-initial -n default
-kubectl wait --for=condition=complete job/update-catalog-initial -n default --timeout=300s
 ```
 
 The [CNPG Extensions catalog](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
