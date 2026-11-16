@@ -86,7 +86,7 @@ CronJob failures covered by your usual monitoring. See the
 
 After configuring email alerts and testing delivery, install this CronJob. Its
 first run installs the catalog; subsequent runs refresh it **every Tuesday at
-1 AM Eastern**, adjusting for daylight saving time.
+10 PM Pacific**, adjusting for daylight saving time.
 CNPG then rolls out changed PostgreSQL and selected extension images to clusters
 referencing that catalog, keeping the selected PostgreSQL major version.
 
@@ -101,8 +101,8 @@ kind: CronJob
 metadata:
   name: update-catalog
 spec:
-  schedule: "0 1 * * 2"
-  timeZone: America/New_York
+  schedule: "0 22 * * 2"
+  timeZone: America/Los_Angeles
   jobTemplate:
     spec:
       template:
@@ -112,9 +112,7 @@ spec:
           containers:
             - name: kubectl
               image: alpine/kubectl:latest
-              command: ["kubectl", "apply", "-f"]
-              args:
-                - https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
+              command: [kubectl, apply, -f, https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml]
 ```
 
 <details>
