@@ -45,11 +45,15 @@ body:
       description: |
         The name of the Debian package in the `main` component (which by
         definition complies with the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)).
-        The PGDG (PostgreSQL Global Development Group) repository is the recommended
-        source, but other trusted, auditable Debian repositories are acceptable. Verify availability by running
-        `apt search <name>` inside a
-        `ghcr.io/cloudnative-pg/postgresql:<pg_version>-minimal-<distro>` container,
-        and provide the repository URL if not PGDG.
+        Packages must provide matching extension versions for both current Debian
+        `stable` and `oldstable`. The PGDG (PostgreSQL Global Development Group)
+        repository is required in practice to provide these matching versions;
+        the regular Debian repositories do not provide this consistency.
+        Other third-party APT repositories are not accepted. See the
+        [Debian-first inclusion policy](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/source-build/README.md).
+        Verify availability by running `apt search <name>` inside a
+        `ghcr.io/cloudnative-pg/postgresql:<pg_version>-minimal-<distro>` container
+        for each distribution.
       placeholder: ex. postgresql-<pg-major>-pgvector
     validations:
       required: true
