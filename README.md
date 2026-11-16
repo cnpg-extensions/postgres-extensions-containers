@@ -98,6 +98,10 @@ When proposing a new extension, the following criteria must be met:
   is the recommended source, but other Debian repositories are acceptable
   provided they meet the same standards. Rust extensions use the [PGRX path](pgrx/README.md);
   other source builds must meet the [Source Build inclusion criteria](source-build/README.md#inclusion-policy-debian-packaging-first).
+- **Dependency evidence:** Identify shipped dependencies and their actual versions,
+  preserve required notices, and account for them in the shared SBOM. Source builds
+  must meet the [dependency evidence requirements](source-build/README.md#dependency-evidence-in-the-sbom)
+  and use the existing build and release infrastructure.
 - **License inclusion:** all necessary license agreements for the extension and
   its dependencies must be included within the extension folder.
 
