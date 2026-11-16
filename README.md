@@ -115,13 +115,12 @@ naming.
 
 ### Submission Process
 
-1. **Proposal:** Open an issue requesting the extension and describing its
-   packaging and licensing requirements.
-2. **Approval:** Repository maintainers review the proposal and either approve it
-   or request changes.
-3. **Submission:** Contributors open a Pull Request (PR) to introduce the extension.
-   Repository maintainers review and maintain all extensions.
-4. **Naming:** The name of the extension is the registry name.
+1. **Proposal and discussion:** Open a GitHub issue to suggest an extension or
+   discuss its packaging and licensing requirements. Pull requests are welcome
+   but are not required to propose an extension or participate in discussion.
+2. **Review:** Repository maintainers review proposals and work with contributors
+   on requirements and implementation. Maintainers maintain all extensions.
+3. **Naming:** The name of the extension is the registry name.
 
 ---
 
