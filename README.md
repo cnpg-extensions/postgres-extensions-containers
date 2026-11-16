@@ -36,12 +36,9 @@ See the [CNPG requirements](https://cloudnative-pg.io/docs/1.30/imagevolume_exte
 
 ### 1. Set up extension-update email alerts first
 
-**Configure email alerts and test delivery before installing the catalog.** Image
-updates can leave SQL extension upgrades pending in individual databases.
-An email alert makes that follow-up work visible after weekly maintenance.
-
-With [CNPG metrics being scraped by Prometheus](https://cloudnative-pg.io/docs/1.30/monitoring/),
-use this query:
+**Configure email alerts and test delivery before installing the catalog.** With
+[CNPG metrics scraped by Prometheus](https://cloudnative-pg.io/docs/1.30/monitoring/),
+use:
 
 ```promql
 max by (namespace, cluster, datname, extname, installed_version, default_version) (
@@ -49,34 +46,32 @@ max by (namespace, cluster, datname, extname, installed_version, default_version
 ) == 1
 ```
 
-Use it in one of these three ways:
+- **Grafana email alert:** alert on values above zero and route to an
+  [email contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/). Self-hosted Grafana needs SMTP configured.
+- **Prometheus + Alertmanager email:** use the query as the alert rule's `expr`
+  and route to an [email receiver](https://prometheus.io/docs/alerting/latest/configuration/#email_config).
+- **Grafana dashboard:** use an instant table showing cluster, database,
+  extension, installed version and default version; pair it with email alerts.
 
-- **Grafana alert with email:** create an alert rule for returned values above
-  zero and route it to an [email contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/).
-  Configure SMTP for self-hosted Grafana and send a test notification.
-- **Prometheus alert with Alertmanager email:** use the query as an alert rule's
-  `expr` and route firing alerts to an [Alertmanager email receiver](https://prometheus.io/docs/alerting/latest/configuration/#email_config).
-- **Grafana dashboard:** use an instant table query to display cluster, database,
-  extension, installed version, and available default version. Pair the dashboard
-  with an email alert for unattended maintenance.
+Image updates supply binaries and scripts but can leave SQL upgrades pending.
+When alerted, review the extension's upgrade instructions and path, then set the
+target `version` in `Database.spec.extensions` or run `ALTER EXTENSION ... UPDATE`
+in each affected SQL-managed database. Verify the installed version and that the
+alert clears. See [CNPG extension management](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 
 ### 2. Set up the catalog maintenance CronJob
 
-After configuring email alerts and testing delivery, **change `schedule` and
-`timeZone` below to the start of your weekly maintenance window before installing
-the CronJob**. The example uses Tuesday at 10 PM in `America/Los_Angeles`,
-adjusting for daylight saving time. Its first run installs the catalog;
-subsequent runs refresh it during your chosen maintenance window.
-CNPG then rolls out changed PostgreSQL and selected extension images to clusters
-referencing that catalog, keeping the selected PostgreSQL major version.
-
-The schedule defines the start of your weekly maintenance window. It does not
-impose an end time on rollouts or prevent changes initiated by other controllers
-or administrators. Apply this example in the `default` namespace after creating
-the ServiceAccount and permissions shown below.
+**Change `schedule` and `timeZone` to your weekly maintenance window.** Apply the
+ServiceAccount/RBAC, then the CronJob in `default`. Its first run installs the
+catalog; later runs refresh it. CNPG rolls out changed PostgreSQL and selected
+extension images to referencing Clusters, keeping their PostgreSQL major version.
 
 <details>
 <summary>CronJob YAML: set your weekly maintenance window</summary>
+
+The example runs Tuesdays at 10 PM Los Angeles time, adjusting for daylight
+saving. The schedule sets a start time, not a rollout deadline, and does not
+prevent changes by other controllers or administrators.
 
 ```yaml
 apiVersion: batch/v1
@@ -98,15 +93,17 @@ spec:
               command: [kubectl, apply, -f, https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml]
 ```
 
+Catalog changes to only environment variables or library paths do not trigger a
+rollout and may need an explicit restart. See [CNPG runtime caveats](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#environment-variables-for-extensions).
+
 </details>
 
 <details>
 <summary>ServiceAccount and RBAC: apply before the CronJob</summary>
 
-This allows the first run to create the catalog and later runs to read and patch
-`postgresql-minimal-trixie`. Kubernetes RBAC cannot restrict `create` by resource
-name, so that permission applies to ClusterImageCatalog resources. If you use
-another namespace or catalog, update the names consistently.
+Allow catalog creation and read/patch access to `postgresql-minimal-trixie`.
+Kubernetes RBAC cannot restrict `create` by resource name. If changing the
+namespace or catalog, update the names consistently.
 
 ```yaml
 apiVersion: v1
@@ -144,73 +141,18 @@ subjects:
 
 </details>
 
-To install the catalog immediately, start a Job from the CronJob and wait for it
-to complete before configuring Clusters in step 3:
+For immediate installation, start a Job and wait for completion before using the
+catalog. Use a new Job name for later manual refreshes; scheduled runs continue.
 
 ```sh
 kubectl create job --from=cronjob/update-catalog update-catalog-initial -n default
 kubectl wait --for=condition=complete job/update-catalog-initial -n default --timeout=300s
 ```
 
-The scheduled runs continue automatically. To request another immediate refresh,
-use a new Job name with the same `kubectl create job --from` command.
-
-This catalog is a drop-in replacement for the corresponding upstream
-`postgresql-minimal-trixie` catalog, with additional extensions. See the
-[published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
-and [CloudNativePG image catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
-
-### 3. Enable extensions on individual Clusters
-
-Define each extension by name under `postgresql.extensions` in your `Cluster`
-resource. The catalog supplies its image reference and runtime settings. This
-example adds PL/Tcl; replace `imageCatalogRef: ...` with your catalog reference
-and keep your existing instance and storage settings.
-
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: example
-spec:
-  imageCatalogRef: ...
-  postgresql:
-    extensions:
-      - name: pltcl
-```
-
-Follow each [extension README](#supported-extensions) for required preload
-libraries, PostgreSQL parameters, dependencies, and the SQL extension name.
-
-Once the extension's files are available in the cluster, you can install it in a
-database in either of two ways:
-
-- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-- **Through SQL**, by running `CREATE EXTENSION pltcl;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
-
-For extensions that normally require superuser privileges, platform teams can use
-[pgextwlist](pgextwlist/README.md) to allow non-superusers to install an
-administrator-approved selection of extensions.
-
-### SQL extension updates
-
-An updated image supplies new binaries and SQL scripts; do not equate an image
-rollout with completion of every database's SQL extension migration. When an
-alert fires, review the extension's upgrade instructions and available upgrade
-path. For declaratively managed extensions, set the reviewed target `version`
-in the relevant `Database.spec.extensions` entry. For extensions managed directly
-with SQL, use `ALTER EXTENSION ... UPDATE` in each affected database. Confirm the
-installed version and that the alert clears. See
-[CNPG's database extension management](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-
-Changes only to catalog environment variables or library paths may need an
-explicit cluster restart; CNPG does not automatically roll out those changes
-alone. See the [runtime configuration caveats](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#environment-variables-for-extensions).
+The [CNPG Extensions catalog](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
+is a drop-in replacement for upstream `postgresql-minimal-trixie`, with additional
+extensions. See [CNPG's catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage)
+and the [extension READMEs](#supported-extensions) for usage.
 
 ---
 
