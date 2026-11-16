@@ -154,6 +154,10 @@ is a drop-in replacement for upstream `postgresql-minimal-trixie`, with addition
 extensions. See [CNPG's catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage)
 and the [extension READMEs](#supported-extensions) for usage.
 
+[Catalog refreshes](.github/workflows/update-catalogs.yml) are scheduled daily at
+**10:00 UTC** and also triggered after successful extension builds on `main`, so
+new images often appear in the published catalog in **less than 24 hours**.
+
 ---
 
 ## Supported Extensions
