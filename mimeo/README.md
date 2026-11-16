@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 Specialized per-table replication using snapshot, incremental, and DML-based methods. [Upstream project](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

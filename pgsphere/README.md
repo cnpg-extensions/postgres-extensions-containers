@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [pgSphere](https://pgsphere.github.io/) is a PostgreSQL extension that provides spherical geometry data types and operators for astronomical and geographical data. It supports types such as spherical points, circles, ellipses, lines, polygons, and boxes, along with indexing via GiST.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/Tcl runs Tcl functions inside PostgreSQL. This image supplies the trusted `pltcl` and untrusted `pltclu` variants with Tcl 8.6's shared library and standard script library. See the [PostgreSQL 18 PL/Tcl documentation](https://www.postgresql.org/docs/18/pltcl.html).
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Use with CloudNativePG

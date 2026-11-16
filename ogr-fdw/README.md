@@ -4,8 +4,8 @@ ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. See t
 
 PG18 packages are available for both Bookworm and Trixie on amd64 and arm64. The image sets GDAL_DATA to its bundled coordinate-system data directory and stages the linked GDAL runtime libraries.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Install and read a GeoJSON layer

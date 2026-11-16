@@ -9,8 +9,8 @@ schema design and configuration problems, including missing primary keys,
 redundant indexes, and missing indexes on foreign keys. These images support
 PostgreSQL 18 on Debian Bookworm and Trixie.
 
-Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

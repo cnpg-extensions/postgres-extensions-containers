@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [tds_fdw](https://github.com/tds-fdw/tds_fdw) is a PostgreSQL Foreign Data Wrapper (FDW) that enables PostgreSQL to query Microsoft SQL Server and Sybase databases using the TDS (Tabular Data Stream) protocol via FreeTDS.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

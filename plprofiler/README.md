@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [plprofiler](https://github.com/bigsql/plprofiler) is a PostgreSQL extension that provides execution profiling for PL/pgSQL functions and procedures. It collects per-statement call counts, total execution time, and self-time, helping you identify performance bottlenecks in stored procedure code.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

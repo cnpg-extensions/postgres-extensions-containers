@@ -10,8 +10,8 @@ Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT authenticity and
 exposes the validated claims to SQL. Without a JWK, it can use PostgREST-
 compatible JWT claims for identifying the current user.
 
-Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

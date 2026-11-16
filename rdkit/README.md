@@ -4,8 +4,8 @@ RDKit provides cheminformatics types and functions in PostgreSQL, including SMIL
 
 The PG18 package is available on Trixie only in this matrix, for amd64 and arm64. Bookworm has RDKit packages for older PostgreSQL majors but no PG18 package.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Install and use

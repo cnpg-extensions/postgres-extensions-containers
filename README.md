@@ -34,15 +34,57 @@ See the [CNPG requirements](https://cloudnative-pg.io/docs/1.30/imagevolume_exte
 
 ## Quick start
 
-Use the CNPG Extensions image catalog, **extension-update email alerts**, and a
-**weekly catalog-update CronJob** as the standard installation and maintenance
-path. The catalog includes upstream CloudNativePG extensions as well as the
+Set up **extension-update email alerts** first, then install the CNPG Extensions
+image catalog and a **weekly catalog-update CronJob** as the standard installation
+and maintenance path. The catalog includes upstream CloudNativePG extensions as well as the
 Debian, PGRX, and Universe extensions maintained here. Upstream entries always
 take precedence for the same extension, distribution, and PostgreSQL major.
 
-### 1. Install the catalog and choose your extensions
+### 1. Set up extension-update email alerts first
 
-Apply the Trixie catalog once:
+**Configure email alerts and test delivery before installing the catalog.** Image
+updates can leave SQL extension upgrades pending in individual databases.
+An email alert makes that follow-up work visible after weekly maintenance.
+
+With [CNPG metrics being scraped by Prometheus](https://cloudnative-pg.io/docs/1.30/monitoring/),
+use this query:
+
+```promql
+max by (namespace, cluster, datname, extname, installed_version, default_version) (
+  cnpg_pg_extensions_update_available
+) == 1
+```
+
+It returns installed extensions whose SQL version differs from the default
+available in the running PostgreSQL instance, with both versions included in
+the labels. It does not check the registry for newer images or report extensions
+that have not been created in a database. The aggregation removes duplicate
+replica results. Ensure your scrape configuration provides `namespace` and
+`cluster` labels; adapt the grouping to your actual cluster identity labels,
+including the Kubernetes cluster identifier when monitoring several clusters.
+
+Use it in one of these three ways:
+
+- **Grafana alert with email:** create an alert rule for returned values above
+  zero and route it to an [email contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/).
+  Configure SMTP for self-hosted Grafana and send a test notification.
+- **Prometheus alert with Alertmanager email:** use the query as an alert rule's
+  `expr` and route firing alerts to an [Alertmanager email receiver](https://prometheus.io/docs/alerting/latest/configuration/#email_config).
+- **Grafana dashboard:** use an instant table query to display cluster, database,
+  extension, installed version, and available default version. Pair the dashboard
+  with an email alert for unattended maintenance.
+
+For an existing cluster, confirm the unfiltered
+`cnpg_pg_extensions_update_available` metric is being collected. For a new
+cluster, configure the alert rule and test email delivery now, then verify
+metric collection once the cluster is running, before enabling the CronJob. No results from the filtered query can mean everything is up
+to date, but can also mean the metric is missing. Keep scrape failures and
+CronJob failures covered by your usual monitoring. See the
+[CNPG metric definition](https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml).
+
+### 2. Install the catalog and choose your extensions
+
+After configuring email alerts and testing delivery, apply the Trixie catalog once:
 
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
@@ -100,46 +142,6 @@ extensions in your manifests as shown in those READMEs; the catalog does not
 add them automatically. Installing the catalog alone does not enable every
 extension. See [CNPG's extension configuration](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#configuration-source-and-precedence).
 
-### 2. Set up extension-update monitoring and email first
-
-**Create and verify monitoring before installing the CronJob below.** Image
-updates can leave SQL extension upgrades pending in individual databases.
-An email alert makes that follow-up work visible after weekly maintenance.
-
-With [CNPG metrics being scraped by Prometheus](https://cloudnative-pg.io/docs/1.30/monitoring/),
-use this query:
-
-```promql
-max by (namespace, cluster, datname, extname, installed_version, default_version) (
-  cnpg_pg_extensions_update_available
-) == 1
-```
-
-It returns installed extensions whose SQL version differs from the default
-available in the running PostgreSQL instance, with both versions included in
-the labels. It does not check the registry for newer images or report extensions
-that have not been created in a database. The aggregation removes duplicate
-replica results. Ensure your scrape configuration provides `namespace` and
-`cluster` labels; adapt the grouping to your actual cluster identity labels,
-including the Kubernetes cluster identifier when monitoring several clusters.
-
-Use it in one of these three ways:
-
-- **Grafana alert with email:** create an alert rule for returned values above
-  zero and route it to an [email contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/).
-  Configure SMTP for self-hosted Grafana and send a test notification.
-- **Prometheus alert with Alertmanager email:** use the query as an alert rule's
-  `expr` and route firing alerts to an [Alertmanager email receiver](https://prometheus.io/docs/alerting/latest/configuration/#email_config).
-- **Grafana dashboard:** use an instant table query to display cluster, database,
-  extension, installed version, and available default version. Pair the dashboard
-  with an email alert for unattended maintenance.
-
-First confirm the unfiltered `cnpg_pg_extensions_update_available` metric is
-being collected. No results from the filtered query can mean everything is up
-to date, but can also mean the metric is missing. Keep scrape failures and
-CronJob failures covered by your usual monitoring. See the
-[CNPG metric definition](https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml).
-
 ### 3. Schedule your weekly maintenance
 
 Once monitoring and email delivery work, install this CronJob. It refreshes the
@@ -177,7 +179,7 @@ spec:
 <details>
 <summary>ServiceAccount and RBAC: apply before the CronJob</summary>
 
-The catalog must already exist from step 1. This grants access to read and patch
+The catalog must already exist from step 2. This grants access to read and patch
 only that catalog. If you use another namespace or the Bookworm catalog, update
 the namespace and catalog name consistently here and in the CronJob command.
 
@@ -223,7 +225,7 @@ choose one [compatible with your API server](https://kubernetes.io/releases/vers
 The catalogs are published daily at 10:00 UTC and after successful extension
 builds on `main`. Each refresh incorporates the upstream catalog. Publication
 does not update your installed Kubernetes object: the CronJob applies the
-latest published manifest on your schedule. You can also rerun the step 1
+latest published manifest on your schedule. You can also rerun the step 2
 command manually during maintenance. See the
 [catalog publication workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml).
 

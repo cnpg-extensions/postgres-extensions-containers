@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_statviz`](https://github.com/vyruss/pg_statviz) captures PostgreSQL statistics in database tables for later SQL analysis. The report generator and chart output are provided by a user-operated external client; this image adds no listener or web UI.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

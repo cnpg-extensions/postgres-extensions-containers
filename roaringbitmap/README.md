@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 Provides compressed Roaring bitmap data structures and set operations for PostgreSQL. See the [upstream project](https://github.com/ChenHuajun/pg_roaringbitmap) for its API and release history.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Use with CloudNativePG

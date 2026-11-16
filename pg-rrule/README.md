@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [pg_rrule](https://github.com/petropavel13/pg_rrule) is a PostgreSQL extension that adds support for iCalendar recurrence rules (RRULE) as a native data type. It allows you to store and process recurring event schedules using the standard RFC 5545 iCalendar format.
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

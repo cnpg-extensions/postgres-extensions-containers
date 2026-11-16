@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 [debversion](https://salsa.debian.org/postgresql/postgresql-debversion) is a PostgreSQL extension that adds a native `debversion` data type for representing and sorting Debian package version strings according to the Debian versioning algorithm (as defined in Debian Policy).
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

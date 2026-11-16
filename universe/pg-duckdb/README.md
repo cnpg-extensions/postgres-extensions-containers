@@ -10,8 +10,8 @@ tables and external data. This image supports PostgreSQL 18 on Debian Bookworm a
 for AMD64 and ARM64. Choose the Trixie or Bookworm catalog to match your cluster;
 the catalog supplies compatible PostgreSQL and extension image references.
 
-Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Usage

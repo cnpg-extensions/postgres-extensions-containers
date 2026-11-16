@@ -2,8 +2,8 @@
 
 Get and set the nice priorities of PostgreSQL backends. [Upstream documentation](http://pgxn.org/dist/prioritize/).
 
-Follow the [quick start](../README.md#quick-start) to install the catalog and set up
-extension-update email alerts before enabling weekly maintenance. These examples
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then install the catalog and enable weekly maintenance. These examples
 inherit image references and runtime settings from the catalog.
 
 ## Supported images
