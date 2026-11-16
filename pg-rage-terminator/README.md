@@ -32,25 +32,13 @@ spec:
     - name: pg-rage-terminator
 ```
 
-### 2. Enable the extension in a database
+### 2. Database setup
 
-Create an application database through CNPG; the worker needs no SQL extension object:
+`pg_rage_terminator` is a background worker and has no SQL extension object to
+install. Create the application database through your usual database provisioning
+process; no `CREATE EXTENSION` command is needed for this worker.
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-rage-terminator-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-rage-terminator
-```
-
-### 3. Verify installation
-
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+### 3. Verify operation
 
 The safe `chance=0` default leaves all sessions alone while confirming the module loaded. A positive chance can terminate any randomly selected TCP-backed session visible to the worker; the extension has no database, role, or application allowlist. Use a positive value only in an isolated ephemeral chaos-test Cluster with no unrelated TCP clients. This component is not a SQL `CREATE EXTENSION` object; check its live setting with `SHOW pg_rage_terminator.chance` through the Cluster's managed PostgreSQL service.
 

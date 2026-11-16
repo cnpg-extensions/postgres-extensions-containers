@@ -30,22 +30,20 @@ spec:
 
 ### 2. Enable the extension in a database
 
-Install the SQL extension in a database with a CNPG `Database` resource:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-unit-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-unit
-  extensions:
-  - ensure: present
-    name: unit
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION unit;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 

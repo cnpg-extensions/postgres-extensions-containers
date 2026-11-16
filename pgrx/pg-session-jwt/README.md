@@ -37,29 +37,20 @@ spec:
 
 ### 2. Enable the extension in a database
 
-You can install `pg_session_jwt` in a specific database by creating or
-updating a `Database` resource, or by running `CREATE EXTENSION` directly in
-`psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-session-jwt-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-session-jwt
-  extensions:
-  - name: pg_session_jwt
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_session_jwt;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_session_jwt;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 

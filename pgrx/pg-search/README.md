@@ -38,34 +38,26 @@ spec:
 ```
 
 `pg_search` also requires the `vector` extension. The example selects `pgvector`
-from the same catalog and installs `vector` before `pg_search` below.
+from the same catalog. Install `vector` before `pg_search` in the database.
 
 ### 2. Enable the extension in a database
 
-You can install `pg_search` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For
-example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-search-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-search
-  extensions:
-  - name: vector
-  - name: pg_search
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_search;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_search CASCADE;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+Install `vector`, then `pg_search` in that order.
 
 ### 3. Verify installation
 

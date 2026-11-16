@@ -36,22 +36,24 @@ spec:
 
 ### 2. Enable the extension in a database
 
-Enable the SQL extension in a Database, conventionally in the partman schema:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-partman-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-partman
-  extensions:
-  - name: pg_partman
-    schema: partman
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_partman;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+For `pg_partman`, create the `partman` schema first and use
+`CREATE EXTENSION pg_partman SCHEMA partman;`, or set `schema: partman` in the
+declarative extension entry.
 
 ### 3. Verify installation
 
