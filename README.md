@@ -49,14 +49,6 @@ max by (namespace, cluster, datname, extname, installed_version, default_version
 ) == 1
 ```
 
-It returns installed extensions whose SQL version differs from the default
-available in the running PostgreSQL instance, with both versions included in
-the labels. It does not check the registry for newer images or report extensions
-that have not been created in a database. The aggregation removes duplicate
-replica results. Ensure your scrape configuration provides `namespace` and
-`cluster` labels; adapt the grouping to your actual cluster identity labels,
-including the Kubernetes cluster identifier when monitoring several clusters.
-
 Use it in one of these three ways:
 
 - **Grafana alert with email:** create an alert rule for returned values above
