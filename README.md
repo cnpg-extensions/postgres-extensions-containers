@@ -94,9 +94,9 @@ This is a drop-in replacement for the corresponding upstream
 `postgresql-minimal-trixie` catalog, with additional extensions. See the [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
 and [CloudNativePG installation and usage documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
 
-Reference the catalog and select extensions by name. This excerpt enables
-PL/Tcl in the default `app` database. Replace `imageCatalogRef: ...` with your
-catalog reference and keep your existing instance and storage settings:
+Reference the catalog and select extensions by name. This excerpt makes PL/Tcl
+available in the cluster. Replace `imageCatalogRef: ...` with your catalog
+reference and keep your existing instance and storage settings:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -108,25 +108,13 @@ spec:
   postgresql:
     extensions:
       - name: pltcl
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: example-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: example
-  extensions:
-    - name: pltcl
 ```
 
 The catalog supplies immutable image references and any required
 `ld_library_path` and `env` values. You do not need to copy those settings into
-your Cluster. A `Database` extension entry without `version` installs the
-available default version initially. The catalog extension name and SQL extension
-name can differ: each [extension README](#supported-extensions) gives both.
+your Cluster. The catalog extension name and SQL extension name can differ:
+each [extension README](#supported-extensions) gives both and explains how to
+install the extension in a database declaratively or through SQL.
 
 Keep required `shared_preload_libraries`, PostgreSQL parameters, and dependent
 extensions in your manifests as shown in those READMEs; the catalog does not
