@@ -225,13 +225,6 @@ For PGRX and Universe images published through the shared source workflow:
 https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/source-build-targets.yml@refs/heads/main
 ```
 
-For older PGRX images published through `pgrx_targets.yml`, use their original
-signing identity instead:
-
-```text
-https://github.com/cnpg-extensions/postgres-extensions-containers/.github/workflows/pgrx_targets.yml@refs/heads/main
-```
-
 Keep the guide's GitHub Actions OIDC issuer and add
 `--new-bundle-format=false` for this repository's legacy-format signatures.
 For another publisher, change both the image repository and the exact workflow
