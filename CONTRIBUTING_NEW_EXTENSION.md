@@ -1,328 +1,132 @@
-# Contributing: Adding a New PostgreSQL Extension
+# Requesting and adding extensions
 
-To maintain high standards and avoid duplicated effort or architectural
-conflicts, every new extension begins with a formal proposal.
-Follow the [Debian-first inclusion policy](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/source-build/README.md)
-when choosing a build path.
-For the Debian framework, the extension must be available as a Debian package
-on both current `stable` and `oldstable`, in the `main` component (which by definition complies with
-the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
-from the PGDG (PostgreSQL Global Development Group) repository. Identify its
-versioning logic. This requirement follows the Debian-first policy: contributing
-packages benefits the wider PostgreSQL community, and preparing packages for
-Debian and PGDG tends to resolve licensing, redistribution and dependency-management
-issues before we distribute them. Other third-party APT repositories are not
-accepted; providing a working `.deb` alone does not establish that this work has
-been done. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
-Other source builds must justify their dependency-packaging obstacles under the
-[Universe criteria](source-build/universe/README.md). The package discovery and
-default scaffolding below describe the Debian path; source recipes use their
-family templates and native build instructions.
+## Start with an issue
 
-This guide walks you through the lifecycle of adding a new extension, from
-setting up your environment to submitting a Pull Request.
+[Request an extension](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose)
+with its name, upstream project link, and your use case. Share packaging and
+license details if known. You do not need to investigate packaging, build an
+image, or submit a PR first.
 
-> [!IMPORTANT]
-> Please ensure you have also read the general
-> [CONTRIBUTING.md](https://github.com/cloudnative-pg/governance/blob/main/CONTRIBUTING.md)
-> for CloudNativePG before proceeding.
+Maintainers maintain accepted extensions. Contributions are welcome, but
+requesting an extension does not commit you to implementing or maintaining it.
 
-## 1. Phase One: Fork, Clone, and Validate
+## What we accept
 
-Before proposing a change, ensure your local machine is compatible with the
-[build stack](BUILD.md).
+**Debian packaging comes first.** It serves the wider PostgreSQL community and
+helps resolve licensing, security, and dependency requirements. A missing package
+alone is not a reason to build from source.
 
-1. **Fork** the [cnpg-extensions/postgres-extensions-containers](https://github.com/cnpg-extensions/postgres-extensions-containers)
-   repository.
-2. **Clone** your fork and enter the directory:
-    ```sh
-    git clone https://github.com/<your-username>/postgres-extensions-containers.git
-    cd postgres-extensions-containers
-    ```
-3. **Verify the Environment:** Run the following to ensure you can build the
-   existing project ecosystem.
-    ```sh
-    task prereqs      # Check if Go, Task, and Docker are ready
-    task checks:all   # Validate Debian recipe configurations
-    task bake:all     # Optional: build all Debian recipes
-    ```
+| Build path | When it applies |
+| --- | --- |
+| Debian | PGDG packages in `main`, available for both current Debian `stable` and `oldstable`. Other APT repositories or standalone `.deb` files do not qualify. |
+| PGRX | PGRX extensions covered by the shared Rust toolchain exception. |
+| Universe | Other extensions with documented dependency-packaging or delivery obstacles. |
 
----
+See the [inclusion policy](source-build/README.md#inclusion-policy-debian-packaging-first)
+for the rationale and source-build criteria.
 
-## 2. Phase Two: The Proposal & Package Discovery
+All shipped material must meet the
+[licensing policy](source-build/README.md#open-source-licensing-policy), including
+notices, attribution, source availability, and redistribution obligations.
+Build-only dependencies are outside its scope. Exceptions require explicit
+approval and documentation.
 
-### Identifying the Package & Version
+Use the issue to settle eligibility, licensing concerns, and the build path
+before substantial implementation work.
 
-You must verify the package across both the current Debian `stable` and
-`oldstable` distributions to ensure compatibility. Use a temporary container to
-search the repositories:
+## Implementing an accepted proposal
 
-For Debian `stable` (13, `trixie`):
+This section is for maintainers, contributors, and coding agents doing the work.
+Follow the general
+[contribution guide](https://github.com/cloudnative-pg/governance/blob/main/CONTRIBUTING.md).
 
-```sh
-docker run -u root -ti --rm ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-```
+### Choose the recipe instructions
 
-For Debian `oldstable` (12, `bookworm`):
+Fork this repository and create a branch for the extension. Follow the guide
+for its build path:
 
-```sh
-docker run -u root -ti --rm ghcr.io/cloudnative-pg/postgresql:18-minimal-bookworm
-```
+- **Debian:** Use the [build guide](BUILD.md) and run
+  `task create-extension NAME=<extension-name>`. Complete the generated
+  `metadata.hcl`, `Dockerfile`, and `README.md`.
+- **PGRX:** Use the [PGRX recipe guide](source-build/pgrx/README.md).
+- **Universe:** Use the [Universe recipe guide](source-build/universe/README.md).
 
-Then, inside the container:
+Source builds use their family templates. See [advanced scaffolding](BUILD.md#advanced-scaffolding)
+for custom Debian versions or distributions.
 
-```sh
-apt update && apt search <EXTENSION_NAME>
-```
+### Configure metadata and updates
 
-#### Understanding the Version String
+Set metadata from the actual payload:
 
-Take note of both the **package name** and the **version string**.
-Using `pgvector` as an example, you will notice that while the package name
-remains constant, the versioning reflects the underlying Debian release:
+- `package`: full Debian package version, or literal upstream tag for source builds.
+- `sql`: SQL extension version matching the control file's `default_version`.
+  Required when `create_extension = true`.
+- `create_extension`: set to `false` for modules without a `.control` file.
 
-- `trixie`: `0.8.2-1.pgdg13+1`
-- `bookworm`: `0.8.2-1.pgdg12+1`
+**Every build path requires working Renovate rules.** Configure the rules and
+annotations for metadata and README examples, and verify version discovery and
+the package-to-SQL-version mapping. Follow the
+[update policy](README.md#automated-dependency-updates).
 
-> [!IMPORTANT]
-> The `pgdg13` or `pgdg12` suffix is critical. Correctly identifying this
-> versioning pattern ensures that `renovate` can automatically monitor the
-> upstream repositories and trigger update Pull Requests once your extension is
-> merged.
+### Document Universe dependencies and the Debian path
 
-#### Inspecting the Package Content
+Debian and PGRX dependency reporting is handled by the framework; no separate
+recipe-specific dependency report is needed.
 
-If you want to get a list of the files contained in the package, you need to
-first install the extension in the disposable container:
+Universe recipes must supply dependency evidence that automatic discovery misses.
+Use canonical upstream or ecosystem package names and actual versions so future
+vulnerability advisories can match them. Recipe-local nicknames are not substitutes
+for established identities. Follow the
+[dependency evidence requirements](source-build/README.md#dependency-evidence-in-the-sbom).
+
+In `PACKAGING.md`, summarize the SBOM contents and document the best path to
+Debian/PGDG inclusion: current blockers and the steps needed to resolve them.
+The Universe build is an interim solution. See the
+[Universe guide](source-build/universe/README.md).
+
+### Demonstrate that it works
+
+Run the targeted checks and full local E2E test:
 
 ```sh
-apt install <package-name>
-```
-
-Then, list the content of the package with:
-
-```sh
-dpkg -L <full-package-name>
-```
-
-Confirm that `.control` and `.sql` files are present in the expected PostgreSQL
-paths.
-
-> [!IMPORTANT]
-> If the package doesn't contain any `.control` file, it is likely to be a
-> **PostgreSQL module** rather than an extension. In this case, remember to set
-> the `create_extension` option to `false` in your `metadata.hcl` file.
-
-### Opening an Issue
-
-Repository maintainers maintain all extensions; contributions are welcome.
-
-After gathering the package details and verifying the extension's license,
-submit your proposal:
-
-1. Point your browser to ["New Extension Proposal"](https://github.com/cnpg-extensions/postgres-extensions-containers/issues/new/choose).
-2. Provide the package name or proposed source-build family, versioning info,
-   and a link to the upstream source.
-3. State the license clearly. All components distributed in the final image must
-   satisfy the [Open Source Licensing Policy](source-build/README.md#open-source-licensing-policy).
-   Identify any material requiring an explicitly approved and documented exception.
-   Include the notices, attribution, source availability and redistribution
-   obligations that apply to the payload. Build-only dependencies are outside
-   the policy's scope.
-
-Review licensing before investing significant development effort. A proposed
-exception requires explicit approval; submitting a proposal does not grant one.
-
----
-
-## 3. Phase Three: Implementation & Scaffolding
-
-### Creating a Branch
-
-```sh
-git checkout -b dev/<extension-name>
-```
-
-### Scaffolding
-
-Generate the directory structure automatically:
-
-```sh
-task create-extension NAME=<extension-name>
-```
-
-> [!NOTE]
-> For advanced scaffolding (custom distros or versions), see
-> [`BUILD.md`](./BUILD.md#advanced-scaffolding).
-
-### Customizing the Files
-
-The scaffolding generates `metadata.hcl`, `Dockerfile`, and `README.md`.
-Follow the specific instructions and "TODO" comments found within each
-generated file to finalize your extension.
-
-#### Package Version vs. SQL Version
-
-Your `metadata.hcl` file requires two version fields:
-
-- **`package`**: The full Debian package version (e.g., `0.8.2-1.pgdg13+1`).
-  This includes packaging metadata and is used to install the correct package.
-  For source recipes, this is the literal upstream source tag instead.
-
-- **`sql`**: The PostgreSQL extension version as it appears in the catalog
-  (e.g., `0.8.2`). This is the version of the extension that will be verified
-  as part of the automatic testing of the resulting containers. It should
-  match what is defined by the `default_version` field in the control file.
-
-
-> [!WARNING]
-> The `sql` version is optional and only needed if your extension uses
-> `CREATE EXTENSION` (when `create_extension = true` in metadata).
-
-> [!TIP]
-> Pay close attention to the `// renovate:` comments in the metadata and
-> `README.md` files; these are required for automated version tracking.
-
-### Automated Dependency Updates
-
-Renovate automatically merges eligible minor, patch and digest updates after
-required checks pass. Major updates and package-specific exceptions require
-manual review. Verify the package-to-SQL-version mapping before enabling an
-automatic update rule; see the [update policy](README.md#automated-dependency-updates).
-
----
-
-## 4. Phase Four: Local Testing & Validation
-
-Testing is the most critical part of the lifecycle.
-
-### Automated E2E Testing
-
-> [!NOTE]
-> For a detailed breakdown of the testing infrastructure, refer to
-> [`BUILD.md`](./BUILD.md#local-testing-guide).
-
-The repository provides a framework for full End-to-End validation. Ensure that
-the entire pipeline is working:
-
-```sh
+task prereqs
 task checks TARGET="<extension-name>"
-```
-
-For PGRX and Universe, first configure the native builder and pinned
-`sbom_generator` environment variable described in [BUILD.md](BUILD.md#usage-and-targets).
-Pass `BUILDER=<name>` to the E2E task.
-
-Then run the full E2E tests for the extension. This task will build your image,
-push it to a local registry, spin up a Kind cluster, and run the functional
-tests:
-
-```sh
 task e2e:test:full TARGET="<extension-name>"
 ```
 
-### Local Manual Verification
+PGRX and Universe require a native builder and pinned `sbom_generator`;
+follow [builder setup](BUILD.md#usage-and-targets) and pass `BUILDER=<name>`
+to the E2E task.
 
-Once the automated tests have run, the Kind cluster remains active. You can
-"drop in" to this environment to verify the instructions you wrote in your
-`README.md`.
+The E2E task builds the image, pushes it to a local registry, and tests it in Kind.
+Check every expected PostgreSQL/distribution combination. Add extension-specific
+Chainsaw tests in `test/` where useful.
 
-#### Exporting the Kubeconfig
-
-```sh
-task e2e:export-kubeconfig KUBECONFIG_PATH=./kubeconfig
-export KUBECONFIG=$PWD/kubeconfig
-```
-
-#### Identifying the Image Tag
-
-Once the image is built and pushed to the local registry (`localhost:5000`),
-you should verify the generated tags. You can use tools like `skopeo` to
-inspect the local registry:
-
-```bash
-skopeo list-tags --tls-verify=false docker://localhost:5000/<extension-name>-testing
-```
-
-> [!IMPORTANT]
-> Remember to add the `-testing` suffix to the container registry.
-
-Verify that the output lists tags for all expected PostgreSQL and Debian
-version combinations.
-
-#### Testing the Extension
-
-Create a `Cluster` resource using the instructions from your `README.md`.
-Pay close attention to the image location. Inside the Kubernetes cluster, the
-local registry is reachable at `registry.pg-extensions:5000`:
+Write and test README examples for `Cluster` and `Database` resources. In Kind,
+use the local image reference:
 
 ```yaml
 image:
   reference: registry.pg-extensions:5000/<extension-name>-testing:<tag>
 ```
 
-### Extending Tests
+The [local testing guide](BUILD.md#local-testing-guide) covers manual validation.
+Clean up with `task e2e:cleanup`.
 
-While the framework provides a generic smoke test, we highly encourage you to
-add **extension-specific tests** using the Chainsaw framework in the `test/`
-directory.
+### Submit the result
 
-### Cleaning up
+Open a PR against this repository's `main` branch using the
+[new-extension template](https://github.com/cnpg-extensions/postgres-extensions-containers/compare?expand=1&template=new_extension.md).
+Include:
 
-Once you have finished your manual verification, tear down the test
-environment:
+- A link to the proposal and a completed template checklist.
+- The recipe, tested README examples, and any extension-specific tests.
+- A `repository.release.distribution-points` entry in
+  [SECURITY-INSIGHTS.yml](SECURITY-INSIGHTS.yml) for the image's GitHub Packages page,
+  using `image_name` from metadata.
+- Validation results stating what ran and what remains unverified.
 
-```bash
-task e2e:cleanup
-```
-
----
-
-## 5. Phase Five: Documentation & The Pull Request
-
-### The `README.md` file
-
-The `README.md` is typically the last file you complete. A clear, professional
-`README.md` makes an extension successful. Ensure it includes YAML examples for
-`Cluster` and `Database` resources so users can immediately adopt your work.
-
-### Commit and Submit
-
-Once you have verified your extension locally and are satisfied with the
-results, it is time to submit your contribution.
-
-To maintain a clean and searchable history, we require a specific commit
-format. If you have multiple experimental commits on your branch, please squash
-them into a single commit before submitting.
-
-Format:
-
-```text
-feat: add `<extension-name>` container image
-
-<DESCRIPTION: Explain what the extension does and why it's being added.>
-
-Closes #<issue-id>
-```
-
-Submission Requirements:
-
-- **DCO Compliance**: All commits must be signed (`git commit -s`) to certify
-  that you have the right to submit the code under the project's license.
-- **Repository Target**: Ensure your Pull Request is targeting the `main` branch
-  of the CNPG Extensions repository.
-- **SECURITY-INSIGHTS.yml**: The PR must add a `distribution-points` entry for
-  the new image under `repository.release` in
-  [`SECURITY-INSIGHTS.yml`](./SECURITY-INSIGHTS.yml), pointing to its GitHub
-  Packages page (using the `image_name` from `metadata.hcl`).
-
-> [!IMPORTANT]
-> When opening the Pull Request, use the **new extension** template, which
-> includes the full contributor checklist for this lifecycle. GitHub does not
-> show a chooser for PR templates, so open the PR with this link to preselect
-> it:
-> [Open a new-extension PR](https://github.com/cnpg-extensions/postgres-extensions-containers/compare?expand=1&template=new_extension.md).
-> For any other change (version bumps, fixes, tooling, docs), the default
-> template is applied automatically, so you can open the PR normally.
-
-Repository maintainers are responsible for maintaining all accepted extensions.
+Squash experimental commits. Use ``feat: add `<extension-name>` container image``
+as the commit subject and reference the issue with `Closes #<issue-id>`.
+Sign off every commit with `git commit -s`. AI-assisted commits also require an
+`Assisted-By` trailer naming the assistant and model.
