@@ -46,10 +46,9 @@ type extensionVersion struct {
 type versionMap map[string]map[string]extensionVersion
 
 type extensionMetadata struct {
-	// BuildSystem is optional for existing targets. An omitted value is the
-	// historical Debian build path; pgrx targets opt in explicitly so the
-	// existing Debian workflows cannot accidentally schedule them.
-	BuildSystem            string            `hcl:"build_system,optional"`
+	// BuildSystem and RecipePath are internal location context, never metadata inputs.
+	BuildSystem            string
+	RecipePath             string
 	Name                   string            `hcl:"name" cty:"name"`
 	SQLName                string            `hcl:"sql_name" cty:"sql_name"`
 	ImageName              string            `hcl:"image_name" cty:"image_name"`
@@ -74,7 +73,7 @@ const (
 // parseBuildMatrix derives the build matrix for a target extension by reading
 // its metadata.hcl from the source directory.
 func parseBuildMatrix(ctx context.Context, source *dagger.Directory, target string) (*buildMatrix, error) {
-	metadata, err := parseExtensionMetadata(ctx, source.Directory(target))
+	metadata, err := lookupExtensionMetadata(ctx, source, target)
 	if err != nil {
 		return nil, err
 	}
@@ -137,8 +136,5 @@ func decodeExtensionMetadata(data []byte) (*extensionMetadata, error) {
 		return nil, err
 	}
 
-	if err := decodeBuildSystem(data, &rootMeta.Metadata); err != nil {
-		return nil, err
-	}
 	return &rootMeta.Metadata, nil
 }

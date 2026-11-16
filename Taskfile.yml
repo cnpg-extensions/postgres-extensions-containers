@@ -9,7 +9,7 @@ vars:
   NC: \033[0m
 
   E2E_NETWORK: pg-extensions-e2e
-  DAGGER_ENGINE_NAME: dagger-engine-pg-extensions
+  DAGGER_ENGINE_NAME: pg-extensions-dagger
   REGISTRY_NAME: registry.pg-extensions
   REGISTRY_HOST_NAME: localhost
   REGISTRY_HOST_PORT: 5000
@@ -74,16 +74,22 @@ tasks:
     prefix: 'checks-{{.TARGET}}'
     silent: true
     env:
+      build_timestamp: '{{now | date "2006-01-02T15:04:05Z07:00"}}'
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
+    vars:
+      RECIPE_PATH:
+        sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      BAKE_OVERLAY:
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
     preconditions:
-      - sh: test -f "{{.TARGET}}/metadata.hcl"
+      - sh: test -f "{{.RECIPE_PATH}}/metadata.hcl"
         msg: 'Not a valid target, metadata.hcl file is missing. Target: {{.TARGET}}'
     cmds:
       - echo -e "{{.BLUE}}Checking target {{.TARGET}}...{{.NC}}"
       # --check builds a single platform, which conflicts with the index-level
       # OCI annotations in docker-bake.hcl. Override the output to cacheonly so
       # the check only lints the build without exporting an image.
-      - docker buildx bake -f docker-bake.hcl -f {{.TARGET}}/metadata.hcl --check --set "*.output=type=cacheonly"
+      - docker buildx bake -f docker-bake.hcl {{.BAKE_OVERLAY}} -f {{.RECIPE_PATH}}/metadata.hcl --check --set "*.output=type=cacheonly"
     requires:
       vars:
         - name: TARGET
@@ -107,21 +113,33 @@ tasks:
     prefix: 'bake-{{.TARGET}}'
     silent: true
     env:
+      build_timestamp: '{{now | date "2006-01-02T15:04:05Z07:00"}}'
       registry: '{{ .REGISTRY_HOST_NAME }}:{{ .REGISTRY_HOST_PORT }}'
     vars:
+      RECIPE_PATH:
+        sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      BAKE_OVERLAY:
+        sh: 'case "{{.RECIPE_PATH}}" in pgrx/*) echo "-f docker-bake-pgrx.hcl";; universe/*) echo "-f docker-bake-universe.hcl";; esac'
+      BUILDER: '{{.BUILDER | default ""}}'
       PUSH: '{{.PUSH | default "false"}}'
       DRY_RUN: '{{.DRY_RUN | default "false"}}'
       METADATA_FILE: '{{.METADATA_FILE | default ""}}'
     preconditions:
-      - sh: test -f "{{.TARGET}}/metadata.hcl"
+      - sh: test -f "{{.RECIPE_PATH}}/metadata.hcl"
         msg: 'Not a valid target, metadata.hcl file is missing. Target: {{.TARGET}}'
     cmds:
       - echo -e "{{.BLUE}}Baking target {{.TARGET}} (push={{.PUSH}})...{{.NC}}"
       - |
         if [ "{{.DRY_RUN}}" = "true" ]; then
-          echo -e "{{.GREEN}}[DRY RUN] docker buildx bake -f docker-bake.hcl -f {{.TARGET}}/metadata.hcl --metadata-file="{{.METADATA_FILE}}" --push={{.PUSH}}{{.NC}}"
+          echo -e "{{.GREEN}}[DRY RUN] docker buildx bake {{if .BUILDER}}--builder {{.BUILDER}}{{end}} -f docker-bake.hcl {{.BAKE_OVERLAY}} -f {{.RECIPE_PATH}}/metadata.hcl --metadata-file="{{.METADATA_FILE}}" --push={{.PUSH}}{{.NC}}"
         else
-          docker buildx bake -f docker-bake.hcl -f {{.TARGET}}/metadata.hcl --metadata-file="{{.METADATA_FILE}}" --push={{.PUSH}}
+          if [ -n "{{.BAKE_OVERLAY}}" ]; then
+            test -n "${sbom_generator:-}" || { echo "Source builds require the pinned sbom_generator" >&2; exit 1; }
+            test -n "{{.BUILDER}}" || { echo "Source builds require BUILDER=<native docker-container builder>" >&2; exit 1; }
+            case "$(uname -m)" in x86_64) arch=amd64;; aarch64|arm64) arch=arm64;; *) exit 1;; esac
+            python3 source-build/build.py --architecture "$arch" --builder "{{.BUILDER}}"
+          fi
+          docker buildx bake {{if .BUILDER}}--builder {{.BUILDER}}{{end}} -f docker-bake.hcl {{.BAKE_OVERLAY}} -f {{.RECIPE_PATH}}/metadata.hcl --metadata-file="{{.METADATA_FILE}}" --push={{.PUSH}} {{if .BAKE_OVERLAY}}--set "*.platforms=linux/$arch"{{end}}
         fi
       - echo -e "{{.GREEN}}--- Successfully baked {{.TARGET}} ---{{.NC}}"
     requires:
@@ -184,8 +202,10 @@ tasks:
       - prereqs
     prefix: 'generate-values-{{.TARGET}}'
     vars:
-        EXTENSION_IMAGE: '{{ .EXTENSION_IMAGE| default "" }}'
-        REGISTRY_USERNAME: '{{ .REGISTRY_USERNAME| default "" }}'
+      RECIPE_PATH:
+        sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      EXTENSION_IMAGE: '{{ .EXTENSION_IMAGE| default "" }}'
+      REGISTRY_USERNAME: '{{ .REGISTRY_USERNAME| default "" }}'
     env:
       _EXPERIMENTAL_DAGGER_RUNNER_HOST: '{{ ._EXPERIMENTAL_DAGGER_RUNNER_HOST | default "" }}'
       REGISTRY_PASSWORD: '{{ .REGISTRY_PASSWORD | default "" }}'
@@ -195,7 +215,7 @@ tasks:
         dagger call -sm ./dagger/maintenance/ generate-testing-values
         --target {{ .TARGET }} --extension-image="{{ .EXTENSION_IMAGE }}"
         --registry-username="{{ .REGISTRY_USERNAME }}" --registry-password="env://REGISTRY_PASSWORD"
-        export --path {{.TARGET}}/values.yaml
+        export --path {{.RECIPE_PATH}}/values.yaml
     requires:
       vars:
         - name: TARGET
@@ -446,7 +466,9 @@ tasks:
   e2e:test:full:
     desc: "Run full E2E tests: setup env, generate values, run tests"
     vars:
-      METADATA_FILE: "{{ .TARGET }}/bake-metadata.json"
+      RECIPE_PATH:
+        sh: dagger call -sm ./dagger/maintenance/ recipe-path --target "{{.TARGET}}"
+      METADATA_FILE: "{{ .RECIPE_PATH }}/bake-metadata.json"
       KUBECONFIG_PATH: "./kubeconfig"
       DISTRO: '{{ .DISTRO | default "trixie" }}'
       REGISTRY_HOST: '{{ .REGISTRY_HOST | default "" }}'
@@ -473,7 +495,7 @@ tasks:
               jq -r --arg distro "{{ .DISTRO }}"
               'to_entries | .[] | select(.key | endswith("-" + $distro)) | .value["image.name"] | split(",")[0]'
               "{{ .METADATA_FILE }}"
-      - defer: rm -f "{{ .TARGET }}/values.yaml"
+      - defer: rm -f "{{ .RECIPE_PATH }}/values.yaml"
       - task: e2e:export-kubeconfig
         vars:
           KUBECONFIG_PATH: "{{ .KUBECONFIG_PATH }}"

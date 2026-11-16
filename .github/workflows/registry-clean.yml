@@ -39,13 +39,16 @@ jobs:
         env:
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
         run: |
-          image_names=()
-          for extension in $(jq -r '.[]' <<< "$VALID_TARGETS"); do
-            image_name=$(sed -n 's/^\s*image_name\s*=\s*"\(.*\)"$/\1/p' "${extension}/metadata.hcl")
-            image_names+=("${image_name}-testing")
-          done
-          printf -v joined '%s, ' "${image_names[@]}"
-          echo "value=${joined%, }" >> "$GITHUB_OUTPUT"
+          python3 - <<'PYTHON'
+          import json, os, sys
+          sys.path.insert(0, 'source-build')
+          from workflow import discover
+          inventory = discover()
+          names = [inventory[name]['image_name'] + '-testing'
+                   for name in json.loads(os.environ['VALID_TARGETS'])]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('value=' + ', '.join(names) + '\n')
+          PYTHON
 
       - name: Delete '-testing' operand images
         uses: snok/container-retention-policy@d3bdcf5ce9b05f685154e4a16c39233b245e3d53 # v3.1.0

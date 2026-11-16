@@ -86,48 +86,92 @@ func getExtensions(
 		opt(options)
 	}
 
-	dirs, err := extensionsDirectories(ctx, source)
+	inventory, err := recipeInventory(ctx, source)
 	if err != nil {
 		return nil, err
 	}
-
 	extensions := make(map[string]string)
-	for _, dir := range dirs {
-		metadata, err := parseExtensionMetadata(ctx, dir)
-		if err != nil {
-			return nil, err
-		}
-		buildSystem, err := effectiveBuildSystem(metadata)
-		if err != nil {
-			return nil, err
-		}
-		if options.buildSystem != "" && buildSystem != options.buildSystem {
+	for name, metadata := range inventory {
+		if options.buildSystem != "" && metadata.BuildSystem != options.buildSystem {
 			continue
 		}
-
-		if options.filterOSLibs && !metadata.AutoUpdateOsLibs {
+		if options.filterOSLibs && (metadata.BuildSystem != debianBuildSystem || !metadata.AutoUpdateOsLibs) {
 			continue
 		}
-
-		dirName, err := dir.Name(ctx)
-		if err != nil {
-			return nil, err
-		}
-		extensions[path.Dir(dirName)] = metadata.Name
+		extensions[metadata.RecipePath] = name
 	}
-
 	return extensions, nil
 }
 
-func extensionsDirectories(ctx context.Context, source *dagger.Directory) ([]*dagger.Directory, error) {
-	paths, err := source.Glob(ctx, path.Join("**", metadataFile))
+// recipeFamily accepts only the three explicit recipe depths.
+func recipeFamily(p string) string {
+	parts := strings.Split(p, "/")
+	if len(parts) == 2 && parts[1] == metadataFile && parts[0] != "source-build" && parts[0] != "pgrx" && parts[0] != "universe" {
+		return debianBuildSystem
+	}
+	if len(parts) == 3 && parts[2] == metadataFile {
+		switch parts[0] {
+		case "pgrx", "universe":
+			return parts[0]
+		}
+	}
+	return ""
+}
+
+func recipeInventory(ctx context.Context, source *dagger.Directory) (map[string]*extensionMetadata, error) {
+	var paths []string
+	for _, pattern := range []string{"*/metadata.hcl", "pgrx/*/metadata.hcl", "universe/*/metadata.hcl"} {
+		matches, err := source.Glob(ctx, pattern)
+		if err != nil {
+			return nil, err
+		}
+		paths = append(paths, matches...)
+	}
+	return loadRecipeInventory(paths, func(p string) (*extensionMetadata, error) {
+		return parseExtensionMetadata(ctx, source.Directory(path.Dir(p)))
+	})
+}
+
+func loadRecipeInventory(paths []string, load func(string) (*extensionMetadata, error)) (map[string]*extensionMetadata, error) {
+	inventory := map[string]*extensionMetadata{}
+	for _, p := range paths {
+		family := recipeFamily(p)
+		if family == "" {
+			continue
+		}
+		metadata, err := load(p)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", p, err)
+		}
+		metadata.BuildSystem, metadata.RecipePath = family, path.Dir(p)
+		if previous, ok := inventory[metadata.Name]; ok {
+			return nil, fmt.Errorf("duplicate logical name %q in %s and %s", metadata.Name, previous.RecipePath, metadata.RecipePath)
+		}
+		inventory[metadata.Name] = metadata
+	}
+	return inventory, nil
+}
+
+func lookupExtensionMetadata(ctx context.Context, source *dagger.Directory, name string) (*extensionMetadata, error) {
+	inventory, err := recipeInventory(ctx, source)
 	if err != nil {
 		return nil, err
 	}
-	directories := make([]*dagger.Directory, 0, len(paths))
-	for _, p := range paths {
-		directories = append(directories, source.Directory(path.Dir(p)))
+	metadata, ok := inventory[name]
+	if !ok {
+		return nil, fmt.Errorf("unknown extension %q", name)
 	}
+	return metadata, nil
+}
 
+func extensionsDirectories(ctx context.Context, source *dagger.Directory) ([]*dagger.Directory, error) {
+	inventory, err := recipeInventory(ctx, source)
+	if err != nil {
+		return nil, err
+	}
+	var directories []*dagger.Directory
+	for _, metadata := range inventory {
+		directories = append(directories, source.Directory(metadata.RecipePath))
+	}
 	return directories, nil
 }

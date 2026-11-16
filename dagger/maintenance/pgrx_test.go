@@ -6,7 +6,7 @@ import (
 )
 
 func TestDecodePgrxBuildSystem(t *testing.T) {
-	data, err := os.ReadFile("../../pg-durable/metadata.hcl")
+	data, err := os.ReadFile("../../pgrx/pg-durable/metadata.hcl")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -14,9 +14,9 @@ func TestDecodePgrxBuildSystem(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Losing the downstream decoder hook must not silently classify PGRX as Debian.
-	if metadata.BuildSystem != pgrxBuildSystem {
-		t.Fatalf("decoded build system = %q, want %q", metadata.BuildSystem, pgrxBuildSystem)
+	// The upstream decoder accepts retained legacy metadata without reading it.
+	if metadata.BuildSystem != "" {
+		t.Fatalf("decoded legacy build system = %q, want empty", metadata.BuildSystem)
 	}
 }
 
@@ -45,12 +45,12 @@ func TestEffectiveBuildSystem(t *testing.T) {
 }
 
 func TestPgrxCatalogVersionPreservesSourceTag(t *testing.T) {
-	metadata := &extensionMetadata{Name: "pg-durable", BuildSystem: pgrxBuildSystem, ImageName: "pg-durable", Versions: versionMap{"trixie": {"18": {Package: "v0.2.7"}}}}
+	metadata := &extensionMetadata{Name: "pg-durable", BuildSystem: pgrxBuildSystem, ImageName: "pg-durable", Versions: versionMap{"trixie": {"18": {Package: "v0.2.7-rc.1-extra"}}}}
 	got, err := getExtensionImage(metadata, "trixie", 18)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got != "ghcr.io/cnpg-extensions/pg-durable:v0.2.7-18-trixie" {
+	if got != "ghcr.io/cnpg-extensions/pg-durable:0.2.7-rc.1-extra-18-trixie" {
 		t.Fatal(got)
 	}
 }

@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+# SPDX-License-Identifier: Apache-2.0
+
+# BuildKit scans the builder, including recipe-owned source evidence.
+ARG BUILDKIT_SBOM_SCAN_STAGE=builder
+ARG BASE=ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
+FROM ${BASE} AS builder
+
+ARG PG_MAJOR={{ .DefaultVersion }}
+ARG EXT_VERSION
+ARG TARGETARCH
+
+USER 0
+COPY source-build/ /source-build/
+
+# TODO: Install the tools and development libraries required by this recipe.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential ca-certificates python3 postgresql-server-dev-${PG_MAJOR} \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /build
+# TODO: Set the upstream archive URL. Metadata supplies the literal EXT_VERSION.
+# Download any pinned nested dependencies required by the selected release here.
+ADD https://github.com/<owner>/<repo>/archive/${EXT_VERSION}.tar.gz /tmp/source.tar.gz
+RUN tar -xzf /tmp/source.tar.gz --strip-components=1 --no-same-owner -C /build \
+    && rm /tmp/source.tar.gz
+
+# TODO: Use the selected release's documented compilation and install commands.
+# Record that documentation URL here. Install under /install for payload staging.
+# This placeholder must be replaced before building.
+RUN echo 'TODO: implement upstream compilation and installation' >&2 && exit 1
+
+# TODO: Stage original notices under /licenses and implement the recipe hook.
+# Use inline copy commands where sufficient; no separate evidence script is required.
+# Preserve dpkg ownership for the shared generator and add source-built components
+# through augment_spdx(document, context), using the documented package boundaries.
+COPY universe/{{ .Name }}/augment_spdx.py /usr/local/share/cnpg-sbom/augment_spdx.py
+
+FROM scratch
+ARG PG_MAJOR={{ .DefaultVersion }}
+# TODO: Adjust installed filenames; copy additional runtime libraries separately
+# under /system only when needed, and declare the corresponding metadata path.
+COPY --from=builder /install/usr/lib/postgresql/${PG_MAJOR}/lib/{{ replaceAll .Name "-" "_" }}.so /lib/
+COPY --from=builder /install/usr/share/postgresql/${PG_MAJOR}/extension/ /share/extension/
+COPY --from=builder /licenses/ /licenses/
+USER 65532:65532

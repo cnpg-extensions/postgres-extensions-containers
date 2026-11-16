@@ -56,7 +56,7 @@ jobs:
       packages: write
       id-token: write
       security-events: write
-    uses: ./.github/workflows/pgrx.yml
+    uses: ./.github/workflows/source-build.yml
     with:
       pr_number: ${{ format('{0}', github.event.pull_request.number) }}
       expected_sha: ${{ github.event.pull_request.head.sha }}

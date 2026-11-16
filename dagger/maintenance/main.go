@@ -105,7 +105,7 @@ func (m *Maintenance) GetOSLibsTargets(
 	if err != nil {
 		return "", err
 	}
-	jsonTargets, err := json.Marshal(slices.Sorted(maps.Keys(targetExtensions)))
+	jsonTargets, err := json.Marshal(slices.Sorted(maps.Values(targetExtensions)))
 	if err != nil {
 		return "", err
 	}
@@ -120,7 +120,7 @@ func (m *Maintenance) GetTargets(
 	// +ignore=["dagger", ".github"]
 	// +defaultPath="/"
 	source *dagger.Directory,
-	// Limit targets to a build system (debian or pgrx). Defaults to debian; use all for every extension.
+	// Limit targets to a build family (debian, pgrx, or universe). Defaults to debian; use all for every extension.
 	// +optional
 	buildSystem string,
 ) (string, error) {
@@ -132,7 +132,7 @@ func (m *Maintenance) GetTargets(
 	if err != nil {
 		return "", err
 	}
-	jsonTargets, err := json.Marshal(slices.Sorted(maps.Keys(targetExtensions)))
+	jsonTargets, err := json.Marshal(slices.Sorted(maps.Values(targetExtensions)))
 	if err != nil {
 		return "", err
 	}
@@ -159,7 +159,7 @@ func (m *Maintenance) GenerateTestingValues(
 	// +optional
 	registryPassword *dagger.Secret,
 ) (*dagger.File, error) {
-	metadata, err := parseExtensionMetadata(ctx, source.Directory(target))
+	metadata, err := lookupExtensionMetadata(ctx, source, target)
 	if err != nil {
 		return nil, err
 	}
@@ -381,31 +381,25 @@ func (m *Maintenance) Test(
 	extraArgs []string,
 ) error {
 	extDir := source
-	if target != "all" {
-		extDir = source.Filter(dagger.DirectoryFilterOpts{
-			Include: []string{path.Join(target, "**"), "test"},
-		})
-		hasMetadataFile, err := extDir.Exists(ctx, path.Join(target, metadataFile))
-		if err != nil {
-			return err
-		}
-		if !hasMetadataFile {
-			return fmt.Errorf("not a valid target, metadata.hcl file is missing. Target: %s", target)
-		}
-	}
-
-	targetExtensions, err := extensionsDirectories(ctx, extDir)
+	inventory, err := recipeInventory(ctx, source)
 	if err != nil {
 		return err
+	}
+	targetExtensions := map[string]*extensionMetadata{}
+	for name, metadata := range inventory {
+		if target != "all" && name != target {
+			continue
+		}
+		targetExtensions[name] = metadata
+	}
+	if len(targetExtensions) == 0 {
+		return fmt.Errorf("unknown extension %q", target)
 	}
 
 	const valuesFile = "values.yaml"
 
-	for _, targetExtension := range targetExtensions {
-		extName, err := targetExtension.Name(ctx)
-		if err != nil {
-			return err
-		}
+	for extName, metadata := range targetExtensions {
+		targetExtension := source.Directory(metadata.RecipePath)
 
 		hasValues, err := targetExtension.Exists(ctx, valuesFile)
 		if err != nil {
@@ -505,6 +499,7 @@ func (m *Maintenance) GenerateCatalogs(
 		if err != nil {
 			return nil, fmt.Errorf("while parsing extension %s metadata: %w", extension, err)
 		}
+		metadata.BuildSystem, metadata.RecipePath = recipeFamily(path.Join(dir, metadataFile)), dir
 		metadataByDir[dir] = metadata
 	}
 
@@ -567,4 +562,15 @@ func (m *Maintenance) GenerateCatalogs(
 	}
 
 	return outDir, nil
+}
+
+// Resolve a logical target to its location-derived recipe directory.
+func (m *Maintenance) RecipePath(ctx context.Context,
+	// +defaultPath="/"
+	source *dagger.Directory, target string) (string, error) {
+	metadata, err := lookupExtensionMetadata(ctx, source, target)
+	if err != nil {
+		return "", err
+	}
+	return metadata.RecipePath, nil
 }

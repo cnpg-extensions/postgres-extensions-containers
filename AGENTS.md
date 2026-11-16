@@ -25,18 +25,66 @@ cleanly. Distinguish pending upstream updates from intentional downstream
 choices. Record actual source workarounds and their removal conditions, rather
 than documenting inherited choices as new exceptions.
 
-Keep Debian and PGRX on the shared CNPG support policy in
+Keep Debian, PGRX and Universe on the shared CNPG support policy in
 [cnpg-versions.yml](.github/workflows/cnpg-versions.yml), with one Renovate-managed
 latest-release pin. This logic was extracted from Debian's `bake_targets.yml`;
 when upstream changes its version selection, apply the same intent to the shared
 workflow rather than creating a separate PGRX support matrix. Follow the
 [upstream merge process](MERGE.md).
 
-Keep PGRX release acceptance aligned with Debian: build-time validation,
+Keep PGRX and Universe release acceptance aligned with Debian: build-time validation,
 security scanning, signing, shared runtime smoke tests, and required SLSA jobs.
 Do not add repeated full OCI-graph verification or per-field BuildKit provenance
 comparisons against preparation records to these stages. Keep independent
-[consumer verification](pgrx/README.md#verify-images) available.
+[consumer verification](README.md#verify-images) available.
+
+## Before major changes: upstream merge-risk review
+
+Use the following prompt before major changes, especially shared infrastructure
+refactors. Use the findings to shape the implementation; this review does not
+introduce an approval gate. Reuse a recent audit when its commit references and
+scope still apply, and review the proposed changes against it.
+
+> Before implementing the proposed change, assess its effect on future merges
+> from `https://github.com/cloudnative-pg/postgres-extensions-containers`.
+>
+> 1. Record the current branch SHA, fetched upstream main SHA, and merge base.
+>    Read `MERGE.md` and the latest merge record. This is a review, not an
+>    instruction to merge upstream or modify unrelated files.
+> 2. Programmatically enumerate every file under `.github/workflows/` and
+>    `dagger/`, plus root `Taskfile.yml`. Include other files affected by the
+>    proposed change and relevant callers. Compare exact paths in both Git trees;
+>    classify each as identical, modified, downstream-only, or upstream-only.
+>    Account separately for local generated/ignored files. Do not hand-merge
+>    generated code.
+> 3. For every shared modified file, inspect the actual changed lines and record
+>    hunk locations. Separate accumulated downstream differences from incoming
+>    upstream changes since the merge base. Use a non-mutating merge preview
+>    where practical, but do not equate clean merging with behavioral safety.
+> 4. Assess each file for both today's merge and future upstream changes. Trace
+>    extracted helpers, parallel Debian/PGRX/Universe paths, and new callers that
+>    could bypass downstream behavior. Consider recipe discovery, family/path
+>    defaults, version handling, metadata propagation, catalog precedence,
+>    dependency resolution, test selection, CNPG support policy, authorization,
+>    required gates, signing/provenance and production promotion.
+> 5. Distinguish mistakes that cause explicit compile/build/test failures from
+>    mistakes that can silently produce valid but incorrect output. Pay special
+>    attention to permissive defaults, empty or reduced selections, optional
+>    fields, omitted gate prerequisites and stale test assertions. Identify the
+>    existing check that catches each mistake, or state that coverage is missing.
+> 6. Prefer small changes that make incorrect merges fail visibly. Preserve
+>    upstream-compatible public behavior while enforcing necessary internal
+>    invariants. Recommend targeted caller/output tests, not fixed inventory
+>    counts, duplicate frameworks or repeated full-image verification. Use
+>    temporary fixtures or overlays to demonstrate important silent regressions
+>    when useful; do not alter the working tree for mutation experiments.
+> 7. Produce a local file-by-file report with commit references, changed-line
+>    evidence, current conflict status, future silent-regression risks, existing
+>    protections and prioritized recommendations. Include identical and
+>    downstream-only files, since upstream intent may need adapting elsewhere.
+>    State exactly what was tested and what remains unverified. Explain how the
+>    proposed implementation avoids or mitigates the highest risks. Do not
+>    publish the report or change repository policy merely to complete the audit.
 
 ## Keep orchestration small
 
@@ -50,7 +98,8 @@ self-checksums. Simplify producers and consumers together, including workflow
 jobs and artifact handoffs. Do not remove a check merely because it is custom:
 retain checks that prevent incorrect or incomplete published output.
 
-Use trusted upstream HTTPS source archives and record what was actually built.
+Use trusted upstream HTTPS source archives or Git checkouts and record what was
+actually built.
 Do not reintroduce preparation-time archive checksum enforcement or
 cross-platform source-consistency machinery that was intentionally removed.
 Keep useful source evidence, lockfile guards for actual recipe workarounds,

@@ -16,20 +16,11 @@ const baseImageDependencyPrefix = "base-image:"
 func resolveTestingDependencies(ctx context.Context, source *dagger.Directory,
 	dependencies []string,
 ) ([]*testingExtensionInfo, error) {
-	return resolveDependencies(dependencies, func(name string) (*extensionMetadata, error) {
-		exists, err := source.Exists(ctx, name)
-		if err != nil {
-			return nil, err
-		}
-		if !exists {
-			return nil, nil
-		}
-		metadata, err := parseExtensionMetadata(ctx, source.Directory(name))
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse dependency metadata %q: %w", name, err)
-		}
-		return metadata, nil
-	})
+	inventory, err := recipeInventory(ctx, source)
+	if err != nil {
+		return nil, err
+	}
+	return resolveDependencies(dependencies, func(name string) (*extensionMetadata, error) { return inventory[name], nil })
 }
 
 func resolveDependencies(dependencies []string,

@@ -108,7 +108,7 @@
       "description": "Synchronize PGRX source tags and SQL versions in extension metadata",
       "customType": "regex",
       "managerFilePatterns": [
-        "/^[^/]+/metadata\\.hcl$/"
+        "/^pgrx/[^/]+/metadata\\.hcl$/"
       ],
       "matchStrings": [
         "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags|git-tags)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
@@ -120,12 +120,46 @@
       "description": "PGRX build tool releases",
       "customType": "regex",
       "managerFilePatterns": [
-        "/pgrx/dependencies/tools\\.json$/"
+        "/^source-build/pgrx/dependencies/tools\\.json$/"
       ],
       "matchStrings": [
         "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"",
         "\"version\":\\s*\"(?<currentValue>[^\"]+)\"\\s*,\\s*\"datasource\":\\s*\"(?<datasource>[^\"]+)\"\\s*,\\s*\"depName\":\\s*\"(?<depName>[^\"]+)\""
       ]
+    },
+    {
+      "description": "Track Universe source releases; SQL versions require release review",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "universe/!(pg-duckdb)/metadata.hcl"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+package\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depTypeTemplate": "universe-source"
+    },
+    {
+      "description": "Synchronize pg_duckdb production release and SQL versions",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^universe/pg-duckdb/metadata\\.hcl$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)[ \\t]*\\r?\\n(?<indentation>[ \\t]*)package[ \\t]*=[ \\t]*\"(?<currentValue>[^\"]+)\"\\s+sql[ \\t]*=[ \\t]*\"[^\"]+\""
+      ],
+      "depTypeTemplate": "universe-source",
+      "autoReplaceStringTemplate": "# renovate: datasource={{{datasource}}} depName={{{depName}}} versioning={{{versioning}}}\n{{{indentation}}}package = \"{{{newValue}}}\"\n{{{indentation}}}sql     = \"{{{replace '^v' '' newValue}}}\""
+    },
+    {
+      "description": "Synchronize source-recipe README image and SQL examples",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^(?:pgrx|universe)/[^/]+/README\\.md$/"
+      ],
+      "matchStrings": [
+        "#\\s*renovate:\\s*datasource=(?<datasource>github-tags|gitlab-tags|git-tags|github-releases)\\s+depName=(?<depName>\\S+)\\s+versioning=(?<versioning>\\S+)\\s+depType=(?<depType>pgrx-source|universe-source)[ \\t]*\\r?\\n[ \\t]*(?:reference: ghcr\\.io/cnpg-extensions/[A-Za-z0-9_-]+:|version: \\x27)(?<currentValue>\\d+\\.\\d+\\.\\d+)(?:-[0-9]+-[a-z]+|\\x27)"
+      ],
+      "extractVersionTemplate": "^v?(?<version>\\d+\\.\\d+\\.\\d+)$"
     }
   ],
   "packageRules": [
@@ -223,10 +257,36 @@
         "gitlab-tags"
       ],
       "matchFileNames": [
-        "pgrx/dependencies/**"
+        "source-build/pgrx/dependencies/**"
       ],
       "groupName": null,
       "pinDigests": false
+    },
+    {
+      "description": "Keep Universe sources separate from GitHub Actions; inherit the shared automerge policy",
+      "matchDepTypes": [
+        "universe-source"
+      ],
+      "groupName": null,
+      "pinDigests": false,
+      "ignoreUnstable": true,
+      "prBodyNotes": [
+        "Minor and patch updates use the shared automerge policy with required acceptance checks. Add package-level automerge exceptions where SQL mappings or bundled dependencies require manual review. Major updates remain manual."
+      ]
+    },
+    {
+      "description": "Track only production pg_duckdb releases",
+      "matchDepTypes": [
+        "universe-source"
+      ],
+      "matchPackageNames": [
+        "duckdb/pg_duckdb"
+      ],
+      "ignoreUnstable": true,
+      "allowedVersions": "/^v?\\d+\\.\\d+\\.\\d+$/",
+      "prBodyNotes": [
+        "The source tag and SQL version update together. Bundled versions are read from the build sources. Keep Debian package mappings and copyright snapshots maintained as upstream changes."
+      ]
     }
   ]
 }
