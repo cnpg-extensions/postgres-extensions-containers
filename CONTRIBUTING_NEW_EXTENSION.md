@@ -1,5 +1,21 @@
 # Contributing: Adding a New PostgreSQL Extension
 
+To maintain high standards and avoid duplicated effort or architectural
+conflicts, every new extension begins with a formal proposal.
+Follow the [Debian-first inclusion policy](https://github.com/cnpg-extensions/postgres-extensions-containers/blob/main/source-build/README.md)
+when choosing a build path.
+For the Debian framework, the extension must be available as a Debian package
+on both current `stable` and `oldstable`, in the `main` component (which by definition complies with
+the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
+from a trusted, auditable repository. Identify its versioning logic.
+The PGDG (PostgreSQL Global Development Group) repository is the
+recommended source; other Debian repositories are acceptable provided they meet
+the same standards. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
+Other source builds must justify their dependency-packaging obstacles under the
+[Universe criteria](source-build/universe/README.md). The package discovery and
+default scaffolding below describe the Debian path; source recipes use their
+family templates and native build instructions.
+
 This guide walks you through the lifecycle of adding a new extension, from
 setting up your environment to submitting a Pull Request.
 
@@ -31,20 +47,6 @@ Before proposing a change, ensure your local machine is compatible with the
 ---
 
 ## 2. Phase Two: The Proposal & Package Discovery
-
-To maintain high standards and avoid duplicated effort or architectural
-conflicts, every new extension begins with a formal proposal.
-For the Debian framework, the extension must be available as a Debian package
-on both current `stable` and `oldstable`, in the `main` component (which by definition complies with
-the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
-from a trusted, auditable repository. Identify its versioning logic.
-The PGDG (PostgreSQL Global Development Group) repository is the
-recommended source; other Debian repositories are acceptable provided they meet
-the same standards. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
-Other source builds must justify their dependency-packaging obstacles under the
-[Universe criteria](source-build/universe/README.md). The package discovery and
-default scaffolding below describe the Debian path; source recipes use their
-family templates and native build instructions.
 
 ### Identifying the Package & Version
 
