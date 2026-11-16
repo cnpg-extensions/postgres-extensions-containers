@@ -98,8 +98,9 @@ When proposing a new extension, the following criteria must be met:
   a trusted, auditable repository. Extensions added through the Debian framework
   should have packages available for both current Debian `stable` and `oldstable`.
   The [PostgreSQL Global Development Group (PGDG)](https://wiki.postgresql.org/wiki/Apt)
-  is the recommended source, but other Debian repositories are acceptable
-  provided they meet the same standards. Rust extensions use the [PGRX path](pgrx/README.md);
+  repository is required in practice to provide matching extension versions for
+  both distributions; the regular Debian repositories do not provide this consistency.
+  Rust extensions use the [PGRX path](pgrx/README.md);
   other source builds must meet the [Source Build inclusion criteria](source-build/README.md#inclusion-policy-debian-packaging-first).
 - **Dependency evidence:** Identify shipped dependencies and their actual versions,
   preserve required notices, and account for them in the shared SBOM. Source builds
