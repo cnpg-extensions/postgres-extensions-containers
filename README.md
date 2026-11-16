@@ -75,6 +75,9 @@ impose an end time on rollouts or prevent changes initiated by other controllers
 or administrators. Apply this example in the `default` namespace after creating
 the ServiceAccount and permissions shown below.
 
+<details>
+<summary>CronJob YAML: set your weekly maintenance window</summary>
+
 ```yaml
 apiVersion: batch/v1
 kind: CronJob
@@ -94,6 +97,8 @@ spec:
               image: alpine/kubectl:latest
               command: [kubectl, apply, -f, https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml]
 ```
+
+</details>
 
 <details>
 <summary>ServiceAccount and RBAC: apply before the CronJob</summary>
