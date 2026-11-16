@@ -1,0 +1,57 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: pgfaceting-behavior
+spec:
+  deletionPropagationPolicy: Foreground
+  timeouts:
+    assert: 3m
+    exec: 30s
+    cleanup: 5m
+  steps:
+  - name: Provision cluster and extension
+    try:
+    - apply:
+        file: ../../test/cluster.yaml
+    - assert:
+        file: ../../test/cluster-assert.yaml
+    - apply:
+        file: ../../test/database.yaml
+    - assert:
+        file: ../../test/database-assert.yaml
+  - name: Verify real behavior
+    try:
+    - script:
+        env:
+        - name: CLUSTER
+          value: ($values.name)
+        - name: NAMESPACE
+          value: ($namespace)
+        content: |
+          set -eu
+          kubectl exec -i -n "$NAMESPACE" "$CLUSTER-1" -- \
+            psql -X -v ON_ERROR_STOP=1 -U postgres -d app <<'SQL'
+          GRANT USAGE ON SCHEMA faceting TO app;
+          GRANT SELECT, INSERT, UPDATE, DELETE
+            ON faceting.faceted_table, faceting.facet_definition TO app;
+          SET ROLE app;
+          CREATE TABLE items(id integer PRIMARY KEY, color text, size text);
+          INSERT INTO items VALUES (1,'red','small'),(2,'red','large'),(3,'blue','small');
+          SELECT faceting.add_faceting_to_table('items', key=>'id',
+            facets=>ARRAY[faceting.plain_facet('color'),faceting.plain_facet('size')]);
+          DO $$ BEGIN
+           IF (SELECT cardinality FROM faceting.top_values('items'::regclass,n=>10)
+               WHERE facet_name='color' AND facet_value='red') IS DISTINCT FROM 2::bigint
+           THEN RAISE EXCEPTION 'incorrect initial facet count'; END IF;
+           IF (SELECT sum(cardinality) FROM faceting.count_results('items'::regclass,
+               filters=>ARRAY[ROW('color','red')]::faceting.facet_filter[])) IS DISTINCT FROM 2::numeric
+           THEN RAISE EXCEPTION 'incorrect filtered facet counts'; END IF;
+          END $$;
+          UPDATE items SET color='blue' WHERE id=2;
+          SELECT faceting.merge_deltas('items'::regclass);
+          DO $$ BEGIN
+           IF (SELECT cardinality FROM faceting.top_values('items'::regclass,n=>10)
+               WHERE facet_name='color' AND facet_value='blue') IS DISTINCT FROM 2::bigint
+           THEN RAISE EXCEPTION 'delta merge did not update facets'; END IF;
+          END $$;
+          SQL
