@@ -18,11 +18,11 @@ ARG PG_MAJOR
 
 # Licenses
 COPY --from=builder /usr/share/doc/postgresql-${PG_MAJOR}-pgsentinel/copyright /licenses/postgresql-${PG_MAJOR}-pgsentinel/
-COPY --from=builder /usr/share/doc/postgresql-${PG_MAJOR}/copyright /licenses/postgresql-${PG_MAJOR}/
 
 # Libraries
 COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/pgsentinel* /lib/
-COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/bitcode/ /lib/bitcode/
+COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/bitcode/pgsentinel/ /lib/bitcode/pgsentinel/
+COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/bitcode/pgsentinel.index.bc /lib/bitcode/
 
 # Share
 COPY --from=builder /usr/share/postgresql/${PG_MAJOR}/extension/pgsentinel* /share/extension/
