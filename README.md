@@ -94,12 +94,16 @@ When proposing a new extension, the following criteria must be met:
   [Open Source Licensing Policy](source-build/README.md#open-source-licensing-policy).
 - **Structure:** only one extension can be included within an extension folder.
 - **Debian Packages:** Prefer extensions available as Debian packages in the `main` component (which by definition complies with
-  the [DFSG](https://www.debian.org/social_contract#guidelines)), sourced from
-  a trusted, auditable repository. Extensions added through the Debian framework
+  the [DFSG](https://www.debian.org/social_contract#guidelines)). Extensions added through the Debian framework
   should have packages available for both current Debian `stable` and `oldstable`.
   The [PostgreSQL Global Development Group (PGDG)](https://wiki.postgresql.org/wiki/Apt)
   repository is required in practice to provide matching extension versions for
   both distributions; the regular Debian repositories do not provide this consistency.
+  Other third-party APT repositories are not accepted: in our experience their
+  packages generally do not meet Debian standards, while packages that meet those
+  standards are usually available in Debian. See the
+  [Debian packaging policy](source-build/README.md#inclusion-policy-debian-packaging-first)
+  for the community, licensing and dependency-management reasons behind this requirement.
   Rust extensions use the [PGRX path](pgrx/README.md);
   other source builds must meet the [Source Build inclusion criteria](source-build/README.md#inclusion-policy-debian-packaging-first).
 - **Dependency evidence:** Identify shipped dependencies and their actual versions,
