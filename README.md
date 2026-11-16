@@ -162,9 +162,10 @@ and [CloudNativePG image catalog documentation](https://cloudnative-pg.io/docs/1
 
 ### 3. Enable extensions on individual Clusters
 
-Reference the catalog and select extensions by name. This excerpt makes PL/Tcl
-available in the cluster. Replace `imageCatalogRef: ...` with your catalog
-reference and keep your existing instance and storage settings:
+Define each extension by name under `postgresql.extensions` in your `Cluster`
+resource. The catalog supplies its image reference and runtime settings. This
+example adds PL/Tcl; replace `imageCatalogRef: ...` with your catalog reference
+and keep your existing instance and storage settings.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -178,16 +179,23 @@ spec:
       - name: pltcl
 ```
 
-The catalog supplies immutable image references and any required
-`ld_library_path` and `env` values. You do not need to copy those settings into
-your Cluster. The catalog extension name and SQL extension name can differ:
-each [extension README](#supported-extensions) gives both and explains how to
-install the extension in a database declaratively or through SQL.
+Follow each [extension README](#supported-extensions) for required preload
+libraries, PostgreSQL parameters, dependencies, and the SQL extension name.
 
-Keep required `shared_preload_libraries`, PostgreSQL parameters, and dependent
-extensions in your manifests as shown in those READMEs; the catalog does not
-add them automatically. Installing the catalog alone does not enable every
-extension. See [CNPG's extension configuration](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#configuration-source-and-precedence).
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pltcl;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### SQL extension updates
 
