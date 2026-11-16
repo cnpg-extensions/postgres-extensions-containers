@@ -97,7 +97,7 @@ When proposing a new extension, the following criteria must be met:
   The [PostgreSQL Global Development Group (PGDG)](https://wiki.postgresql.org/wiki/Apt)
   is the recommended source, but other Debian repositories are acceptable
   provided they meet the same standards. Rust extensions use the [PGRX path](pgrx/README.md);
-  other source builds must meet the [Universe inclusion criteria](universe/README.md).
+  other source builds must meet the [Source Build inclusion criteria](source-build/README.md#inclusion-policy-debian-packaging-first).
 - **License inclusion:** all necessary license agreements for the extension and
   its dependencies must be included within the extension folder.
 
