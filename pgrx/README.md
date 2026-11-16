@@ -4,10 +4,6 @@ These PostgreSQL extension images use PGRX, a framework for writing PostgreSQL
 extensions in Rust. They can be loaded into CloudNativePG without installing a
 Rust toolchain in your database container.
 
-Start with the [quick start](../README.md#quick-start): set up extension-update
-email alerts first, then use the CronJob to install and refresh the catalog. Select extensions
-by name to inherit their image references and runtime settings from the catalog.
-
 See the [supported extensions](../README.md#supported-extensions) in the top-level
 README for the extension list and links to usage instructions.
 
