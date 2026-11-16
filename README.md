@@ -62,9 +62,11 @@ Use it in one of these three ways:
 
 ### 2. Set up the catalog maintenance CronJob
 
-After configuring email alerts and testing delivery, install this CronJob. Its
-first run installs the catalog; subsequent runs refresh it **every Tuesday at
-10 PM Pacific**, adjusting for daylight saving time.
+After configuring email alerts and testing delivery, **change `schedule` and
+`timeZone` below to the start of your weekly maintenance window before installing
+the CronJob**. The example uses Tuesday at 10 PM in `America/Los_Angeles`,
+adjusting for daylight saving time. Its first run installs the catalog;
+subsequent runs refresh it during your chosen maintenance window.
 CNPG then rolls out changed PostgreSQL and selected extension images to clusters
 referencing that catalog, keeping the selected PostgreSQL major version.
 
