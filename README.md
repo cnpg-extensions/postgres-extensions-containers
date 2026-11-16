@@ -52,7 +52,7 @@ Consult each recipe and image's notices and SBOM for license details.
 
 Published extensions are available in both the [Trixie](https://github.com/cnpg-extensions/artifacts/blob/main/image-catalogs-extensions/catalog-minimal-trixie.yaml)
 and [Bookworm](https://github.com/cnpg-extensions/artifacts/blob/main/image-catalogs-extensions/catalog-minimal-bookworm.yaml)
-catalogs, except `pg-duckdb`, `pg-gvm` and `rdkit`, which are Trixie-only.
+catalogs, except `pg-gvm` and `rdkit`, which are Trixie-only.
 
 ---
 
