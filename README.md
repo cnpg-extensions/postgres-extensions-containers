@@ -29,6 +29,13 @@ extensions for [CloudNativePG](https://cloudnative-pg.io/).
 
 ## Supported Extensions
 
+The [upstream CloudNativePG catalog](https://github.com/cloudnative-pg/artifacts/tree/main/image-catalogs-extensions)
+is automatically included in this project's image catalogs. For the same
+extension, distribution and PostgreSQL major version, the upstream entry always
+takes precedence over an entry maintained here.
+
+**Upstream CloudNativePG extensions:** [pg-crash](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/pg-crash), [pg-ivm](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/pg-ivm), [pgaudit](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/pgaudit), [pgrouting](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/pgrouting), [pgvector](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/pgvector), [postgis](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/postgis), [timescaledb-oss](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/timescaledb-oss), [wal2json](https://github.com/cloudnative-pg/postgres-extensions-containers/tree/main/wal2json).
+
 For this grouping, CNCF-compatible means covered by Apache-2.0 or the
 [CNCF license allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md)
 without project-specific exceptions. Packages with non-allowlisted terms or
