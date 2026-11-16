@@ -7,7 +7,7 @@ an installable PGDG package set for both Bookworm and Trixie. See the
 unresolved decisions and technical steps.
 
 The current source build follows upstream's default release settings, with
-Clang for DuckDB and GCC for pg_duckdb; Trixie supplies Clang. The final CNPG
+Clang for DuckDB and GCC for pg_duckdb; each Debian suite supplies Clang. The final CNPG
 extension image contains the extension payload rather than a complete PostgreSQL
 server.
 
@@ -113,6 +113,15 @@ was also exercised through Grype using actual BuildKit SPDX output; later
 simplifications were checked against the existing compiled builder and SBOM
 inventory rather than rerunning compilation or hosted acceptance. A separate known-vulnerable LZ4 fixture confirmed Debian advisory
 matching; scanner matches on the real document still require applicability review.
+
+Bookworm support was checked with a fresh native AMD64 build of pg_duckdb
+1.2.0 on PostgreSQL 18.7, including the final scratch payload export. In a clean
+matching Bookworm PostgreSQL container, preload and `CREATE EXTENSION` passed
+in a UTF-8 database. A forced `DuckDBScan` over a PostgreSQL table returned the
+expected aggregate, as did a direct `duckdb.query` over a DuckDB range. The 42
+shared tooling tests also passed in the pinned SBOM generator image. These
+checks do not cover native ARM64, CNPG/Chainsaw integration, security scanning,
+or hosted signing/SLSA acceptance.
 
 ## Release updates
 

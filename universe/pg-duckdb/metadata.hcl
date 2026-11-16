@@ -18,6 +18,13 @@ metadata = {
   create_extension         = true
 
   versions = {
+    bookworm = {
+      "18" = {
+        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver
+        package = "v1.2.0"
+        sql     = "1.2.0"
+      }
+    }
     trixie = {
       "18" = {
         # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver
