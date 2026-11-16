@@ -160,12 +160,6 @@ This catalog is a drop-in replacement for the corresponding upstream
 [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
 and [CloudNativePG image catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
 
-`OnFailure` uses Kubernetes restart backoff and the Job's default retry limit.
-The community-maintained `alpine/kubectl:latest` image keeps this copy-paste
-example from retaining an old kubectl version; new workloads using `:latest`
-default to `imagePullPolicy: Always`. If you manage kubectl versions explicitly,
-choose one [compatible with your API server](https://kubernetes.io/releases/version-skew-policy/#kubectl).
-
 The catalogs are published daily at 10:00 UTC and after successful extension
 builds on `main`. Each refresh incorporates the upstream catalog. Publication
 does not update your installed Kubernetes object: the CronJob applies the
