@@ -9,8 +9,8 @@ PL/pgSQL. It checks embedded SQL and PL/pgSQL behavior that PostgreSQL's
 function validator cannot detect at function creation time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -56,8 +56,12 @@ Connect to the database with `psql` and run `\dx` to check the installed extensi
 Check a PL/pgSQL function with:
 
 ~~~sql
-CREATE EXTENSION plpgsql_check;
-SELECT * FROM plpgsql_check_function('my_function()');
+CREATE FUNCTION checked_example() RETURNS integer LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN 1;
+END;
+$$;
+SELECT * FROM plpgsql_check_function('checked_example()');
 ~~~
 
 ## Licenses and Copyright

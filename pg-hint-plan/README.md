@@ -9,8 +9,8 @@ to PostgreSQL. Hints are written in SQL comments and can choose scan methods,
 join methods, and other planner behavior for individual queries.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -58,8 +58,10 @@ Connect to the database with `psql` and run `\dx` to check the installed extensi
 The extension creates its objects in the hint_plan schema. For example:
 
 ~~~sql
-CREATE EXTENSION pg_hint_plan;
-/*+ SeqScan(t) */ EXPLAIN SELECT * FROM t WHERE id = 1;
+CREATE TABLE hint_example (id integer PRIMARY KEY);
+INSERT INTO hint_example SELECT generate_series(1, 1000);
+ANALYZE hint_example;
+/*+ SeqScan(t) */ EXPLAIN SELECT * FROM hint_example AS t WHERE id = 1;
 ~~~
 
 ## Licenses and Copyright

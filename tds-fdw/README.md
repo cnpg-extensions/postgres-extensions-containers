@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 [tds_fdw](https://github.com/tds-fdw/tds_fdw) is a PostgreSQL Foreign Data Wrapper (FDW) that enables PostgreSQL to query Microsoft SQL Server and Sybase databases using the TDS (Tabular Data Stream) protocol via FreeTDS.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -60,11 +60,13 @@ You should see `tds_fdw` listed among the installed extensions.
 
 ## Known Caveats
 
-- **No live database tested**: The CI tests verify that the extension can be
+- **CI coverage**: The CI tests verify that the extension can be
   created (`CREATE EXTENSION tds_fdw`), but do not test actual connectivity to
   a SQL Server or Sybase instance. Actual foreign table queries require a
   running TDS-compatible database server and proper `CREATE SERVER` /
-  `CREATE USER MAPPING` configuration.
+  `CREATE USER MAPPING` configuration. A manual test on CNPG 1.30.1 /
+  PostgreSQL 18.7 (Trixie, AMD64) queried an isolated SQL Server 2022 fixture
+  successfully; other servers and authentication modes remain unverified.
 - **Runtime library dependency**: The FreeTDS library (`libsybdb5`) is bundled
   in the image under `/system/`.
 - **License**: `tds_fdw` itself is PostgreSQL-licensed, but its runtime

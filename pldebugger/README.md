@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 [pldebugger](https://github.com/EnterpriseDB/pldebugger) is a PostgreSQL extension that provides a server-side debugger for PL/pgSQL functions and procedures. It enables step-by-step debugging, breakpoints, and variable inspection for stored procedures, and is supported by tools such as pgAdmin.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 

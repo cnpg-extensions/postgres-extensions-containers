@@ -10,16 +10,16 @@ removes unused table space and can sort tuples according to an index while
 allowing normal reads and writes for most of the operation.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
 ## Usage
 
-Add the image to a Cluster. PostgreSQL 18 requires logical decoding for this
 ### 1. Add the pg-squeeze extension image to your Cluster
 
+Add the image to a Cluster. PostgreSQL 18 requires logical decoding for this
 extension:
 
 ```yaml
@@ -62,10 +62,10 @@ administrator-approved selection of extensions.
 Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 The extension stores its configuration and logs in the squeeze schema. A
-table can be registered for maintenance after it has an identity index:
+table can be registered for maintenance after it has an identity index. Replace
+`public.my_table` with an existing table:
 
 ~~~sql
-CREATE EXTENSION pg_squeeze;
 INSERT INTO squeeze.tables (tabschema, tabname, schedule)
 VALUES ('public', 'my_table', ('{30}', '{22}', NULL, NULL, '{3, 5}'));
 ~~~

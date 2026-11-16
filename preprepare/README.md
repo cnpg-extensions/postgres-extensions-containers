@@ -1,10 +1,10 @@
 # preprepare
 
-pre prepare your PostgreSQL statements server side. [Upstream documentation](https://apt.postgresql.org/pub/repos/apt/).
+pre prepare your PostgreSQL statements server side. [Upstream documentation](https://github.com/dimitri/preprepare).
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -51,7 +51,7 @@ Connect to the database with `psql` and run `\dx` to check the installed extensi
 
 ## Operation and privileges
 
-This image provides SQL extension `pre_prepare`. Prepared statements and their source table are session-local; no files are needed. Use `prepare_all('schema.table')` to load statement definitions from an administrator-controlled table of complete PREPARE statements. Restrict which users can modify the source table.
+This image provides SQL extension `pre_prepare`. Prepared statements are session-local; their definitions can be stored in an ordinary database table shared by sessions. No files are needed. Use `prepare_all('schema.table')` to load statement definitions from an administrator-controlled table of complete PREPARE statements. Restrict which users can modify the source table.
 
 ## Dependencies and updates
 

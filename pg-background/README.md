@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 [`pg_background`](https://github.com/vibhorkum/pg_background) runs SQL in PostgreSQL background workers and returns completion metadata to the calling session. It does not require `shared_preload_libraries`; preloading is only needed if you want to set its GUCs in server configuration before first use.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -51,13 +51,15 @@ administrator-approved selection of extensions.
 
 Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
-A superuser can run work asynchronously and check its result:
+A superuser can run SQL in a background worker and inspect its completion metadata:
 
 ~~~sql
-SELECT (pg_background_run('SELECT count(*) FROM pg_class')).*;
+SELECT * FROM pg_background_run('SELECT count(*) FROM pg_class');
 ~~~
 
-The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
+Use the function in `FROM` so it executes once. Expanding
+`(pg_background_run(...)).*` in the select list can execute it once per output
+column. The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
 
 ## Supported matrix and licenses
 

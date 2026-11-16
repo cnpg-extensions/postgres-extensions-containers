@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 [q3c](https://github.com/segasai/q3c) (Quad Tree Cube) is a PostgreSQL extension for indexing and querying sky survey data using spherical coordinate systems. It provides efficient spatial indexing of astronomical objects (stars, galaxies) by right ascension and declination, enabling fast cone searches and neighbor lookups.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 

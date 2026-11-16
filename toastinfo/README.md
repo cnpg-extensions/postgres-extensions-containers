@@ -9,8 +9,8 @@ stores variable-length values, including inline, compressed, and out-of-line
 TOAST values. It does not need to be preloaded.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -53,10 +53,10 @@ administrator-approved selection of extensions.
 
 Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
-Use pg_toastinfo and pg_toastpointer to inspect a value:
+Use `pg_toastinfo` and `pg_toastpointer` to inspect a value. Replace
+`my_table` and `value` with your table and a variable-length column:
 
 ~~~sql
-CREATE EXTENSION toastinfo;
 SELECT pg_toastinfo(value), pg_toastpointer(value) FROM my_table;
 ~~~
 

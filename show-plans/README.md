@@ -9,8 +9,8 @@ query plans of currently running PostgreSQL statements. Plans can be returned
 as plain text, JSON, YAML, or XML.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -58,7 +58,7 @@ Connect to the database with `psql` and run `\dx` to check the installed extensi
 Inspect plans for currently running statements:
 
 ~~~sql
-CREATE EXTENSION pg_show_plans;
+CREATE EXTENSION IF NOT EXISTS pg_show_plans;
 SELECT * FROM pg_show_plans;
 SELECT * FROM pg_show_plans_q;
 ~~~

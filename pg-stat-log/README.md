@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 [`pg_stat_log`](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by backend, database, role, severity, and SQLSTATE, with optional grouping by query identifier. It uses PostgreSQL 18's Custom Cumulative Stats API and must be preloaded. The PGDG package and SQL catalog versions are both `0.3`.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -61,7 +61,7 @@ FROM pg_stat_log
 ORDER BY count DESC;
 ~~~
 
-Statistics persist across clean PostgreSQL restarts and are discarded after crash recovery. Reset counters and reclaim tracked slots with `SELECT pg_stat_log_reset();`. Capacity is bounded by `pg_stat_log.max_entries` (default 1024); increase it and restart if `pg_stat_log_info().n_dropped` grows. The extension writes no external files.
+Statistics persist across clean PostgreSQL restarts and are discarded after crash recovery. Reset counters and reclaim tracked slots with `SELECT pg_stat_log_reset();`. Capacity is bounded by `pg_stat_log.max_entries` (default 1024); increase it and restart if the `n_dropped` value returned by `pg_stat_log_info()` grows. The extension writes no external files.
 
 ## Supported matrix and licenses
 

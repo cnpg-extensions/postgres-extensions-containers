@@ -7,8 +7,8 @@ The PGDG PG18 package is available on Trixie for amd64 and arm64. Bookworm has n
 [Upstream project](https://github.com/greenbone/pg-gvm).
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -59,7 +59,7 @@ The package also includes host-list and iCalendar helpers used by Greenbone SQL 
 
 ## Package, licensing and updates
 
-PGDG package: 22.6.17-1.pgdg13+2; SQL version: 22.6. The extension is GPL-3.0-or-later and includes AGPL-3.0-or-later files. Copyright notices for the extension and bundled runtime packages are under `/licenses/<package>/`. The image includes no source archives.
+The PGDG package version is recorded in `metadata.hcl`; SQL version: 22.6. The extension is GPL-3.0-or-later and includes AGPL-3.0-or-later files. Copyright notices for the extension and bundled runtime packages are under `/licenses/<package>/`. The image includes no source archives.
 
 Renovate tracks the PGDG package. Rebuild after package or base-image security updates and review the runtime libraries and notices.
 

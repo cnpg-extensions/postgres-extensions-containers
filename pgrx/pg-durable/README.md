@@ -11,8 +11,8 @@ steps, without an external orchestration service. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -75,6 +75,9 @@ You should see `pg_durable` listed among the installed extensions.
   background worker processes the database named by `pg_durable.database`. The
   metadata and example above configure that database as `app`; create the
   extension there.
+- After startup or extension creation, `df.start` can briefly report that the
+  control background worker is not yet initialized. Wait for initialization
+  and retry that readiness error; configuring authentication is still required.
 - `CREATE EXTENSION pg_durable` does not grant privileges to `PUBLIC`. Grant
   access to application roles with `SELECT df.grant_usage('app_role')` after
   creating the extension. Superuser-submitted workflows are disabled by

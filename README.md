@@ -34,9 +34,10 @@ See the [CNPG requirements](https://cloudnative-pg.io/docs/1.30/imagevolume_exte
 
 ## Quick start
 
-Set up **extension-update email alerts** first, then install the CNPG Extensions
-image catalog and a **weekly catalog-update CronJob** as the standard installation
-and maintenance path. The catalog includes upstream CloudNativePG extensions as well as the
+Set up **extension-update email alerts** first, then use a **weekly catalog-update
+CronJob** to install and maintain the CNPG Extensions image catalog. Finally,
+select extensions for individual Clusters. This is the standard installation and
+maintenance path. The catalog includes upstream CloudNativePG extensions as well as the
 Debian, PGRX, and Universe extensions maintained here. Upstream entries always
 take precedence for the same extension, distribution, and PostgreSQL major.
 

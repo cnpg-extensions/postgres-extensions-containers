@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 PostgreSQL Workload Analyzer server-side history and snapshot schema. [Upstream project](https://powa.readthedocs.io/en/stable/).
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your existing instance and storage settings.
 
@@ -56,7 +56,12 @@ Install `pg_stat_statements`, then `btree_gist`, then `powa` in that order.
 
 Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
-Install `pg_stat_statements` and `btree_gist` in that Database as well. Start the separate PoWA collector/archivist only after server-side snapshots are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.
+Install `pg_stat_statements` and `btree_gist` in that database as well. The
+preloaded background worker connects to a database named `powa` by default;
+create that database and install all three extensions there, or configure
+`powa.database` with your chosen database name in the Cluster parameters.
+Start a separate PoWA collector or web UI only after server-side snapshots
+are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.
 
 ## Package and runtime details
 
