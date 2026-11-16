@@ -67,38 +67,6 @@ catalog; later runs refresh it. CNPG rolls out changed PostgreSQL and selected
 extension images to referencing Clusters, keeping their PostgreSQL major version.
 
 <details>
-<summary>CronJob YAML: set your weekly maintenance window</summary>
-
-The example runs Tuesdays at 10 PM Los Angeles time, adjusting for daylight
-saving. The schedule sets a start time, not a rollout deadline, and does not
-prevent changes by other controllers or administrators.
-
-```yaml
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: update-catalog
-spec:
-  schedule: "0 22 * * 2"
-  timeZone: America/Los_Angeles
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          serviceAccountName: catalog-updater
-          restartPolicy: OnFailure
-          containers:
-            - name: kubectl
-              image: alpine/kubectl:latest
-              command: [kubectl, apply, -f, https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml]
-```
-
-Catalog changes to only environment variables or library paths do not trigger a
-rollout and may need an explicit restart. See [CNPG runtime caveats](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#environment-variables-for-extensions).
-
-</details>
-
-<details>
 <summary>ServiceAccount and RBAC: apply before the CronJob</summary>
 
 Allow catalog creation and read/patch access to `postgresql-minimal-trixie`.
@@ -138,6 +106,38 @@ subjects:
     name: catalog-updater
     namespace: default
 ```
+
+</details>
+
+<details>
+<summary>CronJob YAML: set your weekly maintenance window</summary>
+
+The example runs Tuesdays at 10 PM Los Angeles time, adjusting for daylight
+saving. The schedule sets a start time, not a rollout deadline, and does not
+prevent changes by other controllers or administrators.
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-catalog
+spec:
+  schedule: "0 22 * * 2"
+  timeZone: America/Los_Angeles
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: catalog-updater
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: alpine/kubectl:latest
+              command: [kubectl, apply, -f, https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml]
+```
+
+Catalog changes to only environment variables or library paths do not trigger a
+rollout and may need an explicit restart. See [CNPG runtime caveats](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#environment-variables-for-extensions).
 
 </details>
 
