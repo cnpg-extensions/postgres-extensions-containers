@@ -77,54 +77,16 @@ Use it in one of these three ways:
 For an existing cluster, confirm the unfiltered
 `cnpg_pg_extensions_update_available` metric is being collected. For a new
 cluster, configure the alert rule and test email delivery now, then verify
-metric collection once the cluster is running, before enabling the CronJob. No results from the filtered query can mean everything is up
+metric collection once the cluster is running. No results from the filtered query can mean everything is up
 to date, but can also mean the metric is missing. Keep scrape failures and
 CronJob failures covered by your usual monitoring. See the
 [CNPG metric definition](https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml).
 
-### 2. Install the catalog and choose your extensions
+### 2. Set up the catalog maintenance CronJob
 
-After configuring email alerts and testing delivery, apply the Trixie catalog once:
-
-```sh
-kubectl apply -f https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
-```
-
-This is a drop-in replacement for the corresponding upstream
-`postgresql-minimal-trixie` catalog, with additional extensions. See the [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
-and [CloudNativePG installation and usage documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
-
-Reference the catalog and select extensions by name. This excerpt makes PL/Tcl
-available in the cluster. Replace `imageCatalogRef: ...` with your catalog
-reference and keep your existing instance and storage settings:
-
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: example
-spec:
-  imageCatalogRef: ...
-  postgresql:
-    extensions:
-      - name: pltcl
-```
-
-The catalog supplies immutable image references and any required
-`ld_library_path` and `env` values. You do not need to copy those settings into
-your Cluster. The catalog extension name and SQL extension name can differ:
-each [extension README](#supported-extensions) gives both and explains how to
-install the extension in a database declaratively or through SQL.
-
-Keep required `shared_preload_libraries`, PostgreSQL parameters, and dependent
-extensions in your manifests as shown in those READMEs; the catalog does not
-add them automatically. Installing the catalog alone does not enable every
-extension. See [CNPG's extension configuration](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#configuration-source-and-precedence).
-
-### 3. Schedule your weekly maintenance
-
-Once monitoring and email delivery work, install this CronJob. It refreshes the
-catalog **every Tuesday at 1 AM Eastern**, adjusting for daylight saving time.
+After configuring email alerts and testing delivery, install this CronJob. Its
+first run installs the catalog; subsequent runs refresh it **every Tuesday at
+1 AM Eastern**, adjusting for daylight saving time.
 CNPG then rolls out changed PostgreSQL and selected extension images to clusters
 referencing that catalog, keeping the selected PostgreSQL major version.
 
@@ -158,9 +120,10 @@ spec:
 <details>
 <summary>ServiceAccount and RBAC: apply before the CronJob</summary>
 
-The catalog must already exist from step 2. This grants access to read and patch
-only that catalog. If you use another namespace or the Bookworm catalog, update
-the namespace and catalog name consistently here and in the CronJob command.
+This allows the first run to create the catalog and later runs to read and patch
+`postgresql-minimal-trixie`. Kubernetes RBAC cannot restrict `create` by resource
+name, so that permission applies to ClusterImageCatalog resources. If you use
+another namespace or catalog, update the names consistently.
 
 ```yaml
 apiVersion: v1
@@ -174,6 +137,9 @@ kind: ClusterRole
 metadata:
   name: catalog-updater
 rules:
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusterimagecatalogs"]
+    verbs: ["create"]
   - apiGroups: ["postgresql.cnpg.io"]
     resources: ["clusterimagecatalogs"]
     resourceNames: ["postgresql-minimal-trixie"]
@@ -195,6 +161,22 @@ subjects:
 
 </details>
 
+To install the catalog immediately, start a Job from the CronJob and wait for it
+to complete before configuring Clusters in step 3:
+
+```sh
+kubectl create job --from=cronjob/update-catalog update-catalog-initial -n default
+kubectl wait --for=condition=complete job/update-catalog-initial -n default --timeout=300s
+```
+
+The scheduled runs continue automatically. To request another immediate refresh,
+use a new Job name with the same `kubectl create job --from` command.
+
+This catalog is a drop-in replacement for the corresponding upstream
+`postgresql-minimal-trixie` catalog, with additional extensions. See the
+[published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
+and [CloudNativePG image catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
+
 `OnFailure` uses Kubernetes restart backoff and the Job's default retry limit.
 The community-maintained `alpine/kubectl:latest` image keeps this copy-paste
 example from retaining an old kubectl version; new workloads using `:latest`
@@ -204,9 +186,37 @@ choose one [compatible with your API server](https://kubernetes.io/releases/vers
 The catalogs are published daily at 10:00 UTC and after successful extension
 builds on `main`. Each refresh incorporates the upstream catalog. Publication
 does not update your installed Kubernetes object: the CronJob applies the
-latest published manifest on your schedule. You can also rerun the step 2
-command manually during maintenance. See the
+latest published manifest on your schedule. See the
 [catalog publication workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml).
+
+### 3. Enable extensions on individual Clusters
+
+Reference the catalog and select extensions by name. This excerpt makes PL/Tcl
+available in the cluster. Replace `imageCatalogRef: ...` with your catalog
+reference and keep your existing instance and storage settings:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: example
+spec:
+  imageCatalogRef: ...
+  postgresql:
+    extensions:
+      - name: pltcl
+```
+
+The catalog supplies immutable image references and any required
+`ld_library_path` and `env` values. You do not need to copy those settings into
+your Cluster. The catalog extension name and SQL extension name can differ:
+each [extension README](#supported-extensions) gives both and explains how to
+install the extension in a database declaratively or through SQL.
+
+Keep required `shared_preload_libraries`, PostgreSQL parameters, and dependent
+extensions in your manifests as shown in those READMEs; the catalog does not
+add them automatically. Installing the catalog alone does not enable every
+extension. See [CNPG's extension configuration](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#configuration-source-and-precedence).
 
 ### SQL extension updates
 
