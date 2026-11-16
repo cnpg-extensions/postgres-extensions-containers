@@ -247,9 +247,12 @@ then adds the images maintained in this repository. Definitions from the
 upstream catalog are retained.
 
 - **Frequency:** Refreshed daily at 10:00 UTC and after successful extension
-  builds on `main`. Allow up to 24 hours after images appear in the upstream
-  catalog for them to appear here; delayed or failed workflow runs can extend
-  this interval. To refresh sooner, manually run the
+  builds on `main`, including builds triggered by extension or dependency updates.
+  Every refresh pulls the latest upstream catalog from `main`, so upstream
+  additions can appear here much sooner than 24 hours whenever an extension
+  rebuild completes. Otherwise, the daily refresh normally picks them up within
+  24 hours; delayed or failed workflow runs can extend this interval. To refresh
+  sooner, manually run the
   [Update Extension Image Catalogs workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml)
   on `main`.
 - **Location:** Published in the [`artifacts`
