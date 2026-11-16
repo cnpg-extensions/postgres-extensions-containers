@@ -4,13 +4,17 @@ Flexible CSV processing for Postgres. [Upstream documentation](https://github.co
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Supported images
 
 PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
 
-## Declarative setup
+## Usage
+
+### 1. Add the pg-csv extension image to your Cluster
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -18,18 +22,13 @@ kind: Cluster
 metadata:
   name: cluster-pg-csv
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-csv
 ```
+
+### 2. Enable the extension in a database
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -44,6 +43,10 @@ spec:
   extensions:
   - name: pg_csv
 ```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 ## Operation and privileges
 

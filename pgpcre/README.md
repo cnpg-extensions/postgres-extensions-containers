@@ -11,9 +11,13 @@ This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PG
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-## Install with CloudNativePG
+## Usage
+
+### 1. Add the pgpcre extension image to your Cluster
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -21,18 +25,15 @@ kind: Cluster
 metadata:
   name: cluster-pgpcre
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pgpcre
----
+```
+
+### 2. Enable the extension in a database
+
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -45,6 +46,10 @@ spec:
   extensions:
   - name: pgpcre
 ```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 The PGDG package links to PCRE2 10.42 on Bookworm and 10.46 on Trixie. The supported CNPG base images provide these runtime libraries, so the extension adds no files under `/system`.
 

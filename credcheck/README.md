@@ -4,7 +4,9 @@ PostgreSQL username/password checks. [Upstream documentation](https://github.com
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Supported images
 
@@ -17,7 +19,9 @@ or later within major version 18. Upgrade PostgreSQL first: on 18.6, credcheck
 prevents startup with `undefined symbol: heap_datum_check`. CNPG does not
 enforce extension minimum minor versions.
 
-## Declarative setup
+## Usage
+
+### 1. Add the credcheck extension image to your Cluster
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -25,14 +29,7 @@ kind: Cluster
 metadata:
   name: cluster-credcheck
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     parameters:
       credcheck.encrypted_password_allowed: 'on'
@@ -41,6 +38,8 @@ spec:
     extensions:
     - name: credcheck
 ```
+
+### 2. Enable the extension in a database
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -55,6 +54,10 @@ spec:
   extensions:
   - name: credcheck
 ```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 ## Operation and privileges
 

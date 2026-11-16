@@ -10,37 +10,36 @@ pg_stat_statements.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
+### 1. Add the pgsentinel extension image to your Cluster
+
 Add the image to a Cluster and preload both libraries:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-pgsentinel
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
     - pg_stat_statements
     - pgsentinel
     extensions:
     - name: pgsentinel
-~~~
+```
+
+### 2. Enable the extension in a database
 
 Enable the SQL extension in a Database:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -52,7 +51,11 @@ spec:
     name: cluster-pgsentinel
   extensions:
   - name: pgsentinel
-~~~
+```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 After the cluster has run for a few seconds, inspect the active session
 history:

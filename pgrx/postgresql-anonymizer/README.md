@@ -11,9 +11,13 @@ Bookworm and Trixie, including the upstream fake-data CSV datasets.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
+
+### 1. Add the postgresql-anonymizer extension image to your Cluster
 
 Add the extension image to your CloudNativePG Cluster and preload `anon`:
 
@@ -23,14 +27,7 @@ kind: Cluster
 metadata:
   name: cluster-anonymizer
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
     - anon
@@ -53,6 +50,8 @@ extension images separately. Keep the Cluster extension name
 Initialization loads the datasets needed by the legacy `fake_*` functions.
 Upstream `dummy_*` functions generate data without this initialization.
 
+### 2. Enable the extension in a database
+
 For declarative installation, use the **SQL name** `anon` in a Database resource:
 
 ```yaml
@@ -68,6 +67,10 @@ spec:
   extensions:
   - name: anon
 ```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Dataset initialization remains a separate superuser step. For masking rules,
 permissions, and transparent dynamic masking, follow the

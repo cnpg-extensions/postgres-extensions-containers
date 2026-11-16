@@ -11,7 +11,9 @@ PostgreSQL 18 on Debian Bookworm and Trixie.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
@@ -26,14 +28,7 @@ kind: Cluster
 metadata:
   name: cluster-pglinter
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pglinter

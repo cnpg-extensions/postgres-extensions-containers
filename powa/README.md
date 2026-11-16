@@ -8,37 +8,36 @@ PostgreSQL Workload Analyzer server-side history and snapshot schema. [Upstream 
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
+### 1. Add the powa extension image to your Cluster
+
 Create a dedicated PoWA Database and declare its required extensions:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-powa
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
     - pg_stat_statements
     - powa
     extensions:
     - name: powa
-~~~
+```
+
+### 2. Enable the extension in a database
 
 Install PoWA and its base-image dependencies in a Database:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -52,7 +51,11 @@ spec:
   - name: pg_stat_statements
   - name: btree_gist
   - name: powa
-~~~
+```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Install `pg_stat_statements` and `btree_gist` in that Database as well. Start the separate PoWA collector/archivist only after server-side snapshots are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.
 

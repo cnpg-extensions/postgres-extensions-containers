@@ -8,12 +8,13 @@ Implements a subset of Oracle-compatible SQL functions and packages, including N
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-## Use with CloudNativePG
+## Usage
 
-Select this extension from the Trixie catalog for PostgreSQL 18. Use
-`postgresql-minimal-bookworm` for an existing Bookworm cluster.
+### 1. Add the orafce extension image to your Cluster
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -21,18 +22,13 @@ kind: Cluster
 metadata:
   name: cluster-orafce
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: orafce
 ```
+
+### 2. Enable the extension in a database
 
 Install the SQL extension in a database with a CNPG `Database` resource:
 
@@ -50,6 +46,10 @@ spec:
   - ensure: present
     name: orafce
 ```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 A SQL check that exercises the installed extension is:
 

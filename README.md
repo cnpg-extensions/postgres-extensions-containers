@@ -91,14 +91,12 @@ kubectl apply -f https://raw.githubusercontent.com/cnpg-extensions/artifacts/mai
 ```
 
 This is a drop-in replacement for the corresponding upstream
-`postgresql-minimal-trixie` catalog, with additional extensions. For Bookworm,
-use `catalog-minimal-bookworm.yaml` and `postgresql-minimal-bookworm` instead.
-Choose the distribution used by your cluster; changing distributions is a
-separate migration. See the [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
+`postgresql-minimal-trixie` catalog, with additional extensions. See the [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
 and [CloudNativePG installation and usage documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
 
-Reference the catalog and select extensions by name. For example, this installs
-PL/Tcl in the default `app` database:
+Reference the catalog and select extensions by name. This excerpt enables
+PL/Tcl in the default `app` database. Replace `imageCatalogRef: ...` with your
+catalog reference and keep your existing instance and storage settings:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -106,14 +104,7 @@ kind: Cluster
 metadata:
   name: example
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
       - name: pltcl

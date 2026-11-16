@@ -5,11 +5,15 @@ A logical decoding output plugin that serializes change events as Protocol Buffe
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-## Supported images and setup
+## Usage
 
 PostgreSQL 18 on Debian Trixie and Bookworm, with amd64 and arm64 build targets.
+### 1. Add the decoderbufs extension image to your Cluster
+
 Use this declarative Cluster setup:
 
 ```yaml
@@ -18,14 +22,7 @@ kind: Cluster
 metadata:
   name: cluster-decoderbufs
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     parameters:
       wal_level: logical
@@ -38,7 +35,7 @@ spec:
 there is no SQL installation script: do not request `CREATE EXTENSION decoderbufs`
 or list it in a Database resource's SQL extensions.
 
-## Operation and verification
+### 2. Verify operation
 
 Clients connect through the CNPG-managed PostgreSQL Service, using a replication
 role and approved authentication. Create a slot using the replication protocol

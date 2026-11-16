@@ -7,12 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 [pg_duckdb](https://github.com/duckdb/pg_duckdb) integrates DuckDB's analytical
 query engine with PostgreSQL. It supports analytical queries over PostgreSQL
 tables and external data. This image supports PostgreSQL 18 on Debian Bookworm and Trixie
-for AMD64 and ARM64. Choose the Trixie or Bookworm catalog to match your cluster;
-the catalog supplies compatible PostgreSQL and extension image references.
+for AMD64 and ARM64.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
@@ -26,14 +27,7 @@ kind: Cluster
 metadata:
   name: cluster-pg-duckdb
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
     - pg_duckdb

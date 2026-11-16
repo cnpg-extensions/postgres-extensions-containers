@@ -11,27 +11,24 @@ allowing normal reads and writes for most of the operation.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email
 alerts first, then install the catalog and enable weekly maintenance. These examples
-inherit image references and runtime settings from the catalog.
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
 Add the image to a Cluster. PostgreSQL 18 requires logical decoding for this
+### 1. Add the pg-squeeze extension image to your Cluster
+
 extension:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-pg-squeeze
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     parameters:
       max_replication_slots: '1'
@@ -41,11 +38,13 @@ spec:
     - pg_squeeze
     extensions:
     - name: pg-squeeze
-~~~
+```
+
+### 2. Enable the extension in a database
 
 Enable the SQL extension in a Database:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -57,7 +56,11 @@ spec:
     name: cluster-pg-squeeze
   extensions:
   - name: pg_squeeze
-~~~
+```
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 The extension stores its configuration and logs in the squeeze schema. A
 table can be registered for maintenance after it has an identity index:
