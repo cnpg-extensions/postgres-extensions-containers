@@ -63,12 +63,6 @@ CREATE EXTENSION pg_qualstats;
 SELECT * FROM pg_qualstats;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

@@ -60,12 +60,6 @@ Connect to the database with `psql` and run `\dx` to check the installed extensi
 See the [pg_partman documentation](https://github.com/pgpartman/pg_partman/tree/development/doc)
 for partition-set configuration examples.
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

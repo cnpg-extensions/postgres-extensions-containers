@@ -84,10 +84,6 @@ COMMENT ON SCHEMA public IS e'@graphql({"introspection": true})';
 See the [upstream configuration guide](https://supabase.github.io/pg_graphql/configuration/)
 for the available schema directives.
 
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
-
 ## Licenses and Copyright
 
 Extension and dependency licenses and copyright notices are bundled in

@@ -61,12 +61,6 @@ CREATE EXTENSION plpgsql_check;
 SELECT * FROM plpgsql_check_function('my_function()');
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

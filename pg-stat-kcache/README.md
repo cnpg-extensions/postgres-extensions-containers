@@ -67,12 +67,6 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_kcache;
 SELECT * FROM pg_stat_kcache;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

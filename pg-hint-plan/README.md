@@ -63,12 +63,6 @@ CREATE EXTENSION pg_hint_plan;
 /*+ SeqScan(t) */ EXPLAIN SELECT * FROM t WHERE id = 1;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

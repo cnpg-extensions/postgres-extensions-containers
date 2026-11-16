@@ -64,12 +64,6 @@ CREATE EXTENSION pg_stat_plans;
 SELECT * FROM pg_stat_plans;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

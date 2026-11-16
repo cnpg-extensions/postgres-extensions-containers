@@ -68,4 +68,3 @@ and review them separately; SQL versions need not match package versions.
 ## Licenses and ownership
 
 PostgreSQL, Apache-2.0. Redistribution notices are preserved under `/licenses/`.
-Maintained by Jeremy Schneider (@ardentperf).

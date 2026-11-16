@@ -68,7 +68,3 @@ The language is trusted, but the extension itself must be installed by a databas
 PGDG package `postgresql-18-pljs` supplies `pljs.so` and its control/SQL files. QuickJS is statically linked, so no additional runtime package is needed. The PGDG package copyright notice is under `/licenses`.
 
 PLJS uses a project-specific license recorded as `LicenseRef-PLJS` in the image metadata. The Debian copyright file preserves its full terms; QuickJS is MIT licensed. Renovate tracks `postgresql-18-pljs`; inspect the source patch and notices when updating it.
-
-## Contributors
-
-Maintained by [@ardentperf](https://github.com/ardentperf).

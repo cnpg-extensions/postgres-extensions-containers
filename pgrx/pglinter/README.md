@@ -70,10 +70,6 @@ SELECT * FROM pglinter.get_violations();
 
 The query returns findings from the enabled lint rules.
 
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
-
 ## Licenses and Copyright
 
 Extension and dependency licenses and copyright notices are bundled in

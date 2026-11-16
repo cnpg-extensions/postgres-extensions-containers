@@ -68,7 +68,3 @@ SELECT lua_add(19, 23); -- 42
 The image contains the PGDG extension modules/control/SQL files and Debian `liblua5.3-0` under `/system`. Package copyright notices are under `/licenses`.
 
 Renovate tracks `postgresql-18-pllua`. Review the separately versioned Lua package and rerun trusted/untrusted tests when rebuilding after either package changes.
-
-## Contributors
-
-Maintained by [@ardentperf](https://github.com/ardentperf).

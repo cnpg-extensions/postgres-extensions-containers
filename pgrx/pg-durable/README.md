@@ -103,10 +103,6 @@ You should see `pg_durable` listed among the installed extensions.
   authentication configuration: a credential-based setup remains unverified,
   and the test's trust rule is not a production recommendation.
 
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
-
 ## Licenses and Copyright
 
 Extension and dependency licenses and copyright notices are bundled in

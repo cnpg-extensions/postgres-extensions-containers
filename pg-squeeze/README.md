@@ -71,12 +71,6 @@ INSERT INTO squeeze.tables (tabschema, tabname, schedule)
 VALUES ('public', 'my_table', ('{30}', '{22}', NULL, NULL, '{3, 5}'));
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

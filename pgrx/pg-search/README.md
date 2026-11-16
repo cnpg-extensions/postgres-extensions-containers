@@ -95,10 +95,6 @@ setting explicitly because preloads are not inherited from the catalog.
   limitation; reconnecting avoids it without disabling extension hooks or
   weakening the search checks. Other platforms were not tested for this issue.
 
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
-
 ## Licenses and Copyright
 
 Extension and dependency licenses and copyright notices are bundled in

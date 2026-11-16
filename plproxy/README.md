@@ -64,6 +64,5 @@ and review them separately; SQL versions need not match package versions.
 ## Licenses and ownership
 
 ISC. Redistribution notices are preserved under `/licenses/`.
-Maintained by Jeremy Schneider (@ardentperf).
 
 PL/Proxy CONNECT strings use libpq keyword/value syntax (for example, `host=cluster-rw dbname=app user=proxy_user`), not connection URIs: the plugin adds connection options to the string. Supply credentials through your deployment Secrets.

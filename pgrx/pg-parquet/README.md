@@ -89,10 +89,6 @@ You should see `pg_parquet` listed with its installed SQL version.
 - The `pg_parquet.enable_copy_hooks` parameter can be set to `off` to disable
   the extension's COPY hooks for a session or role.
 
-## Contributors
-
-Maintained by Jeremy Schneider ([@ardentperf](https://github.com/ardentperf)).
-
 ## Licenses and Copyright
 
 Extension and dependency licenses and copyright notices are bundled in

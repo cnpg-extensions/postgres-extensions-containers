@@ -69,7 +69,6 @@ and review them separately; SQL versions need not match package versions.
 ## Licenses and ownership
 
 PostgreSQL. Redistribution notices are preserved under `/licenses/`.
-Maintained by Jeremy Schneider (@ardentperf).
 
 The PGDG copyright labels its notice(s) `cybertec`. The permission and
 disclaimer text matches the [SPDX PostgreSQL license template](https://github.com/spdx/license-list-data/blob/main/json/details/PostgreSQL.json),

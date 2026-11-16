@@ -62,12 +62,6 @@ SELECT * FROM hypopg_create_index('CREATE INDEX ON my_table (column_name)');
 EXPLAIN SELECT * FROM my_table WHERE column_name = 1;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

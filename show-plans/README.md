@@ -64,12 +64,6 @@ SELECT * FROM pg_show_plans;
 SELECT * FROM pg_show_plans_q;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

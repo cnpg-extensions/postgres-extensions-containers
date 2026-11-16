@@ -63,5 +63,3 @@ protobuf-c is dynamically linked and updated separately.
 
 Renovate tracks the PGDG package pin. Rebuild for protobuf-c or base-runtime
 security updates and repeat architecture builds.
-
-Maintained by Jeremy Schneider (@ardentperf).

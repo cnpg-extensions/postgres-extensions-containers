@@ -61,12 +61,6 @@ CREATE EXTENSION toastinfo;
 SELECT pg_toastinfo(value), pg_toastpointer(value) FROM my_table;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

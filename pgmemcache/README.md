@@ -90,21 +90,6 @@ You should see `pgmemcache` listed among the installed extensions.
   `libmemcached11` is LGPL, which is why this extension is hosted in the
   CNPG Extensions project rather than upstream.
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
-
 ## Licenses and Copyright
 
 This container image contains software that may be licensed under various

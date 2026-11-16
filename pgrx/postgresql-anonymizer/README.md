@@ -76,10 +76,6 @@ Dataset initialization remains a separate superuser step. For masking rules,
 permissions, and transparent dynamic masking, follow the
 [upstream documentation](https://postgresql-anonymizer.readthedocs.io/).
 
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
-
 ## Licenses and Copyright
 
 The extension uses the PostgreSQL license. The image bundles its license and

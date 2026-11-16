@@ -65,12 +65,6 @@ CREATE EXTENSION IF NOT EXISTS pgsentinel;
 SELECT * FROM pg_active_session_history LIMIT 5;
 ~~~
 
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
 ## Licenses and Copyright
 
 The package copyright and license notice are included in the image under

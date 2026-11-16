@@ -86,6 +86,5 @@ and review them separately; SQL versions need not match package versions.
 ## Licenses and ownership
 
 PostgreSQL. Redistribution notices are preserved under `/licenses/`.
-Maintained by Jeremy Schneider (@ardentperf).
 
 The package also includes `pglogical_origin` version 1.0.0, an empty compatibility extension for upgrades from PostgreSQL 9.4. It is not needed for new PostgreSQL 18 replication setups. The upstream SQL suite exercises it in selected replication cases.

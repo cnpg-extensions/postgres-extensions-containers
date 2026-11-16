@@ -70,7 +70,3 @@ The extension configuration adds the image's `/system` directory to the loader p
 PGDG `postgresql-pltcl-18` provides both language control/SQL sets and `pltcl.so`. Debian `libtcl8.6` is the dynamically linked interpreter, with its script library copied to the extension image and native dependencies under `/system`. Package copyright notices are under `/licenses`.
 
 Renovate tracks `postgresql-pltcl-18`; Debian Tcl updates are reviewed separately. Rebuild when either changes.
-
-## Contributors
-
-Maintained by [@ardentperf](https://github.com/ardentperf).
