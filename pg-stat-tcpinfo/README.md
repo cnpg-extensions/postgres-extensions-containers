@@ -1,12 +1,27 @@
 # pg_stat_tcpinfo
+<!--
+SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
+SPDX-License-Identifier: Apache-2.0
+-->
 
 Live Linux TCP socket statistics exposed through SQL. [Upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Supported images
 
 PostgreSQL 18 on Debian Bookworm and Trixie, for amd64 and arm64.
 
-## Declarative setup
+## Usage
+
+### 1. Add the pg-stat-tcpinfo extension image to your Cluster
+
+Define `pg-stat-tcpinfo` under `postgresql.extensions`.
+No shared preload configuration is needed.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -14,38 +29,32 @@ kind: Cluster
 metadata:
   name: cluster-pg-stat-tcpinfo
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-stat-tcpinfo
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-tcpinfo
-        reference: ghcr.io/cnpg-extensions/pg-stat-tcpinfo:1.1-18-trixie
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-stat-tcpinfo-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-stat-tcpinfo
-  extensions:
-  - name: pg_stat_tcpinfo
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-tcpinfo extractVersion=^(?<version>\d+\.\d+)-
-    version: '1.1'
 ```
 
-For Bookworm, use the `postgresql-minimal-bookworm` catalog and the corresponding
-`-18-bookworm` extension image tags. No shared preload configuration is needed.
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_stat_tcpinfo;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 ## Query TCP statistics
 
@@ -76,7 +85,7 @@ not PUBLIC. These monitoring roles expose additional database statistics;
 grant them only to appropriate users. No persistent files or maintenance daemon
 are needed.
 
-## Licensing and payload
+## Licenses and Copyright
 
 The extension and Debian packaging use the **PostgreSQL** license. The full
 copyright and license notice is shipped at
@@ -90,7 +99,7 @@ licenses, not a claim of upstream CNCF project acceptance.
 
 ## Updates and validation
 
-Renovate tracks both Debian package pins and the documented image tags. SQL
+Renovate tracks Debian package pins and SQL versions in `metadata.hcl`. SQL
 versions are extracted from the verified package version shape; review the
 packaged control files and upgrade scripts when that shape changes. Rebuild
 and validate both distributions and architectures after package updates.
@@ -102,5 +111,3 @@ image, in addition to the shared installation checks. Run:
 task checks TARGET=pg-stat-tcpinfo
 task e2e:test:full TARGET=pg-stat-tcpinfo
 ```
-
-Maintained by the repository maintainers.
