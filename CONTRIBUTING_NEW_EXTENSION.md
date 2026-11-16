@@ -54,15 +54,7 @@ for its build path:
 Source builds use their family templates. See [advanced scaffolding](BUILD.md#advanced-scaffolding)
 for custom Debian versions or distributions.
 
-### Record what will ship
-
-Confirm the package or source version, shipped files, dependencies, and license
-evidence. Add findings relevant to eligibility or packaging to the issue.
-
-For Debian, inspect packages in disposable containers for both supported Debian
-releases. Use `apt search`, install the package, and inspect it with `dpkg -L`.
-Record the full package version, including its distribution suffix, such as
-`0.8.2-1.pgdg13+1` or `0.8.2-1.pgdg12+1`.
+### Configure metadata and updates
 
 Set metadata from the actual payload:
 
@@ -71,8 +63,26 @@ Set metadata from the actual payload:
   Required when `create_extension = true`.
 - `create_extension`: set to `false` for modules without a `.control` file.
 
-Preserve Renovate annotations. Verify the package-to-SQL-version mapping before
-enabling automatic updates; follow the [update policy](README.md#automated-dependency-updates).
+**Every build path requires working Renovate rules.** Configure the rules and
+annotations for metadata and README examples, and verify version discovery and
+the package-to-SQL-version mapping. Follow the
+[update policy](README.md#automated-dependency-updates).
+
+### Document Universe dependencies and the Debian path
+
+Debian and PGRX dependency reporting is handled by the framework; no separate
+recipe-specific dependency report is needed.
+
+Universe recipes must supply dependency evidence that automatic discovery misses.
+Use canonical upstream or ecosystem package names and actual versions so future
+vulnerability advisories can match them. Recipe-local nicknames are not substitutes
+for established identities. Follow the
+[dependency evidence requirements](source-build/README.md#dependency-evidence-in-the-sbom).
+
+In `PACKAGING.md`, summarize the SBOM contents and document the best path to
+Debian/PGDG inclusion: current blockers and the steps needed to resolve them.
+The Universe build is an interim solution. See the
+[Universe guide](source-build/universe/README.md).
 
 ### Demonstrate that it works
 
