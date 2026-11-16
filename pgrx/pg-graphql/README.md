@@ -10,6 +10,12 @@ PostgreSQL. It reflects the SQL schema and exposes it through the
 GraphQL without a separate application server. This image supports PostgreSQL
 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-graphql extension image to your Cluster
@@ -23,47 +29,28 @@ kind: Cluster
 metadata:
   name: cluster-pg-graphql
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-graphql
-      image:
-        # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_graphql` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For
-example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-graphql-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-graphql
-  extensions:
-  - name: pg_graphql
-    # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
-    version: '1.6.3'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_graphql;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_graphql;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -87,10 +74,6 @@ COMMENT ON SCHEMA public IS e'@graphql({"introspection": true})';
 
 See the [upstream configuration guide](https://supabase.github.io/pg_graphql/configuration/)
 for the available schema directives.
-
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 

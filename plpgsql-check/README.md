@@ -8,50 +8,61 @@ SPDX-License-Identifier: Apache-2.0
 PL/pgSQL. It checks embedded SQL and PL/pgSQL behavior that PostgreSQL's
 function validator cannot detect at function creation time.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the plpgsql-check extension image to your Cluster
 
 Add the image to a Cluster:
 
-~~~yaml
-postgresql:
-  extensions:
-  - name: plpgsql-check
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-plpgsql-check
-      reference: ghcr.io/cnpg-extensions/plpgsql-check:2.10.16-18-trixie
-~~~
-
-Enable the SQL extension in a Database:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-plpgsql-check-app
+  name: cluster-plpgsql-check
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-plpgsql-check
-  extensions:
-  - name: plpgsql_check
-    # The SQL extension version is 2.10; the package version is 2.10.9.
-    # renovate: suite=trixie-pgdg depName=postgresql-18-plpgsql-check extractVersion=^(?<version>\d+\.\d+)
-    version: '2.10'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    extensions:
+    - name: plpgsql-check
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION plpgsql_check;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Check a PL/pgSQL function with:
 
 ~~~sql
-CREATE EXTENSION plpgsql_check;
-SELECT * FROM plpgsql_check_function('my_function()');
+CREATE FUNCTION checked_example() RETURNS integer LANGUAGE plpgsql AS $$
+BEGIN
+  RETURN 1;
+END;
+$$;
+SELECT * FROM plpgsql_check_function('checked_example()');
 ~~~
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 

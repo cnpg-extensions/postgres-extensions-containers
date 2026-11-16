@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 [pg_rrule](https://github.com/petropavel13/pg_rrule) is a PostgreSQL extension that adds support for iCalendar recurrence rules (RRULE) as a native data type. It allows you to store and process recurring event schedules using the standard RFC 5545 iCalendar format.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-rrule extension image to your Cluster
@@ -19,46 +25,28 @@ kind: Cluster
 metadata:
   name: cluster-pg-rrule
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-rrule
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-rrule
-        reference: ghcr.io/cnpg-extensions/pg-rrule:0.3.0-18-trixie
-      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_rrule` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-rrule-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-rrule
-  extensions:
-  - name: pg_rrule
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-rrule extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '0.3.0'
-```
-Alternatively, you can enable the extension directly with SQL:
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_rrule;` in the target database.
 
-```sql
-CREATE EXTENSION pg_rrule;
-```
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -77,21 +65,6 @@ You should see `pg_rrule` listed among the installed extensions.
 - **License**: `pg_rrule` itself is MIT, but its runtime dependency `libical3`
   is dual-licensed under LGPL-2.1 or MPL-2.0, which is why this extension is
   hosted in the CNPG Extensions project rather than upstream.
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
 
 ## Licenses and Copyright
 

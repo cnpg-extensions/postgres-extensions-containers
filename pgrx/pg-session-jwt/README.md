@@ -10,6 +10,12 @@ Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT authenticity and
 exposes the validated claims to SQL. Without a JWK, it can use PostgREST-
 compatible JWT claims for identifying the current user.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-session-jwt extension image to your Cluster
@@ -23,47 +29,28 @@ kind: Cluster
 metadata:
   name: cluster-pg-session-jwt
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-session-jwt
-      image:
-        # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-session-jwt:0.5.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_session_jwt` in a specific database by creating or
-updating a `Database` resource, or by running `CREATE EXTENSION` directly in
-`psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-session-jwt-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-session-jwt
-  extensions:
-  - name: pg_session_jwt
-    # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
-    version: '0.5.0'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_session_jwt;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_session_jwt;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -83,10 +70,6 @@ You should see `pg_session_jwt` listed among the installed extensions.
 - Without JWK validation, `request.jwt.claims` is a regular PostgreSQL
   parameter that database users may be able to modify. Use this mode only when
   the claims are set by a trusted integration such as PostgREST.
-
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 

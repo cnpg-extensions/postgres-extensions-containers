@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 [tds_fdw](https://github.com/tds-fdw/tds_fdw) is a PostgreSQL Foreign Data Wrapper (FDW) that enables PostgreSQL to query Microsoft SQL Server and Sybase databases using the TDS (Tabular Data Stream) protocol via FreeTDS.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the tds-fdw extension image to your Cluster
@@ -19,46 +25,28 @@ kind: Cluster
 metadata:
   name: cluster-tds-fdw
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: tds-fdw
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-tds-fdw
-        reference: ghcr.io/cnpg-extensions/tds-fdw:2.0.5-18-trixie
-      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `tds_fdw` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-tds-fdw-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-tds-fdw
-  extensions:
-  - name: tds_fdw
-    # renovate: suite=trixie-pgdg depName=postgresql-18-tds-fdw extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.0.5'
-```
-Alternatively, you can enable the extension directly with SQL:
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION tds_fdw;` in the target database.
 
-```sql
-CREATE EXTENSION tds_fdw;
-```
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -72,31 +60,18 @@ You should see `tds_fdw` listed among the installed extensions.
 
 ## Known Caveats
 
-- **No live database tested**: The CI tests verify that the extension can be
+- **CI coverage**: The CI tests verify that the extension can be
   created (`CREATE EXTENSION tds_fdw`), but do not test actual connectivity to
   a SQL Server or Sybase instance. Actual foreign table queries require a
   running TDS-compatible database server and proper `CREATE SERVER` /
-  `CREATE USER MAPPING` configuration.
+  `CREATE USER MAPPING` configuration. A manual test on CNPG 1.30.1 /
+  PostgreSQL 18.7 (Trixie, AMD64) queried an isolated SQL Server 2022 fixture
+  successfully; other servers and authentication modes remain unverified.
 - **Runtime library dependency**: The FreeTDS library (`libsybdb5`) is bundled
   in the image under `/system/`.
 - **License**: `tds_fdw` itself is PostgreSQL-licensed, but its runtime
   dependency `libsybdb5` (FreeTDS) is LGPL-2+, which is why this extension is
   hosted in the CNPG Extensions project rather than upstream.
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
 
 ## Licenses and Copyright
 

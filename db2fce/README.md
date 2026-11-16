@@ -6,9 +6,15 @@ SPDX-License-Identifier: Apache-2.0
 
 DB2-compatible SQL functions and types, including date/time helpers in the db2 schema. See the [upstream project](https://github.com/credativ/db2fce) for its API and release history.
 
-## Use with CloudNativePG
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-Add this image to a PostgreSQL 18 Cluster on Trixie. Choose the Bookworm image tag when the base image uses Bookworm.
+## Usage
+
+### 1. Add the db2fce extension image to your Cluster
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -16,40 +22,32 @@ kind: Cluster
 metadata:
   name: cluster-db2fce
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: db2fce
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-db2fce
-        reference: ghcr.io/cnpg-extensions/db2fce:0.0.17-18-trixie
 ```
 
-Install the SQL extension in a database with a CNPG `Database` resource:
+### 2. Enable the extension in a database
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-db2fce-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-db2fce
-  extensions:
-  - ensure: present
-    name: db2fce
-    # renovate: suite=trixie-pgdg depName=postgresql-18-db2fce extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '0.0.17'
-```
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION db2fce;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 A SQL check that exercises the installed extension is:
 

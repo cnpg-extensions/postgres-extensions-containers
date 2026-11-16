@@ -6,50 +6,51 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_repack`](https://github.com/reorg/pg_repack) rebuilds tables and indexes while allowing normal reads and writes. The server image provides the PostgreSQL extension library and SQL objects. The `pg_repack` client is run separately and must match the server's PostgreSQL major and extension version.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-repack extension image to your Cluster
 
 Add the server image to a complete Cluster definition:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-pg-repack
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
+  imageCatalogRef: ...
   enableSuperuserAccess: true
-  instances: 1
-  storage:
-    size: 1Gi
   postgresql:
     extensions:
     - name: pg-repack
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-repack
-        reference: ghcr.io/cnpg-extensions/pg-repack:1.5.3-18-trixie
-~~~
+```
 
-Install the server extension in the database:
+### 2. Enable the extension in a database
 
-~~~yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-repack-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-repack
-  extensions:
-  - name: pg_repack
-    # renovate: suite=trixie-pgdg depName=postgresql-18-repack extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.5.3'
-~~~
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_repack;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Run a matching client from a separate job, host, or maintenance image. On a Debian Trixie PostgreSQL 18 client, install the PGDG `postgresql-18-repack` package and connect through the Cluster's managed `-rw` service:
 

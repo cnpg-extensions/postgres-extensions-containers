@@ -9,6 +9,12 @@ PostgreSQL extension for fast full-text, faceted, and hybrid search over
 PostgreSQL tables using the BM25 algorithm and Tantivy. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-search extension image to your Cluster
@@ -22,53 +28,36 @@ kind: Cluster
 metadata:
   name: cluster-pg-search
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
-    - "pg_search"
-
+    - pg_search
     extensions:
+    - name: pgvector
     - name: pg-search
-      image:
-        # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-search:0.26.6-18-trixie
 ```
 
-`pg_search` also requires the `vector` extension. Make the `pgvector` image
-available to the Cluster alongside this image.
+`pg_search` also requires the `vector` extension. The example selects `pgvector`
+from the same catalog. Install `vector` before `pg_search` in the database.
 
 ### 2. Enable the extension in a database
 
-You can install `pg_search` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For
-example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-search-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-search
-  extensions:
-  - name: pg_search
-    # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
-    version: '0.26.6'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_search;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_search CASCADE;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+Install `vector`, then `pg_search` in that order.
 
 ### 3. Verify installation
 
@@ -78,9 +67,9 @@ Once the database is ready, connect to it with `psql` and run:
 \dx pg_search
 ```
 
-You should see `pg_search` listed with version `0.26.6`. The extension must be
+You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
-setting, matching the image's catalog metadata.
+setting explicitly because preloads are not inherited from the catalog.
 
 ## Known Caveats
 
@@ -97,10 +86,6 @@ setting, matching the image's catalog metadata.
   did not resolve the same-session failure. This is an installation-session
   limitation; reconnecting avoids it without disabling extension hooks or
   weakening the search checks. Other platforms were not tested for this issue.
-
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 

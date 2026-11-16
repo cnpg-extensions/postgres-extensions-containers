@@ -4,39 +4,48 @@ RDKit provides cheminformatics types and functions in PostgreSQL, including SMIL
 
 The PG18 package is available on Trixie only in this matrix, for amd64 and arm64. Bookworm has RDKit packages for older PostgreSQL majors but no PG18 package.
 
-## Install and use
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-~~~yaml
+## Usage
+
+### 1. Add the rdkit extension image to your Cluster
+
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-rdkit
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: rdkit
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-rdkit
-        reference: ghcr.io/cnpg-extensions/rdkit:202503.1-18-trixie
-      ld_library_path: [system]
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-rdkit-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-rdkit
-  extensions:
-  - name: rdkit
-    version: '4.7.0'
-~~~
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION rdkit;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Parse a molecular SMILES string, canonicalize it and generate a Morgan fingerprint:
 

@@ -8,51 +8,61 @@ SPDX-License-Identifier: Apache-2.0
 to PostgreSQL. Hints are written in SQL comments and can choose scan methods,
 join methods, and other planner behavior for individual queries.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-hint-plan extension image to your Cluster
 
 Add the image to a Cluster and preload pg_hint_plan:
 
-~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_hint_plan
-  extensions:
-  - name: pg-hint-plan
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan
-      reference: ghcr.io/cnpg-extensions/pg-hint-plan:1.8.1-18-trixie
-~~~
-
-Enable the SQL extension in a Database:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-pg-hint-plan-app
+  name: cluster-pg-hint-plan
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-hint-plan
-  extensions:
-  - name: pg_hint_plan
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.8.1'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    shared_preload_libraries:
+    - pg_hint_plan
+    extensions:
+    - name: pg-hint-plan
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_hint_plan;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 The extension creates its objects in the hint_plan schema. For example:
 
 ~~~sql
-CREATE EXTENSION pg_hint_plan;
-/*+ SeqScan(t) */ EXPLAIN SELECT * FROM t WHERE id = 1;
+CREATE TABLE hint_example (id integer PRIMARY KEY);
+INSERT INTO hint_example SELECT generate_series(1, 1000);
+ANALYZE hint_example;
+/*+ SeqScan(t) */ EXPLAIN SELECT * FROM hint_example AS t WHERE id = 1;
 ~~~
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 

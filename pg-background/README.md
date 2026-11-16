@@ -6,57 +6,60 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_background`](https://github.com/vibhorkum/pg_background) runs SQL in PostgreSQL background workers and returns completion metadata to the calling session. It does not require `shared_preload_libraries`; preloading is only needed if you want to set its GUCs in server configuration before first use.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-background extension image to your Cluster
 
 Add the extension image to a complete Cluster definition:
 
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-pg-background
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-background
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-background
-        reference: ghcr.io/cnpg-extensions/pg-background:2.0.3-18-trixie
-~~~
+```
 
-Install it in the database with a Database resource:
+### 2. Enable the extension in a database
 
-~~~yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-background-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-background
-  extensions:
-  - name: pg_background
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-background extractVersion=^(?<version>\d+\.\d+)
-    version: '2.0'
-~~~
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-A superuser can run work asynchronously and check its result:
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_background;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
+
+A superuser can run SQL in a background worker and inspect its completion metadata:
 
 ~~~sql
-SELECT (pg_background_run('SELECT count(*) FROM pg_class')).*;
+SELECT * FROM pg_background_run('SELECT count(*) FROM pg_class');
 ~~~
 
-The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
+Use the function in `FROM` so it executes once. Expanding
+`(pg_background_run(...)).*` in the select list can execute it once per output
+column. The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
 
 ## Supported matrix and licenses
 

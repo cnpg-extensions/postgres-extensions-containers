@@ -6,7 +6,15 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/Lua embeds Lua 5.3 in PostgreSQL. The package provides trusted `pllua`, untrusted `plluau`, and optional hstore transform extensions. See the [PL/Lua reference](https://pllua.github.io/pllua/).
 
-## Use with CloudNativePG
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
+## Usage
+
+### 1. Add the pllua extension image to your Cluster
 
 Mount the image into PostgreSQL 18:
 
@@ -16,42 +24,32 @@ kind: Cluster
 metadata:
   name: cluster-pllua
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pllua
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pllua
-        reference: ghcr.io/cnpg-extensions/pllua:1-2.0.12-18-trixie
-      ld_library_path:
-      - system
 ```
 
-Enable trusted PL/Lua with a `Database` resource:
+### 2. Enable the extension in a database
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pllua-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pllua
-  extensions:
-  - ensure: present
-    name: pllua
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pllua extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-    version: '2.0'
-```
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pllua;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Use a trusted Lua function:
 
@@ -68,7 +66,3 @@ SELECT lua_add(19, 23); -- 42
 The image contains the PGDG extension modules/control/SQL files and Debian `liblua5.3-0` under `/system`. Package copyright notices are under `/licenses`.
 
 Renovate tracks `postgresql-18-pllua`. Review the separately versioned Lua package and rerun trusted/untrusted tests when rebuilding after either package changes.
-
-## Contributors
-
-Maintained by [@ardentperf](https://github.com/ardentperf).

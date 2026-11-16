@@ -13,17 +13,18 @@ PostgreSQL versions and Debian distributions.
 [{{ replaceAll .Name "-" "_" }}](https://github.com/<owner>/<repo>) is a
 PostgreSQL extension that provides [describe the main functionality here].
 
-<!-- TODO: Match Renovate datasource and depName to metadata.hcl. Only annotate
-SQL versions when their mapping from the release tag is verified. -->
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
 <!--
-TODO: Customize the image tag, extension names, SQL version, and Renovate
-instructions below. Use the package version from `metadata.hcl` for the image
-tag after removing a leading `v`. Replace the generated underscore name wherever necessary to match
-metadata.sql_name in the Database resource and SQL commands.
-The Database SQL version matches the source tag without a leading `v`.
+TODO: Match the Cluster image name and Database SQL name to metadata.hcl.
+Include required dependent extensions, preloads and PostgreSQL parameters.
+The catalog supplies image references, runtime library paths and environment.
 -->
 
 ### 1. Add the {{ .Name }} extension image to your Cluster
@@ -37,49 +38,29 @@ kind: Cluster
 metadata:
   name: cluster-{{ .Name }}
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
-  instances: 1
-
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
 
   postgresql:
     extensions:
     - name: {{ .Name }}
-      image:
-        # TODO: Keep this image tag synchronized with metadata.hcl.
-        # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/{{ .Name }}:<package-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `{{ replaceAll .Name "-" "_" }}` in a specific database by creating or
-updating a `Database` resource, or by running `CREATE EXTENSION` directly in
-`psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-{{ .Name }}-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-{{ .Name }}
-  extensions:
-  - name: {{ replaceAll .Name "-" "_" }}
-    # TODO: Set this to the extension's SQL default_version.
-    # renovate: datasource=github-tags depName=<owner>/<repo> versioning=semver depType=pgrx-source
-    version: '<sql-version>'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION {{ replaceAll .Name "-" "_" }};` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION {{ replaceAll .Name "-" "_" }};
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -95,10 +76,6 @@ You should see `{{ replaceAll .Name "-" "_" }}` listed among the installed exten
 TODO: Add a Known Caveats section if the extension requires shared preload
 libraries, PostgreSQL parameters, runtime libraries, or special SQL setup.
 -->
-
-## Contributors
-
-Maintained by FirstName LastName (@GitHub_Handle).
 
 ## Licenses and Copyright
 

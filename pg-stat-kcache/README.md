@@ -9,40 +9,55 @@ per-query kernel statistics, including CPU time and filesystem reads and
 writes. It uses the query identifiers supplied by the bundled
 pg_stat_statements extension.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-stat-kcache extension image to your Cluster
 
 Add the image to a Cluster and preload both libraries:
 
-~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_stat_statements
-  - pg_stat_kcache
-  extensions:
-  - name: pg-stat-kcache
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-kcache
-      reference: ghcr.io/cnpg-extensions/pg-stat-kcache:2.3.2-18-trixie
-~~~
-
-Enable the SQL extension in a Database:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-pg-stat-kcache-app
+  name: cluster-pg-stat-kcache
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-stat-kcache
-  extensions:
-  - name: pg_stat_statements
-  - name: pg_stat_kcache
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-kcache extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.3.2'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    shared_preload_libraries:
+    - pg_stat_statements
+    - pg_stat_kcache
+    extensions:
+    - name: pg-stat-kcache
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_stat_kcache;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+Install `pg_stat_statements`, then `pg_stat_kcache` in that order.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 After running queries, inspect the collected values:
 
@@ -51,12 +66,6 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 CREATE EXTENSION IF NOT EXISTS pg_stat_kcache;
 SELECT * FROM pg_stat_kcache;
 ~~~
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 

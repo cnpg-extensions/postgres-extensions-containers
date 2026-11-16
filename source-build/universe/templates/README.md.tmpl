@@ -12,8 +12,11 @@ supports PostgreSQL {{ .DefaultVersion }} on Debian {{ .DefaultDistro }}.
 SBOM implementation details and Debian packaging rationale out of this README.
 Put a short technical overview in PACKAGING.md instead. -->
 
-<!-- TODO: Match Renovate datasource and depName to metadata.hcl. Only annotate
-SQL versions when their mapping from the release tag is verified. -->
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
@@ -27,50 +30,30 @@ kind: Cluster
 metadata:
   name: cluster-{{ .Name }}
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
-  instances: 1
-
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
 
   postgresql:
     # TODO: Add required preload libraries and parameters from metadata.hcl.
     extensions:
     - name: {{ .Name }}
-      image:
-        # TODO: Use the source package version without its leading v.
-        # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
-        reference: ghcr.io/cnpg-extensions/{{ .Name }}:<image-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
-      # TODO: Set required runtime paths from metadata.hcl, or omit if empty.
-      ld_library_path: []
 ```
 
 ### 2. Enable the extension in a database
 
-Create or update a `Database` resource to install the extension in `app`:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-{{ .Name }}-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-{{ .Name }}
-  extensions:
-  - name: {{ replaceAll .Name "-" "_" }}
-    # TODO: Use the SQL version from metadata.hcl.
-    # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
-    version: '<sql-version>'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION {{ replaceAll .Name "-" "_" }};` in the target database.
 
-Alternatively, run the following SQL with the required privileges:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION {{ replaceAll .Name "-" "_" }};
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 

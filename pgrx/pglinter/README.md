@@ -9,6 +9,12 @@ schema design and configuration problems, including missing primary keys,
 redundant indexes, and missing indexes on foreign keys. These images support
 PostgreSQL 18 on Debian Bookworm and Trixie.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pglinter extension image to your Cluster
@@ -22,47 +28,28 @@ kind: Cluster
 metadata:
   name: cluster-pglinter
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pglinter
-      image:
-        # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pglinter:2.0.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pglinter` in a specific database by creating or updating
-a `Database` resource, or by running `CREATE EXTENSION` directly in `psql`.
-For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pglinter-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pglinter
-  extensions:
-  - name: pglinter
-    # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
-    version: '2.0.0'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pglinter;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pglinter;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -73,10 +60,6 @@ SELECT * FROM pglinter.get_violations();
 ```
 
 The query returns findings from the enabled lint rules.
-
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 

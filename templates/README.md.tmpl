@@ -13,11 +13,19 @@ Add a reference to the official documentation if available.
 The {{ .Name }} PostgreSQL extension provides [describe the main functionality
 here]. For more information, see the [official documentation](https://example.com).
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 <!--
-Usage: add instructions on how to use the extension with CloudNativePG.
-Include code snippets for Cluster and Database resources as needed.
+TODO: Match the Cluster image name and Database SQL name to metadata.hcl.
+Include required dependent extensions, preloads and PostgreSQL parameters.
+Use the catalog for image references and runtime settings; omit SQL versions
+from initial installation examples. Preserve extension-specific setup steps.
 -->
 
 ### 1. Add the {{ .Name }} extension image to your Cluster
@@ -31,47 +39,29 @@ kind: Cluster
 metadata:
   name: cluster-{{ .Name }}
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
-  instances: 1
-
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
 
   postgresql:
     extensions:
     - name: {{ .Name }}
-      image:
-        # renovate: suite={{ .DefaultDistro }}-pgdg depName={{ replaceAll .Package "%version%" (printf "%d" .DefaultVersion) }}
-        reference: ghcr.io/cnpg-extensions/{{ .Name }}:1.0-{{ .DefaultVersion }}-{{ .DefaultDistro }}
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `{{ .Name }}` in a specific database by creating or updating a
-`Database` resource. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-{{ .Name }}-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-{{ .Name }}
-  extensions:
-  - name: {{ .Name }}
-    # renovate: suite={{ .DefaultDistro }}-pgdg depName={{ replaceAll .Package "%version%" (printf "%d" .DefaultVersion) }} extractVersion=^(?<version>\d+\.\d+)
-    version: '1.0'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION {{ .Name }};` in the target database.
 
-<!--
-TODO: Adjust the extractVersion regex pattern above based on your extension's versioning scheme
-If the Debian package version uses an epoch (for example, `1:1.2.3`), use
-`extractVersion=^(?:\d+:)?(?<version>\d+\.\d+)` so Renovate ignores the epoch.
-Examples: \d+\.\d+ for major.minor (e.g., "18.0"), \d+\.\d+\.\d+ for major.minor.patch (e.g., "0.8.2")
--->
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -82,21 +72,6 @@ Once the database is ready, connect to it with `psql` and run:
 ```
 
 You should see `{{ .Name }}` listed among the installed extensions.
-
-## Contributors
-
-This extension is maintained by:
-
-- FirstName LastName (@GitHub_Handle)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
 
 ## Licenses and Copyright
 

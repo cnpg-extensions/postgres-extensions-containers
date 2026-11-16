@@ -10,6 +10,12 @@ in PostgreSQL so executions can resume after crashes, restarts, or failed
 steps, without an external orchestration service. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-durable extension image to your Cluster
@@ -23,52 +29,32 @@ kind: Cluster
 metadata:
   name: cluster-pg-durable
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     parameters:
-      pg_durable.database: "app"
+      pg_durable.database: app
     shared_preload_libraries:
-    - "pg_durable"
-
+    - pg_durable
     extensions:
     - name: pg-durable
-      image:
-        # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-durable:0.2.9-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_durable` in a specific database by creating or
-updating a `Database` resource, or by running `CREATE EXTENSION` directly in
-`psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-durable-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-durable
-  extensions:
-  - name: pg_durable
-    # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
-    version: '0.2.9'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_durable;` in the target database.
 
-Alternatively, you can enable the extension directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_durable;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -89,6 +75,9 @@ You should see `pg_durable` listed among the installed extensions.
   background worker processes the database named by `pg_durable.database`. The
   metadata and example above configure that database as `app`; create the
   extension there.
+- After startup or extension creation, `df.start` can briefly report that the
+  control background worker is not yet initialized. Wait for initialization
+  and retry that readiness error; configuring authentication is still required.
 - `CREATE EXTENSION pg_durable` does not grant privileges to `PUBLIC`. Grant
   access to application roles with `SELECT df.grant_usage('app_role')` after
   creating the extension. Superuser-submitted workflows are disabled by
@@ -107,10 +96,6 @@ You should see `pg_durable` listed among the installed extensions.
   loopback-only trust rule for both roles. This does not validate a production
   authentication configuration: a credential-based setup remains unverified,
   and the test's trust rule is not a production recommendation.
-
-## Contributors
-
-Maintained by Jeremy Schneider (@ardentperf).
 
 ## Licenses and Copyright
 

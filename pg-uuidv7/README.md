@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 [pg_uuidv7](https://github.com/fboulnois/pg_uuidv7) is a PostgreSQL extension that provides functions for generating and working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID format that embeds a Unix timestamp, making it more suitable than UUID v4 for use as database primary keys.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-uuidv7 extension image to your Cluster
@@ -19,45 +25,28 @@ kind: Cluster
 metadata:
   name: cluster-pg-uuidv7
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pg-uuidv7
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7
-        reference: ghcr.io/cnpg-extensions/pg-uuidv7:1.7.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_uuidv7` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-uuidv7-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-uuidv7
-  extensions:
-  - name: pg_uuidv7
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7 extractVersion=^(?<version>\d+\.\d+)
-    version: '1.7'
-```
-Alternatively, you can enable the extension directly with SQL:
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_uuidv7;` in the target database.
 
-```sql
-CREATE EXTENSION pg_uuidv7;
-```
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -78,21 +67,6 @@ SELECT uuid_generate_v7();
 
 - **License**: `pg_uuidv7` is licensed under MPL-2.0 (Mozilla Public License),
   which is why it is hosted in the CNPG Extensions project rather than upstream.
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
 
 ## Licenses and Copyright
 

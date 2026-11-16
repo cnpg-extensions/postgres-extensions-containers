@@ -3,9 +3,17 @@
 A logical decoding output plugin that serializes change events as Protocol Buffers.
 [Upstream project](https://github.com/debezium/postgres-decoderbufs).
 
-## Supported images and setup
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
+## Usage
 
 PostgreSQL 18 on Debian Trixie and Bookworm, with amd64 and arm64 build targets.
+### 1. Add the decoderbufs extension image to your Cluster
+
 Use this declarative Cluster setup:
 
 ```yaml
@@ -14,27 +22,20 @@ kind: Cluster
 metadata:
   name: cluster-decoderbufs
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     parameters:
       wal_level: logical
       output_plugin_libraries: pgoutput,test_decoding,decoderbufs
     extensions:
     - name: decoderbufs
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-decoderbufs
-        reference: ghcr.io/cnpg-extensions/decoderbufs:3.7.0-18-trixie
-      ld_library_path: [system]
 ```
 
 `decoderbufs` is an output plugin. Although the package contains a control file,
 there is no SQL installation script: do not request `CREATE EXTENSION decoderbufs`
 or list it in a Database resource's SQL extensions.
 
-## Operation and verification
+### 2. Verify operation
 
 Clients connect through the CNPG-managed PostgreSQL Service, using a replication
 role and approved authentication. Create a slot using the replication protocol
@@ -62,5 +63,3 @@ protobuf-c is dynamically linked and updated separately.
 
 Renovate tracks the PGDG package pin. Rebuild for protobuf-c or base-runtime
 security updates and repeat architecture builds.
-
-Maintained by Jeremy Schneider (@ardentperf).

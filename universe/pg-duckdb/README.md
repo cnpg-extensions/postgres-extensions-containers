@@ -7,8 +7,13 @@ SPDX-License-Identifier: Apache-2.0
 [pg_duckdb](https://github.com/duckdb/pg_duckdb) integrates DuckDB's analytical
 query engine with PostgreSQL. It supports analytical queries over PostgreSQL
 tables and external data. This image supports PostgreSQL 18 on Debian Bookworm and Trixie
-for AMD64 and ARM64. Use matching distro tags for the PostgreSQL and extension
-images (for example, `18-minimal-bookworm` and `1.2.0-18-bookworm`).
+for AMD64 and ARM64.
+
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
 ## Usage
 
@@ -22,49 +27,30 @@ kind: Cluster
 metadata:
   name: cluster-pg-duckdb
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
     - pg_duckdb
-
     extensions:
     - name: pg-duckdb
-      image:
-        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
-        reference: ghcr.io/cnpg-extensions/pg-duckdb:1.2.0-18-trixie
-      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
 
-Create or update a `Database` resource to install the extension in `app`:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-duckdb-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-duckdb
-  extensions:
-  - name: pg_duckdb
-    # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
-    version: '1.2.0'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_duckdb;` in the target database.
 
-Alternatively, run the following SQL as a superuser:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_duckdb;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -81,7 +67,7 @@ for querying with DuckDB and accessing external data.
 ## Known Caveats
 
 - `pg_duckdb` requires `shared_preload_libraries`; adding it to an existing
-  cluster requires PostgreSQL to restart. Keep `ld_library_path: [system]` so the
+  cluster requires PostgreSQL to restart. The catalog supplies `ld_library_path: [system]` so the
   extension can load its bundled DuckDB shared library.
 - DuckDB execution defaults to superusers. Review upstream's role and secret
   access settings before granting access through `duckdb.allowed_role`.

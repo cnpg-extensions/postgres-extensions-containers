@@ -8,48 +8,59 @@ SPDX-License-Identifier: Apache-2.0
 time-based and ID-based PostgreSQL partition sets. Its optional background
 worker can run partition maintenance automatically.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-partman extension image to your Cluster
 
 Add the image to a Cluster and preload the background worker:
 
-~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_partman_bgw
-  extensions:
-  - name: pg-partman
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-partman
-      reference: ghcr.io/cnpg-extensions/pg-partman:5.5.0-18-trixie
-~~~
-
-Enable the SQL extension in a Database, conventionally in the partman schema:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-pg-partman-app
+  name: cluster-pg-partman
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-partman
-  extensions:
-  - name: pg_partman
-    schema: partman
-    # renovate: suite=trixie-pgdg depName=postgresql-18-partman extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '5.5.0'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    shared_preload_libraries:
+    - pg_partman_bgw
+    extensions:
+    - name: pg-partman
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_partman;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+For `pg_partman`, create the `partman` schema first and use
+`CREATE EXTENSION pg_partman SCHEMA partman;`, or set `schema: partman` in the
+declarative extension entry.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 See the [pg_partman documentation](https://github.com/pgpartman/pg_partman/tree/development/doc)
 for partition-set configuration examples.
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 

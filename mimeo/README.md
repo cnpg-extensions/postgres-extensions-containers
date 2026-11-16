@@ -6,48 +6,50 @@ SPDX-License-Identifier: Apache-2.0
 
 Specialized per-table replication using snapshot, incremental, and DML-based methods. [Upstream project](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
-~~~yaml
+### 1. Add the mimeo extension image to your Cluster
+
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-mimeo
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: mimeo
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-mimeo
-        reference: ghcr.io/cnpg-extensions/mimeo:1.5.1-18-trixie
-~~~
+```
 
-Install `dblink` and `mimeo` in the destination database:
+### 2. Enable the extension in a database
 
-~~~yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-mimeo-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-mimeo
-  extensions:
-  - name: dblink
-  - name: mimeo
-    # renovate: suite=trixie-pgdg depName=postgresql-18-mimeo extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.5.1'
-~~~
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION mimeo;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+Install `dblink`, then `mimeo` in that order.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 The `mimeo` control file requires `dblink`; install both extensions in the destination Database. By default, the PGDG SQL installs its objects in `public`, including `public.dblink_mapping_mimeo`, `public.table_maker`, and `public.refresh_table`. Store source credentials in the mapping table using appropriately restricted roles, and schedule refresh functions from a separate client. Mimeo copies selected tables, not a cluster or database catalog.
 

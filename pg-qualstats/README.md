@@ -8,51 +8,58 @@ SPDX-License-Identifier: Apache-2.0
 about predicates found in WHERE and JOIN clauses. The statistics help
 identify frequently used predicates and potentially missing indexes.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the pg-qualstats extension image to your Cluster
 
 Add the image to a Cluster and preload pg_qualstats:
 
-~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_qualstats
-  extensions:
-  - name: pg-qualstats
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats
-      reference: ghcr.io/cnpg-extensions/pg-qualstats:2.1.4-18-trixie
-~~~
-
-Enable the SQL extension in a Database:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-pg-qualstats-app
+  name: cluster-pg-qualstats
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-qualstats
-  extensions:
-  - name: pg_qualstats
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.1.4'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    shared_preload_libraries:
+    - pg_qualstats
+    extensions:
+    - name: pg-qualstats
+```
+
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_qualstats;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 Inspect the gathered predicate statistics with:
 
 ~~~sql
-CREATE EXTENSION pg_qualstats;
 SELECT * FROM pg_qualstats;
 ~~~
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 

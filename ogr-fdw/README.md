@@ -4,47 +4,54 @@ ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. See t
 
 PG18 packages are available for both Bookworm and Trixie on amd64 and arm64. The image sets GDAL_DATA to its bundled coordinate-system data directory and stages the linked GDAL runtime libraries.
 
-## Install and read a GeoJSON layer
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
 
-~~~yaml
+## Usage
+
+### 1. Add the ogr-fdw extension image to your Cluster
+
+```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: cluster-ogr-fdw
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: ogr-fdw
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-ogr-fdw
-        reference: ghcr.io/cnpg-extensions/ogr-fdw:1.1.9-18-trixie
-      ld_library_path: [system]
-      env:
-      - name: GDAL_DATA
-        value: ${image_root}/share/gdal
-      - name: PROJ_DATA
-        value: ${image_root}/share/proj
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-ogr-fdw-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-ogr-fdw
-  extensions:
-  - name: ogr_fdw
-    # renovate: suite=trixie-pgdg depName=postgresql-18-ogr-fdw extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-    version: '1.1'
-~~~
+```
 
-The image environment resolves IMAGE_ROOT to the extension mount directory for both GDAL driver data and PROJ coordinate-system data. The example below reads a GeoJSON file over HTTP; application queries remain on the managed PostgreSQL endpoint.
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION ogr_fdw;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
+
+The catalog supplies `GDAL_DATA` and `PROJ_DATA`, with `${image_root}` expanded
+to the extension mount directory for GDAL driver data and PROJ coordinate-system
+data. Replace the example URL below with a reachable GeoJSON datasource containing
+a layer named `places` and properties `place_id` and `name`. Application queries
+remain on the managed PostgreSQL endpoint.
 
 ~~~sql
 CREATE SERVER geojson_source
@@ -70,6 +77,7 @@ OGR_FDW only supports the GDAL drivers available in the installed libgdal build.
 
 ## Package, licensing and updates
 
-Bookworm package: 1.1.9-1.pgdg12+1. Trixie package: 1.1.9-1.pgdg13+1. SQL version: 1.1. The extension is MIT-licensed. Copyright notices for bundled runtime packages and GDAL/PROJ data are under `/licenses/<package>/`. The image includes no source archives.
+The suite-specific PGDG package versions and SQL version are recorded in
+`metadata.hcl`. The extension is MIT-licensed. Copyright notices for bundled runtime packages and GDAL/PROJ data are under `/licenses/<package>/`. The image includes no source archives.
 
 Renovate tracks both PGDG package versions. Rebuild after package or base-image security updates and review the resulting runtime libraries and package notices.

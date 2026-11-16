@@ -6,6 +6,12 @@ SPDX-License-Identifier: Apache-2.0
 
 [plprofiler](https://github.com/bigsql/plprofiler) is a PostgreSQL extension that provides execution profiling for PL/pgSQL functions and procedures. It collects per-statement call counts, total execution time, and self-time, helping you identify performance bottlenecks in stored procedure code.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the plprofiler extension image to your Cluster
@@ -19,45 +25,28 @@ kind: Cluster
 metadata:
   name: cluster-plprofiler
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: plprofiler
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-plprofiler
-        reference: ghcr.io/cnpg-extensions/plprofiler:4.2.5-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `plprofiler` in a specific database by creating or updating a
-`Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For example, to enable it in the `app` database:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-plprofiler-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-plprofiler
-  extensions:
-  - name: plprofiler
-    # renovate: suite=trixie-pgdg depName=postgresql-18-plprofiler extractVersion=^(?<version>\d+\.\d+)
-    version: '4.2'
-```
-Alternatively, you can enable the extension directly with SQL:
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION plprofiler;` in the target database.
 
-```sql
-CREATE EXTENSION plprofiler;
-```
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -73,21 +62,6 @@ You should see `plprofiler` listed among the installed extensions.
 
 - **License**: `plprofiler` is Artistic-2.0, which is why it is hosted in the
   CNPG Extensions project rather than upstream.
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
-
-The maintainers are responsible for:
-
-- Monitoring upstream releases and security vulnerabilities.
-- Ensuring compatibility with supported PostgreSQL versions.
-- Reviewing and merging contributions specific to this extension's container
-  image and lifecycle.
-
----
 
 ## Licenses and Copyright
 

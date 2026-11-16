@@ -10,6 +10,12 @@ with PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure
 Blob Storage, Google Cloud Storage, and HTTP(S) endpoints. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
 
 ### 1. Add the pg-parquet extension image to your Cluster
@@ -24,49 +30,30 @@ kind: Cluster
 metadata:
   name: cluster-pg-parquet
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
-  instances: 1
-
-  storage:
-    size: 1Gi
-
+  imageCatalogRef: ...
   postgresql:
     shared_preload_libraries:
-    - "pg_parquet"
-
+    - pg_parquet
     extensions:
     - name: pg-parquet
-      image:
-        # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-parquet:0.5.1-18-trixie
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `pg_parquet` in a specific database by creating or updating a
-`Database` resource:
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-parquet-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-parquet
-  extensions:
-  - name: pg_parquet
-    # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
-    version: '0.5.1'
-```
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pg_parquet;` in the target database.
 
-Alternatively, enable it directly with SQL:
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
 
-```sql
-CREATE EXTENSION pg_parquet;
-```
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
@@ -76,7 +63,7 @@ Once the database is ready, connect to it with `psql` and run:
 \dx
 ```
 
-You should see `pg_parquet` listed with version `0.5.1`.
+You should see `pg_parquet` listed with its installed SQL version.
 
 ## Known Caveats
 
@@ -93,10 +80,6 @@ You should see `pg_parquet` listed with version `0.5.1`.
   [upstream documentation](https://github.com/CrunchyData/pg_parquet#object-store-support).
 - The `pg_parquet.enable_copy_hooks` parameter can be set to `off` to disable
   the extension's COPY hooks for a session or role.
-
-## Contributors
-
-Maintained by Jeremy Schneider ([@ardentperf](https://github.com/ardentperf)).
 
 ## Licenses and Copyright
 

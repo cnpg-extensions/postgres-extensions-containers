@@ -6,7 +6,15 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/JS provides a trusted JavaScript procedural language for PostgreSQL, backed by QuickJS statically compiled into `pljs.so`. See the [upstream project](https://github.com/plv8/pljs) for its API and release history.
 
-## Use with CloudNativePG
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
+## Usage
+
+### 1. Add the pljs extension image to your Cluster
 
 Mount the extension image into PostgreSQL 18:
 
@@ -16,40 +24,32 @@ kind: Cluster
 metadata:
   name: cluster-pljs
 spec:
-  imageCatalogRef:
-    apiGroup: postgresql.cnpg.io
-    kind: ClusterImageCatalog
-    name: postgresql-minimal-trixie
-    major: 18
-  instances: 1
-  storage:
-    size: 1Gi
+  imageCatalogRef: ...
   postgresql:
     extensions:
     - name: pljs
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pljs
-        reference: ghcr.io/cnpg-extensions/pljs:1.0.5-18-trixie
 ```
 
-Install PL/JS in a database with a `Database` resource:
+### 2. Enable the extension in a database
 
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pljs-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pljs
-  extensions:
-  - ensure: present
-    name: pljs
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pljs extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.0.5'
-```
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION pljs;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
 
 A function exercises the JavaScript runtime:
 
@@ -66,7 +66,3 @@ The language is trusted, but the extension itself must be installed by a databas
 PGDG package `postgresql-18-pljs` supplies `pljs.so` and its control/SQL files. QuickJS is statically linked, so no additional runtime package is needed. The PGDG package copyright notice is under `/licenses`.
 
 PLJS uses a project-specific license recorded as `LicenseRef-PLJS` in the image metadata. The Debian copyright file preserves its full terms; QuickJS is MIT licensed. Renovate tracks `postgresql-18-pljs`; inspect the source patch and notices when updating it.
-
-## Contributors
-
-Maintained by [@ardentperf](https://github.com/ardentperf).

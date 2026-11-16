@@ -8,50 +8,57 @@ SPDX-License-Identifier: Apache-2.0
 stores variable-length values, including inline, compressed, and out-of-line
 TOAST values. It does not need to be preloaded.
 
+Follow the [quick start](../README.md#quick-start) to set up extension-update email
+alerts first, then use the CronJob to install and refresh the catalog. These
+examples inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your existing instance and storage settings.
+
 ## Usage
+
+### 1. Add the toastinfo extension image to your Cluster
 
 Add the image to a Cluster:
 
-~~~yaml
-postgresql:
-  extensions:
-  - name: toastinfo
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-toastinfo
-      reference: ghcr.io/cnpg-extensions/toastinfo:1.7-18-trixie
-~~~
-
-Enable the SQL extension in a Database:
-
-~~~yaml
+```yaml
 apiVersion: postgresql.cnpg.io/v1
-kind: Database
+kind: Cluster
 metadata:
-  name: cluster-toastinfo-app
+  name: cluster-toastinfo
 spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-toastinfo
-  extensions:
-  - name: toastinfo
-    # toastinfo's SQL extension version is independent of its package version.
-    # SQL version must be checked in the package control files before merging updates.
-    version: '1'
-~~~
+  imageCatalogRef: ...
+  postgresql:
+    extensions:
+    - name: toastinfo
+```
 
-Use pg_toastinfo and pg_toastpointer to inspect a value:
+### 2. Enable the extension in a database
+
+Once the extension's files are available in the cluster, you can install it in a
+database in either of two ways:
+
+- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+- **Through SQL**, by running `CREATE EXTENSION toastinfo;` in the target database.
+
+Platform teams may make extension containers available across their clusters
+without installing every extension in every database. Install only the extensions
+a database uses; letting users enable them through SQL alongside the rest of their
+DDL schema management code can be a convenient approach.
+
+For extensions that normally require superuser privileges, platform teams can use
+[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
+administrator-approved selection of extensions.
+
+### 3. Verify installation
+
+Connect to the database with `psql` and run `\dx` to check the installed extensions.
+
+Use `pg_toastinfo` and `pg_toastpointer` to inspect a value. Replace
+`my_table` and `value` with your table and a variable-length column:
 
 ~~~sql
-CREATE EXTENSION toastinfo;
 SELECT pg_toastinfo(value), pg_toastpointer(value) FROM my_table;
 ~~~
-
-## Contributors
-
-This extension is maintained by:
-
-- Jeremy Schneider (@ardentperf)
 
 ## Licenses and Copyright
 
