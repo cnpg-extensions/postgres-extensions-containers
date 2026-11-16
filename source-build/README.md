@@ -344,7 +344,7 @@ tools select the recipe and build family. See the
 [local testing guide](../BUILD.md#local-testing-guide) for individual steps and
 cleanup. The `:all` tasks currently discover Debian recipes only.
 
-## Tooling tests for framework maintainers
+## Tooling tests
 
 Maintainers working on the shared tools and framework for extension development
 can run this suite in the pinned generator image so its Syft, SPDX validator and
