@@ -136,16 +136,48 @@ class HookComposition(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'expected one version'):
             self.run_hook()
 
-    def test_consolidated_notices_preserved_by_hook(self):
-        result = self.run_hook()
-        extracted = {item['licenseId']: item['extractedText'] for item in result['hasExtractedLicensingInfos']}
-        for package in result['packages']:
-            directory = self.final / 'licenses' / package['name']
-            expected = '\n\n'.join(p.read_text() for p in sorted(directory.iterdir()))
-            self.assertEqual(extracted[package['licenseDeclared']], expected)
-            for notice in directory.iterdir():
-                self.assertIn(dict(spdxElementId=package['SPDXID'], relationshipType='DISTRIBUTION_ARTIFACT',
-                    relatedSpdxElement=self.file_id(str(notice.relative_to(self.final)))), result['relationships'])
+    def test_notice_references_preserve_files_without_embedding_text(self):
+        # Existing generator license records, including text when supplied,
+        # belong to the generator and must not be rewritten by this hook.
+        inherited = dict(licenseId='LicenseRef-system', extractedText='System terms')
+        self.document['hasExtractedLicensingInfos'] = [inherited]
+        before = copy.deepcopy(self.document)
+        for platform in ('linux/amd64', 'linux/arm64'):
+            with self.subTest(platform=platform):
+                self.context.platform = platform
+                result = self.run_hook()
+                self.assertEqual(self.document, before)
+                self.assertEqual(result['files'], before['files'])
+                self.assertIn(inherited, result['hasExtractedLicensingInfos'])
+                extracted = {item['licenseId']: item for item in result['hasExtractedLicensingInfos']}
+                for package in result['packages']:
+                    directory = self.final / 'licenses' / package['name']
+                    notices = sorted(p for p in directory.rglob('*') if p.is_file())
+                    original = '\n\n'.join(p.read_text() for p in notices)
+                    # Existing notice-derived license identities stay stable.
+                    expected_id = 'LicenseRef-Notices-' + hashlib.sha256(original.encode()).hexdigest()[:24]
+                    self.assertEqual(package['licenseDeclared'], expected_id)
+                    self.assertEqual(package['licenseConcluded'], expected_id)
+                    self.assertEqual(extracted[expected_id]['extractedText'], 'NOASSERTION')
+                    for notice in notices:
+                        path = str(notice.relative_to(self.final))
+                        self.assertIn(dict(spdxElementId=package['SPDXID'],
+                            relationshipType='DISTRIBUTION_ARTIFACT',
+                            relatedSpdxElement=self.file_id(path)), result['relationships'])
+                        record = next(f for f in result['files'] if f['SPDXID'] == self.file_id(path))
+                        self.assertIn(dict(algorithm='SHA256',
+                            checksumValue=hashlib.sha256(notice.read_bytes()).hexdigest()), record['checksums'])
+
+    def test_missing_copyright_fails_even_with_common_license(self):
+        (self.final / 'licenses/libduckdb2.0/copyright').unlink()
+        with self.assertRaisesRegex(ValueError, 'missing copyright notices for libduckdb2.0'):
+            self.run_hook()
+
+    def test_missing_notice_inventory_fails(self):
+        self.document['files'] = [f for f in self.document['files']
+                                 if f['SPDXID'] != self.file_id('licenses/libduckdb2.0/copyright')]
+        with self.assertRaises(KeyError):
+            self.run_hook()
 
 
 

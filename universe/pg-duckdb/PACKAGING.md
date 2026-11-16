@@ -61,7 +61,10 @@ they are not an inventory of additional runtime components.
 There is no license extraction script, build-time copyright download, dependency
 discovery or comment parser. `augment_spdx.py` has one maintained package mapping with source-version readers and
 emits records directly, without an intermediate JSON manifest. License texts are
-read from the final image. Docker COPY handles staging, and the shared generator
+read from the final image to derive stable `LicenseRef` identifiers. Their SPDX
+records use `extractedText: "NOASSERTION"`, matching the shared generator/Syft
+convention for references without embedded text; the complete original texts
+remain retrievable under `/licenses`. Docker COPY handles staging, and the shared generator
 inventories shipped files; the hook does not repeat builder-to-final comparisons.
 Readable source-package SPDX IDs and explicit relationships associate the two
 known binaries with pg_duckdb and DuckDB.
@@ -86,8 +89,10 @@ common-license files can cause it to select an installed builder package even
 when none of that package's binary files ship. The hook replaces only records
 whose entire shipped-file ownership consists of these mapped notices. Packages
 owning actual shipped binaries remain intact, including distinct system and
-embedded copies of the same library. Notice relationships and complete extracted
-license text are retained under the explicit compiled-version records.
+embedded copies of the same library. Notice relationships and notice-derived license identifiers are retained under
+the explicit compiled-version records. The shared file inventory retains notice
+checksums; `DISTRIBUTION_ARTIFACT` relationships identify the files containing
+the full terms without duplicating them in the SPDX license records.
 
 The PostgreSQL 18/Trixie amd64 build uses five Debian library packages from its
 base image: libc6, libgcc-s1, libstdc++6, liblz4-1 and libxxhash0. pg_duckdb links

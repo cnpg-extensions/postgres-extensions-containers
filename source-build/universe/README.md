@@ -49,3 +49,42 @@ README image and SQL examples use Renovate annotations matching metadata
 The shared README rule removes a leading `v` from release versions and preserves
 the image's PostgreSQL/distribution suffix. Annotate SQL examples only when their
 release-version mapping is verified. Keep historical investigation versions fixed.
+
+## Review checklist for new recipes and updates
+
+Record recipe-specific evidence and limitations in `PACKAGING.md`; keep this
+checklist as the shared review entry point. Revisit it when source versions,
+bundled dependencies, build flags or the pinned SBOM generator change.
+
+- **Payload and boundaries:** justify the Universe packaging choice, identify
+  source-built and system runtime components (including static code and data),
+  and explain package boundaries. Verify versions against the selected source
+  and compiler settings. Exclude build-only tools and runtime downloads.
+- **Original notices:** retrieve `/licenses` from the final image. Check complete
+  upstream notices, bundled-component attribution and any referenced common
+  license texts against the selected sources. Reassess checked-in copyright
+  snapshots on updates; a successful build does not establish their coverage.
+- **SBOM conventions:** compare the hook's output with the pinned shared
+  generator and an existing extension. Preserve standard license expressions,
+  existing license records, file ownership and checksums. For notice references
+  without embedded text, use the generator/Syft `extractedText: "NOASSERTION"`
+  convention, with original text shipped under `/licenses` and explicit package
+  relationships to the inventoried notice files. Every `LicenseRef` must resolve;
+  do not remove its record or replace package attribution with `NOASSERTION`
+  merely to avoid embedding text. Do not rewrite generator-owned license text.
+- **Regression coverage:** exercise the recipe hook in the existing
+  `source-build/tests` suite. Check complete package/notice relationships,
+  unchanged inventory and checksums, resolved license references, and missing
+  notice failures. Assert the intended consumer-visible evidence, rather than
+  fixed package counts or the hook's current serialization alone.
+- **Real output:** use the [shared build and verification commands](../README.md#local-builds)
+  to inspect attached SPDX and extract notices for every supported distribution
+  and architecture. Check notice hashes against the final image, run the shared
+  scans and runtime smoke tests, and retain the normal signing/SLSA release
+  gates. Report exactly which checks ran, distinguishing fixture tests, reused
+  compiled builders, fresh native builds and hosted acceptance.
+
+The [pg_duckdb packaging notes](../../universe/pg-duckdb/PACKAGING.md) illustrate
+where to record component boundaries and notice provenance. Its
+[hook tests](../tests/test_universe_hook.py) cover notice references without
+embedded text and preservation of the shared inventory.
