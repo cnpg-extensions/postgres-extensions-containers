@@ -48,11 +48,11 @@ Consult each recipe and image's notices and SBOM for license details.
 
 **Source-built PGRX packages:** [pg-durable](pgrx/pg-durable), [pg-graphql](pgrx/pg-graphql), [pg-jsonschema](pgrx/pg-jsonschema), [pg-parquet](pgrx/pg-parquet), [pg-search](pgrx/pg-search), [pg-session-jwt](pgrx/pg-session-jwt), [pglinter](pgrx/pglinter), [postgresql-anonymizer](pgrx/postgresql-anonymizer).
 
-**Source-built Universe packages:** [pg-duckdb](universe/pg-duckdb) (Trixie only; pending publication in the image catalogs).
+**Source-built Universe packages:** [pg-duckdb](universe/pg-duckdb).
 
 Published extensions are available in both the [Trixie](https://github.com/cnpg-extensions/artifacts/blob/main/image-catalogs-extensions/catalog-minimal-trixie.yaml)
 and [Bookworm](https://github.com/cnpg-extensions/artifacts/blob/main/image-catalogs-extensions/catalog-minimal-bookworm.yaml)
-catalogs, except `pg-gvm` and `rdkit`, which are Trixie-only.
+catalogs, except `pg-duckdb`, `pg-gvm` and `rdkit`, which are Trixie-only.
 
 ---
 
