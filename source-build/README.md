@@ -269,9 +269,10 @@ principles in three ways:
   packages that own shipped binaries, keeping system and embedded library
   copies distinct.
 - **License evidence:** copyright and common-license texts are shipped under
-  `/licenses/`. The hook reads those final-image files into SPDX extracted
-  licensing information, references them through `LicenseRef` identifiers and
-  links the notice files to their packages with `DISTRIBUTION_ARTIFACT`.
+  `/licenses/`. The hook retains notice-derived `LicenseRef` identifiers with
+  `extractedText: "NOASSERTION"`, following the shared generator/Syft convention
+  for references without embedded text. `DISTRIBUTION_ARTIFACT` links each
+  package to its original notice files in the checksummed inventory.
 
 ### Example: pg-search's Rust dependencies
 

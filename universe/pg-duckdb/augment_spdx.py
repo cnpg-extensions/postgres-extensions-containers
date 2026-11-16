@@ -83,6 +83,8 @@ def augment_spdx(document, context):
     def add_package(name, version, purl, source_url):
         notice_dir = final / 'licenses' / name
         notices = sorted(p for p in notice_dir.rglob('*') if p.is_file())
+        if not notices or not (notice_dir / 'copyright').is_file():
+            raise ValueError('missing copyright notices for ' + name)
         text = '\n\n'.join(p.read_text() for p in notices)
         license_id = 'LicenseRef-Notices-' + hashlib.sha256(text.encode()).hexdigest()[:24]
         sid = 'SPDXRef-Source-' + name.replace('_', '-')
@@ -93,7 +95,11 @@ def augment_spdx(document, context):
             externalRefs=[dict(referenceCategory='PACKAGE-MANAGER', referenceType='purl', referenceLocator=purl)]))
         extracted = result.setdefault('hasExtractedLicensingInfos', [])
         if not any(item['licenseId'] == license_id for item in extracted):
-            extracted.append(dict(licenseId=license_id, extractedText=text, name=name + ' bundled notices'))
+            # Match the shared generator/Syft convention for references without
+            # embedded text. Original notices remain in the inventoried payload,
+            # linked below; retain the notice-derived ID for existing attribution.
+            extracted.append(dict(licenseId=license_id, extractedText='NOASSERTION',
+                                  name=name + ' bundled notices'))
         for notice in notices:
             relate(sid, 'DISTRIBUTION_ARTIFACT', files[str(notice.relative_to(final))]['SPDXID'])
         return sid
