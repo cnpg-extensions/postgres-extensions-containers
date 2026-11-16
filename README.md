@@ -160,12 +160,6 @@ This catalog is a drop-in replacement for the corresponding upstream
 [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
 and [CloudNativePG image catalog documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
 
-The catalogs are published daily at 10:00 UTC and after successful extension
-builds on `main`. Each refresh incorporates the upstream catalog. Publication
-does not update your installed Kubernetes object: the CronJob applies the
-latest published manifest on your schedule. See the
-[catalog publication workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml).
-
 ### 3. Enable extensions on individual Clusters
 
 Reference the catalog and select extensions by name. This excerpt makes PL/Tcl
