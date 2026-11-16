@@ -29,15 +29,15 @@ extensions for [CloudNativePG](https://cloudnative-pg.io/).
 
 ## Supported Extensions
 
-The Debian groups use the [CNCF license allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md)
-and the recipes' documented license evidence. The review group includes
-non-allowlisted terms and unresolved dependency or attribution questions; CNCF
-can approve exceptions, so this is not a permanent exclusion from CNCF hosting.
-Consult each recipe and image's notices and SBOM before relying on this summary.
+For this grouping, CNCF-compatible means covered by Apache-2.0 or the
+[CNCF license allowlist](https://github.com/cncf/foundation/blob/main/policies-guidance/allowed-third-party-license-policy.md)
+without project-specific exceptions. Packages with non-allowlisted terms or
+unresolved dependency or attribution questions are outside the compatible group.
+Consult each recipe and image's notices and SBOM for license details.
 
 **Debian packages with CNCF-compatible declared licenses:** [credcheck](credcheck), [db2fce](db2fce), [decoderbufs](decoderbufs), [extra-window-functions](extra-window-functions), [first-last-agg](first-last-agg), [hll](hll), [http](http), [hypopg](hypopg), [ip4r](ip4r), [jsquery](jsquery), [mimeo](mimeo), [periods](periods), [pg-background](pg-background), [pg-csv](pg-csv), [pg-dirtyread](pg-dirtyread), [pg-partman](pg-partman), [pg-permissions](pg-permissions), [pg-qualstats](pg-qualstats), [pg-rage-terminator](pg-rage-terminator), [pg-repack](pg-repack), [pg-rewrite](pg-rewrite), [pg-similarity](pg-similarity), [pg-squeeze](pg-squeeze), [pg-stat-kcache](pg-stat-kcache), [pg-stat-log](pg-stat-log), [pg-statviz](pg-statviz), [pg-track-settings](pg-track-settings), [pg-wait-sampling](pg-wait-sampling), [pgextwlist](pgextwlist), [pgfincore](pgfincore), [pglogical](pglogical), [pgnodemx](pgnodemx), [pgpcre](pgpcre), [pgq](pgq), [pgtap](pgtap), [pgtt](pgtt), [pllua](pllua), [plpgsql-check](plpgsql-check), [plproxy](plproxy), [plsh](plsh), [pointcloud](pointcloud), [powa](powa), [preprepare](preprepare), [prioritize](prioritize), [rational](rational), [roaringbitmap](roaringbitmap), [rum](rum), [semver](semver), [set-user](set-user), [tdigest](tdigest), [timestamp9](timestamp9), [toastinfo](toastinfo).
 
-**Debian packages requiring CNCF license review or an exception:** [age](age), [asn1oid](asn1oid), [debversion](debversion), [h3](h3), [icu-ext](icu-ext), [mobilitydb](mobilitydb), [mysql-fdw](mysql-fdw), [numeral](numeral), [ogr-fdw](ogr-fdw), [orafce](orafce), [pg-cron](pg-cron), [pg-gvm](pg-gvm), [pg-hint-plan](pg-hint-plan), [pg-pwhash](pg-pwhash), [pg-rrule](pg-rrule), [pg-stat-plans](pg-stat-plans), [pg-uuidv7](pg-uuidv7), [pgmemcache](pgmemcache), [pgmp](pgmp), [pgsentinel](pgsentinel), [pgsphere](pgsphere), [pldebugger](pldebugger), [pljs](pljs), [plprofiler](plprofiler), [pltcl](pltcl), [prefix](prefix), [q3c](q3c), [rdkit](rdkit), [show-plans](show-plans), [table-log](table-log), [tds-fdw](tds-fdw), [unit](unit).
+**Debian packages outside the CNCF-compatible group:** [age](age), [asn1oid](asn1oid), [debversion](debversion), [h3](h3), [icu-ext](icu-ext), [mobilitydb](mobilitydb), [mysql-fdw](mysql-fdw), [numeral](numeral), [ogr-fdw](ogr-fdw), [orafce](orafce), [pg-cron](pg-cron), [pg-gvm](pg-gvm), [pg-hint-plan](pg-hint-plan), [pg-pwhash](pg-pwhash), [pg-rrule](pg-rrule), [pg-stat-plans](pg-stat-plans), [pg-uuidv7](pg-uuidv7), [pgmemcache](pgmemcache), [pgmp](pgmp), [pgsentinel](pgsentinel), [pgsphere](pgsphere), [pldebugger](pldebugger), [pljs](pljs), [plprofiler](plprofiler), [pltcl](pltcl), [prefix](prefix), [q3c](q3c), [rdkit](rdkit), [show-plans](show-plans), [table-log](table-log), [tds-fdw](tds-fdw), [unit](unit).
 
 **Source-built PGRX packages:** [pg-durable](pgrx/pg-durable), [pg-graphql](pgrx/pg-graphql), [pg-jsonschema](pgrx/pg-jsonschema), [pg-parquet](pgrx/pg-parquet), [pg-search](pgrx/pg-search), [pg-session-jwt](pgrx/pg-session-jwt), [pglinter](pgrx/pglinter), [postgresql-anonymizer](pgrx/postgresql-anonymizer).
 
