@@ -60,14 +60,6 @@ Use it in one of these three ways:
   extension, installed version, and available default version. Pair the dashboard
   with an email alert for unattended maintenance.
 
-For an existing cluster, confirm the unfiltered
-`cnpg_pg_extensions_update_available` metric is being collected. For a new
-cluster, configure the alert rule and test email delivery now, then verify
-metric collection once the cluster is running. No results from the filtered query can mean everything is up
-to date, but can also mean the metric is missing. Keep scrape failures and
-CronJob failures covered by your usual monitoring. See the
-[CNPG metric definition](https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml).
-
 ### 2. Set up the catalog maintenance CronJob
 
 After configuring email alerts and testing delivery, install this CronJob. Its
