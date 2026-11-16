@@ -229,11 +229,12 @@ When proposing a new extension, the following criteria must be met:
   the [DFSG](https://www.debian.org/social_contract#guidelines)). Extensions added through the Debian framework
   should have packages available for both current Debian `stable` and `oldstable`.
   The [PostgreSQL Global Development Group (PGDG)](https://wiki.postgresql.org/wiki/Apt)
-  repository is required in practice to provide matching extension versions for
-  both distributions; the regular Debian repositories do not provide this consistency.
-  Other third-party APT repositories are not accepted: in our experience their
-  packages generally do not meet Debian standards, while packages that meet those
-  standards are usually available in Debian. See the
+  repository is the required package source. This follows the same rationale as
+  our Debian-first policy: contributing packages benefits the wider PostgreSQL
+  community, and preparing packages for Debian and PGDG tends to resolve licensing,
+  redistribution and dependency-management issues before we distribute them.
+  Other third-party APT repositories are not accepted; providing a working `.deb`
+  alone does not establish that this work has been done. See the
   [Debian packaging policy](source-build/README.md#inclusion-policy-debian-packaging-first)
   for the community, licensing and dependency-management reasons behind this requirement.
   Rust extensions use the [PGRX path](pgrx/README.md);
