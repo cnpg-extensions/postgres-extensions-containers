@@ -310,8 +310,9 @@ The PGRX helpers implement this policy deliberately:
 ## Local builds
 
 Use the same Task/Dagger build and smoke-test workflow as Debian extensions,
-following the [shared build guide](../BUILD.md#prerequisites). Keep the contributor
-process aligned with upstream CloudNativePG wherever possible.
+following the [shared build guide](../BUILD.md#prerequisites). The CNPG Extensions
+project explicitly aims to keep the contributor process aligned with upstream
+CloudNativePG wherever possible.
 
 Run from the repository root. Source builds additionally require Python 3,
 the repository's current digest-qualified shared SBOM generator image and a
@@ -343,33 +344,11 @@ tools select the recipe and build family. See the
 [local testing guide](../BUILD.md#local-testing-guide) for individual steps and
 cleanup. The `:all` tasks currently discover Debian recipes only.
 
-### Advanced: reproduce workflow preparation
+## Tooling tests for framework maintainers
 
-To inspect the build plan used by CI, invoke preparation directly with a recipe
-name and family. Use a fresh output directory:
-
-```sh
-printf '%s\n' '{"extension_name":"pg-duckdb","build_family":"universe"}' > /tmp/source-inputs.json
-GITHUB_RUN_ID=local registry=localhost:5000 \
-  python3 source-build/prepare.py --inputs /tmp/source-inputs.json \
-  --generator "$sbom_generator" --output /tmp/source-prepared
-python3 source-build/build.py --architecture amd64 --builder NAME
-```
-
-Use `arm64` on an ARM64 host and `build_family=pgrx` for a PGRX recipe.
-The resulting `preparation.json` lists each distribution/PostgreSQL/platform row
-and its Bake file. Choose the row matching the local architecture and intended
-target:
-
-```sh
-docker buildx bake --builder NAME \
-  -f /tmp/source-prepared/ROW.json TARGET
-```
-
-## Tooling tests
-
-Run the existing suite in the pinned generator image so its Syft, SPDX validator
-and composer match the build environment:
+Maintainers working on the shared tools and framework for extension development
+can run this suite in the pinned generator image so its Syft, SPDX validator and
+composer match the build environment:
 
 ```sh
 docker run --rm --entrypoint python3 \
@@ -377,10 +356,10 @@ docker run --rm --entrypoint python3 \
   "$sbom_generator" source-build/test.py
 ```
 
-The runner discovers both shared and PGRX tests, including preparation, native
-assembly and generator/hook composition. Recipe evidence tests should cover lost
-packages, identifiers, notices and payload ownership. Universe's evidence is
-recipe-specific and must be reviewed when upstream components change.
+The runner discovers shared and PGRX tooling tests covering preparation, native
+assembly and generator/hook composition, including package identities, notices
+and payload ownership. These tests use fixtures and mocked commands; extension
+builds and runtime testing follow the local build flow above.
 
 ## Directory guide
 
