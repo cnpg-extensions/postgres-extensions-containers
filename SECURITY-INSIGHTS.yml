@@ -49,8 +49,6 @@ repository:
         comment: GitHub packages for the h3 extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/mobilitydb
         comment: GitHub packages for the MobilityDB extension image
-      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/mysql-fdw
-        comment: GitHub packages for the mysql_fdw extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/hypopg
         comment: GitHub packages for the HypoPG extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-hint-plan
