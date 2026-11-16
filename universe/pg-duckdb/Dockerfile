@@ -24,7 +24,7 @@ RUN git clone --branch "${EXT_VERSION}" --single-branch https://github.com/duckd
     && git submodule update --init --recursive
 
 # Match upstream's Docker image compiler selection and default release build.
-# Trixie supplies its supported Clang version rather than Bookworm's clang-14.
+# Use each Debian suite's supported Clang version.
 ENV DUCKDB_CC=/usr/bin/clang DUCKDB_CXX=/usr/bin/clang++
 ENV PATH=/usr/lib/ccache:$PATH
 ENV CCACHE_DIR=/ccache

@@ -6,8 +6,9 @@ SPDX-License-Identifier: Apache-2.0
 
 [pg_duckdb](https://github.com/duckdb/pg_duckdb) integrates DuckDB's analytical
 query engine with PostgreSQL. It supports analytical queries over PostgreSQL
-tables and external data. This image supports PostgreSQL 18
-for AMD64 and ARM64.
+tables and external data. This image supports PostgreSQL 18 on Debian Bookworm and Trixie
+for AMD64 and ARM64. Use matching distro tags for the PostgreSQL and extension
+images (for example, `18-minimal-bookworm` and `1.2.0-18-bookworm`).
 
 ## Usage
 
