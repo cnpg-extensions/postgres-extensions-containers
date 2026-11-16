@@ -209,7 +209,6 @@
       "description": "require SQL version review when no verified package mapping covers all shipped extensions",
       "matchPackageNames": [
         "postgresql-*-jsquery",
-        "postgresql-*-mysql-fdw",
         "postgresql-*-pg-csv",
         "postgresql-*-pglogical",
         "postgresql-*-pgmp",
