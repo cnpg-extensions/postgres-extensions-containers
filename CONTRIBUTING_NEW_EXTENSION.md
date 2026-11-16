@@ -7,11 +7,13 @@ when choosing a build path.
 For the Debian framework, the extension must be available as a Debian package
 on both current `stable` and `oldstable`, in the `main` component (which by definition complies with
 the [Debian Free Software Guidelines (DFSG)](https://www.debian.org/social_contract#guidelines)),
-with matching extension versions across both distributions. Identify the package
-versioning logic. The PGDG (PostgreSQL Global Development Group) repository is
-required in practice to provide these matching versions; the regular Debian
-repositories do not provide this consistency. Other third-party APT repositories
-are not accepted. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
+from the PGDG (PostgreSQL Global Development Group) repository. Identify its
+versioning logic. This requirement follows the Debian-first policy: contributing
+packages benefits the wider PostgreSQL community, and preparing packages for
+Debian and PGDG tends to resolve licensing, redistribution and dependency-management
+issues before we distribute them. Other third-party APT repositories are not
+accepted; providing a working `.deb` alone does not establish that this work has
+been done. For Rust source builds, follow the [PGRX guide](source-build/pgrx/README.md).
 Other source builds must justify their dependency-packaging obstacles under the
 [Universe criteria](source-build/universe/README.md). The package discovery and
 default scaffolding below describe the Debian path; source recipes use their
