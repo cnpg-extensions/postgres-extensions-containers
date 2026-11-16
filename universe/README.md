@@ -21,5 +21,4 @@ summarize its bundled components and Debian packaging rationale.
 ## Contributing
 
 For recipe development and local builds, see the
-[source-build guide](../source-build/universe/README.md) and its
-[recipe review checklist](../source-build/universe/README.md#review-checklist-for-new-recipes-and-updates).
+[source-build guide](../source-build/universe/README.md).
