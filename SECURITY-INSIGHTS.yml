@@ -41,6 +41,10 @@ repository:
   release:
     automated-pipeline: true
     distribution-points:
+      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pgfaceting
+        comment: GitHub packages for the pgfaceting extension image
+      - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/pg-stat-tcpinfo
+        comment: GitHub packages for the pg_stat_tcpinfo extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/age
         comment: GitHub packages for the age extension image
       - uri: https://github.com/cnpg-extensions/postgres-extensions-containers/pkgs/container/debversion

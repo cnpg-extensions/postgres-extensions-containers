@@ -1,0 +1,51 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: pg-stat-tcpinfo-behavior
+spec:
+  deletionPropagationPolicy: Foreground
+  timeouts:
+    assert: 3m
+    exec: 30s
+    cleanup: 5m
+  steps:
+  - name: Provision cluster and extension
+    try:
+    - apply:
+        file: ../../test/cluster.yaml
+    - assert:
+        file: ../../test/cluster-assert.yaml
+    - apply:
+        file: ../../test/database.yaml
+    - assert:
+        file: ../../test/database-assert.yaml
+  - name: Verify real behavior
+    try:
+    - script:
+        env:
+        - name: CLUSTER
+          value: ($values.name)
+        - name: NAMESPACE
+          value: ($namespace)
+        content: |
+          set -eu
+          kubectl exec -i -n "$NAMESPACE" "$CLUSTER-1" -- \
+            psql -X -v ON_ERROR_STOP=1 -U postgres -d app <<'SQL'
+          DO $$ BEGIN
+           IF has_table_privilege('public','pg_stat_tcpinfo','SELECT') OR
+              has_function_privilege('public','pg_stat_get_tcpinfo()','EXECUTE')
+           THEN RAISE EXCEPTION 'TCP statistics are accessible to PUBLIC'; END IF;
+          END $$;
+          GRANT pg_monitor TO app;
+          SQL
+          PASSWORD=$(kubectl get secret -n "$NAMESPACE" "$CLUSTER-app" -o jsonpath='{.data.password}' | base64 -d)
+          kubectl exec -i -n "$NAMESPACE" "$CLUSTER-1" -- \
+            env PGPASSWORD="$PASSWORD" PGSSLMODE=require \
+            psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -U app -d app <<'SQL'
+          DO $$ BEGIN
+           IF NOT EXISTS (SELECT FROM pg_stat_tcpinfo
+                          WHERE pid=pg_backend_pid() AND state='ESTABLISHED'
+                            AND tcpinfo ? 'rtt')
+           THEN RAISE EXCEPTION 'missing TCP metrics for current backend'; END IF;
+          END $$;
+          SQL
