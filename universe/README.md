@@ -4,6 +4,10 @@ Universe contains PostgreSQL extension images with complex bundled dependencies.
 These images use the same CloudNativePG installation mechanism as the other
 extensions in this repository.
 
+Start with the [catalog quick start](../README.md#quick-start), including
+extension-update email alerts and scheduled weekly maintenance. Select extensions
+by name to inherit their image references and runtime settings from the catalog.
+
 See the [supported extensions](../README.md#supported-extensions) in the top-level
 README for the extension list and links to usage instructions.
 

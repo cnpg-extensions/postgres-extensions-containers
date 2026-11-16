@@ -10,6 +10,10 @@ in PostgreSQL so executions can resume after crashes, restarts, or failed
 steps, without an external orchestration service. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-durable extension image to your Cluster
@@ -23,23 +27,21 @@ kind: Cluster
 metadata:
   name: cluster-pg-durable
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     parameters:
-      pg_durable.database: "app"
+      pg_durable.database: app
     shared_preload_libraries:
-    - "pg_durable"
-
+    - pg_durable
     extensions:
     - name: pg-durable
-      image:
-        # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-durable:0.2.9-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -60,8 +62,6 @@ spec:
     name: cluster-pg-durable
   extensions:
   - name: pg_durable
-    # renovate: datasource=github-tags depName=microsoft/pg_durable versioning=semver depType=pgrx-source
-    version: '0.2.9'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

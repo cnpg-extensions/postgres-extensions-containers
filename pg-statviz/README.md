@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_statviz`](https://github.com/vyruss/pg_statviz) captures PostgreSQL statistics in database tables for later SQL analysis. The report generator and chart output are provided by a user-operated external client; this image adds no listener or web UI.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the extension image to a complete Cluster definition:
@@ -27,9 +31,6 @@ spec:
   postgresql:
     extensions:
     - name: pg-statviz
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-statviz
-        reference: ghcr.io/cnpg-extensions/pg-statviz:1.2.1-18-trixie
 ~~~
 
 Install the extension in the database:
@@ -46,8 +47,6 @@ spec:
     name: cluster-pg-statviz
   extensions:
   - name: pg_statviz
-    # renovate: suite=trixie-pgdg depName=postgresql-18-statviz extractVersion=^(?<version>\d+\.\d+)
-    version: '1.2'
 ~~~
 
 Create a snapshot and inspect its timestamp:

@@ -8,19 +8,33 @@ SPDX-License-Identifier: Apache-2.0
 to PostgreSQL. Hints are written in SQL comments and can choose scan methods,
 join methods, and other planner behavior for individual queries.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload pg_hint_plan:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_hint_plan
-  extensions:
-  - name: pg-hint-plan
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan
-      reference: ghcr.io/cnpg-extensions/pg-hint-plan:1.8.1-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-hint-plan
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_hint_plan
+    extensions:
+    - name: pg-hint-plan
 ~~~
 
 Enable the SQL extension in a Database:
@@ -37,8 +51,6 @@ spec:
     name: cluster-pg-hint-plan
   extensions:
   - name: pg_hint_plan
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-hint-plan extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.8.1'
 ~~~
 
 The extension creates its objects in the hint_plan schema. For example:

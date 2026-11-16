@@ -12,8 +12,9 @@ supports PostgreSQL {{ .DefaultVersion }} on Debian {{ .DefaultDistro }}.
 SBOM implementation details and Debian packaging rationale out of this README.
 Put a short technical overview in PACKAGING.md instead. -->
 
-<!-- TODO: Match Renovate datasource and depName to metadata.hcl. Only annotate
-SQL versions when their mapping from the release tag is verified. -->
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
 
 ## Usage
 
@@ -27,7 +28,11 @@ kind: Cluster
 metadata:
   name: cluster-{{ .Name }}
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:{{ .DefaultVersion }}-minimal-{{ .DefaultDistro }}
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-{{ .DefaultDistro }}
+    major: {{ .DefaultVersion }}
   instances: 1
 
   storage:
@@ -37,12 +42,6 @@ spec:
     # TODO: Add required preload libraries and parameters from metadata.hcl.
     extensions:
     - name: {{ .Name }}
-      image:
-        # TODO: Use the source package version without its leading v.
-        # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
-        reference: ghcr.io/cnpg-extensions/{{ .Name }}:<image-version>-{{ .DefaultVersion }}-{{ .DefaultDistro }}
-      # TODO: Set required runtime paths from metadata.hcl, or omit if empty.
-      ld_library_path: []
 ```
 
 ### 2. Enable the extension in a database
@@ -61,9 +60,6 @@ spec:
     name: cluster-{{ .Name }}
   extensions:
   - name: {{ replaceAll .Name "-" "_" }}
-    # TODO: Use the SQL version from metadata.hcl.
-    # renovate: datasource=github-releases depName=<owner>/<repo> versioning=semver depType=universe-source
-    version: '<sql-version>'
 ```
 
 Alternatively, run the following SQL with the required privileges:

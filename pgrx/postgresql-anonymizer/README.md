@@ -9,6 +9,10 @@ provides anonymization and data masking through the `anon` SQL extension.
 This image builds upstream release **3.3.2** for PostgreSQL 18 on Debian
 Bookworm and Trixie, including the upstream fake-data CSV datasets.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the extension image to your CloudNativePG Cluster and preload `anon`:
@@ -19,7 +23,11 @@ kind: Cluster
 metadata:
   name: cluster-anonymizer
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
@@ -28,9 +36,6 @@ spec:
     - anon
     extensions:
     - name: postgresql-anonymizer
-      image:
-        # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/postgresql-anonymizer:3.3.2-18-trixie
 ```
 
 Connect as a superuser to the target database and enable the extension:
@@ -62,8 +67,6 @@ spec:
     name: cluster-anonymizer
   extensions:
   - name: anon
-    # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver depType=pgrx-source
-    version: '3.3.2'
 ```
 
 Dataset initialization remains a separate superuser step. For masking rules,

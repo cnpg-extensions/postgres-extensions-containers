@@ -9,20 +9,34 @@ per-query kernel statistics, including CPU time and filesystem reads and
 writes. It uses the query identifiers supplied by the bundled
 pg_stat_statements extension.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload both libraries:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_stat_statements
-  - pg_stat_kcache
-  extensions:
-  - name: pg-stat-kcache
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-kcache
-      reference: ghcr.io/cnpg-extensions/pg-stat-kcache:2.3.2-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-stat-kcache
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_stat_statements
+    - pg_stat_kcache
+    extensions:
+    - name: pg-stat-kcache
 ~~~
 
 Enable the SQL extension in a Database:
@@ -40,8 +54,6 @@ spec:
   extensions:
   - name: pg_stat_statements
   - name: pg_stat_kcache
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-kcache extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.3.2'
 ~~~
 
 After running queries, inspect the collected values:

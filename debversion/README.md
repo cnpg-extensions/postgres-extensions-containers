@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [debversion](https://salsa.debian.org/postgresql/postgresql-debversion) is a PostgreSQL extension that adds a native `debversion` data type for representing and sorting Debian package version strings according to the Debian versioning algorithm (as defined in Debian Policy).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the debversion extension image to your Cluster
@@ -19,18 +23,17 @@ kind: Cluster
 metadata:
   name: cluster-debversion
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: debversion
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-debversion
-        reference: ghcr.io/cnpg-extensions/debversion:1.2.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -50,9 +53,8 @@ spec:
     name: cluster-debversion
   extensions:
   - name: debversion
-    # renovate: suite=trixie-pgdg depName=postgresql-18-debversion extractVersion=^(?<version>\d+\.\d+)
-    version: '1.2'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

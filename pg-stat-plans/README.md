@@ -9,19 +9,33 @@ per-plan call counts, execution times, plan IDs, and `EXPLAIN` plan text in
 PostgreSQL. It is useful for identifying plan regressions and comparing
 different plans chosen for the same query.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload pg_stat_plans:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_stat_plans
-  extensions:
-  - name: pg-stat-plans
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans
-      reference: ghcr.io/cnpg-extensions/pg-stat-plans:2.1.1-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-stat-plans
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_stat_plans
+    extensions:
+    - name: pg-stat-plans
 ~~~
 
 Enable the SQL extension in a Database:
@@ -38,8 +52,6 @@ spec:
     name: cluster-pg-stat-plans
   extensions:
   - name: pg_stat_plans
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-stat-plans extractVersion=^(?<version>\d+\.\d+)
-    version: '2.1'
 ~~~
 
 Inspect the collected plan statistics:

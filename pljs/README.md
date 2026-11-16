@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/JS provides a trusted JavaScript procedural language for PostgreSQL, backed by QuickJS statically compiled into `pljs.so`. See the [upstream project](https://github.com/plv8/pljs) for its API and release history.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Use with CloudNativePG
 
 Mount the extension image into PostgreSQL 18:
@@ -27,9 +31,6 @@ spec:
   postgresql:
     extensions:
     - name: pljs
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pljs
-        reference: ghcr.io/cnpg-extensions/pljs:1.0.5-18-trixie
 ```
 
 Install PL/JS in a database with a `Database` resource:
@@ -47,8 +48,6 @@ spec:
   extensions:
   - ensure: present
     name: pljs
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pljs extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.0.5'
 ```
 
 A function exercises the JavaScript runtime:

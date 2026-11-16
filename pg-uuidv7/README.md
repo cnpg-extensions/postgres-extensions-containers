@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [pg_uuidv7](https://github.com/fboulnois/pg_uuidv7) is a PostgreSQL extension that provides functions for generating and working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID format that embeds a Unix timestamp, making it more suitable than UUID v4 for use as database primary keys.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-uuidv7 extension image to your Cluster
@@ -19,18 +23,17 @@ kind: Cluster
 metadata:
   name: cluster-pg-uuidv7
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pg-uuidv7
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7
-        reference: ghcr.io/cnpg-extensions/pg-uuidv7:1.7.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -50,9 +53,8 @@ spec:
     name: cluster-pg-uuidv7
   extensions:
   - name: pg_uuidv7
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-uuidv7 extractVersion=^(?<version>\d+\.\d+)
-    version: '1.7'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

@@ -9,6 +9,10 @@ pgpcre adds a PCRE2-backed regular-expression type and capture functions to Post
 
 This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Install with CloudNativePG
 
 ```yaml
@@ -17,17 +21,17 @@ kind: Cluster
 metadata:
   name: cluster-pgpcre
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
   postgresql:
     extensions:
     - name: pgpcre
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pgpcre
-        reference: ghcr.io/cnpg-extensions/pgpcre:0.20190509-18-trixie
-      ld_library_path: []
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
@@ -40,8 +44,6 @@ spec:
     name: cluster-pgpcre
   extensions:
   - name: pgpcre
-    # The SQL catalog version is fixed at 1; the PGDG package release is date-based.
-    version: '1'
 ```
 
 The PGDG package links to PCRE2 10.42 on Bookworm and 10.46 on Trixie. The supported CNPG base images provide these runtime libraries, so the extension adds no files under `/system`.

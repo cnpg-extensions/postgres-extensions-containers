@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/Tcl runs Tcl functions inside PostgreSQL. This image supplies the trusted `pltcl` and untrusted `pltclu` variants with Tcl 8.6's shared library and standard script library. See the [PostgreSQL 18 PL/Tcl documentation](https://www.postgresql.org/docs/18/pltcl.html).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Use with CloudNativePG
 
 Mount the image into PostgreSQL 18:
@@ -27,16 +31,6 @@ spec:
   postgresql:
     extensions:
     - name: pltcl
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-pltcl-18
-        reference: ghcr.io/cnpg-extensions/pltcl:18.7-18-trixie
-      ld_library_path:
-      - system
-      env:
-      - name: TCL_LIBRARY
-        value: ${image_root}/share/tcl8.6
-      - name: TCL8_6_TM_PATH
-        value: ${image_root}/share/tcl8.6/tcl8
 ```
 
 Enable trusted PL/Tcl in a database with a `Database` resource:
@@ -54,8 +48,6 @@ spec:
   extensions:
   - ensure: present
     name: pltcl
-    # SQL version must be checked in the package control files before merging updates.
-    version: "1.0"
 ```
 
 A trusted Tcl function can perform simple computation:

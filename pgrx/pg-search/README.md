@@ -9,6 +9,10 @@ PostgreSQL extension for fast full-text, faceted, and hybrid search over
 PostgreSQL tables using the BM25 algorithm and Tantivy. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-search extension image to your Cluster
@@ -22,25 +26,24 @@ kind: Cluster
 metadata:
   name: cluster-pg-search
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     shared_preload_libraries:
-    - "pg_search"
-
+    - pg_search
     extensions:
+    - name: pgvector
     - name: pg-search
-      image:
-        # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-search:0.26.6-18-trixie
 ```
 
-`pg_search` also requires the `vector` extension. Make the `pgvector` image
-available to the Cluster alongside this image.
+`pg_search` also requires the `vector` extension. The example selects `pgvector`
+from the same catalog and installs `vector` before `pg_search` below.
 
 ### 2. Enable the extension in a database
 
@@ -59,9 +62,8 @@ spec:
   cluster:
     name: cluster-pg-search
   extensions:
+  - name: vector
   - name: pg_search
-    # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver depType=pgrx-source
-    version: '0.26.6'
 ```
 
 Alternatively, you can enable the extension directly with SQL:
@@ -78,9 +80,9 @@ Once the database is ready, connect to it with `psql` and run:
 \dx pg_search
 ```
 
-You should see `pg_search` listed with version `0.26.6`. The extension must be
+You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
-setting, matching the image's catalog metadata.
+setting explicitly because preloads are not inherited from the catalog.
 
 ## Known Caveats
 

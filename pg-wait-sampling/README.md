@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_wait_sampling`](https://github.com/postgrespro/pg_wait_sampling) samples PostgreSQL wait events and exposes current, historical, and aggregated profile views in SQL.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the extension image and preload its worker in a complete Cluster definition:
@@ -29,9 +33,6 @@ spec:
     - pg_wait_sampling
     extensions:
     - name: pg-wait-sampling
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-wait-sampling
-        reference: ghcr.io/cnpg-extensions/pg-wait-sampling:1.1.11-18-trixie
 ~~~
 
 Install the extension in a database:
@@ -48,8 +49,6 @@ spec:
     name: cluster-pg-wait-sampling
   extensions:
   - name: pg_wait_sampling
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-wait-sampling extractVersion=^(?<version>\d+\.\d+)
-    version: '1.1'
 ~~~
 
 After the library is preloaded and the extension is installed, inspect sampled waits:

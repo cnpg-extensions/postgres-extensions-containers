@@ -7,8 +7,12 @@ SPDX-License-Identifier: Apache-2.0
 [pg_duckdb](https://github.com/duckdb/pg_duckdb) integrates DuckDB's analytical
 query engine with PostgreSQL. It supports analytical queries over PostgreSQL
 tables and external data. This image supports PostgreSQL 18 on Debian Bookworm and Trixie
-for AMD64 and ARM64. Use matching distro tags for the PostgreSQL and extension
-images (for example, `18-minimal-bookworm` and `1.2.0-18-bookworm`).
+for AMD64 and ARM64. Choose the Trixie or Bookworm catalog to match your cluster;
+the catalog supplies compatible PostgreSQL and extension image references.
+
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
 
 ## Usage
 
@@ -22,22 +26,19 @@ kind: Cluster
 metadata:
   name: cluster-pg-duckdb
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     shared_preload_libraries:
     - pg_duckdb
-
     extensions:
     - name: pg-duckdb
-      image:
-        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
-        reference: ghcr.io/cnpg-extensions/pg-duckdb:1.2.0-18-trixie
-      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -56,8 +57,6 @@ spec:
     name: cluster-pg-duckdb
   extensions:
   - name: pg_duckdb
-    # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver depType=universe-source
-    version: '1.2.0'
 ```
 
 Alternatively, run the following SQL as a superuser:
@@ -81,7 +80,7 @@ for querying with DuckDB and accessing external data.
 ## Known Caveats
 
 - `pg_duckdb` requires `shared_preload_libraries`; adding it to an existing
-  cluster requires PostgreSQL to restart. Keep `ld_library_path: [system]` so the
+  cluster requires PostgreSQL to restart. The catalog supplies `ld_library_path: [system]` so the
   extension can load its bundled DuckDB shared library.
 - DuckDB execution defaults to superusers. Review upstream's role and secret
   access settings before granting access through `duckdb.allowed_role`.

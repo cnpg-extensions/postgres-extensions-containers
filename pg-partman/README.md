@@ -8,19 +8,33 @@ SPDX-License-Identifier: Apache-2.0
 time-based and ID-based PostgreSQL partition sets. Its optional background
 worker can run partition maintenance automatically.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload the background worker:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_partman_bgw
-  extensions:
-  - name: pg-partman
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-partman
-      reference: ghcr.io/cnpg-extensions/pg-partman:5.5.0-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-partman
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_partman_bgw
+    extensions:
+    - name: pg-partman
 ~~~
 
 Enable the SQL extension in a Database, conventionally in the partman schema:
@@ -38,8 +52,6 @@ spec:
   extensions:
   - name: pg_partman
     schema: partman
-    # renovate: suite=trixie-pgdg depName=postgresql-18-partman extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '5.5.0'
 ~~~
 
 See the [pg_partman documentation](https://github.com/pgpartman/pg_partman/tree/development/doc)

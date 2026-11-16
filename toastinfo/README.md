@@ -8,17 +8,31 @@ SPDX-License-Identifier: Apache-2.0
 stores variable-length values, including inline, compressed, and out-of-line
 TOAST values. It does not need to be preloaded.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster:
 
 ~~~yaml
-postgresql:
-  extensions:
-  - name: toastinfo
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-toastinfo
-      reference: ghcr.io/cnpg-extensions/toastinfo:1.7-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-toastinfo
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    extensions:
+    - name: toastinfo
 ~~~
 
 Enable the SQL extension in a Database:
@@ -35,9 +49,6 @@ spec:
     name: cluster-toastinfo
   extensions:
   - name: toastinfo
-    # toastinfo's SQL extension version is independent of its package version.
-    # SQL version must be checked in the package control files before merging updates.
-    version: '1'
 ~~~
 
 Use pg_toastinfo and pg_toastpointer to inspect a value:

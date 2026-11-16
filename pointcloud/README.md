@@ -9,6 +9,10 @@ pgPointcloud adds PostgreSQL types and functions for storing, querying, and tran
 
 This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Install with CloudNativePG
 
 ```yaml
@@ -17,7 +21,11 @@ kind: Cluster
 metadata:
   name: cluster-pointcloud
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   enableSuperuserAccess: true
   storage:
@@ -25,10 +33,6 @@ spec:
   postgresql:
     extensions:
     - name: pointcloud
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pointcloud
-        reference: ghcr.io/cnpg-extensions/pointcloud:1.2.5-18-trixie
-      ld_library_path: []
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
@@ -41,8 +45,6 @@ spec:
     name: cluster-pointcloud
   extensions:
   - name: pointcloud
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pointcloud extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.2.5'
 ```
 
 The PGDG package links to libxml2 and zlib. The optional `pointcloud_postgis` integration files are omitted because that feature requires a separately supplied PostGIS extension. The base pointcloud feature works without PostGIS.

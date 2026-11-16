@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 A PostgreSQL background worker that can terminate random sessions for chaos testing. [Upstream project](https://github.com/disco-stu/pg_rage_terminator).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ~~~yaml
@@ -23,14 +27,12 @@ spec:
   storage:
     size: 1Gi
   postgresql:
-    shared_preload_libraries: [pg_rage_terminator]
+    shared_preload_libraries:
+    - pg_rage_terminator
     parameters:
-      pg_rage_terminator.chance: "0"
+      pg_rage_terminator.chance: '0'
     extensions:
     - name: pg-rage-terminator
-      image:
-        # renovate: suite=trixie-pgdg depName=pg-rage-terminator-18
-        reference: ghcr.io/cnpg-extensions/pg-rage-terminator:0.1.7-18-trixie
 ~~~
 
 Create an application database through CNPG; the worker needs no SQL extension object:

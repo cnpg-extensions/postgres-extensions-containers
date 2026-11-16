@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [MobilityDB](https://mobilitydb.com/) is a PostgreSQL extension that adds support for temporal and spatio-temporal data types. It enables moving object databases for tracking positions, trajectories, and other time-varying spatial attributes. MobilityDB extends PostGIS with temporal types for geographic data.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the mobilitydb extension image to your Cluster
@@ -20,23 +24,18 @@ kind: Cluster
 metadata:
   name: cluster-mobilitydb
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: postgis
-      image:
-        reference: ghcr.io/cloudnative-pg/postgis-extension:3.6.2-18-trixie
-      ld_library_path: [system]
     - name: mobilitydb
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb
-        reference: ghcr.io/cnpg-extensions/mobilitydb:1.3.2-18-trixie
-      ld_library_path: [system]
 ```
 
 ### 2. Enable the extension in a database
@@ -56,11 +55,9 @@ spec:
     name: cluster-mobilitydb
   extensions:
   - name: postgis
-    version: '3.6.2'
   - name: mobilitydb
-    # renovate: suite=trixie-pgdg depName=postgresql-18-mobilitydb extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.3.2'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

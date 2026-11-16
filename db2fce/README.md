@@ -6,9 +6,14 @@ SPDX-License-Identifier: Apache-2.0
 
 DB2-compatible SQL functions and types, including date/time helpers in the db2 schema. See the [upstream project](https://github.com/credativ/db2fce) for its API and release history.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Use with CloudNativePG
 
-Add this image to a PostgreSQL 18 Cluster on Trixie. Choose the Bookworm image tag when the base image uses Bookworm.
+Select this extension from the Trixie catalog for PostgreSQL 18. Use
+`postgresql-minimal-bookworm` for an existing Bookworm cluster.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -27,9 +32,6 @@ spec:
   postgresql:
     extensions:
     - name: db2fce
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-db2fce
-        reference: ghcr.io/cnpg-extensions/db2fce:0.0.17-18-trixie
 ```
 
 Install the SQL extension in a database with a CNPG `Database` resource:
@@ -47,8 +49,6 @@ spec:
   extensions:
   - ensure: present
     name: db2fce
-    # renovate: suite=trixie-pgdg depName=postgresql-18-db2fce extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '0.0.17'
 ```
 
 A SQL check that exercises the installed extension is:

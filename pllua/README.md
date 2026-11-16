@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 PL/Lua embeds Lua 5.3 in PostgreSQL. The package provides trusted `pllua`, untrusted `plluau`, and optional hstore transform extensions. See the [PL/Lua reference](https://pllua.github.io/pllua/).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Use with CloudNativePG
 
 Mount the image into PostgreSQL 18:
@@ -27,11 +31,6 @@ spec:
   postgresql:
     extensions:
     - name: pllua
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pllua
-        reference: ghcr.io/cnpg-extensions/pllua:1-2.0.12-18-trixie
-      ld_library_path:
-      - system
 ```
 
 Enable trusted PL/Lua with a `Database` resource:
@@ -49,8 +48,6 @@ spec:
   extensions:
   - ensure: present
     name: pllua
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pllua extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-    version: '2.0'
 ```
 
 Use a trusted Lua function:

@@ -10,6 +10,10 @@ PostgreSQL. It reflects the SQL schema and exposes it through the
 GraphQL without a separate application server. This image supports PostgreSQL
 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-graphql extension image to your Cluster
@@ -23,18 +27,17 @@ kind: Cluster
 metadata:
   name: cluster-pg-graphql
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pg-graphql
-      image:
-        # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-graphql:1.6.3-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -55,8 +58,6 @@ spec:
     name: cluster-pg-graphql
   extensions:
   - name: pg_graphql
-    # renovate: datasource=github-tags depName=supabase/pg_graphql versioning=semver depType=pgrx-source
-    version: '1.6.3'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

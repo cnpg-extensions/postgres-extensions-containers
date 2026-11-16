@@ -21,9 +21,226 @@ extensions for [CloudNativePG](https://cloudnative-pg.io/).
 
 ## Requirements
 
-- **CloudNativePG** ≥ 1.27
+- **CloudNativePG** ≥ 1.29 (extension image catalog support)
 - **PostgreSQL** ≥ 18 (requires the `extension_control_path` feature)
-- **Kubernetes** 1.33+ (with [ImageVolume feature enabled in 1.33 and 1.34](https://kubernetes.io/blog/2024/08/16/kubernetes-1-31-image-volume-source/))
+- **Kubernetes** 1.33+ (enable ImageVolume explicitly on 1.33 and 1.34; enabled by default on 1.35+)
+- **Container runtime** with ImageVolume support: containerd 2.1+ or CRI-O 1.31+
+
+See the [CNPG requirements](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#requirements).
+
+---
+
+<a id="image-catalogs"></a>
+
+## Quick start
+
+Use the CNPG Extensions image catalog, **extension-update email alerts**, and a
+**weekly catalog-update CronJob** as the standard installation and maintenance
+path. The catalog includes upstream CloudNativePG extensions as well as the
+Debian, PGRX, and Universe extensions maintained here. Upstream entries always
+take precedence for the same extension, distribution, and PostgreSQL major.
+
+### 1. Install the catalog and choose your extensions
+
+Apply the Trixie catalog once:
+
+```sh
+kubectl apply -f https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
+```
+
+This is a drop-in replacement for the corresponding upstream
+`postgresql-minimal-trixie` catalog, with additional extensions. For Bookworm,
+use `catalog-minimal-bookworm.yaml` and `postgresql-minimal-bookworm` instead.
+Choose the distribution used by your cluster; changing distributions is a
+separate migration. See the [published catalogs](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions)
+and [CloudNativePG installation and usage documentation](https://cloudnative-pg.io/docs/1.30/image_catalog/#installation-and-usage).
+
+Reference the catalog and select extensions by name. For example, this installs
+PL/Tcl in the default `app` database:
+
+```yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: example
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    extensions:
+      - name: pltcl
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: example-app
+spec:
+  name: app
+  owner: app
+  cluster:
+    name: example
+  extensions:
+    - name: pltcl
+```
+
+The catalog supplies immutable image references and any required
+`ld_library_path` and `env` values. You do not need to copy those settings into
+your Cluster. A `Database` extension entry without `version` installs the
+available default version initially. The catalog extension name and SQL extension
+name can differ: each [extension README](#supported-extensions) gives both.
+
+Keep required `shared_preload_libraries`, PostgreSQL parameters, and dependent
+extensions in your manifests as shown in those READMEs; the catalog does not
+add them automatically. Installing the catalog alone does not enable every
+extension. See [CNPG's extension configuration](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#configuration-source-and-precedence).
+
+### 2. Set up extension-update monitoring and email first
+
+**Create and verify monitoring before installing the CronJob below.** Image
+updates can leave SQL extension upgrades pending in individual databases.
+An email alert makes that follow-up work visible after weekly maintenance.
+
+With [CNPG metrics being scraped by Prometheus](https://cloudnative-pg.io/docs/1.30/monitoring/),
+use this query:
+
+```promql
+max by (namespace, cluster, datname, extname, installed_version, default_version) (
+  cnpg_pg_extensions_update_available
+) == 1
+```
+
+It returns installed extensions whose SQL version differs from the default
+available in the running PostgreSQL instance, with both versions included in
+the labels. It does not check the registry for newer images or report extensions
+that have not been created in a database. The aggregation removes duplicate
+replica results. Ensure your scrape configuration provides `namespace` and
+`cluster` labels; adapt the grouping to your actual cluster identity labels,
+including the Kubernetes cluster identifier when monitoring several clusters.
+
+Use it in one of these three ways:
+
+- **Grafana alert with email:** create an alert rule for returned values above
+  zero and route it to an [email contact point](https://grafana.com/docs/grafana/latest/alerting/configure-notifications/manage-contact-points/integrations/configure-email/).
+  Configure SMTP for self-hosted Grafana and send a test notification.
+- **Prometheus alert with Alertmanager email:** use the query as an alert rule's
+  `expr` and route firing alerts to an [Alertmanager email receiver](https://prometheus.io/docs/alerting/latest/configuration/#email_config).
+- **Grafana dashboard:** use an instant table query to display cluster, database,
+  extension, installed version, and available default version. Pair the dashboard
+  with an email alert for unattended maintenance.
+
+First confirm the unfiltered `cnpg_pg_extensions_update_available` metric is
+being collected. No results from the filtered query can mean everything is up
+to date, but can also mean the metric is missing. Keep scrape failures and
+CronJob failures covered by your usual monitoring. See the
+[CNPG metric definition](https://github.com/cloudnative-pg/charts/blob/main/charts/cloudnative-pg/values.yaml).
+
+### 3. Schedule your weekly maintenance
+
+Once monitoring and email delivery work, install this CronJob. It refreshes the
+catalog **every Tuesday at 1 AM Eastern**, adjusting for daylight saving time.
+CNPG then rolls out changed PostgreSQL and selected extension images to clusters
+referencing that catalog, keeping the selected PostgreSQL major version.
+
+The schedule defines the start of your weekly maintenance window. It does not
+impose an end time on rollouts or prevent changes initiated by other controllers
+or administrators. Apply this example in the `default` namespace after creating
+the ServiceAccount and permissions shown below.
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: update-catalog
+spec:
+  schedule: "0 1 * * 2"
+  timeZone: America/New_York
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: catalog-updater
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: alpine/kubectl:latest
+              command: ["kubectl", "apply", "-f"]
+              args:
+                - https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
+```
+
+<details>
+<summary>ServiceAccount and RBAC: apply before the CronJob</summary>
+
+The catalog must already exist from step 1. This grants access to read and patch
+only that catalog. If you use another namespace or the Bookworm catalog, update
+the namespace and catalog name consistently here and in the CronJob command.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: catalog-updater
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: catalog-updater
+rules:
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusterimagecatalogs"]
+    resourceNames: ["postgresql-minimal-trixie"]
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: catalog-updater
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: catalog-updater
+subjects:
+  - kind: ServiceAccount
+    name: catalog-updater
+    namespace: default
+```
+
+</details>
+
+`OnFailure` uses Kubernetes restart backoff and the Job's default retry limit.
+The community-maintained `alpine/kubectl:latest` image keeps this copy-paste
+example from retaining an old kubectl version; new workloads using `:latest`
+default to `imagePullPolicy: Always`. If you manage kubectl versions explicitly,
+choose one [compatible with your API server](https://kubernetes.io/releases/version-skew-policy/#kubectl).
+
+The catalogs are published daily at 10:00 UTC and after successful extension
+builds on `main`. Each refresh incorporates the upstream catalog. Publication
+does not update your installed Kubernetes object: the CronJob applies the
+latest published manifest on your schedule. You can also rerun the step 1
+command manually during maintenance. See the
+[catalog publication workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml).
+
+### SQL extension updates
+
+An updated image supplies new binaries and SQL scripts; do not equate an image
+rollout with completion of every database's SQL extension migration. When an
+alert fires, review the extension's upgrade instructions and available upgrade
+path. For declaratively managed extensions, set the reviewed target `version`
+in the relevant `Database.spec.extensions` entry. For extensions managed directly
+with SQL, use `ALTER EXTENSION ... UPDATE` in each affected database. Confirm the
+installed version and that the alert clears. See
+[CNPG's database extension management](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
+
+Changes only to catalog environment variables or library paths may need an
+explicit cluster restart; CNPG does not automatically roll out those changes
+alone. See the [runtime configuration caveats](https://cloudnative-pg.io/docs/1.30/imagevolume_extensions/#environment-variables-for-extensions).
 
 ---
 
@@ -248,38 +465,5 @@ single-platform index, confirm its platform with `docker buildx imagetools
 inspect`, then use `.SBOM.SPDX` and `.Provenance.SLSA` in the format expressions.
 
 Scan the PostgreSQL base image separately using its own SBOM.
-
-## Image catalogs
-
-To simplify the deployment of PostgreSQL extensions, this project automatically
-generates `ClusterImageCatalog` resources. These catalogs provide a curated
-list of compatible extension images for PostgreSQL 18+ versions. The generated
-catalog starts from CNPG's [upstream extension catalog](https://github.com/cloudnative-pg/artifacts/tree/main/image-catalogs-extensions),
-then adds the images maintained in this repository. Definitions from the
-upstream catalog are retained.
-
-- **Frequency:** Refreshed daily at 10:00 UTC and after successful extension
-  builds on `main`, including builds triggered by extension or dependency updates.
-  Every refresh pulls the latest upstream catalog from `main`, so upstream
-  additions can appear here much sooner than 24 hours whenever an extension
-  rebuild completes. Otherwise, the daily refresh normally picks them up within
-  24 hours; delayed or failed workflow runs can extend this interval. To refresh
-  sooner, manually run the
-  [Update Extension Image Catalogs workflow](https://github.com/cnpg-extensions/postgres-extensions-containers/actions/workflows/update-catalogs.yml)
-  on `main`.
-- **Location:** Published in the [`artifacts`
-  repository](https://github.com/cnpg-extensions/artifacts/tree/main/image-catalogs-extensions).
-- **Naming Convention:** These are based on the `minimal` catalog and use the
-  `catalog-minimal` prefix (e.g., `catalog-minimal-trixie.yaml`)
-
-For example, apply the PostgreSQL 18 catalog for Debian trixie with:
-
-```bash
-kubectl apply -f \
-  https://raw.githubusercontent.com/cnpg-extensions/artifacts/main/image-catalogs-extensions/catalog-minimal-trixie.yaml
-```
-
-Clusters using this catalog should reference it instead of the corresponding
-upstream base catalog; it already includes the upstream extension definitions.
 
 PGRX and Universe build contributors: see the [shared build and local validation guide](./source-build/README.md).

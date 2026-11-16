@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_repack`](https://github.com/reorg/pg_repack) rebuilds tables and indexes while allowing normal reads and writes. The server image provides the PostgreSQL extension library and SQL objects. The `pg_repack` client is run separately and must match the server's PostgreSQL major and extension version.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the server image to a complete Cluster definition:
@@ -28,9 +32,6 @@ spec:
   postgresql:
     extensions:
     - name: pg-repack
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-repack
-        reference: ghcr.io/cnpg-extensions/pg-repack:1.5.3-18-trixie
 ~~~
 
 Install the server extension in the database:
@@ -47,8 +48,6 @@ spec:
     name: cluster-pg-repack
   extensions:
   - name: pg_repack
-    # renovate: suite=trixie-pgdg depName=postgresql-18-repack extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.5.3'
 ~~~
 
 Run a matching client from a separate job, host, or maintenance image. On a Debian Trixie PostgreSQL 18 client, install the PGDG `postgresql-18-repack` package and connect through the Cluster's managed `-rw` service:

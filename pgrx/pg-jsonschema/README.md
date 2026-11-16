@@ -11,6 +11,10 @@ expected structure and constraints of JSON documents, allowing the extension
 to validate values, check schemas, and report validation errors directly in
 SQL.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-jsonschema extension image to your Cluster
@@ -24,18 +28,17 @@ kind: Cluster
 metadata:
   name: cluster-pg-jsonschema
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pg-jsonschema
-      image:
-        # renovate: datasource=github-tags depName=supabase/pg_jsonschema versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-jsonschema:0.3.4-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -56,8 +59,6 @@ spec:
     name: cluster-pg-jsonschema
   extensions:
   - name: pg_jsonschema
-    # renovate: datasource=github-tags depName=supabase/pg_jsonschema versioning=semver depType=pgrx-source
-    version: '0.3.4'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

@@ -8,19 +8,33 @@ SPDX-License-Identifier: Apache-2.0
 query plans of currently running PostgreSQL statements. Plans can be returned
 as plain text, JSON, YAML, or XML.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload pg_show_plans:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_show_plans
-  extensions:
-  - name: show-plans
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-show-plans
-      reference: ghcr.io/cnpg-extensions/show-plans:2.1.8-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-show-plans
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_show_plans
+    extensions:
+    - name: show-plans
 ~~~
 
 Enable the SQL extension in a Database:
@@ -37,8 +51,6 @@ spec:
     name: cluster-show-plans
   extensions:
   - name: pg_show_plans
-    # renovate: suite=trixie-pgdg depName=postgresql-18-show-plans extractVersion=^(?<version>\d+\.\d+)
-    version: '2.1'
 ~~~
 
 Inspect plans for currently running statements:

@@ -10,6 +10,10 @@ with PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure
 Blob Storage, Google Cloud Storage, and HTTP(S) endpoints. This image supports
 PostgreSQL 18 on Debian bookworm and trixie.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-parquet extension image to your Cluster
@@ -24,21 +28,19 @@ kind: Cluster
 metadata:
   name: cluster-pg-parquet
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     shared_preload_libraries:
-    - "pg_parquet"
-
+    - pg_parquet
     extensions:
     - name: pg-parquet
-      image:
-        # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-parquet:0.5.1-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -58,8 +60,6 @@ spec:
     name: cluster-pg-parquet
   extensions:
   - name: pg_parquet
-    # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver depType=pgrx-source
-    version: '0.5.1'
 ```
 
 Alternatively, enable it directly with SQL:
@@ -76,7 +76,7 @@ Once the database is ready, connect to it with `psql` and run:
 \dx
 ```
 
-You should see `pg_parquet` listed with version `0.5.1`.
+You should see `pg_parquet` listed with its installed SQL version.
 
 ## Known Caveats
 

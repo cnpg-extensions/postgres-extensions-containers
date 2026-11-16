@@ -9,6 +9,10 @@ schema design and configuration problems, including missing primary keys,
 redundant indexes, and missing indexes on foreign keys. These images support
 PostgreSQL 18 on Debian Bookworm and Trixie.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pglinter extension image to your Cluster
@@ -22,18 +26,17 @@ kind: Cluster
 metadata:
   name: cluster-pglinter
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pglinter
-      image:
-        # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pglinter:2.0.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -54,8 +57,6 @@ spec:
     name: cluster-pglinter
   extensions:
   - name: pglinter
-    # renovate: datasource=github-tags depName=pmpetit/pglinter versioning=semver depType=pgrx-source
-    version: '2.0.0'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

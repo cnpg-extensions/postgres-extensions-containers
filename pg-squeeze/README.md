@@ -9,24 +9,38 @@ The requested pg-squeeze image contains the upstream
 removes unused table space and can sort tuples according to an index while
 allowing normal reads and writes for most of the operation.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster. PostgreSQL 18 requires logical decoding for this
 extension:
 
 ~~~yaml
-postgresql:
-  parameters:
-    max_replication_slots: '1'
-    output_plugin_libraries: pg_squeeze
-    wal_level: logical
-  shared_preload_libraries:
-  - pg_squeeze
-  extensions:
-  - name: pg-squeeze
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-squeeze
-      reference: ghcr.io/cnpg-extensions/pg-squeeze:1.9.4-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-squeeze
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    parameters:
+      max_replication_slots: '1'
+      output_plugin_libraries: pg_squeeze
+      wal_level: logical
+    shared_preload_libraries:
+    - pg_squeeze
+    extensions:
+    - name: pg-squeeze
 ~~~
 
 Enable the SQL extension in a Database:
@@ -43,8 +57,6 @@ spec:
     name: cluster-pg-squeeze
   extensions:
   - name: pg_squeeze
-    # renovate: suite=trixie-pgdg depName=postgresql-18-squeeze extractVersion=^(?<version>\d+\.\d+)
-    version: '1.9'
 ~~~
 
 The extension stores its configuration and logs in the squeeze schema. A

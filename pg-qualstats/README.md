@@ -8,19 +8,33 @@ SPDX-License-Identifier: Apache-2.0
 about predicates found in WHERE and JOIN clauses. The statistics help
 identify frequently used predicates and potentially missing indexes.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload pg_qualstats:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_qualstats
-  extensions:
-  - name: pg-qualstats
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats
-      reference: ghcr.io/cnpg-extensions/pg-qualstats:2.1.4-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pg-qualstats
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_qualstats
+    extensions:
+    - name: pg-qualstats
 ~~~
 
 Enable the SQL extension in a Database:
@@ -37,8 +51,6 @@ spec:
     name: cluster-pg-qualstats
   extensions:
   - name: pg_qualstats
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-qualstats extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '2.1.4'
 ~~~
 
 Inspect the gathered predicate statistics with:

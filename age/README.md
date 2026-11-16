@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [Apache AGE](https://age.apache.org/) is a PostgreSQL extension that provides graph database functionality, enabling you to store, query, and analyze graph data using Cypher queries alongside SQL. It is based on the openCypher graph query language.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### PostgreSQL compatibility
@@ -27,21 +31,19 @@ kind: Cluster
 metadata:
   name: cluster-age
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     shared_preload_libraries:
-      - "age"
-
+    - age
     extensions:
     - name: age
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-age
-        reference: ghcr.io/cnpg-extensions/age:1.8.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -61,9 +63,8 @@ spec:
     name: cluster-age
   extensions:
   - name: age
-    # renovate: suite=trixie-pgdg depName=postgresql-18-age extractVersion=^(?<version>[\d.]+)
-    version: '1.8.0'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

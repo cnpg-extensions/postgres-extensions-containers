@@ -2,6 +2,10 @@
 
 pre prepare your PostgreSQL statements server side. [Upstream documentation](https://apt.postgresql.org/pub/repos/apt/).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Supported images
 
 PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
@@ -14,16 +18,17 @@ kind: Cluster
 metadata:
   name: cluster-preprepare
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
   postgresql:
     extensions:
     - name: preprepare
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-preprepare
-        reference: ghcr.io/cnpg-extensions/preprepare:0.9-18-trixie
 ```
 
 ```yaml
@@ -38,7 +43,6 @@ spec:
     name: cluster-preprepare
   extensions:
   - name: pre_prepare
-    version: "0.4"
 ```
 
 ## Operation and privileges
@@ -49,10 +53,10 @@ This image provides SQL extension `pre_prepare`. Prepared statements and their s
 
 The image contains only the PGDG package server payload and license notices.
 The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Renovate tracks the pinned extension package. For an extension or base-runtime
-security fix, update the affected package/base image, rebuild every advertised
-architecture. SQL versions must be checked against
-the installed control file separately because they need not match package versions.
+Project automation tracks package updates and rebuilds the extension images.
+Use the catalog maintenance schedule in the quick start to consume published
+PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
+and review them separately; SQL versions need not match package versions.
 
 ## Licenses and ownership
 

@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 A transactional, lockless event queue implemented with SQL and PostgreSQL C helpers. [Upstream project](https://github.com/pgq/pgq).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ~~~yaml
@@ -25,9 +29,6 @@ spec:
   postgresql:
     extensions:
     - name: pgq
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pgq3
-        reference: ghcr.io/cnpg-extensions/pgq:3.5.1-18-trixie
 ~~~
 
 Install the SQL extension in the Database:
@@ -44,8 +45,6 @@ spec:
     name: cluster-pgq
   extensions:
   - name: pgq
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pgq3 extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '3.5.1'
 ~~~
 
 ~~~sql

@@ -9,6 +9,10 @@ http adds HTTP client functions to PostgreSQL so SQL can call HTTP services thro
 
 This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Install with CloudNativePG
 
 ```yaml
@@ -17,17 +21,17 @@ kind: Cluster
 metadata:
   name: cluster-http
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
   postgresql:
     extensions:
     - name: http
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-http
-        reference: ghcr.io/cnpg-extensions/http:1.7.2-18-trixie
-      ld_library_path: [system]
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
@@ -40,8 +44,6 @@ spec:
     name: cluster-http
   extensions:
   - name: http
-    # renovate: suite=trixie-pgdg depName=postgresql-18-http extractVersion=^(?<version>\d+\.\d+)
-    version: '1.7'
 ```
 
 The PGDG package links to libcurl. The build stages the resolved non-core shared libraries and matching Debian copyright notices under `/system` and `/licenses`; no HTTP client daemon is included.

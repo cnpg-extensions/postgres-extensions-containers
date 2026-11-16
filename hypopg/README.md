@@ -8,17 +8,31 @@ SPDX-License-Identifier: Apache-2.0
 PostgreSQL. It lets you compare query plans with an index that has not been
 physically created.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster:
 
 ~~~yaml
-postgresql:
-  extensions:
-  - name: hypopg
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-hypopg
-      reference: ghcr.io/cnpg-extensions/hypopg:1.4.5-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-hypopg
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    extensions:
+    - name: hypopg
 ~~~
 
 Enable the SQL extension in a Database:
@@ -35,8 +49,6 @@ spec:
     name: cluster-hypopg
   extensions:
   - name: hypopg
-    # renovate: suite=trixie-pgdg depName=postgresql-18-hypopg extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.4.5'
 ~~~
 
 Create a hypothetical index and inspect the resulting plan:

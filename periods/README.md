@@ -2,6 +2,10 @@
 
 PERIODs and SYSTEM VERSIONING for PostgreSQL. [Upstream documentation](https://github.com/xocolatl/periods).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Supported images
 
 PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
@@ -14,16 +18,17 @@ kind: Cluster
 metadata:
   name: cluster-periods
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
   postgresql:
     extensions:
     - name: periods
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-periods
-        reference: ghcr.io/cnpg-extensions/periods:1.2.3-18-trixie
 ```
 
 ```yaml
@@ -39,8 +44,6 @@ spec:
   extensions:
   - name: btree_gist
   - name: periods
-    # renovate: suite=trixie-pgdg depName=postgresql-18-periods extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-    version: '1.2'
 ```
 
 ## Operation and privileges
@@ -51,10 +54,10 @@ Temporal history uses ordinary PostgreSQL tables on the CNPG data volume. To ret
 
 The image contains only the PGDG package server payload and license notices.
 The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Renovate tracks the pinned extension package. For an extension or base-runtime
-security fix, update the affected package/base image, rebuild every advertised
-architecture. SQL versions must be checked against
-the installed control file separately because they need not match package versions.
+Project automation tracks package updates and rebuilds the extension images.
+Use the catalog maintenance schedule in the quick start to consume published
+PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
+and review them separately; SQL versions need not match package versions.
 
 ## Licenses and ownership
 

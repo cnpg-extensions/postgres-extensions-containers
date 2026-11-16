@@ -8,6 +8,10 @@ SPDX-License-Identifier: Apache-2.0
 that provides a simple cron-based job scheduler for PostgreSQL, allowing you
 to schedule PostgreSQL commands directly from the database.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### PostgreSQL compatibility
@@ -19,7 +23,7 @@ enforce extension minimum minor versions.
 
 ### 1. Add the cron extension image to your Cluster
 
-Define the `pg_cron` extension under the `postgresql.extensions` section of
+Define the `pg-cron` extension under the `postgresql.extensions` section of
 your `Cluster` resource. For example:
 
 ```yaml
@@ -28,30 +32,27 @@ kind: Cluster
 metadata:
   name: cluster-pg-cron
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     parameters:
       cron.database_name: app
-      cron.use_background_workers: "on"
-
+      cron.use_background_workers: 'on'
     shared_preload_libraries:
-    - "pg_cron"
-
+    - pg_cron
     extensions:
-    - name: pg_cron
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-cron
-        reference: ghcr.io/cnpg-extensions/pg-cron:1.6.8-18-trixie
+    - name: pg-cron
 ```
 
 ### 2. Enable the extension in a database
 
-You can install `cron` in a specific database by creating or updating a
+You can install `pg_cron` in a specific database by creating or updating a
 `Database` resource, or by running `CREATE EXTENSION` directly in `psql`. For example, to enable it in the `app` database:
 
 ```yaml
@@ -66,9 +67,8 @@ spec:
     name: cluster-pg-cron
   extensions:
   - name: pg_cron
-    # renovate: suite=trixie-pgdg depName=postgresql-18-cron extractVersion=^(?<version>\d+\.\d+)
-    version: '1.6'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

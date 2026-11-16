@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 PostgreSQL Workload Analyzer server-side history and snapshot schema. [Upstream project](https://powa.readthedocs.io/en/stable/).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Create a dedicated PoWA Database and declare its required extensions:
@@ -25,12 +29,11 @@ spec:
   storage:
     size: 1Gi
   postgresql:
-    shared_preload_libraries: [pg_stat_statements, powa]
+    shared_preload_libraries:
+    - pg_stat_statements
+    - powa
     extensions:
     - name: powa
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-powa
-        reference: ghcr.io/cnpg-extensions/powa:5.3.0-18-trixie
 ~~~
 
 Install PoWA and its base-image dependencies in a Database:
@@ -49,8 +52,6 @@ spec:
   - name: pg_stat_statements
   - name: btree_gist
   - name: powa
-    # renovate: suite=trixie-pgdg depName=postgresql-18-powa extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '5.3.0'
 ~~~
 
 Install `pg_stat_statements` and `btree_gist` in that Database as well. Start the separate PoWA collector/archivist only after server-side snapshots are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.

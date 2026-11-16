@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [`pg_background`](https://github.com/vibhorkum/pg_background) runs SQL in PostgreSQL background workers and returns completion metadata to the calling session. It does not require `shared_preload_libraries`; preloading is only needed if you want to set its GUCs in server configuration before first use.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the extension image to a complete Cluster definition:
@@ -27,9 +31,6 @@ spec:
   postgresql:
     extensions:
     - name: pg-background
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pg-background
-        reference: ghcr.io/cnpg-extensions/pg-background:2.0.3-18-trixie
 ~~~
 
 Install it in the database with a Database resource:
@@ -46,8 +47,6 @@ spec:
     name: cluster-pg-background
   extensions:
   - name: pg_background
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pg-background extractVersion=^(?<version>\d+\.\d+)
-    version: '2.0'
 ~~~
 
 A superuser can run work asynchronously and check its result:

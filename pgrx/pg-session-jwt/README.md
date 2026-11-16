@@ -10,6 +10,10 @@ Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT authenticity and
 exposes the validated claims to SQL. Without a JWK, it can use PostgREST-
 compatible JWT claims for identifying the current user.
 
+Follow the [quick start](../../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pg-session-jwt extension image to your Cluster
@@ -23,18 +27,17 @@ kind: Cluster
 metadata:
   name: cluster-pg-session-jwt
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pg-session-jwt
-      image:
-        # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
-        reference: ghcr.io/cnpg-extensions/pg-session-jwt:0.5.0-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -55,8 +58,6 @@ spec:
     name: cluster-pg-session-jwt
   extensions:
   - name: pg_session_jwt
-    # renovate: datasource=git-tags depName=https://github.com/neondatabase/pg_session_jwt.git versioning=semver depType=pgrx-source
-    version: '0.5.0'
 ```
 
 Alternatively, you can enable the extension directly with SQL:

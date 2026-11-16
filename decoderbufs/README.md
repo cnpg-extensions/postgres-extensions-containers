@@ -3,6 +3,10 @@
 A logical decoding output plugin that serializes change events as Protocol Buffers.
 [Upstream project](https://github.com/debezium/postgres-decoderbufs).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Supported images and setup
 
 PostgreSQL 18 on Debian Trixie and Bookworm, with amd64 and arm64 build targets.
@@ -14,7 +18,11 @@ kind: Cluster
 metadata:
   name: cluster-decoderbufs
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
@@ -24,10 +32,6 @@ spec:
       output_plugin_libraries: pgoutput,test_decoding,decoderbufs
     extensions:
     - name: decoderbufs
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-decoderbufs
-        reference: ghcr.io/cnpg-extensions/decoderbufs:3.7.0-18-trixie
-      ld_library_path: [system]
 ```
 
 `decoderbufs` is an output plugin. Although the package contains a control file,

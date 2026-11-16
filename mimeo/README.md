@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 Specialized per-table replication using snapshot, incremental, and DML-based methods. [Upstream project](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ~~~yaml
@@ -25,9 +29,6 @@ spec:
   postgresql:
     extensions:
     - name: mimeo
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-mimeo
-        reference: ghcr.io/cnpg-extensions/mimeo:1.5.1-18-trixie
 ~~~
 
 Install `dblink` and `mimeo` in the destination database:
@@ -45,8 +46,6 @@ spec:
   extensions:
   - name: dblink
   - name: mimeo
-    # renovate: suite=trixie-pgdg depName=postgresql-18-mimeo extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.5.1'
 ~~~
 
 The `mimeo` control file requires `dblink`; install both extensions in the destination Database. By default, the PGDG SQL installs its objects in `public`, including `public.dblink_mapping_mimeo`, `public.table_maker`, and `public.refresh_table`. Store source credentials in the mapping table using appropriately restricted roles, and schedule refresh functions from a separate client. Mimeo copies selected tables, not a cluster or database catalog.

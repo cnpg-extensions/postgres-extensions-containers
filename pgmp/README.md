@@ -6,6 +6,10 @@ SPDX-License-Identifier: Apache-2.0
 
 [pgmp](https://github.com/dvarrazzo/pgmp) is a PostgreSQL extension that provides arbitrary precision integer and rational arithmetic using the GNU Multiple Precision Arithmetic Library (GMP). It adds `mpz` (integer) and `mpq` (rational) data types with full arithmetic support.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 ### 1. Add the pgmp extension image to your Cluster
@@ -19,18 +23,17 @@ kind: Cluster
 metadata:
   name: cluster-pgmp
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
-
   storage:
     size: 1Gi
-
   postgresql:
     extensions:
     - name: pgmp
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-pgmp
-        reference: ghcr.io/cnpg-extensions/pgmp:1.0.6-18-trixie
 ```
 
 ### 2. Enable the extension in a database
@@ -50,9 +53,8 @@ spec:
     name: cluster-pgmp
   extensions:
   - name: pgmp
-    # SQL version must be checked in the package control files before merging updates.
-    version: '1.1'
 ```
+
 Alternatively, you can enable the extension directly with SQL:
 
 ```sql

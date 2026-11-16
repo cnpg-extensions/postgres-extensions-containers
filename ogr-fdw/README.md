@@ -4,6 +4,10 @@ ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. See t
 
 PG18 packages are available for both Bookworm and Trixie on amd64 and arm64. The image sets GDAL_DATA to its bundled coordinate-system data directory and stages the linked GDAL runtime libraries.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Install and read a GeoJSON layer
 
 ~~~yaml
@@ -12,22 +16,17 @@ kind: Cluster
 metadata:
   name: cluster-ogr-fdw
 spec:
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-minimal-trixie
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
   instances: 1
   storage:
     size: 1Gi
   postgresql:
     extensions:
     - name: ogr-fdw
-      image:
-        # renovate: suite=trixie-pgdg depName=postgresql-18-ogr-fdw
-        reference: ghcr.io/cnpg-extensions/ogr-fdw:1.1.9-18-trixie
-      ld_library_path: [system]
-      env:
-      - name: GDAL_DATA
-        value: ${image_root}/share/gdal
-      - name: PROJ_DATA
-        value: ${image_root}/share/proj
 ---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
@@ -40,11 +39,11 @@ spec:
     name: cluster-ogr-fdw
   extensions:
   - name: ogr_fdw
-    # renovate: suite=trixie-pgdg depName=postgresql-18-ogr-fdw extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-    version: '1.1'
 ~~~
 
-The image environment resolves IMAGE_ROOT to the extension mount directory for both GDAL driver data and PROJ coordinate-system data. The example below reads a GeoJSON file over HTTP; application queries remain on the managed PostgreSQL endpoint.
+The catalog supplies `GDAL_DATA` and `PROJ_DATA`, with `${image_root}` expanded
+to the extension mount directory for GDAL driver data and PROJ coordinate-system
+data. The example below reads a GeoJSON file over HTTP; application queries remain on the managed PostgreSQL endpoint.
 
 ~~~sql
 CREATE SERVER geojson_source

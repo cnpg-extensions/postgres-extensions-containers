@@ -8,20 +8,34 @@ SPDX-License-Identifier: Apache-2.0
 history into an in-memory ring buffer and links session activity with
 pg_stat_statements.
 
+Follow the [quick start](../README.md#quick-start) to install the catalog and set up
+extension-update email alerts before enabling weekly maintenance. These examples
+inherit image references and runtime settings from the catalog.
+
 ## Usage
 
 Add the image to a Cluster and preload both libraries:
 
 ~~~yaml
-postgresql:
-  shared_preload_libraries:
-  - pg_stat_statements
-  - pgsentinel
-  extensions:
-  - name: pgsentinel
-    image:
-      # renovate: suite=trixie-pgdg depName=postgresql-18-pgsentinel
-      reference: ghcr.io/cnpg-extensions/pgsentinel:1.5.2-18-trixie
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: cluster-pgsentinel
+spec:
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-minimal-trixie
+    major: 18
+  instances: 1
+  storage:
+    size: 1Gi
+  postgresql:
+    shared_preload_libraries:
+    - pg_stat_statements
+    - pgsentinel
+    extensions:
+    - name: pgsentinel
 ~~~
 
 Enable the SQL extension in a Database:
@@ -38,8 +52,6 @@ spec:
     name: cluster-pgsentinel
   extensions:
   - name: pgsentinel
-    # renovate: suite=trixie-pgdg depName=postgresql-18-pgsentinel extractVersion=^(?<version>\d+\.\d+\.\d+)
-    version: '1.5.2'
 ~~~
 
 After the cluster has run for a few seconds, inspect the active session
