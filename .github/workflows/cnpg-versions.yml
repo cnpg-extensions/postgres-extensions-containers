@@ -29,7 +29,7 @@ jobs:
         id: versions
         env:
           # renovate: datasource=github-tags depName=cloudnative-pg/cloudnative-pg versioning=semver-coerced extractVersion=^v(?<version>\d+\.\d+\.\d+)$
-          LATEST_RELEASE: "1.30.1"
+          LATEST_RELEASE: "1.30.2"
           CNPG_VERSION: ${{ inputs.cnpg_version }}
         run: |
           if [[ -n "$CNPG_VERSION" ]]; then
