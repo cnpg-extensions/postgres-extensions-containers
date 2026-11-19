@@ -4,15 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_search](https://github.com/paradedb/paradedb) is a
-PostgreSQL extension for fast full-text, faceted, and hybrid search over
-PostgreSQL tables using the BM25 algorithm and Tantivy. This image supports
-PostgreSQL 18 on Debian bookworm and trixie.
+[pg_search](https://github.com/paradedb/paradedb) (also known as ParadeDB)
+provides a custom index for fast full-text and vector
+search, BM25 scoring, filters, facets, aggregations, and joins. It keeps your
+application data and search engine in one database with standard SQL and ACID
+transactions.
 
-> [!WARNING]
-> Use this Community build only with `spec.instances: 1` (no replicas).
-> Physical replication of search indexes is unsupported and can stop standby
-> recovery. See [Replication and failover](#replication-and-failover).
+> [!NOTE]
+> This image is a build of **ParadeDB Community**. It supports single-node deployments
+> (`spec.instances: 1`).
+>
+> ParadeDB Enterprise adds commercial licensing, support, and physical replication for
+> ParadeDB indexes, enabling high availability, failover, and read replicas
+> (`spec.instances: 2` or more). [ParadeDB Documentation](https://www.paradedb.com/docs/operate/deploy/enterprise)
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then use the CronJob to install and refresh the catalog. These
@@ -43,8 +47,9 @@ spec:
     - name: pg-search
 ```
 
-`pg_search` also requires the `vector` extension. The example selects `pgvector`
-from the same catalog. Install `vector` before `pg_search` in the database.
+`pg_search` also requires the `vector` extension for the vector types used by its
+vector search functionality. The example selects `pgvector` from the same
+catalog. Install `vector` before `pg_search` in the database.
 
 ### 2. Enable the extension in a database
 
@@ -76,40 +81,6 @@ Once the database is ready, connect to it with `psql` and run:
 You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
 setting explicitly because preloads are not inherited from the catalog.
-
-## Replication and failover
-
-This image builds **ParadeDB Community**, which does not support physical
-replication of its search indexes. Do not use it with more than one instance
-(`spec.instances: 1`). A normal CNPG multi-instance cluster uses physical
-replication; mounting this extension image on every pod does not add the
-Enterprise WAL implementation.
-
-With the packaged pg_search 0.26.6, indexed queries on a standby fail explicitly
-because serving standby reads requires ParadeDB Enterprise. Upstream also rejects
-replaying index-initialization WAL records in Community, which can stop recovery
-of the entire standby, including replication of ordinary tables.
-
-Use a single-instance Community deployment, or evaluate an upstream-supported
-Enterprise deployment for physical replication and HA. Upstream also supports
-Community as a logical-replication subscriber with locally maintained search
-indexes; that is a different deployment from a CNPG physical standby.
-
-## Known Caveats
-
-- `pg_search` requires `vector` from [pgvector](https://github.com/pgvector/pgvector).
-  Install or mount pgvector before creating `pg_search`.
-- With pg_search 0.26.6 preloaded, creating pg_duckdb 1.2.0 before
-  pg_search in the same connection can make `CREATE INDEX ... USING paradedb`
-  fail with `XX000: relation is not a ParadeDB index`, even with
-  `duckdb.force_execution = off`. On native AMD64 PostgreSQL 18 / Trixie /
-  CNPG 1.30.1, creating pg_search before pg_duckdb or reconnecting after
-  extension installation passed the BM25 match, ranking, and index-maintenance
-  assertions. An eleven-extension composition plus pgvector passed
-  with that connection boundary and the original preload order. `DISCARD ALL`
-  did not resolve the same-session failure. This is an installation-session
-  limitation; reconnecting avoids it without disabling extension hooks or
-  weakening the search checks. Other platforms were not tested for this issue.
 
 ## Licenses and Copyright
 
