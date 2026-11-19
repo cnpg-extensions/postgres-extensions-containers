@@ -11,12 +11,12 @@ application data and search engine in one database with standard SQL and ACID
 transactions.
 
 > [!NOTE]
-> This image is a build of **ParadeDB Community**. It supports single-node deployments
-> (`spec.instances: 1`).
+> This image is **ParadeDB Community**. It supports single-node deployments.
+> (`spec.instances:1`)
 >
 > ParadeDB Enterprise adds commercial licensing, support, and physical replication for
-> ParadeDB indexes, enabling high availability, failover, and read replicas
-> (`spec.instances: 2` or more). [ParadeDB Documentation](https://www.paradedb.com/docs/operate/deploy/enterprise)
+> ParadeDB indexes, enabling high availability, failover, and read replicas.
+> (`spec.instances:2` or more) [ParadeDB Documentation](https://www.paradedb.com/docs/operate/deploy/enterprise)
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email
 alerts first, then use the CronJob to install and refresh the catalog. These
