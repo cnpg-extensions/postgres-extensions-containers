@@ -4,18 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_plans](https://github.com/pganalyze/pg_stat_plans) tracks aggregate
-per-plan call counts, execution times, plan IDs, and `EXPLAIN` plan text in
-PostgreSQL. It is useful for identifying plan regressions and comparing
-different plans chosen for the same query.
+[pg_stat_plans](https://github.com/pganalyze/pg_stat_plans) tracks aggregate per-plan call counts, execution times, plan IDs,
+and `EXPLAIN` plan text in PostgreSQL. It is useful for identifying plan
+regressions and comparing different plans chosen for the same query.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/pganalyze/pg_stat_plans).
 
 ### 1. Add the pg-stat-plans extension image to your Cluster
 
@@ -54,7 +56,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_stat_plans
+```
+
+You should see `pg_stat_plans` listed with its installed SQL version.
 
 Inspect the collected plan statistics:
 
@@ -64,5 +72,5 @@ SELECT * FROM pg_stat_plans;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-pg-stat-plans/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

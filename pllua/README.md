@@ -4,19 +4,23 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PL/Lua embeds Lua 5.3 in PostgreSQL. The package provides trusted `pllua`, untrusted `plluau`, and optional hstore transform extensions. See the [PL/Lua reference](https://pllua.github.io/pllua/).
+[PL/Lua](https://pllua.github.io/pllua/) lets you write PostgreSQL functions in Lua. It provides trusted `pllua`,
+untrusted `plluau`, and optional hstore transforms.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
+
 ### 1. Add the pllua extension image to your Cluster
 
-Mount the image into PostgreSQL 18:
+Mount the image into your Cluster:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -49,7 +53,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pllua
+```
+
+You should see `pllua` listed with its installed SQL version.
 
 Use a trusted Lua function:
 
@@ -61,8 +71,7 @@ SELECT lua_add(19, 23); -- 42
 
 `pllua` runs inside a sandbox that exposes safe Lua operations; for example, `os.execute` is absent there. To install the untrusted language, a superuser runs `CREATE EXTENSION plluau;`. Only superusers can create `plluau` functions. The untrusted interpreter exposes Lua's operating-system functions, which run with PostgreSQL's operating-system account and its filesystem/network permissions. Do not grant `EXECUTE` on such functions without reviewing their code and effects. Optional `hstore_pllua` and `hstore_plluau` transforms require the `hstore` extension supplied by the matching CNPG PostgreSQL base image. The included example performs SQL-only work.  Before enabling `plluau` functions that produce persistent files, declaratively provide a volume with suitable ownership/access, retention, and cleanup; the image does not define an application data-storage lifecycle.
 
-## Package and dependency notes
+## Licenses and Copyright
 
-The image contains the PGDG extension modules/control/SQL files and Debian `liblua5.3-0` under `/system`. Package copyright notices are under `/licenses`.
-
-Renovate tracks `postgresql-18-pllua`. Review the separately versioned Lua package and rerun trusted/untrusted tests when rebuilding after either package changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,19 +4,23 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PL/Tcl runs Tcl functions inside PostgreSQL. This image supplies the trusted `pltcl` and untrusted `pltclu` variants with Tcl 8.6's shared library and standard script library. See the [PostgreSQL 18 PL/Tcl documentation](https://www.postgresql.org/docs/18/pltcl.html).
+[PL/Tcl](https://www.postgresql.org/docs/18/pltcl.html) lets you write PostgreSQL functions in Tcl. It provides the trusted
+`pltcl` and untrusted `pltclu` language variants.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://www.postgresql.org/docs/18/pltcl.html).
+
 ### 1. Add the pltcl extension image to your Cluster
 
-Mount the image into PostgreSQL 18:
+Mount the image into your Cluster:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -49,7 +53,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pltcl
+```
+
+You should see `pltcl` listed with its installed SQL version.
 
 A trusted Tcl function can perform simple computation:
 
@@ -63,8 +73,7 @@ SELECT tcl_add(19, 23); -- 42
 
 The extension configuration adds the image's `/system` directory to the loader path, sets `TCL_LIBRARY` to the packaged Tcl 8.6 scripts, and sets `TCL8_6_TM_PATH` to its modules, including `msgcat` used by date functions. Users need no package installation or filesystem changes in the database container.
 
-## Package, dependency and license notes
+## Licenses and Copyright
 
-PGDG `postgresql-pltcl-18` provides both language control/SQL sets and `pltcl.so`. Debian `libtcl8.6` is the dynamically linked interpreter, with its script library copied to the extension image and native dependencies under `/system`. Package copyright notices are under `/licenses`.
-
-Renovate tracks `postgresql-pltcl-18`; Debian Tcl updates are reviewed separately. Rebuild when either changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,15 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[`pg_stat_log`](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by backend, database, role, severity, and SQLSTATE, with optional grouping by query identifier. It uses PostgreSQL 18's Custom Cumulative Stats API and must be preloaded. The PGDG package and SQL catalog versions are both `0.3`.
+[pg_stat_log](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by
+backend, database, role, severity, and SQLSTATE, with optional grouping by query
+identifier. It must be preloaded.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/fabriziomello/pg_stat_log).
 
 ### 1. Add the pg-stat-log extension image to your Cluster
 
@@ -51,7 +56,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_stat_log
+```
+
+You should see `pg_stat_log` listed with its installed SQL version.
 
 Inspect recent counts as a role with `pg_read_all_stats`:
 
@@ -63,6 +74,7 @@ ORDER BY count DESC;
 
 Statistics persist across clean PostgreSQL restarts and are discarded after crash recovery. Reset counters and reclaim tracked slots with `SELECT pg_stat_log_reset();`. Capacity is bounded by `pg_stat_log.max_entries` (default 1024); increase it and restart if the `n_dropped` value returned by `pg_stat_log_info()` grows. The extension writes no external files.
 
-## Supported matrix and licenses
+## Licenses and Copyright
 
-PGDG supplies this image for PostgreSQL 18 on Debian Bookworm and Trixie. The PostgreSQL license notice is included under `/licenses/postgresql-18-stat-log/`. Renovate follows the versioned PGDG package.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

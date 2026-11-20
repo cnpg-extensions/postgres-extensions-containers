@@ -1,18 +1,21 @@
 # pg-gvm
 
-pg-gvm adds Greenbone helper functions to PostgreSQL, including host-list matching, regular-expression matching and iCalendar schedule calculations. It supplies the SQL library only; it does not install or operate Greenbone Vulnerability Manager services.
+[pg-gvm](https://github.com/greenbone/pg-gvm) adds Greenbone helper functions to PostgreSQL, including host-list
+matching, regular-expression matching and iCalendar schedule calculations. It
+supplies the SQL library only; it does not install or operate Greenbone
+Vulnerability Manager services.
 
-The PGDG PG18 package is available on Trixie for amd64 and arm64. Bookworm has no PG18 package.
-
-[Upstream project](https://github.com/greenbone/pg-gvm).
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
+
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/greenbone/pg-gvm).
 
 ### 1. Add the pg-gvm extension image to your Cluster
 
@@ -47,7 +50,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg-gvm
+```
+
+You should see `pg-gvm` listed with its installed SQL version.
 
 The image installs the pg-gvm SQL extension but not a GVM manager or scanner. A standalone expression check is:
 
@@ -57,17 +66,7 @@ SELECT regexp('host.example', '^host');
 
 The package also includes host-list and iCalendar helpers used by Greenbone SQL workflows. `hosts_contains()` reads Greenbone's `meta` table, so it is exercised only in a database with that application schema installed.
 
-## Package, licensing and updates
+## Licenses and Copyright
 
-The PGDG package version is recorded in `metadata.hcl`; SQL version: 22.6. The extension is GPL-3.0-or-later and includes AGPL-3.0-or-later files. Copyright notices for the extension and bundled runtime packages are under `/licenses/<package>/`. The image includes no source archives.
-
-Renovate tracks the PGDG package. Rebuild after package or base-image security updates and review the runtime libraries and notices.
-
-The regex and calendar helpers work without a Greenbone application schema.
-These helpers do not create files; the image adds no listener or background
-service.
-
-The runtime closure is dynamically linked. ICU and PCRE2 are redistributed under
-their permissive notices; the GCC runtime libraries use the GCC Runtime Library
-Exception. Copyright notices for bundled runtime packages are under
-`/licenses/<package>/`. The matching CNPG base supplies glibc and the ELF loader.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

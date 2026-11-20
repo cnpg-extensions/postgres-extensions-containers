@@ -4,18 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PostgreSQL Anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer)
-provides anonymization and data masking through the `anon` SQL extension.
-This image builds upstream release **3.3.2** for PostgreSQL 18 on Debian
-Bookworm and Trixie, including the upstream fake-data CSV datasets.
+[PostgreSQL Anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer) lets you anonymize data and define masking rules through
+the `anon` SQL extension. It includes fake-data datasets for generating
+replacement values.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://gitlab.com/dalibo/postgresql_anonymizer).
 
 ### 1. Add the postgresql-anonymizer extension image to your Cluster
 
@@ -69,7 +71,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx anon
+```
+
+You should see `anon` listed with its installed SQL version.
 
 Dataset initialization remains a separate superuser step. For masking rules,
 permissions, and transparent dynamic masking, follow the
@@ -77,7 +85,5 @@ permissions, and transparent dynamic masking, follow the
 
 ## Licenses and Copyright
 
-The extension uses the PostgreSQL license. The image bundles its license and
-Rust dependency notices under `/licenses/rust/`. The Dockerfile downloads the source tag selected in metadata. Cargo builds use
-the release lockfile, with the guarded root-version correction documented in
-[the workaround register](../../WORKAROUNDS.md#postgresql-anonymizer-332-stale-root-cargolock-version).
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

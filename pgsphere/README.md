@@ -4,15 +4,21 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgSphere](https://pgsphere.github.io/) is a PostgreSQL extension that provides spherical geometry data types and operators for astronomical and geographical data. It supports types such as spherical points, circles, ellipses, lines, polygons, and boxes, along with indexing via GiST.
+[pgSphere](https://pgsphere.github.io/) is a PostgreSQL extension that provides spherical geometry data types
+and operators for astronomical and geographical data. It supports types such as
+spherical points, circles, ellipses, lines, polygons, and boxes, along with
+indexing via GiST.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://pgsphere.github.io/).
 
 ### 1. Add the pgsphere extension image to your Cluster
 
@@ -53,30 +59,18 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_sphere
 ```
 
-You should see `pg_sphere` listed among the installed extensions.
+You should see `pg_sphere` listed with its installed SQL version.
 
 ## Known Caveats
 
 - **Runtime library dependency**: This extension requires HEALPIX and other
   astronomical libraries at runtime. These are bundled in the image under
   `/system/`.
-- **License**: `pgsphere` is GPL-3+, which is why it is hosted in the
-  CNPG Extensions project rather than upstream.
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `pgsphere` extension
-and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

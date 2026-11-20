@@ -5,17 +5,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-icu_ext exposes ICU internationalization functions for text transformation, comparison, collation, and Unicode metadata. See the [upstream project](https://github.com/dverite/icu_ext) for the extension documentation.
+[icu_ext](https://github.com/dverite/icu_ext) exposes ICU internationalization functions for text transformation,
+comparison, collation, and Unicode metadata.
 
-This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/dverite/icu_ext).
 
 ### 1. Add the icu-ext extension image to your Cluster
 
@@ -50,9 +52,15 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
 
-The PGDG package links to ICU 76 on Trixie and ICU 72 on Bookworm. The supported CNPG base images provide these runtime libraries and their notices; ICU locale data is supplied by the ICU runtime package.
+```sql
+\dx icu_ext
+```
+
+You should see `icu_ext` listed with its installed SQL version.
+
+The PGDG package links to ICU. The supported CNPG base images provide these runtime libraries; ICU locale data is supplied by the ICU runtime package.
 
 ### SQL example
 
@@ -60,7 +68,7 @@ The PGDG package links to ICU 76 on Trixie and ICU 72 on Bookworm. The supported
 SELECT icu_transform('Hello, PostgreSQL', 'Any-Upper');
 ```
 
+## Licenses and Copyright
 
-## Licenses and updates
-
-The extension is distributed under its custom permissive Verite license (`LicenseRef-verite`). Its PGDG copyright notice is included under `/licenses/<package>/`. The supported CNPG base images already provide the linked ICU runtime libraries, so this extension adds no ICU files under `/system`. The image includes no source archives. Renovate tracks the suite-specific PGDG package; rebuild against the supported Debian suite and review package and notice changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

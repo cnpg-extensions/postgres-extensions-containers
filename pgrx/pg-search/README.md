@@ -10,21 +10,24 @@ search, BM25 scoring, filters, facets, aggregations, and joins. It keeps your
 application data and search engine in one database with standard SQL and ACID
 transactions.
 
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
+is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
+keep your instance and storage settings, following any extension-specific
+requirements below.
+
 > [!NOTE]
 > This image is **ParadeDB Community**. It supports single-node deployments.
 > (`spec.instances:1`)
 >
-> ParadeDB Enterprise adds commercial licensing, support, and physical replication for
+> ParadeDB Enterprise adds support and physical replication for
 > ParadeDB indexes, enabling high availability, failover, and read replicas.
 > (`spec.instances:2` or more) [ParadeDB Documentation](https://www.paradedb.com/docs/operate/deploy/enterprise)
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-set `instances: 1`, and keep your storage settings.
-
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/paradedb/paradedb).
 
 ### 1. Add the pg-search extension image to your Cluster
 

@@ -1,17 +1,19 @@
 # decoderbufs
 
-A logical decoding output plugin that serializes change events as Protocol Buffers.
-[Upstream project](https://github.com/debezium/postgres-decoderbufs).
+[decoderbufs](https://github.com/debezium/postgres-decoderbufs) serializes PostgreSQL change events as Protocol Buffers for logical
+replication clients.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
-PostgreSQL 18 on Debian Trixie and Bookworm, with amd64 and arm64 build targets.
+For more information, see the [upstream documentation](https://github.com/debezium/postgres-decoderbufs).
+
 ### 1. Add the decoderbufs extension image to your Cluster
 
 Use this declarative Cluster setup:
@@ -35,7 +37,7 @@ spec:
 there is no SQL installation script: do not request `CREATE EXTENSION decoderbufs`
 or list it in a Database resource's SQL extensions.
 
-### 2. Verify operation
+### 2. Verify installation
 
 Clients connect through the CNPG-managed PostgreSQL Service, using a replication
 role and approved authentication. Create a slot using the replication protocol
@@ -53,13 +55,7 @@ consumer lag and disk use, configure an appropriate `max_slot_wal_keep_size`, an
 drop unused slots with `pg_drop_replication_slot` after coordinating with their
 consumers. No separate incoming listener or manual container setup is required.
 
-## Dependencies, licenses and updates
+## Licenses and Copyright
 
-The version-pinned PGDG `postgresql-18-decoderbufs` package supplies the plugin.
-Package copyright notices are under `/licenses`. The matching `libprotobuf-c1`
-runtime is bundled in `/system`; the base supplies libc. Generated protobuf
-serialization code follows the decoderbufs package's update lifecycle;
-protobuf-c is dynamically linked and updated separately.
-
-Renovate tracks the PGDG package pin. Rebuild for protobuf-c or base-runtime
-security updates and repeat architecture builds.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

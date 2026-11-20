@@ -4,15 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PostgreSQL Workload Analyzer server-side history and snapshot schema. [Upstream project](https://powa.readthedocs.io/en/stable/).
+[PoWA](https://powa.readthedocs.io/en/stable/) records PostgreSQL workload statistics and snapshots so you can analyze
+database activity over time.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/).
 
 ### 1. Add the powa extension image to your Cluster
 
@@ -54,7 +58,13 @@ Install `pg_stat_statements`, then `btree_gist`, then `powa` in that order.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx powa
+```
+
+You should see `powa` listed with its installed SQL version.
 
 Install `pg_stat_statements` and `btree_gist` in that database as well. The
 preloaded background worker connects to a database named `powa` by default;
@@ -63,8 +73,7 @@ create that database and install all three extensions there, or configure
 Start a separate PoWA collector or web UI only after server-side snapshots
 are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.
 
-## Package and runtime details
+## Licenses and Copyright
 
-PG18 images use the PGDG `postgresql-18-powa` package. The image carries the `powa.so` server module, its PostgreSQL LLVM bitcode, SQL/control files, and the full Debian copyright notice under `/licenses/postgresql-18-powa/`. The module's only external runtime dependency is libc from the CNPG base image. PoWA requires the base-image `pg_stat_statements` and `btree_gist` extensions. Its background worker is provided by `powa.so`; a separate PoWA collector/archivist and web UI are optional client components.
-
-The image supports PostgreSQL 18 on Debian Bookworm and Trixie. Renovate tracks the PGDG package pins in `metadata.hcl`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

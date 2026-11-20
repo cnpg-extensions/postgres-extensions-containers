@@ -1,16 +1,18 @@
 # RDKit PostgreSQL cartridge
 
-RDKit provides cheminformatics types and functions in PostgreSQL, including SMILES parsing, molecule fingerprints and molecular descriptors. See the [upstream RDKit project](https://github.com/rdkit/rdkit) for toolkit documentation.
+[RDKit](https://github.com/rdkit/rdkit) provides cheminformatics types and functions in PostgreSQL, including
+SMILES parsing, molecule fingerprints and molecular descriptors.
 
-The PG18 package is available on Trixie only in this matrix, for amd64 and arm64. Bookworm has RDKit packages for older PostgreSQL majors but no PG18 package.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/rdkit/rdkit).
 
 ### 1. Add the rdkit extension image to your Cluster
 
@@ -45,7 +47,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx rdkit
+```
+
+You should see `rdkit` listed with its installed SQL version.
 
 Parse a molecular SMILES string, canonicalize it and generate a Morgan fingerprint:
 
@@ -56,8 +64,7 @@ SELECT mol_to_smiles(mol_from_smiles('CCO'))::text = 'CCO'
 
 No writable storage or runtime shell access is needed for the SQL cartridge functions shown here.
 
-## Package, licensing and updates
+## Licenses and Copyright
 
-PGDG package: 202503.1-5.pgdg13+1; SQL version: 4.7.0. RDKit is BSD-3-Clause; its package copyright and notices for bundled runtime dependencies are included under `/licenses/<package>/`. The image includes no source archives.
-
-Renovate tracks the PGDG package. Rebuild after package or base-image security updates and review the resulting runtime libraries and their notices.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,15 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-A transactional, lockless event queue implemented with SQL and PostgreSQL C helpers. [Upstream project](https://github.com/pgq/pgq).
+[PgQ](https://github.com/pgq/pgq) provides a transactional event queue in PostgreSQL for applications that
+process events asynchronously.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/pgq/pgq).
 
 ### 1. Add the pgq extension image to your Cluster
 
@@ -47,7 +51,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pgq
+```
+
+You should see `pgq` listed with its installed SQL version.
 
 ~~~sql
 SELECT pgq.create_queue('order_events');
@@ -56,8 +66,7 @@ SELECT pgq.insert_event('order_events', 'order_created', 'order_id=42');
 
 A separate `pgqd` daemon advances ticks and handles queue maintenance. The server image does not start or supervise daemon processes.
 
-## Package and runtime details
+## Licenses and Copyright
 
-PG18 images use the PGDG `postgresql-18-pgq3` package. Its full Debian copyright notice is carried in `/licenses/postgresql-18-pgq3/`. Server C helpers use libc/libpq from the base image. The PGQ tick/maintenance daemon is not bundled; run PGDG `pgqd` separately and connect through a CNPG `-rw` service.
-
-The image supports PostgreSQL 18 on Debian Bookworm and Trixie. Renovate tracks the PGDG package pins in `metadata.hcl`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,17 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[plpgsql_check](https://github.com/okbob/plpgsql_check) is a linter for
-PL/pgSQL. It checks embedded SQL and PL/pgSQL behavior that PostgreSQL's
-function validator cannot detect at function creation time.
+[plpgsql_check](https://github.com/okbob/plpgsql_check) is a linter for PL/pgSQL. It checks embedded SQL and PL/pgSQL
+behavior that PostgreSQL's function validator cannot detect at function creation
+time.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/okbob/plpgsql_check).
 
 ### 1. Add the plpgsql-check extension image to your Cluster
 
@@ -51,7 +54,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx plpgsql_check
+```
+
+You should see `plpgsql_check` listed with its installed SQL version.
 
 Check a PL/pgSQL function with:
 
@@ -66,5 +75,5 @@ SELECT * FROM plpgsql_check_function('checked_example()');
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-plpgsql-check/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

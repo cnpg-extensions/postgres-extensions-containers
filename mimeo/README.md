@@ -4,15 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Specialized per-table replication using snapshot, incremental, and DML-based methods. [Upstream project](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
+[Mimeo](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html) replicates individual tables between PostgreSQL databases using snapshot,
+incremental, and DML-based methods.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
 
 ### 1. Add the mimeo extension image to your Cluster
 
@@ -49,16 +53,21 @@ Install `dblink`, then `mimeo` in that order.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx mimeo
+```
+
+You should see `mimeo` listed with its installed SQL version.
 
 The `mimeo` control file requires `dblink`; install both extensions in the destination Database. By default, the PGDG SQL installs its objects in `public`, including `public.dblink_mapping_mimeo`, `public.table_maker`, and `public.refresh_table`. Store source credentials in the mapping table using appropriately restricted roles, and schedule refresh functions from a separate client. Mimeo copies selected tables, not a cluster or database catalog.
-
-## Package and runtime details
-
-PG18 images use the PGDG `postgresql-18-mimeo` package. Its full Debian copyright notice is carried in `/licenses/postgresql-18-mimeo/`. Requires the CNPG base-image `dblink` extension. Upstream recommends `pg_jobmon` for audit logging; it is optional.
-
-The image supports PostgreSQL 18 on Debian Bookworm and Trixie. Renovate tracks the PGDG package pins in `metadata.hcl`.
 
 For this standalone setup, pass `p_jobmon := false` to `table_maker` and
 `refresh_table`. Enable job logging only after separately provisioning the
 optional `pg_jobmon` extension.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,19 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Live Linux TCP socket statistics exposed through SQL. [Upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
+[pg_stat_tcpinfo](https://github.com/jakubwartakEDB/pg_stat_tcpinfo) exposes live Linux TCP socket statistics through SQL so you can
+inspect PostgreSQL connections.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18 on Debian Bookworm and Trixie, for amd64 and arm64.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
 
 ### 1. Add the pg-stat-tcpinfo extension image to your Cluster
 
@@ -54,7 +54,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_stat_tcpinfo
+```
+
+You should see `pg_stat_tcpinfo` listed with its installed SQL version.
 
 ## Query TCP statistics
 
@@ -76,8 +82,7 @@ ORDER BY pid;
 
 The extension reports sockets owned by PostgreSQL's OS user within the pod's
 network namespace. It requires Linux procfs and netlink socket diagnostics;
-restricted sandbox policies can prevent collection. No extra Linux capabilities
-are required in the tested stock CNPG environment. UNIX-domain connections do
+restricted sandbox policies can prevent collection. UNIX-domain connections do
 not appear as TCP sockets; use a TCP connection when verifying the view.
 
 Access is restricted to `pg_read_all_stats` (also inherited by `pg_monitor`),
@@ -87,27 +92,5 @@ are needed.
 
 ## Licenses and Copyright
 
-The extension and Debian packaging use the **PostgreSQL** license. The full
-copyright and license notice is shipped at
-`/licenses/postgresql-18-pg-stat-tcpinfo/copyright`.
-
-The image contains the extension library, its LLVM bitcode, SQL/control files,
-and notice. It bundles no system libraries: libc and the ELF loader come from
-the matching PostgreSQL base image. The payload belongs in the top-level
-README's CNCF-compatible declared-license group; this classification describes
-licenses, not a claim of upstream CNCF project acceptance.
-
-## Updates and validation
-
-Renovate tracks Debian package pins and SQL versions in `metadata.hcl`. SQL
-versions are extracted from the verified package version shape; review the
-packaged control files and upgrade scripts when that shape changes. Rebuild
-and validate both distributions and architectures after package updates.
-
-The extension-specific Chainsaw test exercises real behavior through the mounted
-image, in addition to the shared installation checks. Run:
-
-```sh
-task checks TARGET=pg-stat-tcpinfo
-task e2e:test:full TARGET=pg-stat-tcpinfo
-```
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

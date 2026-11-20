@@ -4,15 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_rrule](https://github.com/petropavel13/pg_rrule) is a PostgreSQL extension that adds support for iCalendar recurrence rules (RRULE) as a native data type. It allows you to store and process recurring event schedules using the standard RFC 5545 iCalendar format.
+[pg_rrule](https://github.com/petropavel13/pg_rrule) is a PostgreSQL extension that adds support for iCalendar recurrence
+rules (RRULE) as a native data type. It allows you to store and process
+recurring event schedules using the standard RFC 5545 iCalendar format.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/petropavel13/pg_rrule).
 
 ### 1. Add the pg-rrule extension image to your Cluster
 
@@ -53,30 +58,17 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_rrule
 ```
 
-You should see `pg_rrule` listed among the installed extensions.
+You should see `pg_rrule` listed with its installed SQL version.
 
 ## Known Caveats
 
 - **Runtime library dependency**: This extension requires `libical3` at runtime.
   The library is bundled in the image under `/system/`.
-- **License**: `pg_rrule` itself is MIT, but its runtime dependency `libical3`
-  is dual-licensed under LGPL-2.1 or MPL-2.0, which is why this extension is
-  hosted in the CNPG Extensions project rather than upstream.
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `pg-rrule` extension
-and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,15 +4,21 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[MobilityDB](https://mobilitydb.com/) is a PostgreSQL extension that adds support for temporal and spatio-temporal data types. It enables moving object databases for tracking positions, trajectories, and other time-varying spatial attributes. MobilityDB extends PostGIS with temporal types for geographic data.
+[MobilityDB](https://mobilitydb.com/) is a PostgreSQL extension that adds support for temporal and
+spatio-temporal data types. It enables moving object databases for tracking
+positions, trajectories, and other time-varying spatial attributes. MobilityDB
+extends PostGIS with temporal types for geographic data.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
+
+For more information, see the [upstream documentation](https://mobilitydb.com/).
 
 ### 1. Add the mobilitydb extension image to your Cluster
 
@@ -57,10 +63,10 @@ Install `postgis`, then `mobilitydb` in that order.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx mobilitydb
 ```
 
-You should see `mobilitydb` listed among the installed extensions.
+You should see `mobilitydb` listed with its installed SQL version.
 
 ## Known Caveats
 
@@ -70,22 +76,8 @@ You should see `mobilitydb` listed among the installed extensions.
   enforces this ordering.
 - **Runtime library dependency**: This extension requires GEOS and other spatial
   libraries at runtime. These are bundled in the image under `/system/`.
-- **License**: MobilityDB is licensed under GPL-2+ and GPL-3+, which is why it
-  is hosted in the CNPG Extensions project rather than upstream.
-- **Testing limitation**: The CI tests verify basic extension installation.
-  Full spatio-temporal query functionality was not exercised in integration tests.
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `mobilitydb` extension
-and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.
