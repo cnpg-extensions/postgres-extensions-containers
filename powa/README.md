@@ -70,8 +70,3 @@ create that database and install all three extensions there, or configure
 `powa.database` with your chosen database name in the Cluster parameters.
 Start a separate PoWA collector or web UI only after server-side snapshots
 are configured. Use `powa_take_snapshot()` for a manual one-shot snapshot.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

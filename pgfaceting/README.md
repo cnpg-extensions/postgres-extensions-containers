@@ -96,8 +96,3 @@ Facet indexes and pending changes are ordinary database tables, included in
 normal database backup/replication. Schedule `CALL faceting.run_maintenance()`
 through your SQL scheduler to merge deltas regularly. Keys must fit in 32-bit
 integers. No external daemon or writable extension-image directory is needed.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

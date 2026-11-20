@@ -66,13 +66,3 @@ generate a UUIDv7 with:
 ```sql
 SELECT uuid_generate_v7();
 ```
-
-## Known Caveats
-
-- **License**: `pg_uuidv7` is licensed under MPL-2.0 (Mozilla Public License),
-  which is why it is hosted in the CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

@@ -69,18 +69,13 @@ You should see `pg_parquet` listed with its installed SQL version.
 - `pg_parquet` must be loaded through `shared_preload_libraries`; the Cluster
   configuration above supplies this setting.
 - When also preloading `pg_duckdb`, place `pg_parquet` after it for the
-  [tested COPY behavior](../../universe/pg-duckdb/README.md#known-caveats).
-- Local `COPY TO` paths must be writable by PostgreSQL. CNPG's read-only root
-  filesystem rejected `/tmp` in runtime testing; a path under the writable
-  PostgreSQL data volume passed the write/read roundtrip.
+  [COPY hook ordering](../../universe/pg-duckdb/README.md#known-caveats).
+- Local `COPY TO` paths must be writable by PostgreSQL. Use a path under the
+  writable PostgreSQL data volume rather than `/tmp` on CNPG's read-only root
+  filesystem.
 - To read from or write to an object store, grant the corresponding
   `parquet_object_store_read` or `parquet_object_store_write` role to the
   PostgreSQL user. Configure credentials using the methods described in the
   [upstream documentation](https://github.com/CrunchyData/pg_parquet#object-store-support).
 - The `pg_parquet.enable_copy_hooks` parameter can be set to `off` to disable
   the extension's COPY hooks for a session or role.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

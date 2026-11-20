@@ -69,10 +69,3 @@ You should see `pgmp` listed with its installed SQL version.
   `/usr/share/postgresql/<version>/pgmp/` rather than the standard `extension/`
   subdirectory. The Dockerfile handles this with an additional `COPY` for the
   `pgmp/` directory.
-- **License**: `pgmp` is LGPL-3+, which is why it is hosted in the
-  CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

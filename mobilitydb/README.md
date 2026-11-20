@@ -74,12 +74,3 @@ You should see `mobilitydb` listed with its installed SQL version.
   enforces this ordering.
 - **Runtime library dependency**: This extension requires GEOS and other spatial
   libraries at runtime. These are bundled in the image under `/system/`.
-- **License**: MobilityDB is licensed under GPL-2+ and GPL-3+, which is why it
-  is hosted in the CNPG Extensions project rather than upstream.
-- **Testing limitation**: The CI tests verify basic extension installation.
-  Full spatio-temporal query functionality was not exercised in integration tests.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

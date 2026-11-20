@@ -88,15 +88,4 @@ You should see `pg_durable` listed with its installed SQL version.
   `df.grant_usage` alone does not resolve this. The upstream
   [connection host setting](https://github.com/microsoft/pg_durable/blob/v0.2.9/USER_GUIDE.md#connection-host)
   selects the connection endpoint, but authentication must work for both the
-  management role (`postgres` by default) and submitting roles. In the tested
-  CNPG 1.30.1 / PostgreSQL 18 setup, switching to TCP while allowing only
-  `app` left management initialization failing authentication as `postgres`.
-  A workflow completed with `pg_durable.host=127.0.0.1` and a disposable,
-  loopback-only trust rule for both roles. This does not validate a production
-  authentication configuration: a credential-based setup remains unverified,
-  and the test's trust rule is not a production recommendation.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.
+  management role (`postgres` by default) and submitting roles.

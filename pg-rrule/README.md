@@ -65,11 +65,3 @@ You should see `pg_rrule` listed with its installed SQL version.
 
 - **Runtime library dependency**: This extension requires `libical3` at runtime.
   The library is bundled in the image under `/system/`.
-- **License**: `pg_rrule` itself is MIT, but its runtime dependency `libical3`
-  is dual-licensed under LGPL-2.1 or MPL-2.0, which is why this extension is
-  hosted in the CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

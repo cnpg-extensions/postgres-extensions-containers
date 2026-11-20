@@ -58,15 +58,10 @@ Once the database is ready, connect to it with `psql` and run:
 
 You should see `http` listed with its installed SQL version.
 
-The PGDG package links to libcurl. The build stages the resolved non-core shared libraries and matching Debian copyright notices under `/system` and `/licenses`; no HTTP client daemon is included.
+The PGDG package links to libcurl. The image includes the required non-core shared libraries under `/system`; no HTTP client daemon is included.
 
 ### SQL example
 
 ```sql
 SELECT status, content FROM http_get('https://example.org/');
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

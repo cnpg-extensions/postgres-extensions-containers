@@ -58,15 +58,10 @@ Once the database is ready, connect to it with `psql` and run:
 
 You should see `icu_ext` listed with its installed SQL version.
 
-The PGDG package links to ICU. The supported CNPG base images provide these runtime libraries and their notices; ICU locale data is supplied by the ICU runtime package.
+The PGDG package links to ICU. The supported CNPG base images provide these runtime libraries; ICU locale data is supplied by the ICU runtime package.
 
 ### SQL example
 
 ```sql
 SELECT icu_transform('Hello, PostgreSQL', 'Any-Upper');
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

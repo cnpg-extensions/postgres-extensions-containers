@@ -65,8 +65,3 @@ The PGDG package links to PCRE2. The supported CNPG base images provide these ru
 ```sql
 SELECT pcre_match('^([A-Z]+)-([0-9]+)$'::pcre, 'DB-42');
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

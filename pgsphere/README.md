@@ -67,10 +67,3 @@ You should see `pg_sphere` listed with its installed SQL version.
 - **Runtime library dependency**: This extension requires HEALPIX and other
   astronomical libraries at runtime. These are bundled in the image under
   `/system/`.
-- **License**: `pgsphere` is GPL-3+, which is why it is hosted in the
-  CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

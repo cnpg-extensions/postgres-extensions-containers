@@ -63,20 +63,8 @@ You should see `tds_fdw` listed with its installed SQL version.
 
 ## Known Caveats
 
-- **CI coverage**: The CI tests verify that the extension can be
-  created (`CREATE EXTENSION tds_fdw`), but do not test actual connectivity to
-  a SQL Server or Sybase instance. Actual foreign table queries require a
-  running TDS-compatible database server and proper `CREATE SERVER` /
-  `CREATE USER MAPPING` configuration. A manual test on CNPG 1.30.1 /
-  PostgreSQL 18 (Trixie, AMD64) queried an isolated SQL Server 2022 fixture
-  successfully; other servers and authentication modes remain unverified.
+- **External database required**: Foreign table queries require a running
+  TDS-compatible database server and `CREATE SERVER` / `CREATE USER MAPPING`
+  configuration.
 - **Runtime library dependency**: The FreeTDS library (`libsybdb5`) is bundled
   in the image under `/system/`.
-- **License**: `tds_fdw` itself is PostgreSQL-licensed, but its runtime
-  dependency `libsybdb5` (FreeTDS) is LGPL-2+, which is why this extension is
-  hosted in the CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

@@ -58,8 +58,3 @@ You should see `pgtt` listed with its installed SQL version.
 ## Operation and privileges
 
 Global temporary table definitions are shared, while rows are session-local. Load `pgtt` for each session with the declarative parameter above. Temporary rows live in PostgreSQL-managed temporary storage and are removed at session end; ON COMMIT controls transaction cleanup.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

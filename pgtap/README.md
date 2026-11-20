@@ -55,8 +55,3 @@ You should see `pgtap` listed with its installed SQL version.
 ## Operation and privileges
 
 The server-side TAP assertion functions return text through SQL. Test runners remain separate clients connected to the CNPG-managed endpoint; they own report files and retention.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

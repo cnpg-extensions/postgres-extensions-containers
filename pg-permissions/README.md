@@ -55,8 +55,3 @@ You should see `pg_permissions` listed with its installed SQL version.
 ## Operation and privileges
 
 Permissions are exposed through SQL views in the extension installation schema. Restrict access to administrative roles when object or role names are sensitive.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

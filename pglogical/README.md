@@ -78,8 +78,3 @@ slot limits and disk capacity; remove unused subscriptions with
 `pglogical.drop_subscription` and remove unused nodes after their consumers are
 stopped. Failed consumers must not retain WAL indefinitely. No extra listener
 or container shell setup is required.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

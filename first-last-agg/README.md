@@ -62,8 +62,3 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT (SELECT first(v ORDER BY i) = 10 AND last(v ORDER BY i) = 20 FROM (VALUES (1,10),(2,20)) AS s(i,v));
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

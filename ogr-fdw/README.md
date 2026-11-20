@@ -83,8 +83,3 @@ ORDER BY place_id;
 ~~~
 
 OGR_FDW only supports the GDAL drivers available in the installed libgdal build. The runtime includes GDAL's data files; place datasets in separately managed object storage or another supported datasource.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

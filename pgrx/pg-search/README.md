@@ -21,7 +21,7 @@ requirements below.
 > This image is **ParadeDB Community**. It supports single-node deployments.
 > (`spec.instances:1`)
 >
-> ParadeDB Enterprise adds commercial licensing, support, and physical replication for
+> ParadeDB Enterprise adds support and physical replication for
 > ParadeDB indexes, enabling high availability, failover, and read replicas.
 > (`spec.instances:2` or more) [ParadeDB Documentation](https://www.paradedb.com/docs/operate/deploy/enterprise)
 
@@ -82,8 +82,3 @@ Once the database is ready, connect to it with `psql` and run:
 You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
 setting explicitly because preloads are not inherited from the catalog.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

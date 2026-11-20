@@ -73,10 +73,3 @@ You should see `pldbgapi` listed with its installed SQL version.
 - **SQL extension name differs from image name**: The extension image is named
   `pldebugger` but the PostgreSQL extension object is `pldbgapi`. Use
   `CREATE EXTENSION pldbgapi` (not `pldebugger`).
-- **License**: `pldebugger` is Artistic-2.0, which is why it is hosted in the
-  CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

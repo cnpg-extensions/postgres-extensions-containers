@@ -68,8 +68,3 @@ SELECT lua_add(19, 23); -- 42
 ```
 
 `pllua` runs inside a sandbox that exposes safe Lua operations; for example, `os.execute` is absent there. To install the untrusted language, a superuser runs `CREATE EXTENSION plluau;`. Only superusers can create `plluau` functions. The untrusted interpreter exposes Lua's operating-system functions, which run with PostgreSQL's operating-system account and its filesystem/network permissions. Do not grant `EXECUTE` on such functions without reviewing their code and effects. Optional `hstore_pllua` and `hstore_plluau` transforms require the `hstore` extension supplied by the matching CNPG PostgreSQL base image. The included example performs SQL-only work.  Before enabling `plluau` functions that produce persistent files, declaratively provide a volume with suitable ownership/access, retention, and cleanup; the image does not define an application data-storage lifecycle.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

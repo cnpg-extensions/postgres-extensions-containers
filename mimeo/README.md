@@ -64,8 +64,3 @@ The `mimeo` control file requires `dblink`; install both extensions in the desti
 For this standalone setup, pass `p_jobmon := false` to `table_maker` and
 `refresh_table`. Enable job logging only after separately provisioning the
 optional `pg_jobmon` extension.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

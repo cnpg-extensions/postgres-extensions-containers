@@ -61,8 +61,3 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT '1/2'::rational + '1/3'::rational = '5/6'::rational;
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

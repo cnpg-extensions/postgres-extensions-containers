@@ -66,11 +66,3 @@ You should see `h3` listed with its installed SQL version.
 - **Runtime library dependency**: This extension requires `libh3-1` at runtime.
   The library is bundled in the image under `/system/`. The `ld_library_path`
   is configured to include this directory automatically.
-- **License**: The H3 library (`libh3`) itself is Apache-2.0, but the Debian
-  package bundles AGPL-3+ licensed components, which is why this extension is
-  hosted in the CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

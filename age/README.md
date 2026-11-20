@@ -69,13 +69,5 @@ You should see `age` listed with its installed SQL version.
 - **`shared_preload_libraries` required**: Apache AGE must be listed in
   `shared_preload_libraries`. Without it, `CREATE EXTENSION age` will fail
   with a "must be preloaded" error.
-- **License**: AGE itself is Apache-2.0, but its bundled CSV parser library
-  (`libcsv`) is LGPL-2.1, which is why this extension is hosted in the
-  CNPG Extensions project rather than upstream.
 - **Cypher support**: After installation, use `SET search_path = ag_catalog, "$user", public;`
   to access AGE's graph functions and the `cypher()` function for graph queries.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

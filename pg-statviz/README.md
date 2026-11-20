@@ -68,8 +68,3 @@ SELECT * FROM pgstatviz.snapshots ORDER BY snapshot_tstamp DESC;
 ~~~
 
 Snapshots are stored in ordinary database tables and included in database backups. Define SQL-based retention for the expected snapshot volume. `SELECT pgstatviz.delete_snapshots();` truncates the snapshot tables and is the packaged cleanup operation; it removes all snapshots. The image does not write report files.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

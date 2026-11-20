@@ -84,8 +84,3 @@ SELECT PC_Get(PC_MakePoint(1, ARRAY[-127, 45, 124.0, 4.0]), 'Intensity');
 ```
 
 Schemas and point values live in PostgreSQL tables. No database pod shell or container filesystem changes are needed.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

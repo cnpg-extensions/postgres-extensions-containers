@@ -73,8 +73,3 @@ INSERT INTO rum_demo VALUES
 CREATE INDEX ON rum_demo USING rum (doc rum_tsvector_ops);
 SELECT id FROM rum_demo WHERE doc @@ to_tsquery('english', 'postgres');
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

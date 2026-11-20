@@ -74,22 +74,13 @@ for querying with DuckDB and accessing external data.
   `$PGDATA/pg_duckdb/extensions`. The PostgreSQL user needs write access to these
   directories. Superusers can configure `duckdb.temporary_directory` and
   `duckdb.extension_directory`.
-- The image includes DuckDB's json and icu extensions. Loadable extensions such as httpfs
-  downloaded at runtime are not covered by the image's SBOM or bundled notices.
+- The image includes DuckDB's json and icu extensions. Other loadable
+  extensions, such as httpfs, are downloaded separately at runtime.
 
 - When combining pg_duckdb 1.2.0 with pg_parquet 0.5.1, put `pg_parquet`
-  after `pg_duckdb` in `shared_preload_libraries`. On CNPG 1.30.1 / PostgreSQL 18 (Trixie, AMD64), the reverse order let DuckDB intercept Parquet
-  `COPY FROM` into a PostgreSQL table and reject it as unsupported. Loading
-  Parquet last passed the tested Parquet write/read roundtrip and DuckDB query.
-  This is an observed hook-order integration constraint.
-- In that same environment, top-level `EXPLAIN (FORMAT JSON)` of a forced
-  DuckDB query succeeded, but executing it dynamically inside PL/pgSQL raised
+  after `pg_duckdb` in `shared_preload_libraries` so DuckDB does not intercept
+  Parquet `COPY FROM` into PostgreSQL tables and reject it as unsupported.
+- Use top-level `EXPLAIN (FORMAT JSON)` for forced DuckDB queries. Dynamic
+  execution inside PL/pgSQL can raise
   `INTERNAL Error: Attempted to access index 1 within vector of size 1`
-  from `PGDuckDB/Duckdb_ExplainCustomScan_Cpp`. Use top-level EXPLAIN for this
-  diagnostic; the dynamic EXPLAIN failure remains unresolved. These runtime
-  findings do not establish an image packaging defect.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.
+  from `PGDuckDB/Duckdb_ExplainCustomScan_Cpp`.

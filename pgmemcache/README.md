@@ -78,14 +78,3 @@ You should see `pgmemcache` listed with its installed SQL version.
   startup.
 - **Runtime library dependency**: This extension requires `libmemcached11` at
   runtime. The library is bundled in the image under `/system/`.
-- **Testing limitation**: The CI tests verify that the extension can be created
-  (`CREATE EXTENSION pgmemcache`), but do not test actual Memcached
-  connectivity. No Memcached server is provisioned in the test environment.
-- **License**: `pgmemcache` is BSD-3-Clause, but its runtime dependency
-  `libmemcached11` is LGPL, which is why this extension is hosted in the
-  CNPG Extensions project rather than upstream.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

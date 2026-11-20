@@ -58,7 +58,7 @@ Once the database is ready, connect to it with `psql` and run:
 
 You should see `pg_pwhash` listed with its installed SQL version.
 
-The PGDG package uses libscrypt, libargon2, libxcrypt, and OpenSSL. Its runtime dependencies are provided by the CNPG base image or staged under `/system`, with copyright notices for bundled runtime packages under `/licenses/<package>/`. The image includes no source archives.
+The PGDG package uses libscrypt, libargon2, libxcrypt, and OpenSSL. Its runtime dependencies are provided by the CNPG base image or staged under `/system`. The image includes no source archives.
 
 Choose hash parameters that meet your application security and latency requirements; the upstream documentation explains supported algorithms and tuning options.
 
@@ -77,8 +77,3 @@ WITH credentials AS (
 SELECT pwhash_crypt('password', stored_hash) = stored_hash AS password_matches
 FROM credentials;
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

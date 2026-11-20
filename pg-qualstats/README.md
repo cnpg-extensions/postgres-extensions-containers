@@ -67,8 +67,3 @@ Inspect the gathered predicate statistics with:
 ~~~sql
 SELECT * FROM pg_qualstats;
 ~~~
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

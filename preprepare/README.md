@@ -56,8 +56,3 @@ You should see `pre_prepare` listed with its installed SQL version.
 ## Operation and privileges
 
 This image provides SQL extension `pre_prepare`. Prepared statements are session-local; their definitions can be stored in an ordinary database table shared by sessions. No files are needed. Use `prepare_all('schema.table')` to load statement definitions from an administrator-controlled table of complete PREPARE statements. Restrict which users can modify the source table.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

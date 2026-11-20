@@ -62,8 +62,3 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT ('40'::numeral + '2'::numeral) = '42'::numeral;
 ```
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

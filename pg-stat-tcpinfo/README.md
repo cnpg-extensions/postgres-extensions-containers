@@ -80,16 +80,10 @@ ORDER BY pid;
 
 The extension reports sockets owned by PostgreSQL's OS user within the pod's
 network namespace. It requires Linux procfs and netlink socket diagnostics;
-restricted sandbox policies can prevent collection. No extra Linux capabilities
-are required in the tested stock CNPG environment. UNIX-domain connections do
+restricted sandbox policies can prevent collection. UNIX-domain connections do
 not appear as TCP sockets; use a TCP connection when verifying the view.
 
 Access is restricted to `pg_read_all_stats` (also inherited by `pg_monitor`),
 not PUBLIC. These monitoring roles expose additional database statistics;
 grant them only to appropriate users. No persistent files or maintenance daemon
 are needed.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

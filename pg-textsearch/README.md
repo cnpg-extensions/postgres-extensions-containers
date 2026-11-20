@@ -112,7 +112,7 @@ To use our separate [pg-durable image](../pgrx/pg-durable/README.md), add
 both extensions there. The index owner must have `LOGIN` and pg_durable usage
 privileges, granted by an administrator with `SELECT df.grant_usage('app');`
 when the owner is `app`. Superuser-owned workflows require an additional
-pg_durable setting; the tested configuration uses a non-superuser owner.
+pg_durable setting; this example uses a non-superuser owner.
 
 Configure authentication for pg_durable's management and index-owner connections
 before enabling background mode; see its [authentication caveats](../pgrx/pg-durable/README.md#known-caveats).
@@ -127,13 +127,6 @@ compaction with `compaction = 'inline'`. See the
 [upstream background-compaction documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#background-compaction)
 for scheduling and workflow lifecycle details.
 
-With our pg_durable 0.2.9 container, managed compaction cleared existing and new
-spill backlogs before and after planned switchover and automatic failover,
-retaining the same workflow ID. These local tests used PostgreSQL 18,
-CNPG 1.30.1, and AMD64 Bookworm and Trixie. Worker authentication used a
-disposable loopback-only trust rule; production credential-based authentication
-and a crash deliberately timed inside a merge were not validated.
-
 ## Replication and recovery
 
 Keep `hot_standby_feedback = on` when replicas serve search queries. Upstream
@@ -142,16 +135,4 @@ The Cluster example supplies it explicitly. The index is WAL-logged; its
 shared-memory cache is rebuilt from persisted index data.
 See the [versioned upstream documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#compaction).
 
-Local tests of pg_textsearch 1.5.1 with PostgreSQL 18 and CNPG 1.30.1
-passed on AMD64 Bookworm and Trixie: live index creation and replica searches,
-committed and rolled-back index updates, primary and standby crash recovery,
-planned switchover, and automatic
-failover to a different pod. Search results and new writes remained correct on
-the promoted primary, and the former primary rejoined successfully. Clients
-must reconnect when CNPG closes connections during a role change. These checks
-do not cover PITR, backup restores, native ARM64 execution, or other versions.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.
+Clients must reconnect when CNPG closes connections during a role change.

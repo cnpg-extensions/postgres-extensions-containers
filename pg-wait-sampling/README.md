@@ -69,8 +69,3 @@ FROM pg_wait_sampling_profile
 GROUP BY event_type, event
 ORDER BY samples DESC;
 ~~~
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.

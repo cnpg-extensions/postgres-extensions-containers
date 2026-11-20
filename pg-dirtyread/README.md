@@ -55,9 +55,4 @@ You should see `pg_dirtyread` listed with its installed SQL version.
 
 ## Operation and privileges
 
-Superuser-only inspection can recover dead tuples that PostgreSQL has not vacuumed. It does not replace backups and may reveal data deleted by application users. The upstream regression test disables autovacuum only on its disposable test tables.
-
-## Licenses and Copyright
-
-Extension and dependency licenses and copyright notices are bundled in
-`/licenses/` in the image.
+Superuser-only inspection can recover dead tuples that PostgreSQL has not vacuumed. It does not replace backups and may reveal data deleted by application users.
