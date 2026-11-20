@@ -4,17 +4,17 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_session_jwt](https://github.com/neondatabase/pg_session_jwt) is a
-PostgreSQL extension for managing authenticated sessions through JSON Web
-Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT authenticity and
-exposes the validated claims to SQL. Without a JWK, it can use PostgREST-
-compatible JWT claims for identifying the current user.
+pg_session_jwt is a PostgreSQL extension for managing authenticated sessions
+through JSON Web Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT
+authenticity and exposes the validated claims to SQL. Without a JWK, it can use
+PostgREST-compatible JWT claims for identifying the current user.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -57,10 +57,10 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_session_jwt
 ```
 
-You should see `pg_session_jwt` listed among the installed extensions.
+You should see `pg_session_jwt` listed with its installed SQL version.
 
 ## Known Caveats
 

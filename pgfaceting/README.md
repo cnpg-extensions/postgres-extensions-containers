@@ -4,17 +4,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Fast facet counts using roaring bitmap indexes. [Upstream documentation](https://github.com/cybertec-postgresql/pgfaceting).
+pgfaceting uses Roaring bitmap indexes to compute fast facet counts for filtered
+searches.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18 on Debian Bookworm and Trixie, for amd64 and arm64.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -58,7 +56,13 @@ Install `roaringbitmap`, then `pgfaceting` in that order. Through SQL, run
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pgfaceting
+```
+
+You should see `pgfaceting` listed with its installed SQL version.
 
 ## Use and maintain facets
 
@@ -95,29 +99,5 @@ integers. No external daemon or writable extension-image directory is needed.
 
 ## Licenses and Copyright
 
-The PGDG copyright file calls its license **Aasma**; the complete text is the
-standard **BSD-3-Clause** license (including the non-endorsement clause), so
-`metadata.hcl` uses that SPDX identifier. The shared SBOM generator retains
-Debian's `LicenseRef-Aasma` label; it refers to the same reviewed license text.
-The unmodified notice is shipped at
-`/licenses/postgresql-18-pgfaceting/copyright`.
-
-The image contains only pgfaceting SQL/control files and its copyright notice;
-no shared libraries, interpreter or build tools are shipped. The required
-roaringbitmap extension is a separate image with its own notices and SBOM.
-Both fit the top-level README's CNCF-compatible declared-license group.
-
-## Updates and validation
-
-Renovate tracks Debian package pins and SQL versions in `metadata.hcl`. SQL
-versions are extracted from the verified package version shape; review the
-packaged control files and upgrade scripts when that shape changes. Rebuild
-and validate both distributions and architectures after package updates.
-
-The extension-specific Chainsaw test exercises real behavior through the mounted
-image, in addition to the shared installation checks. Run:
-
-```sh
-task checks TARGET=pgfaceting
-task e2e:test:full TARGET=pgfaceting
-```
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,13 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgmemcache](https://github.com/ohmu/pgmemcache) is a PostgreSQL extension that provides an interface to Memcached from within SQL. It allows PostgreSQL to get, set, delete, and manage keys in a Memcached server directly using SQL functions.
+pgmemcache is a PostgreSQL extension that provides an interface to Memcached
+from within SQL. It allows PostgreSQL to get, set, delete, and manage keys in a
+Memcached server directly using SQL functions.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -59,10 +62,10 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pgmemcache
 ```
 
-You should see `pgmemcache` listed among the installed extensions.
+You should see `pgmemcache` listed with its installed SQL version.
 
 ## Known Caveats
 
@@ -84,15 +87,5 @@ You should see `pgmemcache` listed among the installed extensions.
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `pgmemcache` extension
-and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

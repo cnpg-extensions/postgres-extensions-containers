@@ -5,15 +5,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pgpcre adds a PCRE2-backed regular-expression type and capture functions to PostgreSQL. See the [upstream project](https://github.com/petere/pgpcre) for the extension documentation.
+pgpcre adds a PCRE2-backed regular-expression type and capture functions to
+PostgreSQL.
 
-This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -50,9 +50,15 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
 
-The PGDG package links to PCRE2 10.42 on Bookworm and 10.46 on Trixie. The supported CNPG base images provide these runtime libraries, so the extension adds no files under `/system`.
+```sql
+\dx pgpcre
+```
+
+You should see `pgpcre` listed with its installed SQL version.
+
+The PGDG package links to PCRE2. The supported CNPG base images provide these runtime libraries, so the extension adds no files under `/system`.
 
 ### SQL example
 
@@ -60,7 +66,7 @@ The PGDG package links to PCRE2 10.42 on Bookworm and 10.46 on Trixie. The suppo
 SELECT pcre_match('^([A-Z]+)-([0-9]+)$'::pcre, 'DB-42');
 ```
 
+## Licenses and Copyright
 
-## Licenses and updates
-
-The extension is licensed under `PostgreSQL`. Its copyright notice is included under `/licenses/<package>/`. The supported CNPG base images provide the runtime libraries required by the extension, so no files are staged under `/system`. The image includes no source archives. Renovate tracks the suite-specific PGDG package; rebuild against the supported Debian suite and review package and notice changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

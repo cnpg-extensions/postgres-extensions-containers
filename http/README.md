@@ -5,15 +5,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-http adds HTTP client functions to PostgreSQL so SQL can call HTTP services through libcurl. See the [upstream project](https://github.com/pramsey/pgsql-http) for the extension documentation.
+http adds HTTP client functions to PostgreSQL so SQL can call HTTP services
+through libcurl.
 
-This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -50,7 +50,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx http
+```
+
+You should see `http` listed with its installed SQL version.
 
 The PGDG package links to libcurl. The build stages the resolved non-core shared libraries and matching Debian copyright notices under `/system` and `/licenses`; no HTTP client daemon is included.
 
@@ -60,7 +66,7 @@ The PGDG package links to libcurl. The build stages the resolved non-core shared
 SELECT status, content FROM http_get('https://example.org/');
 ```
 
+## Licenses and Copyright
 
-## Licenses and updates
-
-The extension is licensed under `MIT`. Its copyright notice and notices for bundled runtime packages are included under `/licenses/<package>/`. The image includes no source archives. Renovate tracks the suite-specific PGDG package; rebuild against the supported Debian suite to refresh the package and linked runtime files, then review dependency and notice changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

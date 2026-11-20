@@ -1,16 +1,14 @@
 # plproxy
 
-database partitioning system for PostgreSQL 18. [Upstream documentation](https://plproxy.github.io/).
+PL/Proxy lets you route function calls to remote PostgreSQL databases for
+partitioned workloads.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -47,23 +45,19 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx plproxy
+```
+
+You should see `plproxy` listed with its installed SQL version.
 
 ## Operation and privileges
 
 PL/Proxy forwards SQL through PostgreSQL connections. Its dynamically linked libpq and transitive libraries are supplied by the matching CNPG minimal base (which includes psql); no runtime installation is needed. Configure connection strings and credentials through SQL and Kubernetes Secrets, and allow only required outbound destinations.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-ISC. Redistribution notices are preserved under `/licenses/`.
-
-PL/Proxy CONNECT strings use libpq keyword/value syntax (for example, `host=cluster-rw dbname=app user=proxy_user`), not connection URIs: the plugin adds connection options to the string. Supply credentials through your deployment Secrets.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

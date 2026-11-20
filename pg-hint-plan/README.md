@@ -4,15 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_hint_plan](https://github.com/ossc-db/pg_hint_plan) adds optimizer hints
-to PostgreSQL. Hints are written in SQL comments and can choose scan methods,
-join methods, and other planner behavior for individual queries.
+pg_hint_plan adds optimizer hints to PostgreSQL. Hints are written in SQL
+comments and can choose scan methods, join methods, and other planner behavior
+for individual queries.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -53,7 +54,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_hint_plan
+```
+
+You should see `pg_hint_plan` listed with its installed SQL version.
 
 The extension creates its objects in the hint_plan schema. For example:
 
@@ -66,5 +73,5 @@ ANALYZE hint_example;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-pg-hint-plan/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

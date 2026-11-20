@@ -1,16 +1,14 @@
 # prioritize
 
-Get and set the nice priorities of PostgreSQL backends. [Upstream documentation](http://pgxn.org/dist/prioritize/).
+prioritize lets you inspect and change the operating system scheduling priority
+of PostgreSQL backends.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -47,21 +45,19 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx prioritize
+```
+
+You should see `prioritize` listed with its installed SQL version.
 
 ## Operation and privileges
 
 Backend priority functions require database privileges and are subject to OS permissions. An unprivileged CNPG process can lower its scheduling priority by increasing the nice value; raising priority normally requires CAP_SYS_NICE and is not supported. No extra capability is requested.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-PostgreSQL. Redistribution notices are preserved under `/licenses/`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

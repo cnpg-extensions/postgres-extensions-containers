@@ -4,15 +4,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_textsearch](https://github.com/timescale/pg_textsearch) is a
-PostgreSQL extension for full-text search with BM25 relevance ranking. This image supports
-PostgreSQL 18 on Debian bookworm and trixie.
+pg_textsearch is a PostgreSQL extension for full-text search with BM25 relevance
+ranking.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -129,7 +129,7 @@ for scheduling and workflow lifecycle details.
 
 With our pg_durable 0.2.9 container, managed compaction cleared existing and new
 spill backlogs before and after planned switchover and automatic failover,
-retaining the same workflow ID. These local tests used PostgreSQL 18.7,
+retaining the same workflow ID. These local tests used PostgreSQL 18,
 CNPG 1.30.1, and AMD64 Bookworm and Trixie. Worker authentication used a
 disposable loopback-only trust rule; production credential-based authentication
 and a crash deliberately timed inside a merge were not validated.
@@ -142,7 +142,7 @@ The Cluster example supplies it explicitly. The index is WAL-logged; its
 shared-memory cache is rebuilt from persisted index data.
 See the [versioned upstream documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#compaction).
 
-Local tests of pg_textsearch 1.5.1 with PostgreSQL 18.7 and CNPG 1.30.1
+Local tests of pg_textsearch 1.5.1 with PostgreSQL 18 and CNPG 1.30.1
 passed on AMD64 Bookworm and Trixie: live index creation and replica searches,
 committed and rolled-back index updates, primary and standby crash recovery,
 planned switchover, and automatic
@@ -153,5 +153,5 @@ do not cover PITR, backup restores, native ARM64 execution, or other versions.
 
 ## Licenses and Copyright
 
-pg_textsearch is distributed under the PostgreSQL license. Extension and dependency licenses and copyright notices are bundled in
+Extension and dependency licenses and copyright notices are bundled in
 `/licenses/` in the image.

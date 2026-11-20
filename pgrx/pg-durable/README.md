@@ -4,17 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_durable](https://github.com/microsoft/pg_durable) is a PostgreSQL extension
-for durable, fault-tolerant SQL workflows. It checkpoints composable SQL steps
-in PostgreSQL so executions can resume after crashes, restarts, or failed
-steps, without an external orchestration service. This image supports
-PostgreSQL 18 on Debian bookworm and trixie.
+pg_durable is a PostgreSQL extension for durable, fault-tolerant SQL workflows.
+It checkpoints composable SQL steps in PostgreSQL so executions can resume after
+crashes, restarts, or failed steps, without an external orchestration service.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -64,10 +63,10 @@ configuration before application workflows can run (see [Known Caveats](#known-c
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_durable
 ```
 
-You should see `pg_durable` listed among the installed extensions.
+You should see `pg_durable` listed with its installed SQL version.
 
 ## Known Caveats
 
@@ -90,7 +89,7 @@ You should see `pg_durable` listed among the installed extensions.
   [connection host setting](https://github.com/microsoft/pg_durable/blob/v0.2.9/USER_GUIDE.md#connection-host)
   selects the connection endpoint, but authentication must work for both the
   management role (`postgres` by default) and submitting roles. In the tested
-  CNPG 1.30.1 / PostgreSQL 18.7 setup, switching to TCP while allowing only
+  CNPG 1.30.1 / PostgreSQL 18 setup, switching to TCP while allowing only
   `app` left management initialization failing authentication as `postgres`.
   A workflow completed with `pg_durable.host=127.0.0.1` and a disposable,
   loopback-only trust rule for both roles. This does not validate a production

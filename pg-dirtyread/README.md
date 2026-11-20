@@ -1,16 +1,14 @@
 # pg_dirtyread
 
-Read dead but unvacuumed tuples from a PostgreSQL relation. [Upstream documentation](https://github.com/df7cb/pg_dirtyread).
+pg_dirtyread lets you inspect dead rows that have not yet been removed by
+VACUUM.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -47,21 +45,19 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_dirtyread
+```
+
+You should see `pg_dirtyread` listed with its installed SQL version.
 
 ## Operation and privileges
 
 Superuser-only inspection can recover dead tuples that PostgreSQL has not vacuumed. It does not replace backups and may reveal data deleted by application users. The upstream regression test disables autovacuum only on its disposable test tables.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-BSD-3-Clause. Redistribution notices are preserved under `/licenses/`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

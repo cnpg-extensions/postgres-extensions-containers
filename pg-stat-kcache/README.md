@@ -4,16 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_kcache](https://github.com/powa-team/pg_stat_kcache) collects
-per-query kernel statistics, including CPU time and filesystem reads and
-writes. It uses the query identifiers supplied by the bundled
-pg_stat_statements extension.
+pg_stat_kcache collects per-query kernel statistics, including CPU time and
+filesystem reads and writes. It uses the query identifiers supplied by the
+bundled pg_stat_statements extension.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -57,7 +57,13 @@ Install `pg_stat_statements`, then `pg_stat_kcache` in that order.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_stat_kcache
+```
+
+You should see `pg_stat_kcache` listed with its installed SQL version.
 
 After running queries, inspect the collected values:
 
@@ -69,5 +75,5 @@ SELECT * FROM pg_stat_kcache;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-pg-stat-kcache/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

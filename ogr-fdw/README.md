@@ -1,14 +1,17 @@
 # ogr_fdw
 
-ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. See the [upstream ogr_fdw project](https://github.com/pramsey/pgsql-ogr-fdw) for supported options. It can read local files and remote datasets supported by the bundled GDAL build. It does not run an external GIS service.
+ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. It
+can read local files and remote datasets supported by the bundled GDAL build. It
+does not run an external GIS service.
 
-PG18 packages are available for both Bookworm and Trixie on amd64 and arm64. The image sets GDAL_DATA to its bundled coordinate-system data directory and stages the linked GDAL runtime libraries.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
+
+The image sets GDAL_DATA to its bundled coordinate-system data directory and stages the linked GDAL runtime libraries.
 
 ## Usage
 
@@ -45,7 +48,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx ogr_fdw
+```
+
+You should see `ogr_fdw` listed with its installed SQL version.
 
 The catalog supplies `GDAL_DATA` and `PROJ_DATA`, with `${image_root}` expanded
 to the extension mount directory for GDAL driver data and PROJ coordinate-system
@@ -75,9 +84,7 @@ ORDER BY place_id;
 
 OGR_FDW only supports the GDAL drivers available in the installed libgdal build. The runtime includes GDAL's data files; place datasets in separately managed object storage or another supported datasource.
 
-## Package, licensing and updates
+## Licenses and Copyright
 
-The suite-specific PGDG package versions and SQL version are recorded in
-`metadata.hcl`. The extension is MIT-licensed. Copyright notices for bundled runtime packages and GDAL/PROJ data are under `/licenses/<package>/`. The image includes no source archives.
-
-Renovate tracks both PGDG package versions. Rebuild after package or base-image security updates and review the resulting runtime libraries and package notices.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

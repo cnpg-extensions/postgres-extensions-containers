@@ -4,17 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_graphql](https://github.com/supabase/pg_graphql) adds GraphQL support to
-PostgreSQL. It reflects the SQL schema and exposes it through the
-`graphql.resolve(...)` SQL function, so clients can query the database with
-GraphQL without a separate application server. This image supports PostgreSQL
-18 on Debian bookworm and trixie.
+pg_graphql adds GraphQL support to PostgreSQL. It reflects the SQL schema and
+exposes it through the `graphql.resolve(...)` SQL function, so clients can query
+the database with GraphQL without a separate application server.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -57,10 +56,10 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_graphql
 ```
 
-You should see `pg_graphql` listed among the installed extensions.
+You should see `pg_graphql` listed with its installed SQL version.
 
 ## Known Caveats
 

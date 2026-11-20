@@ -4,17 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_parquet](https://github.com/CrunchyData/pg_parquet) is a PostgreSQL
-extension for reading and writing [Parquet files](https://parquet.apache.org)
-with PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure
-Blob Storage, Google Cloud Storage, and HTTP(S) endpoints. This image supports
-PostgreSQL 18 on Debian bookworm and trixie.
+pg_parquet is a PostgreSQL extension for reading and writing Parquet files with
+PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure Blob
+Storage, Google Cloud Storage, and HTTP(S) endpoints.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -60,7 +59,7 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_parquet
 ```
 
 You should see `pg_parquet` listed with its installed SQL version.
@@ -85,5 +84,3 @@ You should see `pg_parquet` listed with its installed SQL version.
 
 Extension and dependency licenses and copyright notices are bundled in
 `/licenses/` in the image.
-
-The extension uses the [PostgreSQL License](https://github.com/CrunchyData/pg_parquet/blob/v0.5.1/LICENSE).

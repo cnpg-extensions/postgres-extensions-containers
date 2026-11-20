@@ -4,16 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pglinter](https://github.com/pmpetit/pglinter) checks PostgreSQL databases for
-schema design and configuration problems, including missing primary keys,
-redundant indexes, and missing indexes on foreign keys. These images support
-PostgreSQL 18 on Debian Bookworm and Trixie.
+pglinter checks PostgreSQL databases for schema design and configuration
+problems, including missing primary keys, redundant indexes, and missing indexes
+on foreign keys.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 

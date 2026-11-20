@@ -1,16 +1,13 @@
 # pg_permissions
 
-see all permissions in a PostgreSQL database. [Upstream documentation](https://github.com/cybertec-postgresql/pg_permissions).
+pg_permissions lets you inspect database permissions through SQL views.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -47,27 +44,19 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_permissions
+```
+
+You should see `pg_permissions` listed with its installed SQL version.
 
 ## Operation and privileges
 
 Permissions are exposed through SQL views in the extension installation schema. Restrict access to administrative roles when object or role names are sensitive.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-PostgreSQL. Redistribution notices are preserved under `/licenses/`.
-
-The PGDG copyright labels its notice(s) `CYBERTEC`. The permission and
-disclaimer text matches the [SPDX PostgreSQL license template](https://github.com/spdx/license-list-data/blob/main/json/details/PostgreSQL.json),
-which allows copyright-holder substitutions in the disclaimer paragraphs.
-The metadata uses that SPDX identifier; the image retains the complete original
-package copyright, including every named holder and notice.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -1,16 +1,14 @@
 # pglogical
 
-Logical replication through PostgreSQL connections. [Upstream project](https://github.com/2ndQuadrant/pglogical).
+pglogical replicates selected tables between PostgreSQL databases using logical
+replication.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -52,7 +50,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pglogical
+```
+
+You should see `pglogical` listed with its installed SQL version.
 
 ## Operation and privileges
 
@@ -75,17 +79,7 @@ slot limits and disk capacity; remove unused subscriptions with
 stopped. Failed consumers must not retain WAL indefinitely. No extra listener
 or container shell setup is required.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-PostgreSQL. Redistribution notices are preserved under `/licenses/`.
-
-The package also includes `pglogical_origin` version 1.0.0, an empty compatibility extension for upgrades from PostgreSQL 9.4. It is not needed for new PostgreSQL 18 replication setups. The upstream SQL suite exercises it in selected replication cases.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

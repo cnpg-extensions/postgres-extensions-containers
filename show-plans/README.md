@@ -4,15 +4,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_show_plans](https://github.com/cybertec-postgresql/pg_show_plans) shows the
-query plans of currently running PostgreSQL statements. Plans can be returned
-as plain text, JSON, YAML, or XML.
+pg_show_plans shows the query plans of currently running PostgreSQL statements.
+Plans can be returned as plain text, JSON, YAML, or XML.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -53,7 +53,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_show_plans
+```
+
+You should see `pg_show_plans` listed with its installed SQL version.
 
 Inspect plans for currently running statements:
 
@@ -65,5 +71,5 @@ SELECT * FROM pg_show_plans_q;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-show-plans/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

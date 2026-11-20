@@ -1,23 +1,14 @@
 # credcheck
 
-PostgreSQL username/password checks. [Upstream documentation](https://github.com/MigOpsRepos/credcheck).
+credcheck checks usernames and passwords against configurable policies when
+roles are created or credentials change.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
-
-## PostgreSQL compatibility
-
-credcheck 6.0 images using PGDG package revision `+2` require PostgreSQL 18.7
-or later within major version 18. Upgrade PostgreSQL first: on 18.6, credcheck
-prevents startup with `undefined symbol: heap_datum_check`. CNPG does not
-enforce extension minimum minor versions.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -58,7 +49,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx credcheck
+```
+
+You should see `credcheck` listed with its installed SQL version.
 
 ## Operation and privileges
 
@@ -66,15 +63,7 @@ CNPG reconciles role credentials using precomputed SCRAM verifiers. Set `credche
 
 Credential checks apply to role creation and password changes. Configure policy settings in `postgresql.parameters`; only administrators should change them.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-MIT. Redistribution notices are preserved under `/licenses/`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

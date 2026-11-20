@@ -4,18 +4,17 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_jsonschema](https://github.com/supabase/pg_jsonschema) is a PostgreSQL
-extension that adds support for [JSON Schema](https://json-schema.org/)
+pg_jsonschema is a PostgreSQL extension that adds support for JSON Schema
 validation on the `json` and `jsonb` data types. JSON Schema describes the
-expected structure and constraints of JSON documents, allowing the extension
-to validate values, check schemas, and report validation errors directly in
-SQL.
+expected structure and constraints of JSON documents, allowing the extension to
+validate values, check schemas, and report validation errors directly in SQL.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -58,10 +57,10 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_jsonschema
 ```
 
-You should see `pg_jsonschema` listed among the installed extensions.
+You should see `pg_jsonschema` listed with its installed SQL version.
 
 ## Licenses and Copyright
 

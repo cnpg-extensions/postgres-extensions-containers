@@ -4,15 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_qualstats](https://github.com/powa-team/pg_qualstats) gathers statistics
-about predicates found in WHERE and JOIN clauses. The statistics help
-identify frequently used predicates and potentially missing indexes.
+pg_qualstats gathers statistics about predicates found in WHERE and JOIN
+clauses. The statistics help identify frequently used predicates and potentially
+missing indexes.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -53,7 +54,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pg_qualstats
+```
+
+You should see `pg_qualstats` listed with its installed SQL version.
 
 Inspect the gathered predicate statistics with:
 
@@ -63,5 +70,5 @@ SELECT * FROM pg_qualstats;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-pg-qualstats/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -4,13 +4,17 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_uuidv7](https://github.com/fboulnois/pg_uuidv7) is a PostgreSQL extension that provides functions for generating and working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID format that embeds a Unix timestamp, making it more suitable than UUID v4 for use as database primary keys.
+pg_uuidv7 is a PostgreSQL extension that provides functions for generating and
+working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID
+format that embeds a Unix timestamp, making it more suitable than UUID v4 for
+use as database primary keys.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -53,10 +57,10 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx pg_uuidv7
 ```
 
-You should see `pg_uuidv7` listed among the installed extensions. You can then
+You should see `pg_uuidv7` listed with its installed SQL version. You can then
 generate a UUIDv7 with:
 
 ```sql
@@ -70,15 +74,5 @@ SELECT uuid_generate_v7();
 
 ## Licenses and Copyright
 
-This container image contains software that may be licensed under various
-open-source licenses.
-
-All relevant license and copyright information for the `pg-uuidv7` extension
-and its dependencies are bundled within the image at:
-
-```text
-/licenses/
-```
-
-By using this image, you agree to comply with the terms of the licenses
-contained therein.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

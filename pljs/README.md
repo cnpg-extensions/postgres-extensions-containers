@@ -4,19 +4,21 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PL/JS provides a trusted JavaScript procedural language for PostgreSQL, backed by QuickJS statically compiled into `pljs.so`. See the [upstream project](https://github.com/plv8/pljs) for its API and release history.
+PL/JS lets you write PostgreSQL functions in JavaScript using the QuickJS
+engine.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
 ### 1. Add the pljs extension image to your Cluster
 
-Mount the extension image into PostgreSQL 18:
+Mount the extension image into your Cluster:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -49,7 +51,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pljs
+```
+
+You should see `pljs` listed with its installed SQL version.
 
 A function exercises the JavaScript runtime:
 
@@ -61,8 +69,7 @@ SELECT js_double(21); -- 42
 
 The language is trusted, but the extension itself must be installed by a database superuser. Continue to apply PostgreSQL's normal function and schema privileges to JavaScript functions. The included example performs SQL-only work.  If application functions are extended to write files through other installed interfaces, declaratively provide a volume with suitable ownership/access, retention, and cleanup before enabling that workflow.
 
-## Package, dependency and license notes
+## Licenses and Copyright
 
-PGDG package `postgresql-18-pljs` supplies `pljs.so` and its control/SQL files. QuickJS is statically linked, so no additional runtime package is needed. The PGDG package copyright notice is under `/licenses`.
-
-PLJS uses a project-specific license recorded as `LicenseRef-PLJS` in the image metadata. The Debian copyright file preserves its full terms; QuickJS is MIT licensed. Renovate tracks `postgresql-18-pljs`; inspect the source patch and notices when updating it.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

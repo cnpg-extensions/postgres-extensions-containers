@@ -1,16 +1,14 @@
 # pgextwlist
 
-PostgreSQL Extension Whitelisting. [Upstream documentation](https://github.com/dimitri/pgextwlist).
+pgextwlist lets administrators allow non-superusers to install an approved
+selection of PostgreSQL extensions.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
-
-## Supported images
-
-PostgreSQL 18; Debian Trixie and Bookworm; amd64 and arm64 build targets.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -32,7 +30,7 @@ spec:
     - name: pgextwlist
 ```
 
-### 2. Verify operation
+### 2. Verify installation
 
 Connect with `psql` and run `SHOW extwlist.extensions;` to check the configured
 allowlist.
@@ -41,15 +39,7 @@ allowlist.
 
 This module has no CREATE EXTENSION artifact. Its preload hook allows non-superusers to install administrator-allowlisted extensions that normally require superuser privileges; PostgreSQL trusted extensions retain their ordinary permissions. The example allowlists `dblink`, already present in the minimal PostgreSQL image. Optional custom script execution is not configured or supported by this image.
 
-## Dependencies and updates
+## Licenses and Copyright
 
-The image contains only the PGDG package server payload and license notices.
-The matching CNPG minimal image supplies PostgreSQL, libc and its base runtime.
-Project automation tracks package updates and rebuilds the extension images.
-Use the catalog maintenance schedule in the quick start to consume published
-PostgreSQL and extension image updates. Monitor pending SQL extension upgrades
-and review them separately; SQL versions need not match package versions.
-
-## Licenses and ownership
-
-PostgreSQL. Redistribution notices are preserved under `/licenses/`.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

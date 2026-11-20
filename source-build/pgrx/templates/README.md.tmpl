@@ -6,18 +6,18 @@ SPDX-License-Identifier: Apache-2.0
 
 <!--
 TODO: Replace this section with a brief introduction of the extension.
-Describe what it does, link to the upstream project, and state the supported
-PostgreSQL versions and Debian distributions.
+Describe what it does for users, without links in the introduction.
 -->
 
-[{{ replaceAll .Name "-" "_" }}](https://github.com/<owner>/<repo>) is a
+{{ replaceAll .Name "-" "_" }} is a
 PostgreSQL extension that provides [describe the main functionality here].
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -67,7 +67,7 @@ administrator-approved selection of extensions.
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx
+\dx {{ replaceAll .Name "-" "_" }}
 ```
 
 You should see `{{ replaceAll .Name "-" "_" }}` listed among the installed extensions.

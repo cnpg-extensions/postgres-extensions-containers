@@ -4,15 +4,15 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[HypoPG](https://github.com/HypoPG/hypopg) provides hypothetical indexes for
-PostgreSQL. It lets you compare query plans with an index that has not been
-physically created.
+HypoPG provides hypothetical indexes for PostgreSQL. It lets you compare query
+plans with an index that has not been physically created.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -51,7 +51,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx hypopg
+```
+
+You should see `hypopg` listed with its installed SQL version.
 
 For an existing table `my_table` with an integer `column_name` column, create a
 hypothetical index and inspect the resulting plan in the same session:
@@ -64,5 +70,5 @@ EXPLAIN SELECT * FROM my_table WHERE column_name = 1;
 
 ## Licenses and Copyright
 
-The package copyright and license notice are included in the image under
-/licenses/postgresql-18-hypopg/.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

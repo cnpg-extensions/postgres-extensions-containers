@@ -5,15 +5,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pgPointcloud adds PostgreSQL types and functions for storing, querying, and transforming LiDAR point-cloud data. Point formats and values live in database tables; the extension does not need to write container files. See the [upstream project](https://github.com/pgpointcloud/pointcloud) for the extension documentation.
+pgPointcloud adds PostgreSQL types and functions for storing, querying, and
+transforming LiDAR point-cloud data. Point formats and values live in database
+tables; the extension does not need to write container files.
 
-This image supports PostgreSQL 18 on Debian Bookworm and Trixie. The selected PGDG package versions are maintained independently per suite in `metadata.hcl`.
-
-Follow the [quick start](../README.md#quick-start) to set up extension-update email
-alerts first, then use the CronJob to install and refresh the catalog. These
-examples inherit image references and runtime settings from the catalog. The Cluster YAML
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog. These examples
+inherit image references and runtime settings from the catalog. The Cluster YAML
 is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your existing instance and storage settings.
+keep your instance and storage settings, following any extension-specific
+requirements below.
 
 ## Usage
 
@@ -51,7 +52,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Connect to the database with `psql` and run `\dx` to check the installed extensions.
+Once the database is ready, connect to it with `psql` and run:
+
+```sql
+\dx pointcloud
+```
+
+You should see `pointcloud` listed with its installed SQL version.
 
 The PGDG package links to libxml2 and zlib. The optional `pointcloud_postgis` integration files are omitted because that feature requires a separately supplied PostGIS extension. The base pointcloud feature works without PostGIS.
 
@@ -78,7 +85,7 @@ SELECT PC_Get(PC_MakePoint(1, ARRAY[-127, 45, 124.0, 4.0]), 'Intensity');
 
 Schemas and point values live in PostgreSQL tables. No database pod shell or container filesystem changes are needed.
 
+## Licenses and Copyright
 
-## Licenses and updates
-
-The extension is licensed under `BSD-3-Clause`. Its copyright notice is included under `/licenses/<package>/`. The supported CNPG base images provide the runtime libraries required by the extension, so no files are staged under `/system`. The image includes no source archives. Renovate tracks the suite-specific PGDG package; rebuild against the supported Debian suite and review package and notice changes.
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.
