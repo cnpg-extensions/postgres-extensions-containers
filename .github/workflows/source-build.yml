@@ -141,8 +141,10 @@ jobs:
             _pgrx:
               - 'docker-bake-pgrx.hcl'
               - 'source-build/pgrx/**'
+              - '!source-build/pgrx/templates/**'
             _universe:
               - 'source-build/universe/**'
+              - '!source-build/universe/templates/**'
             ${{ env.EXTENSIONS }}
 
       - name: Verify selected PR revision
