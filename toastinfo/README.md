@@ -66,3 +66,8 @@ Use `pg_toastinfo` and `pg_toastpointer` to inspect a value. Replace
 ~~~sql
 SELECT pg_toastinfo(value), pg_toastpointer(value) FROM my_table;
 ~~~
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

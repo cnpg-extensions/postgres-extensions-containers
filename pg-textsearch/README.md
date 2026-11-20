@@ -136,3 +136,8 @@ shared-memory cache is rebuilt from persisted index data.
 See the [versioned upstream documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#compaction).
 
 Clients must reconnect when CNPG closes connections during a role change.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

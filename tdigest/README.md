@@ -62,3 +62,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT (SELECT tdigest_percentile(i::float8, 100, 0.5::float8) BETWEEN 45 AND 55 FROM generate_series(1,100) AS s(i));
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

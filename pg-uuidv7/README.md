@@ -66,3 +66,8 @@ generate a UUIDv7 with:
 ```sql
 SELECT uuid_generate_v7();
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -63,3 +63,8 @@ SELECT pgq.insert_event('order_events', 'order_created', 'order_id=42');
 ~~~
 
 A separate `pgqd` daemon advances ticks and handles queue maintenance. The server image does not start or supervise daemon processes.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

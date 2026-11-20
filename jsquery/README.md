@@ -62,3 +62,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT '{"a": 1}'::jsonb @@ 'a = 1'::jsquery;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

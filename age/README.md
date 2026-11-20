@@ -71,3 +71,8 @@ You should see `age` listed with its installed SQL version.
   with a "must be preloaded" error.
 - **Cypher support**: After installation, use `SET search_path = ag_catalog, "$user", public;`
   to access AGE's graph functions and the `cypher()` function for graph queries.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -56,3 +56,8 @@ You should see `pgfincore` listed with its installed SQL version.
 ## Operation and privileges
 
 Administrative functions inspect or advise the operating-system page cache for relation files. Calls are limited by PostgreSQL and container permissions. Optional filesystem export/import features are not supported; use the SQL-returning inspection and cache-advice functions.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

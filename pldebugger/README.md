@@ -73,3 +73,8 @@ You should see `pldbgapi` listed with its installed SQL version.
 - **SQL extension name differs from image name**: The extension image is named
   `pldebugger` but the PostgreSQL extension object is `pldbgapi`. Use
   `CREATE EXTENSION pldbgapi` (not `pldebugger`).
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -80,3 +80,8 @@ You should see `anon` listed with its installed SQL version.
 Dataset initialization remains a separate superuser step. For masking rules,
 permissions, and transparent dynamic masking, follow the
 [upstream documentation](https://postgresql-anonymizer.readthedocs.io/).
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

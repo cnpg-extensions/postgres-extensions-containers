@@ -62,3 +62,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT db2.year(date '2026-09-29') = 2026;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

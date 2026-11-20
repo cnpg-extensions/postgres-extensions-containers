@@ -66,3 +66,8 @@ You should see `h3` listed with its installed SQL version.
 - **Runtime library dependency**: This extension requires `libh3-1` at runtime.
   The library is bundled in the image under `/system/`. The `ld_library_path`
   is configured to include this directory automatically.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -61,3 +61,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT '2026-09-29 00:00:00.000000001'::timestamp9 < '2026-09-29 00:00:00.000000002'::timestamp9;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -82,3 +82,8 @@ Once the database is ready, connect to it with `psql` and run:
 You should see `pg_search` listed with its installed SQL version. The extension must be
 included in `shared_preload_libraries`; the Cluster example above supplies this
 setting explicitly because preloads are not inherited from the catalog.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

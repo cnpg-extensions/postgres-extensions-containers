@@ -67,3 +67,8 @@ Inspect the collected plan statistics:
 ~~~sql
 SELECT * FROM pg_stat_plans;
 ~~~
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

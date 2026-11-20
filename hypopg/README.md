@@ -67,3 +67,8 @@ CREATE EXTENSION IF NOT EXISTS hypopg;
 SELECT * FROM hypopg_create_index('CREATE INDEX ON my_table (column_name)');
 EXPLAIN SELECT * FROM my_table WHERE column_name = 1;
 ~~~
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

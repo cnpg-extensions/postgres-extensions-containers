@@ -65,3 +65,8 @@ The PGDG package links to ICU. The supported CNPG base images provide these runt
 ```sql
 SELECT icu_transform('Hello, PostgreSQL', 'Any-Upper');
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -62,3 +62,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT rb_cardinality(rb_build(ARRAY[1,2,3])) = 3;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

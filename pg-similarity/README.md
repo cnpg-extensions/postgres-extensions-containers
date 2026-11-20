@@ -56,3 +56,8 @@ You should see `pg_similarity` listed with its installed SQL version.
 ## Operation and privileges
 
 Similarity functions execute inside PostgreSQL and require no writable files or external services.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

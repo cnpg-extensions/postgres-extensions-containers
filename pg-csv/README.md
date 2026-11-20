@@ -55,3 +55,8 @@ You should see `pg_csv` listed with its installed SQL version.
 ## Operation and privileges
 
 CSV is returned as SQL text; this image supports no server-side CSV file export. Clients own storage and retention of exported results.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

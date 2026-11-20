@@ -62,3 +62,8 @@ You should see `credcheck` listed with its installed SQL version.
 CNPG reconciles role credentials using precomputed SCRAM verifiers. Set `credcheck.encrypted_password_allowed: "on"` so those updates succeed. Plaintext password policy cannot inspect precomputed verifiers; enforce equivalent policy where Kubernetes password Secrets are generated. SQL role changes using plaintext passwords remain checked.
 
 Credential checks apply to role creation and password changes. Configure policy settings in `postgresql.parameters`; only administrators should change them.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

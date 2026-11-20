@@ -55,3 +55,8 @@ You should see `plsh` listed with its installed SQL version.
 ## Operation and privileges
 
 PL/sh is an untrusted language: only superusers can create its functions. Commands run as the PostgreSQL OS user and inherit its filesystem and network access. This image supports the `/bin/sh` already supplied by the matching CNPG minimal image, with shell built-ins only. It does not add arbitrary external commands or support file-producing functions. Restrict function EXECUTE grants to trusted administrators.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

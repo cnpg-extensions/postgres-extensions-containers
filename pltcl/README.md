@@ -70,3 +70,8 @@ SELECT tcl_add(19, 23); -- 42
 `pltcl` uses Tcl's safe interpreter, which omits commands such as `exec` and `open`; it cannot access the host filesystem or launch processes directly. To install the untrusted variant, a superuser runs `CREATE EXTENSION pltclu;`. Only superusers can create `pltclu` functions. Those functions run as the PostgreSQL operating-system user with its available filesystem, process and network access. Review untrusted function code and privileges carefully. The included examples perform SQL-only work.  Before enabling `pltclu` functions that produce persistent files, declaratively provide a volume with suitable ownership/access, retention, and cleanup; the image does not define an application data-storage lifecycle.
 
 The extension configuration adds the image's `/system` directory to the loader path, sets `TCL_LIBRARY` to the packaged Tcl 8.6 scripts, and sets `TCL8_6_TM_PATH` to its modules, including `msgcat` used by date functions. Users need no package installation or filesystem changes in the database container.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

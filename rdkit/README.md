@@ -61,3 +61,8 @@ SELECT mol_to_smiles(mol_from_smiles('CCO'))::text = 'CCO'
 ~~~
 
 No writable storage or runtime shell access is needed for the SQL cartridge functions shown here.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

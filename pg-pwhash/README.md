@@ -77,3 +77,8 @@ WITH credentials AS (
 SELECT pwhash_crypt('password', stored_hash) = stored_hash AS password_matches
 FROM credentials;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

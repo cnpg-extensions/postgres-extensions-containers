@@ -70,3 +70,8 @@ INSERT INTO hint_example SELECT generate_series(1, 1000);
 ANALYZE hint_example;
 /*+ SeqScan(t) */ EXPLAIN SELECT * FROM hint_example AS t WHERE id = 1;
 ~~~
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

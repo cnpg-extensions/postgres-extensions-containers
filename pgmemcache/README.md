@@ -78,3 +78,8 @@ You should see `pgmemcache` listed with its installed SQL version.
   startup.
 - **Runtime library dependency**: This extension requires `libmemcached11` at
   runtime. The library is bundled in the image under `/system/`.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

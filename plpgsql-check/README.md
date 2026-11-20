@@ -70,3 +70,8 @@ END;
 $$;
 SELECT * FROM plpgsql_check_function('checked_example()');
 ~~~
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

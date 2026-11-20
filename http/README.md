@@ -65,3 +65,8 @@ The PGDG package links to libcurl. The image includes the required non-core shar
 ```sql
 SELECT status, content FROM http_get('https://example.org/');
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

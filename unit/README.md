@@ -61,3 +61,8 @@ A SQL check that exercises the installed extension is:
 ```sql
 SELECT '1 m'::unit = '100 cm'::unit;
 ```
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

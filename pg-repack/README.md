@@ -69,3 +69,8 @@ pg_repack --host=cluster-pg-repack-rw --username=postgres --dbname=app --table=p
 ~~~
 
 Supply credentials through a Kubernetes Secret or the client environment. The extension image deliberately does not put the client executable in the PostgreSQL server image.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

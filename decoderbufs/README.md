@@ -52,3 +52,8 @@ Unconsumed replication slots retain WAL on the database's data volume. Monitor
 consumer lag and disk use, configure an appropriate `max_slot_wal_keep_size`, and
 drop unused slots with `pg_drop_replication_slot` after coordinating with their
 consumers. No separate incoming listener or manual container setup is required.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

@@ -68,3 +68,8 @@ You should see `pg_partman` listed with its installed SQL version.
 
 See the [pg_partman documentation](https://github.com/pgpartman/pg_partman/tree/development/doc)
 for partition-set configuration examples.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

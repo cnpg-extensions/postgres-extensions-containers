@@ -70,3 +70,8 @@ SELECT * FROM pg_background_run('SELECT count(*) FROM pg_class');
 Use the function in `FROM` so it executes once. Expanding
 `(pg_background_run(...)).*` in the select list can execute it once per output
 column. The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

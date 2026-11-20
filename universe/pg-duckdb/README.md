@@ -84,3 +84,8 @@ for querying with DuckDB and accessing external data.
   execution inside PL/pgSQL can raise
   `INTERNAL Error: Attempted to access index 1 within vector of size 1`
   from `PGDuckDB/Duckdb_ExplainCustomScan_Cpp`.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

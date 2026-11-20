@@ -89,3 +89,8 @@ You should see `pg_durable` listed with its installed SQL version.
   [connection host setting](https://github.com/microsoft/pg_durable/blob/v0.2.9/USER_GUIDE.md#connection-host)
   selects the connection endpoint, but authentication must work for both the
   management role (`postgres` by default) and submitting roles.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

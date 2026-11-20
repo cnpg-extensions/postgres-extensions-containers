@@ -71,3 +71,8 @@ ORDER BY count DESC;
 ~~~
 
 Statistics persist across clean PostgreSQL restarts and are discarded after crash recovery. Reset counters and reclaim tracked slots with `SELECT pg_stat_log_reset();`. Capacity is bounded by `pg_stat_log.max_entries` (default 1024); increase it and restart if the `n_dropped` value returned by `pg_stat_log_info()` grows. The extension writes no external files.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

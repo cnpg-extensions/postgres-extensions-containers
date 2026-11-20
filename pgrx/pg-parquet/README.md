@@ -79,3 +79,8 @@ You should see `pg_parquet` listed with its installed SQL version.
   [upstream documentation](https://github.com/CrunchyData/pg_parquet#object-store-support).
 - The `pg_parquet.enable_copy_hooks` parameter can be set to `off` to disable
   the extension's COPY hooks for a session or role.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

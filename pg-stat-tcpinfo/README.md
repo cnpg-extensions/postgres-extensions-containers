@@ -87,3 +87,8 @@ Access is restricted to `pg_read_all_stats` (also inherited by `pg_monitor`),
 not PUBLIC. These monitoring roles expose additional database statistics;
 grant them only to appropriate users. No persistent files or maintenance daemon
 are needed.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.

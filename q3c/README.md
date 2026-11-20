@@ -61,3 +61,8 @@ Once the database is ready, connect to it with `psql` and run:
 ```
 
 You should see `q3c` listed with its installed SQL version.
+
+## Licenses and Copyright
+
+Extension and dependency licenses and copyright notices are bundled in
+`/licenses/` in the image.
