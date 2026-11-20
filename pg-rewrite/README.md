@@ -11,6 +11,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_rewrite).
+
 ### 1. Add the pg-rewrite extension image to your Cluster
 
 ```yaml

@@ -11,6 +11,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_permissions).
+
 ### 1. Add the pg-permissions extension image to your Cluster
 
 ```yaml

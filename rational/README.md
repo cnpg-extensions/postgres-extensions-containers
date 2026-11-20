@@ -15,6 +15,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/begriffs/pg_rational).
+
 ### 1. Add the rational extension image to your Cluster
 
 ```yaml

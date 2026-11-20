@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/dimitri/prefix).
+
 ### 1. Add the prefix extension image to your Cluster
 
 ```yaml

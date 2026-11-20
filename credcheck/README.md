@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/MigOpsRepos/credcheck).
+
 ### 1. Add the credcheck extension image to your Cluster
 
 ```yaml

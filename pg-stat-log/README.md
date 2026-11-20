@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/fabriziomello/pg_stat_log).
+
 ### 1. Add the pg-stat-log extension image to your Cluster
 
 Add the image and preload its statistics worker in a complete Cluster definition:

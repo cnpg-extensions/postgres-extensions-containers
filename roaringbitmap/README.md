@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/ChenHuajun/pg_roaringbitmap).
+
 ### 1. Add the roaringbitmap extension image to your Cluster
 
 ```yaml

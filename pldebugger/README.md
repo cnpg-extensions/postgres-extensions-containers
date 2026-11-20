@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/EnterpriseDB/pldebugger).
+
 ### 1. Add the pldebugger extension image to your Cluster
 
 Define the `pldebugger` extension under the `postgresql.extensions` section of

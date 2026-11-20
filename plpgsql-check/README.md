@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/okbob/plpgsql_check).
+
 ### 1. Add the plpgsql-check extension image to your Cluster
 
 Add the image to a Cluster:

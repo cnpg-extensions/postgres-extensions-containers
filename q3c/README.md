@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/segasai/q3c).
+
 ### 1. Add the q3c extension image to your Cluster
 
 Define the `q3c` extension under the `postgresql.extensions` section of

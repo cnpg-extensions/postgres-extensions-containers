@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/dverite/icu_ext).
+
 ### 1. Add the icu-ext extension image to your Cluster
 
 ```yaml

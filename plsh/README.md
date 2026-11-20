@@ -11,6 +11,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/petere/plsh).
+
 ### 1. Add the plsh extension image to your Cluster
 
 ```yaml

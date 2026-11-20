@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pgsphere.github.io/).
+
 ### 1. Add the pgsphere extension image to your Cluster
 
 Define the `pgsphere` extension under the `postgresql.extensions` section of

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/df7cb/pgsql-asn1oid).
+
 ### 1. Add the asn1oid extension image to your Cluster
 
 ```yaml

@@ -15,6 +15,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/RhodiumToad/ip4r).
+
 ### 1. Add the ip4r extension image to your Cluster
 
 ```yaml

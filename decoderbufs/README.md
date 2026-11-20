@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/debezium/postgres-decoderbufs).
+
 ### 1. Add the decoderbufs extension image to your Cluster
 
 Use this declarative Cluster setup:

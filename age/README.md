@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://age.apache.org/).
+
 ### 1. Add the age extension image to your Cluster
 
 Define the `age` extension under the `postgresql.extensions` section of

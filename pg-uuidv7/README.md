@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/fboulnois/pg_uuidv7).
+
 ### 1. Add the pg-uuidv7 extension image to your Cluster
 
 Define the `pg-uuidv7` extension under the `postgresql.extensions` section of

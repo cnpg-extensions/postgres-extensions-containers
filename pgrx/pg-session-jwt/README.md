@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/neondatabase/pg_session_jwt).
+
 ### 1. Add the pg-session-jwt extension image to your Cluster
 
 Define the `pg-session-jwt` extension under the `postgresql.extensions` section

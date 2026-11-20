@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://salsa.debian.org/postgresql/postgresql-debversion).
+
 ### 1. Add the debversion extension image to your Cluster
 
 Define the `debversion` extension under the `postgresql.extensions` section of

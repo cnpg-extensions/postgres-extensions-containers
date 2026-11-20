@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/postgrespro/pg_wait_sampling).
+
 ### 1. Add the pg-wait-sampling extension image to your Cluster
 
 Add the extension image and preload its worker in a complete Cluster definition:

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/).
+
 ### 1. Add the powa extension image to your Cluster
 
 Create a dedicated PoWA Database and declare its required extensions:

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
+
 ### 1. Add the mimeo extension image to your Cluster
 
 ```yaml

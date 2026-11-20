@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://powa.readthedocs.io/).
+
 ### 1. Add the pg-track-settings extension image to your Cluster
 
 ```yaml

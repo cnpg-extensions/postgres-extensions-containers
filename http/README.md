@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pramsey/pgsql-http).
+
 ### 1. Add the http extension image to your Cluster
 
 ```yaml

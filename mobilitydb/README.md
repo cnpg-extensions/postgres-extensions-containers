@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://mobilitydb.com/).
+
 ### 1. Add the mobilitydb extension image to your Cluster
 
 Define the `mobilitydb` extension under the `postgresql.extensions` section of

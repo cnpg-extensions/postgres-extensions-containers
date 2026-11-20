@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
+
 ### 1. Add the pg-stat-tcpinfo extension image to your Cluster
 
 Define `pg-stat-tcpinfo` under `postgresql.extensions`.

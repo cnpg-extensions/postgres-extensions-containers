@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
+
 ### 1. Add the pllua extension image to your Cluster
 
 Mount the image into your Cluster:

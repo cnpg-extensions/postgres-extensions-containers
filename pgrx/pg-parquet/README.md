@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/CrunchyData/pg_parquet).
+
 ### 1. Add the pg-parquet extension image to your Cluster
 
 Define the `pg-parquet` extension under the `postgresql.extensions` section of

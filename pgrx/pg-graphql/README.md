@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/supabase/pg_graphql).
+
 ### 1. Add the pg-graphql extension image to your Cluster
 
 Define the `pg-graphql` extension under the `postgresql.extensions` section of

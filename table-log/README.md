@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/df7cb/table_log).
+
 ### 1. Add the table-log extension image to your Cluster
 
 ```yaml

@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_pwhash).
+
 ### 1. Add the pg-pwhash extension image to your Cluster
 
 ```yaml

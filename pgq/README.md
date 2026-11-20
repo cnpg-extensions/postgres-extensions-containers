@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgq/pgq).
+
 ### 1. Add the pgq extension image to your Cluster
 
 ```yaml

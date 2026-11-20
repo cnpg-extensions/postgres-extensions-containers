@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/reorg/pg_repack).
+
 ### 1. Add the pg-repack extension image to your Cluster
 
 Add the server image to a complete Cluster definition:

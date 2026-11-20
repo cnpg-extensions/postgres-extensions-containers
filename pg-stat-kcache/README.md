@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/powa-team/pg_stat_kcache).
+
 ### 1. Add the pg-stat-kcache extension image to your Cluster
 
 Add the image to a Cluster and preload both libraries:

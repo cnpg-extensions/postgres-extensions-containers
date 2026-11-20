@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/bigsql/plprofiler).
+
 ### 1. Add the plprofiler extension image to your Cluster
 
 Define the `plprofiler` extension under the `postgresql.extensions` section of

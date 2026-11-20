@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgsentinel/pgsentinel).
+
 ### 1. Add the pgsentinel extension image to your Cluster
 
 Add the image to a Cluster and preload both libraries:

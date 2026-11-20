@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://www.postgresql.org/docs/18/pltcl.html).
+
 ### 1. Add the pltcl extension image to your Cluster
 
 Mount the image into your Cluster:

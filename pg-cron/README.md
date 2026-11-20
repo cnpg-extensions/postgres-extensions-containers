@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/citusdata/pg_cron).
+
 ### 1. Add the pg-cron extension image to your Cluster
 
 Define the `pg-cron` extension under the `postgresql.extensions` section of

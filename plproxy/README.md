@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://plproxy.github.io/).
+
 ### 1. Add the plproxy extension image to your Cluster
 
 ```yaml

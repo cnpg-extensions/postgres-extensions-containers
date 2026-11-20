@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/tds-fdw/tds_fdw).
+
 ### 1. Add the tds-fdw extension image to your Cluster
 
 Define the `tds-fdw` extension under the `postgresql.extensions` section of

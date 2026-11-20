@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/vyruss/pg_statviz).
+
 ### 1. Add the pg-statviz extension image to your Cluster
 
 Add the extension image to a complete Cluster definition:

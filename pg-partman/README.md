@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgpartman/pg_partman).
+
 ### 1. Add the pg-partman extension image to your Cluster
 
 Add the image to a Cluster and preload the background worker:

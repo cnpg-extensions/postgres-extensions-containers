@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pganalyze/pg_stat_plans).
+
 ### 1. Add the pg-stat-plans extension image to your Cluster
 
 Add the image to a Cluster and preload pg_stat_plans:

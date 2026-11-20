@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/dimitri/preprepare).
+
 ### 1. Add the preprepare extension image to your Cluster
 
 ```yaml

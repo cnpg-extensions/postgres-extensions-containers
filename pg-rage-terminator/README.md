@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/disco-stu/pg_rage_terminator).
+
 ### 1. Add the pg-rage-terminator extension image to your Cluster
 
 ```yaml

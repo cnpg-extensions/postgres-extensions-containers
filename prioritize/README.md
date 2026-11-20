@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](http://pgxn.org/dist/prioritize/).
+
 ### 1. Add the prioritize extension image to your Cluster
 
 ```yaml

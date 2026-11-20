@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](http://villemain.org/projects/pgfincore).
+
 ### 1. Add the pgfincore extension image to your Cluster
 
 ```yaml

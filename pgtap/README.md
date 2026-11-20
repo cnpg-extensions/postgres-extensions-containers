@@ -11,6 +11,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pgtap.org/).
+
 ### 1. Add the pgtap extension image to your Cluster
 
 ```yaml

@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/zachasme/h3-pg).
+
 ### 1. Add the h3 extension image to your Cluster
 
 Define the `h3` extension under the `postgresql.extensions` section of

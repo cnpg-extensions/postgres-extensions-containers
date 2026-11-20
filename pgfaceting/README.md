@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pgfaceting).
+
 ### 1. Add the pgfaceting extension image to your Cluster
 
 Include the required `roaringbitmap` extension image before `pgfaceting`.

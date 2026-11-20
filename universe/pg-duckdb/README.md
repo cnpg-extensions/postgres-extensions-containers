@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/duckdb/pg_duckdb).
+
 ### 1. Add the pg-duckdb extension image to your Cluster
 
 Define the extension under `postgresql.extensions` and preload `pg_duckdb`:

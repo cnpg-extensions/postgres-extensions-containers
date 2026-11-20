@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/dvarrazzo/pgmp).
+
 ### 1. Add the pgmp extension image to your Cluster
 
 Define the `pgmp` extension under the `postgresql.extensions` section of

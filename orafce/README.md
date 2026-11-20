@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/orafce/orafce).
+
 ### 1. Add the orafce extension image to your Cluster
 
 ```yaml

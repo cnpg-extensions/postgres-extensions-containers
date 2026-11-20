@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/rdkit/rdkit).
+
 ### 1. Add the rdkit extension image to your Cluster
 
 ```yaml

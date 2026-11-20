@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/microsoft/pg_durable).
+
 ### 1. Add the pg-durable extension image to your Cluster
 
 Define the `pg-durable` extension under the `postgresql.extensions`

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/postgrespro/rum).
+
 ### 1. Add the rum extension image to your Cluster
 
 ```yaml

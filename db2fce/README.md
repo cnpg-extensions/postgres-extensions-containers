@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/credativ/db2fce).
+
 ### 1. Add the db2fce extension image to your Cluster
 
 ```yaml

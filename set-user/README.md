@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgaudit/set_user).
+
 ### 1. Add the set-user extension image to your Cluster
 
 ```yaml

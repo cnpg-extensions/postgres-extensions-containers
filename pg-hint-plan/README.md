@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/ossc-db/pg_hint_plan).
+
 ### 1. Add the pg-hint-plan extension image to your Cluster
 
 Add the image to a Cluster and preload pg_hint_plan:

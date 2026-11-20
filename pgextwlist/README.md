@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/dimitri/pgextwlist).
+
 ### 1. Add the pgextwlist extension image to your Cluster
 
 ```yaml

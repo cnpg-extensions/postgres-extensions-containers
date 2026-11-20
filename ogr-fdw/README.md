@@ -15,6 +15,8 @@ The image sets GDAL_DATA to its bundled coordinate-system data directory and sta
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pramsey/pgsql-ogr-fdw).
+
 ### 1. Add the ogr-fdw extension image to your Cluster
 
 ```yaml

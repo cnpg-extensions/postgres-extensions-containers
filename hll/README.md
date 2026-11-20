@@ -15,6 +15,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/citusdata/postgresql-hll).
+
 ### 1. Add the hll extension image to your Cluster
 
 ```yaml

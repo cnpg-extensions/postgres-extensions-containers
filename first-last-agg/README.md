@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/wulczer/first_last_agg).
+
 ### 1. Add the first-last-agg extension image to your Cluster
 
 ```yaml

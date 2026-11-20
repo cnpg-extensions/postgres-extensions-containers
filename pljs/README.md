@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/plv8/pljs).
+
 ### 1. Add the pljs extension image to your Cluster
 
 Mount the extension image into your Cluster:

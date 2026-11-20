@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/petropavel13/pg_rrule).
+
 ### 1. Add the pg-rrule extension image to your Cluster
 
 Define the `pg-rrule` extension under the `postgresql.extensions` section of

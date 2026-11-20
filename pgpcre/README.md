@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/petere/pgpcre).
+
 ### 1. Add the pgpcre extension image to your Cluster
 
 ```yaml

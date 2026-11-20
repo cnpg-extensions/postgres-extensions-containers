@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/timescale/pg_textsearch).
+
 ### 1. Add the pg-textsearch extension image to your Cluster
 
 Define the `pg-textsearch` extension under the `postgresql.extensions` section of

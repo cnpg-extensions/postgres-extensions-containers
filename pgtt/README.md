@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/darold/pgtt/).
+
 ### 1. Add the pgtt extension image to your Cluster
 
 ```yaml

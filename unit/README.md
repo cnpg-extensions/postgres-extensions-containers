@@ -15,6 +15,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/df7cb/postgresql-unit).
+
 ### 1. Add the unit extension image to your Cluster
 
 ```yaml

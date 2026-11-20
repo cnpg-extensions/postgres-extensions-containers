@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://gitlab.com/dalibo/postgresql_anonymizer).
+
 ### 1. Add the postgresql-anonymizer extension image to your Cluster
 
 Add the extension image to your CloudNativePG Cluster and preload `anon`:

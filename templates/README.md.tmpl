@@ -8,6 +8,8 @@ SPDX-License-Identifier: Apache-2.0
 TODO: Replace this section with a brief introduction of your extension.
 Describe what the extension does and what it is useful for.
 Keep the introduction focused on user-facing functionality, without links.
+Keep supported-target lists and build, packaging, and test-history details out
+of this README.
 -->
 
 The {{ .Name }} PostgreSQL extension provides [describe the main functionality
@@ -22,8 +24,11 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://example.com).
+
 <!--
-TODO: Match the Cluster image name and Database SQL name to metadata.hcl.
+TODO: Replace the upstream documentation URL with the extension documentation.
+Match the Cluster image name and Database SQL name to metadata.hcl.
 Include required dependent extensions, preloads and PostgreSQL parameters.
 Use the catalog for image references and runtime settings; omit SQL versions
 from initial installation examples. Preserve extension-specific setup steps.
@@ -72,7 +77,12 @@ Once the database is ready, connect to it with `psql` and run:
 \dx {{ .Name }}
 ```
 
-You should see `{{ .Name }}` listed among the installed extensions.
+You should see `{{ .Name }}` listed with its installed SQL version.
+
+<!--
+TODO: Add a Known Caveats section when needed for user-facing setup or
+operational requirements.
+-->
 
 ## Licenses and Copyright
 

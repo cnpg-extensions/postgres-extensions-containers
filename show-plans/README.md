@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_show_plans).
+
 ### 1. Add the show-plans extension image to your Cluster
 
 Add the image to a Cluster and preload pg_show_plans:

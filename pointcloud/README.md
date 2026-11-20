@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgpointcloud/pointcloud).
+
 ### 1. Add the pointcloud extension image to your Cluster
 
 ```yaml

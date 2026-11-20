@@ -11,6 +11,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/PostgREST/pg_csv/).
+
 ### 1. Add the pg-csv extension image to your Cluster
 
 ```yaml

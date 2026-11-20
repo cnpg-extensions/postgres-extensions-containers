@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/powa-team/pg_qualstats).
+
 ### 1. Add the pg-qualstats extension image to your Cluster
 
 Add the image to a Cluster and preload pg_qualstats:

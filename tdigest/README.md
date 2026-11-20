@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/tvondra/tdigest).
+
 ### 1. Add the tdigest extension image to your Cluster
 
 ```yaml

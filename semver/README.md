@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://pgxn.org/dist/semver/doc/semver.html).
+
 ### 1. Add the semver extension image to your Cluster
 
 ```yaml

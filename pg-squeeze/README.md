@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_squeeze).
+
 ### 1. Add the pg-squeeze extension image to your Cluster
 
 Add the image to a Cluster and enable logical decoding for this extension:

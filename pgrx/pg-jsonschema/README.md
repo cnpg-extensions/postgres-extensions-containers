@@ -18,6 +18,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/supabase/pg_jsonschema).
+
 ### 1. Add the pg-jsonschema extension image to your Cluster
 
 Define the `pg-jsonschema` extension under the `postgresql.extensions` section

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/HypoPG/hypopg).
+
 ### 1. Add the hypopg extension image to your Cluster
 
 Add the image to a Cluster:

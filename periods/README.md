@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/xocolatl/periods).
+
 ### 1. Add the periods extension image to your Cluster
 
 ```yaml

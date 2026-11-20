@@ -27,6 +27,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/paradedb/paradedb).
+
 ### 1. Add the pg-search extension image to your Cluster
 
 Define the `pg-search` extension under the `postgresql.extensions` section of

@@ -12,9 +12,10 @@ is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
 keep your instance and storage settings, following any extension-specific
 requirements below.
 
-[Upstream project](https://github.com/greenbone/pg-gvm).
 
 ## Usage
+
+For more information, see the [upstream documentation](https://github.com/greenbone/pg-gvm).
 
 ### 1. Add the pg-gvm extension image to your Cluster
 

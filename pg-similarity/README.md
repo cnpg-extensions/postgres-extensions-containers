@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/eulerto/pg_similarity).
+
 ### 1. Add the pg-similarity extension image to your Cluster
 
 ```yaml

@@ -16,6 +16,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/xocolatl/extra_window_functions).
+
 ### 1. Add the extra-window-functions extension image to your Cluster
 
 ```yaml

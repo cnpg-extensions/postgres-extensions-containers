@@ -12,6 +12,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pgnodemx/pgnodemx).
+
 ### 1. Add the pgnodemx extension image to your Cluster
 
 ```yaml

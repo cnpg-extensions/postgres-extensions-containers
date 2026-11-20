@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/df7cb/toastinfo).
+
 ### 1. Add the toastinfo extension image to your Cluster
 
 Add the image to a Cluster:

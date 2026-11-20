@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/pmpetit/pglinter).
+
 ### 1. Add the pglinter extension image to your Cluster
 
 Define the `pglinter` extension under the `postgresql.extensions` section

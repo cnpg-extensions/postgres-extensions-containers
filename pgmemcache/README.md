@@ -17,6 +17,8 @@ requirements below.
 
 ## Usage
 
+For more information, see the [upstream documentation](https://github.com/ohmu/pgmemcache).
+
 ### 1. Add the pgmemcache extension image to your Cluster
 
 Define the `pgmemcache` extension under the `postgresql.extensions` section of
