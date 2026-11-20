@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-`pg_repack` rebuilds tables and indexes while allowing normal reads and writes.
+[pg_repack](https://github.com/reorg/pg_repack) rebuilds tables and indexes while allowing normal reads and writes.
 The server image provides the PostgreSQL extension library and SQL objects. The
 `pg_repack` client is run separately and must match the server's PostgreSQL
 major and extension version.

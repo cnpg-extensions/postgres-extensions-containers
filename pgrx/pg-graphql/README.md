@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_graphql adds GraphQL support to PostgreSQL. It reflects the SQL schema and
+[pg_graphql](https://github.com/supabase/pg_graphql) adds GraphQL support to PostgreSQL. It reflects the SQL schema and
 exposes it through the `graphql.resolve(...)` SQL function, so clients can query
 the database with GraphQL without a separate application server.
 

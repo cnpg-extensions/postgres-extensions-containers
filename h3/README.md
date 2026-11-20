@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-h3-pg is a PostgreSQL extension that binds the Uber H3 hierarchical hexagonal
+[h3-pg](https://github.com/zachasme/h3-pg) is a PostgreSQL extension that binds the Uber H3 hierarchical hexagonal
 geospatial indexing system to PostgreSQL. It enables efficient geospatial
 analysis using H3 cell indexes.
 

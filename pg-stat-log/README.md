@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-`pg_stat_log` collects cumulative counts of server log messages grouped by
+[pg_stat_log](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by
 backend, database, role, severity, and SQLSTATE, with optional grouping by query
 identifier. It must be preloaded.
 

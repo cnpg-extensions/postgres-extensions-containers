@@ -1,6 +1,6 @@
 # pg_track_settings
 
-pg_track_settings records PostgreSQL configuration changes so you can review how
+[pg_track_settings](https://powa.readthedocs.io/) records PostgreSQL configuration changes so you can review how
 settings have changed over time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

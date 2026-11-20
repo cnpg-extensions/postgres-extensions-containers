@@ -1,6 +1,6 @@
 # ogr_fdw
 
-ogr_fdw exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. It
+[ogr_fdw](https://github.com/pramsey/pgsql-ogr-fdw) exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. It
 can read local files and remote datasets supported by the bundled GDAL build. It
 does not run an external GIS service.
 

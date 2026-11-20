@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-`pg_statviz` captures PostgreSQL statistics in database tables for later SQL
+[pg_statviz](https://github.com/vyruss/pg_statviz) captures PostgreSQL statistics in database tables for later SQL
 analysis. The report generator and chart output are provided by a user-operated
 external client; this image adds no listener or web UI.
 

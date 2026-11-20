@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pgfaceting uses Roaring bitmap indexes to compute fast facet counts for filtered
+[pgfaceting](https://github.com/cybertec-postgresql/pgfaceting) uses Roaring bitmap indexes to compute fast facet counts for filtered
 searches.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

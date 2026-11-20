@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pgPointcloud adds PostgreSQL types and functions for storing, querying, and
+[pgPointcloud](https://github.com/pgpointcloud/pointcloud) adds PostgreSQL types and functions for storing, querying, and
 transforming LiDAR point-cloud data. Point formats and values live in database
 tables; the extension does not need to write container files.
 

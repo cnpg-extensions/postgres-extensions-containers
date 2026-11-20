@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_stat_plans tracks aggregate per-plan call counts, execution times, plan IDs,
+[pg_stat_plans](https://github.com/pganalyze/pg_stat_plans) tracks aggregate per-plan call counts, execution times, plan IDs,
 and `EXPLAIN` plan text in PostgreSQL. It is useful for identifying plan
 regressions and comparing different plans chosen for the same query.
 

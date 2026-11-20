@@ -1,6 +1,6 @@
 # pgTAP
 
-pgTAP lets you write and run tests for database objects and behavior using SQL.
+[pgTAP](https://pgtap.org/) lets you write and run tests for database objects and behavior using SQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PoWA records PostgreSQL workload statistics and snapshots so you can analyze
+[PoWA](https://powa.readthedocs.io/en/stable/) records PostgreSQL workload statistics and snapshots so you can analyze
 database activity over time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

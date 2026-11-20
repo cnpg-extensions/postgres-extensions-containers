@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_pwhash provides adaptive Argon2, scrypt, and yescrypt password-hashing
+[pg_pwhash](https://github.com/cybertec-postgresql/pg_pwhash) provides adaptive Argon2, scrypt, and yescrypt password-hashing
 functions backed by packaged cryptographic libraries.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

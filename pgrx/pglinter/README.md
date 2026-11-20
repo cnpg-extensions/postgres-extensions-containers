@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pglinter checks PostgreSQL databases for schema design and configuration
+[pglinter](https://github.com/pmpetit/pglinter) checks PostgreSQL databases for schema design and configuration
 problems, including missing primary keys, redundant indexes, and missing indexes
 on foreign keys.
 

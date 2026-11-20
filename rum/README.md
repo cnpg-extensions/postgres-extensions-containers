@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-rum adds the RUM index access method, including full-text search indexing and
+[rum](https://github.com/postgrespro/rum) adds the RUM index access method, including full-text search indexing and
 ordering support.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

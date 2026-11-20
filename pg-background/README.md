@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-`pg_background` runs SQL in PostgreSQL background workers and returns completion
+[pg_background](https://github.com/vibhorkum/pg_background) runs SQL in PostgreSQL background workers and returns completion
 metadata to the calling session. It does not require `shared_preload_libraries`;
 preloading is only needed if you want to set its GUCs in server configuration
 before first use.

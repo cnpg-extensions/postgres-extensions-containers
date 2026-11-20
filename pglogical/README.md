@@ -1,6 +1,6 @@
 # pglogical
 
-pglogical replicates selected tables between PostgreSQL databases using logical
+[pglogical](https://github.com/2ndQuadrant/pglogical) replicates selected tables between PostgreSQL databases using logical
 replication.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

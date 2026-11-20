@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_stat_tcpinfo exposes live Linux TCP socket statistics through SQL so you can
+[pg_stat_tcpinfo](https://github.com/jakubwartakEDB/pg_stat_tcpinfo) exposes live Linux TCP socket statistics through SQL so you can
 inspect PostgreSQL connections.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

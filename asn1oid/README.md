@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-asn1oid adds an ASN.1 object identifier type so you can store and compare
+[asn1oid](https://github.com/df7cb/pgsql-asn1oid) adds an ASN.1 object identifier type so you can store and compare
 hierarchical identifiers in PostgreSQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

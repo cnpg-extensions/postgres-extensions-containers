@@ -1,6 +1,6 @@
 # RDKit PostgreSQL cartridge
 
-RDKit provides cheminformatics types and functions in PostgreSQL, including
+[RDKit](https://github.com/rdkit/rdkit) provides cheminformatics types and functions in PostgreSQL, including
 SMILES parsing, molecule fingerprints and molecular descriptors.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

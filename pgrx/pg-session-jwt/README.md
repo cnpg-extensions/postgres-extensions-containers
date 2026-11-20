@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_session_jwt is a PostgreSQL extension for managing authenticated sessions
+[pg_session_jwt](https://github.com/neondatabase/pg_session_jwt) is a PostgreSQL extension for managing authenticated sessions
 through JSON Web Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT
 authenticity and exposes the validated claims to SQL. Without a JWK, it can use
 PostgREST-compatible JWT claims for identifying the current user.

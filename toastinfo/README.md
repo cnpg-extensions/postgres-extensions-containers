@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-toastinfo describes how PostgreSQL stores variable-length values, including
+[toastinfo](https://github.com/df7cb/toastinfo) describes how PostgreSQL stores variable-length values, including
 inline, compressed, and out-of-line TOAST values. It does not need to be
 preloaded.
 

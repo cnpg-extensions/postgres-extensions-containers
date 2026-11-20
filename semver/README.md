@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-semver provides a semantic-version data type with comparison and ordering
+[semver](https://pgxn.org/dist/semver/doc/semver.html) provides a semantic-version data type with comparison and ordering
 operators.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

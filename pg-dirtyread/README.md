@@ -1,6 +1,6 @@
 # pg_dirtyread
 
-pg_dirtyread lets you inspect dead rows that have not yet been removed by
+[pg_dirtyread](https://github.com/df7cb/pg_dirtyread) lets you inspect dead rows that have not yet been removed by
 VACUUM.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-icu_ext exposes ICU internationalization functions for text transformation,
+[icu_ext](https://github.com/dverite/icu_ext) exposes ICU internationalization functions for text transformation,
 comparison, collation, and Unicode metadata.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

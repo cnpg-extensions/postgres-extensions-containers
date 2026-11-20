@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-orafce implements a subset of Oracle-compatible SQL functions and packages,
+[orafce](https://github.com/orafce/orafce) implements a subset of Oracle-compatible SQL functions and packages,
 including NVL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

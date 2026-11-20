@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Apache AGE is a PostgreSQL extension that provides graph database functionality,
+[Apache AGE](https://age.apache.org/) is a PostgreSQL extension that provides graph database functionality,
 enabling you to store, query, and analyze graph data using Cypher queries
 alongside SQL. It is based on the openCypher graph query language.
 

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-HypoPG provides hypothetical indexes for PostgreSQL. It lets you compare query
+[HypoPG](https://github.com/HypoPG/hypopg) provides hypothetical indexes for PostgreSQL. It lets you compare query
 plans with an index that has not been physically created.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

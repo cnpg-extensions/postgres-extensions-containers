@@ -1,6 +1,6 @@
 # pg-gvm
 
-pg-gvm adds Greenbone helper functions to PostgreSQL, including host-list
+[pg-gvm](https://github.com/greenbone/pg-gvm) adds Greenbone helper functions to PostgreSQL, including host-list
 matching, regular-expression matching and iCalendar schedule calculations. It
 supplies the SQL library only; it does not install or operate Greenbone
 Vulnerability Manager services.

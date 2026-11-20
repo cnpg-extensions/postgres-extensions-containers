@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_durable is a PostgreSQL extension for durable, fault-tolerant SQL workflows.
+[pg_durable](https://github.com/microsoft/pg_durable) is a PostgreSQL extension for durable, fault-tolerant SQL workflows.
 It checkpoints composable SQL steps in PostgreSQL so executions can resume after
 crashes, restarts, or failed steps, without an external orchestration service.
 

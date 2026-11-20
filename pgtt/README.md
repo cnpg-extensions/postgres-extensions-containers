@@ -1,6 +1,6 @@
 # pgtt
 
-pgtt provides global temporary tables with shared definitions and session-local
+[pgtt](https://github.com/darold/pgtt/) provides global temporary tables with shared definitions and session-local
 data.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

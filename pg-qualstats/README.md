@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_qualstats gathers statistics about predicates found in WHERE and JOIN
+[pg_qualstats](https://github.com/powa-team/pg_qualstats) gathers statistics about predicates found in WHERE and JOIN
 clauses. The statistics help identify frequently used predicates and potentially
 missing indexes.
 

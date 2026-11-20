@@ -1,6 +1,6 @@
 # credcheck
 
-credcheck checks usernames and passwords against configurable policies when
+[credcheck](https://github.com/MigOpsRepos/credcheck) checks usernames and passwords against configurable policies when
 roles are created or credentials change.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

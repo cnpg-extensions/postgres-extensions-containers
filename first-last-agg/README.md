@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-first_last_agg provides first() and last() aggregates that follow an explicit
+[first_last_agg](https://github.com/wulczer/first_last_agg) provides first() and last() aggregates that follow an explicit
 ORDER BY within each aggregate.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

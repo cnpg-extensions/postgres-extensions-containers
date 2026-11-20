@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pldebugger is a PostgreSQL extension that provides a server-side debugger for
+[pldebugger](https://github.com/EnterpriseDB/pldebugger) is a PostgreSQL extension that provides a server-side debugger for
 PL/pgSQL functions and procedures. It enables step-by-step debugging,
 breakpoints, and variable inspection for stored procedures, and is supported by
 tools such as pgAdmin.

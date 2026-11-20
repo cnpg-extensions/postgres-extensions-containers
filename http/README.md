@@ -5,7 +5,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-http adds HTTP client functions to PostgreSQL so SQL can call HTTP services
+[http](https://github.com/pramsey/pgsql-http) adds HTTP client functions to PostgreSQL so SQL can call HTTP services
 through libcurl.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

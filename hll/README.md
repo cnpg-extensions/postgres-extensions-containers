@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-hll provides HyperLogLog types and aggregates for approximate distinct-counting.
+[hll](https://github.com/citusdata/postgresql-hll) provides HyperLogLog types and aggregates for approximate distinct-counting.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

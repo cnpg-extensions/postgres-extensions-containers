@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-`pg_wait_sampling` samples PostgreSQL wait events and exposes current,
+[pg_wait_sampling](https://github.com/postgrespro/pg_wait_sampling) samples PostgreSQL wait events and exposes current,
 historical, and aggregated profile views in SQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

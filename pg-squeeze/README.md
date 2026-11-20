@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-pg_squeeze reclaims unused table space and can sort rows according to an index
+[pg_squeeze](https://github.com/cybertec-postgresql/pg_squeeze) reclaims unused table space and can sort rows according to an index
 while allowing normal reads and writes for most of the operation.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

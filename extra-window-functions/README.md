@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-extra_window_functions adds window functions such as lag_ignore_nulls and
+[extra_window_functions](https://github.com/xocolatl/extra_window_functions) adds window functions such as lag_ignore_nulls and
 lead_ignore_nulls.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

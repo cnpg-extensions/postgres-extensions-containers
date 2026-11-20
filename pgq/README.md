@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-PgQ provides a transactional event queue in PostgreSQL for applications that
+[PgQ](https://github.com/pgq/pgq) provides a transactional event queue in PostgreSQL for applications that
 process events asynchronously.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

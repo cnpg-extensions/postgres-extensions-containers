@@ -1,6 +1,6 @@
 # plsh
 
-PL/sh lets you write PostgreSQL functions as shell scripts.
+[PL/sh](https://github.com/petere/plsh) lets you write PostgreSQL functions as shell scripts.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-roaringbitmap provides compressed Roaring bitmap data structures and set
+[roaringbitmap](https://github.com/ChenHuajun/pg_roaringbitmap) provides compressed Roaring bitmap data structures and set
 operations for PostgreSQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

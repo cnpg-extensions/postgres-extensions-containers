@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-plprofiler is a PostgreSQL extension that provides execution profiling for
+[plprofiler](https://github.com/bigsql/plprofiler) is a PostgreSQL extension that provides execution profiling for
 PL/pgSQL functions and procedures. It collects per-statement call counts, total
 execution time, and self-time, helping you identify performance bottlenecks in
 stored procedure code.
