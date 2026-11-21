@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Captures PostgreSQL statistics in database tables for later SQL
-analysis. The report generator and chart output are provided by a user-operated
-external client; this image adds no listener or web UI.
+Captures PostgreSQL statistics in database tables for later SQL analysis.
+Use it to compare database activity before and during a slowdown.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +17,9 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/vyruss/pg_statviz).
+
+The report generator and chart output are provided by a user-operated external
+client; this image adds no listener or web UI.
 
 ### 1. Add the pg-statviz extension image to your Cluster
 

@@ -4,7 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides exact integer-fraction arithmetic in PostgreSQL.
+Provides exact integer-fraction arithmetic in PostgreSQL. Use it to calculate
+with fractions such as one third without rounding them to decimals.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

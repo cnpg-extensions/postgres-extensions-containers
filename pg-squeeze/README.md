@@ -4,8 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Reclaims unused table space and can sort rows according to an index
-while allowing normal reads and writes for most of the operation.
+Reclaims unused table space and can sort rows according to an index while
+allowing normal reads and writes for most of the operation.
+Use it to automatically shrink tables that have grown wasteful after many
+updates and deletions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

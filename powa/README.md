@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Records PostgreSQL workload statistics and snapshots so you can analyze
-database activity over time.
+database activity over time. Use it to look back at which queries made your
+database busy during a slowdown.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

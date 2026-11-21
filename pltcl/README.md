@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lets you write PostgreSQL functions in Tcl. It provides the trusted
-`pltcl` and untrusted `pltclu` language variants.
+Lets you write PostgreSQL functions in Tcl. Use it to update a row’s change
+counter automatically with a small Tcl script.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides DB2-compatible SQL functions and types, including date and time
-helpers in the `db2` schema.
+helpers in the `db2` schema. Use it to move an application from DB2 to
+PostgreSQL with fewer changes to its SQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

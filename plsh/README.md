@@ -1,6 +1,7 @@
 # plsh
 
-Lets you write PostgreSQL functions as shell scripts.
+Lets you write PostgreSQL functions as shell scripts. Use it to call an
+existing shell script from SQL and read back its output.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

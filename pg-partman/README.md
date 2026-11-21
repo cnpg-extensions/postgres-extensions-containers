@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Creates and maintains time-based and ID-based PostgreSQL partition
-sets. Its optional background worker can run partition maintenance
-automatically.
+Creates and maintains time-based and ID-based PostgreSQL partition sets. Use
+it to split growing data into manageable tables and retire old data, such as
+keeping only recent months of records.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -20,6 +20,8 @@ requirements below.
 For more information, see the [upstream documentation](https://github.com/pgpartman/pg_partman).
 
 ### 1. Add the pg-partman extension image to your Cluster
+
+Its optional background worker can run partition maintenance automatically.
 
 Add the image to a Cluster and preload the background worker:
 

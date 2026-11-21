@@ -4,9 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds a native `debversion` data type
-for representing and sorting Debian package version strings according to the
-Debian versioning algorithm (as defined in Debian Policy).
+Adds a native `debversion` data type for representing and sorting Debian
+package version strings according to the Debian versioning algorithm (as
+defined in Debian Policy). Use it to find the newest Debian package in a list,
+even when version numbers contain letters or punctuation.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

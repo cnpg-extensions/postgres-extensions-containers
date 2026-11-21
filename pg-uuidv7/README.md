@@ -4,10 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides functions for generating and
-working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID
-format that embeds a Unix timestamp, making it more suitable than UUID v4 for
-use as database primary keys.
+Provides functions for generating and working with UUID version 7 (UUIDv7)
+identifiers.
+Use it to give new records unique IDs that sort roughly in the order they were
+created.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

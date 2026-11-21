@@ -7,6 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Adds a PCRE2-backed regular-expression type and capture functions to
 PostgreSQL.
+Use it to pull matching pieces, such as reference numbers, out of stored text.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

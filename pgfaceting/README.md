@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Uses Roaring bitmap indexes to compute fast facet counts for filtered
-searches.
+searches. Use it to show how many results match each filter option, such as
+a size or color, as a search narrows.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

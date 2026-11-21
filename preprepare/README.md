@@ -1,7 +1,8 @@
 # preprepare
 
-Lets you define prepared SQL statements on the server for reuse by
-database sessions.
+Lets you define prepared SQL statements on the server for reuse by database
+sessions. Use it to have common application queries ready to run when a
+database connection opens.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

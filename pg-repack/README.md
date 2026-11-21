@@ -5,9 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Rebuilds tables and indexes while allowing normal reads and writes.
-The server image provides the PostgreSQL extension library and SQL objects. The
-`pg_repack` client is run separately and must match the server's PostgreSQL
-major and extension version.
+Use it to recover disk space wasted by old row versions in busy tables.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -19,6 +17,10 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/reorg/pg_repack).
+
+The server image provides the PostgreSQL extension library and SQL objects. The
+`pg_repack` client is run separately and must match the server's PostgreSQL
+major and extension version.
 
 ### 1. Add the pg-repack extension image to your Cluster
 

@@ -5,8 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Supports durable, fault-tolerant SQL workflows.
-It checkpoints composable SQL steps in PostgreSQL so executions can resume after
-crashes, restarts, or failed steps, without an external orchestration service.
+Use it to run a multi-step data import that can resume after a database
+restart.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

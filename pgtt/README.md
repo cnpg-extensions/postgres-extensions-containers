@@ -1,7 +1,8 @@
 # pgtt
 
 Provides global temporary tables with shared definitions and session-local
-data.
+data. Use it to give each connection its own temporary workspace while
+sharing the same table definition.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

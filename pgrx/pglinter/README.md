@@ -4,9 +4,11 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Checks PostgreSQL databases for schema design and configuration
-problems, including missing primary keys, redundant indexes, and missing indexes
-on foreign keys.
+Checks PostgreSQL databases for schema design and configuration problems,
+including missing primary keys, redundant indexes, and missing indexes on
+foreign keys.
+Use it to spot database design mistakes before they cause problems for your
+application.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

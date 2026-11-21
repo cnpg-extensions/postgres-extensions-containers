@@ -2,6 +2,8 @@
 
 Exposes host and container operating system metrics through PostgreSQL
 functions.
+Use it to check the database container’s memory use and limits without logging
+into its host.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

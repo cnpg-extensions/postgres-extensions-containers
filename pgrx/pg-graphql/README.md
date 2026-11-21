@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds GraphQL support to PostgreSQL. It reflects the SQL schema and
-exposes it through the `graphql.resolve(...)` SQL function, so clients can query
-the database with GraphQL without a separate application server.
+Adds GraphQL support to PostgreSQL. Use it to fetch related records
+together, such as a post and its author, with one GraphQL query.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +17,10 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/supabase/pg_graphql).
+
+It reflects the SQL schema and exposes it through the `graphql.resolve(...)`
+SQL function, so clients can query the database with GraphQL without a separate
+application server.
 
 ### 1. Add the pg-graphql extension image to your Cluster
 

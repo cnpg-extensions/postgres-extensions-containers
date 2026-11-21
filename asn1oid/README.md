@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds an ASN.1 object identifier type so you can store and compare
-hierarchical identifiers in PostgreSQL.
+Adds an ASN.1 object identifier type so you can store and compare hierarchical
+identifiers in PostgreSQL. Use it to sort dotted identifiers such as `1.3.6.1`
+by their numbered parts.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,10 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Manages authenticated sessions
-through JSON Web Tokens (JWTs). With a JSON Web Key (JWK), it verifies JWT
-authenticity and exposes the validated claims to SQL. Without a JWK, it can use
-PostgREST-compatible JWT claims for identifying the current user.
+Manages authenticated sessions through JSON Web Tokens (JWTs).
+Use it to identify the signed-in user when deciding which rows they may see.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -19,6 +17,10 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/neondatabase/pg_session_jwt).
+
+With a JSON Web Key (JWK), it verifies JWT authenticity and exposes the
+validated claims to SQL. Without a JWK, it can use PostgREST-compatible JWT
+claims for identifying the current user.
 
 ### 1. Add the pg-session-jwt extension image to your Cluster
 

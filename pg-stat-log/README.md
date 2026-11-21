@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Collects cumulative counts of server log messages grouped by
-backend, database, role, severity, and SQLSTATE, with optional grouping by query
-identifier.
+Collects cumulative counts of server log messages grouped by backend, database,
+role, severity, and SQLSTATE, with optional grouping by query identifier.
+Use it to see which databases or users are producing the most errors.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

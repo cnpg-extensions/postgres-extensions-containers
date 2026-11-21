@@ -4,7 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds a timestamp type with nanosecond precision.
+Adds a timestamp type with nanosecond precision. Use it to keep very closely
+timed events in order without losing their nanosecond timestamps.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

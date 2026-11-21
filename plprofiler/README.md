@@ -4,10 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides execution profiling for
-PL/pgSQL functions and procedures. It collects per-statement call counts, total
-execution time, and self-time, helping you identify performance bottlenecks in
-stored procedure code.
+Provides execution profiling for PL/pgSQL functions and procedures. Use it to
+find which line of a database function is taking the most time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides first() and last() aggregates that follow an explicit
-ORDER BY within each aggregate.
+Provides first() and last() aggregates that follow an explicit ORDER BY within
+each aggregate. Use it to pick the first and last values in each group after
+putting them in the order you choose.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

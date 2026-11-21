@@ -1,8 +1,7 @@
 # ogr_fdw
 
-Exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. It
-can read local files and remote datasets supported by the bundled GDAL build. It
-does not run an external GIS service.
+Exposes GDAL/OGR vector data sources as PostgreSQL foreign tables. Use it to
+combine map data from a GeoJSON file with records already in your database.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +17,9 @@ The image sets GDAL_DATA to its bundled coordinate-system data directory and sta
 For more information, see the [upstream documentation](https://github.com/pramsey/pgsql-ogr-fdw).
 
 ### 1. Add the ogr-fdw extension image to your Cluster
+
+It can read local files and remote datasets supported by the bundled GDAL
+build. It does not run an external GIS service.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1

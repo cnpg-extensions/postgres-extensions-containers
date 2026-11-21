@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lets you write PostgreSQL functions in Lua. It provides trusted `pllua`,
-untrusted `plluau`, and optional hstore transforms.
+Lets you write PostgreSQL functions in Lua. Use it to process database
+values with Lua, such as calculating a total whenever a row is saved.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

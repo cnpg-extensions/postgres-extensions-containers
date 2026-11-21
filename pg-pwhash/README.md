@@ -5,8 +5,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides adaptive Argon2, scrypt, and yescrypt password-hashing
-functions backed by packaged cryptographic libraries.
+Provides adaptive Argon2, scrypt, and yescrypt password-hashing functions
+backed by packaged cryptographic libraries. Use it to store and check
+application passwords as hashes instead of saving the passwords themselves.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,9 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Collects per-query kernel statistics, including CPU time and
-filesystem reads and writes. It uses the query identifiers supplied by the
-bundled pg_stat_statements extension.
+Collects per-query kernel statistics, including CPU time and filesystem reads
+and writes.
+Use it to find which queries use the most processor time or read the most data
+from disk.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +19,9 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/powa-team/pg_stat_kcache).
+
+It uses the query identifiers supplied by the bundled pg_stat_statements
+extension.
 
 ### 1. Add the pg-stat-kcache extension image to your Cluster
 

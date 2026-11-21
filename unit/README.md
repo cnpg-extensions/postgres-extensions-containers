@@ -4,7 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides SI unit values, conversions and arithmetic.
+Provides SI unit values, conversions and arithmetic. Use it to add measurements
+recorded in meters and feet without doing the conversions yourself.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

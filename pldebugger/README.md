@@ -4,10 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides a server-side debugger for
-PL/pgSQL functions and procedures. It enables step-by-step debugging,
-breakpoints, and variable inspection for stored procedures, and is supported by
-tools such as pgAdmin.
+Provides a server-side debugger for PL/pgSQL functions and procedures. Use it
+with pgAdmin to pause a misbehaving function and inspect its values one step at
+a time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

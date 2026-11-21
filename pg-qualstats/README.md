@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Gathers statistics about predicates found in WHERE and JOIN
-clauses. The statistics help identify frequently used predicates and potentially
-missing indexes.
+Gathers statistics about predicates found in WHERE and JOIN clauses. Use it to
+see which columns people filter on most when deciding where an index might
+help.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

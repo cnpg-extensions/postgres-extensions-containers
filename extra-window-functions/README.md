@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds window functions such as lag_ignore_nulls and
-lead_ignore_nulls.
+Adds window functions such as lag_ignore_nulls and lead_ignore_nulls. Use it to
+compare a value with earlier or later values in a list, skipping missing ones.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -5,6 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides HyperLogLog types and aggregates for approximate distinct-counting.
+Use it to estimate how many different values appear in a large dataset, such
+as unique visitors to a website.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

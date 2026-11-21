@@ -1,7 +1,8 @@
 # pg_dirtyread
 
-Lets you inspect dead rows that have not yet been removed by
-VACUUM.
+Lets you inspect dead rows that have not yet been removed by VACUUM. Use it to
+inspect accidentally deleted records while their old contents are still on
+disk.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

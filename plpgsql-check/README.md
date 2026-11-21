@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lints PL/pgSQL. It checks embedded SQL and PL/pgSQL
-behavior that PostgreSQL's function validator cannot detect at function creation
-time.
+Lints PL/pgSQL. Use it to catch mistakes such as a misspelled column name
+before a function runs.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

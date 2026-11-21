@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lets you anonymize data and define masking rules through
-the `anon` SQL extension. It includes fake-data datasets for generating
-replacement values.
+Lets you anonymize data and define masking rules through the `anon` SQL
+extension. Use it to replace sensitive data with fake values for testing,
+such as names and contact details.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

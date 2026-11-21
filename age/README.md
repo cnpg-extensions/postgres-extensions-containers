@@ -4,9 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides graph database functionality,
-enabling you to store, query, and analyze graph data using Cypher queries
-alongside SQL. It is based on the openCypher graph query language.
+Provides graph database functionality, enabling you to store, query, and
+analyze graph data using Cypher queries alongside SQL. Use it to find
+connections in your data, such as friends of friends. It is based on the
+openCypher graph query language.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

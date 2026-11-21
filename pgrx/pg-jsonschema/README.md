@@ -4,10 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds support for JSON Schema
-validation on the `json` and `jsonb` data types. JSON Schema describes the
-expected structure and constraints of JSON documents, allowing the extension to
-validate values, check schemas, and report validation errors directly in SQL.
+Adds support for JSON Schema validation on the `json` and `jsonb` data types.
+Use it to reject JSON records that are missing required fields or contain the
+wrong kinds of values.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

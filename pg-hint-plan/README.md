@@ -4,7 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds optimizer hints to PostgreSQL. Hints are written in SQL
+Adds optimizer hints to PostgreSQL. Use it to try a different way of running a
+slow query, such as choosing a particular index. Hints are written in SQL
 comments and can choose scan methods, join methods, and other planner behavior
 for individual queries.
 

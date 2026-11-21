@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Runs SQL in PostgreSQL background workers and returns completion
-metadata to the calling session.
+Runs SQL in PostgreSQL background workers and returns completion metadata to
+the calling session. Use it to launch a long-running database task while your
+session continues with other work.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

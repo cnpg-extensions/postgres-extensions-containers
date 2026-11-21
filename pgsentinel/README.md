@@ -4,8 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Samples active session history into an in-memory ring buffer and
-links session activity with pg_stat_statements.
+Samples active session history into an in-memory ring buffer and links session
+activity with pg_stat_statements.
+Use it to look back at which queries were running or waiting during a recent
+slowdown.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

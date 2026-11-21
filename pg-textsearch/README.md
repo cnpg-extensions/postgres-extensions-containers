@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides full-text search with BM25 relevance
-ranking.
+Provides full-text search with BM25 relevance ranking. Use it to search
+stored text and show the most relevant matches first, such as matching
+articles or descriptions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

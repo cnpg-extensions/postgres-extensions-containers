@@ -2,6 +2,7 @@
 
 Replicates selected tables between PostgreSQL databases using logical
 replication.
+Use it to keep copies of selected tables up to date in another database.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

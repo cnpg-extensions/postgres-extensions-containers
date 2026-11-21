@@ -5,9 +5,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds PostgreSQL types and functions for storing, querying, and
-transforming LiDAR point-cloud data. Point formats and values live in database
-tables; the extension does not need to write container files.
+Adds PostgreSQL types and functions for storing, querying, and transforming
+LiDAR point-cloud data. Use it to store and examine collections of measured
+points in space, such as laser scans of buildings or terrain.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

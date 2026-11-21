@@ -1,6 +1,8 @@
 # pg_rewrite
 
 Lets you rewrite PostgreSQL tables with less locking.
+Use it to change a large table’s column types while keeping the table available
+for most of the work.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

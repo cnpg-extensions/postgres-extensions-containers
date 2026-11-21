@@ -1,7 +1,8 @@
 # set_user
 
-Lets you switch database roles with additional control and audit
-logging.
+Lets you switch database roles with additional control and audit logging. Use
+it to let an administrator perform maintenance under another role while
+recording the role change.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

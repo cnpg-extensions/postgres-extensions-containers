@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides a simple cron-based job
-scheduler for PostgreSQL, allowing you to schedule PostgreSQL commands directly
-from the database.
+Provides a simple cron-based job scheduler for PostgreSQL, allowing you to
+schedule PostgreSQL commands directly from the database. Use it to delete old
+records every night or refresh a report every hour.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

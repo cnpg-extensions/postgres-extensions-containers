@@ -4,10 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Indexes and queries sky survey data using spherical coordinate systems
-with Quad Tree Cube (Q3C). It provides efficient spatial
-indexing of astronomical objects (stars, galaxies) by right ascension and
-declination, enabling fast cone searches and neighbor lookups.
+Indexes and queries sky survey data using spherical coordinate systems with
+Quad Tree Cube (Q3C). Use it to find nearby stars or match the same objects
+across two sky catalogs.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

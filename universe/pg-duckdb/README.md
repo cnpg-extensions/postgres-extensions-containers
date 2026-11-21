@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Integrates DuckDB's analytical query engine with PostgreSQL. It
-supports analytical queries over PostgreSQL tables and external data.
+Integrates DuckDB's analytical query engine with PostgreSQL. Use it to
+summarize large datasets with SQL, such as calculating totals across
+millions of records.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

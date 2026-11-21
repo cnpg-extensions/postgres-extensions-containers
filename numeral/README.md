@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides a compact numeral data type with arithmetic, comparison and
-bitwise operators.
+Provides numeric types that read and write numbers as English or German words
+or Roman numerals. Use it to calculate with values written as words, such as
+adding "thirty" and "twelve" to get "forty-two".
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

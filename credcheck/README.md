@@ -1,7 +1,8 @@
 # credcheck
 
-Checks usernames and passwords against configurable policies when
-roles are created or credentials change.
+Checks usernames and passwords against configurable policies when roles are
+created or credentials change. Use it to stop database users from choosing
+passwords that are too short or easy to guess.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

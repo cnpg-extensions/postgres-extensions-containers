@@ -1,7 +1,9 @@
 # pgextwlist
 
-Lets administrators allow non-superusers to install an approved
-selection of PostgreSQL extensions.
+Lets administrators allow non-superusers to install an approved selection of
+PostgreSQL extensions.
+Use it to let application teams enable approved extensions without giving them
+full control of the server.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

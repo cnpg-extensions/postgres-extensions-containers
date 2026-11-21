@@ -4,10 +4,11 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[ParadeDB](https://github.com/paradedb/paradedb) provides a custom index for fast full-text and vector
-search, BM25 scoring, filters, facets, aggregations, and joins. It keeps your
-application data and search engine in one database with standard SQL and ACID
-transactions.
+[ParadeDB](https://github.com/paradedb/paradedb) provides a custom index for
+fast full-text and vector search, BM25 scoring, filters, facets,
+aggregations, and joins. Use it to search and rank database records while
+filtering the results, such as finding items that match both keywords and
+categories.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

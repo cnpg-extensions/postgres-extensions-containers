@@ -1,9 +1,8 @@
 # pg-gvm
 
-Adds Greenbone helper functions to PostgreSQL, including host-list
-matching, regular-expression matching and iCalendar schedule calculations. It
-supplies the SQL library only; it does not install or operate Greenbone
-Vulnerability Manager services.
+Adds Greenbone helper functions to PostgreSQL, including host-list matching,
+regular-expression matching and iCalendar schedule calculations. Use it in
+Greenbone workflows to check which computers match a scan target list.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +17,9 @@ requirements below.
 For more information, see the [upstream documentation](https://github.com/greenbone/pg-gvm).
 
 ### 1. Add the pg-gvm extension image to your Cluster
+
+The image supplies the SQL library only; it does not install or operate
+Greenbone Vulnerability Manager services.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1

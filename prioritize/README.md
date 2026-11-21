@@ -1,7 +1,8 @@
 # prioritize
 
-Lets you inspect and change the operating system scheduling priority
-of PostgreSQL backends.
+Lets you inspect and change the operating system scheduling priority of
+PostgreSQL backends. Use it to give a long report less CPU priority so more
+urgent queries can take precedence.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -12,7 +13,7 @@ requirements below.
 
 ## Usage
 
-For more information, see the [upstream documentation](http://pgxn.org/dist/prioritize/).
+For more information, see the [upstream documentation](https://github.com/schmiddy/pg_prioritize).
 
 ### 1. Add the prioritize extension image to your Cluster
 
@@ -56,6 +57,15 @@ Once the database is ready, connect to it with `psql` and run:
 You should see `prioritize` listed with its installed SQL version.
 
 ## Operation and privileges
+
+**Caution:** Lowering a backend's CPU priority can also delay other backends
+waiting for locks it holds, including internal spinlocks. This can cause
+priority inversion: higher-priority work waits for a lower-priority process to
+get CPU time and release a lock. PostgreSQL's spinlock waits back off to give
+the lock holder a chance to run, but do not automatically raise its priority.
+Exercise care and test under CPU contention before changing priorities in
+production. See the [PostgreSQL spinlock implementation](https://github.com/postgres/postgres/blob/master/src/backend/storage/lmgr/s_lock.c)
+for the scheduling and starvation considerations.
 
 Backend priority functions require database privileges and are subject to OS permissions. An unprivileged CNPG process can lower its scheduling priority by increasing the nice value; raising priority normally requires CAP_SYS_NICE and is not supported. No extra capability is requested.
 

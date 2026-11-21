@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides t-digest aggregates for approximate quantile and percentile
-calculations.
+calculations. Use it to estimate a cutoff below which most values fall, such
+as the time within which 95% of requests finish.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -1,6 +1,7 @@
 # pg_csv
 
-Lets you parse and generate CSV data directly in PostgreSQL.
+Lets you parse and generate CSV data directly in PostgreSQL. Use it to turn
+query results into CSV text that a spreadsheet can read.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

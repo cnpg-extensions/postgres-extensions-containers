@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds support for iCalendar recurrence
-rules (RRULE) as a native data type. It allows you to store and process
-recurring event schedules using the standard RFC 5545 iCalendar format.
+Adds support for iCalendar recurrence rules (RRULE) as a native data type.
+Use it to work out the dates of repeating events, such as a meeting every
+Monday.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

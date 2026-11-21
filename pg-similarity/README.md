@@ -1,7 +1,8 @@
 # pg_similarity
 
-Provides text similarity functions for comparing strings and
-finding approximate matches.
+Provides text similarity functions for comparing strings and finding
+approximate matches. Use it to find text that is nearly the same, such as
+names with small spelling differences.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

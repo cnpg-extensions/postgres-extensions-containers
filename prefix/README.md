@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides prefix ranges over text values for prefix-based lookup and
-indexing.
+indexing. Use it to match text by its starting characters, such as finding a
+phone number’s area or country code.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

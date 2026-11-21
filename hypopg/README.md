@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides hypothetical indexes for PostgreSQL. It lets you compare query
-plans with an index that has not been physically created.
+Provides hypothetical indexes for PostgreSQL. Use it to check whether
+PostgreSQL would choose a proposed index before spending time and disk space
+building it.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

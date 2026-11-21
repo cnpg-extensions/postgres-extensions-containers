@@ -1,7 +1,8 @@
 # pg_track_settings
 
-Records PostgreSQL configuration changes so you can review how
-settings have changed over time.
+Records PostgreSQL configuration changes so you can review how settings have
+changed over time.
+Use it to check whether a changed database setting coincided with a slowdown.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -12,7 +13,7 @@ requirements below.
 
 ## Usage
 
-For more information, see the [upstream documentation](https://powa.readthedocs.io/).
+For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/components/stats_extensions/pg_track_settings.html).
 
 ### 1. Add the pg-track-settings extension image to your Cluster
 

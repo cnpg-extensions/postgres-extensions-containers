@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Runs a background worker that can terminate random PostgreSQL
-sessions for chaos testing.
+Runs a background worker that can terminate random PostgreSQL sessions for
+chaos testing. Use it in a test environment to check whether your application
+recovers when database connections suddenly disappear.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,10 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides arbitrary precision integer and
-rational arithmetic using the GNU Multiple Precision Arithmetic Library (GMP).
-It adds `mpz` (integer) and `mpq` (rational) data types with full arithmetic
-support.
+Provides arbitrary precision integer and rational arithmetic using the GNU
+Multiple Precision Arithmetic Library (GMP).
+Use it to calculate with very large whole numbers and exact fractions without
+rounding them.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

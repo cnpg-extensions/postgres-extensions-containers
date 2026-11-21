@@ -1,7 +1,8 @@
 # plproxy
 
-Lets you route function calls to remote PostgreSQL databases for
-partitioned workloads.
+Lets you route function calls to remote PostgreSQL databases for partitioned
+workloads. Use it to look up records spread across several databases without
+having to choose the right database for each request.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Enables PostgreSQL to
-query Microsoft SQL Server and Sybase databases using the TDS (Tabular Data
-Stream) protocol via FreeTDS.
+Enables PostgreSQL to query Microsoft SQL Server and Sybase databases using the
+TDS (Tabular Data Stream) protocol via FreeTDS. Use it to combine PostgreSQL
+records with data that still lives in a SQL Server database.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

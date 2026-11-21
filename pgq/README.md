@@ -6,6 +6,7 @@ SPDX-License-Identifier: Apache-2.0
 
 Provides a transactional event queue in PostgreSQL for applications that
 process events asynchronously.
+Use it to queue work when data changes so another program can handle it later.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

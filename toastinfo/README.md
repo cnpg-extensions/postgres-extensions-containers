@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Describes how PostgreSQL stores variable-length values, including
-inline, compressed, and out-of-line TOAST values.
+Describes how PostgreSQL stores variable-length values, including inline,
+compressed, and out-of-line TOAST values. Use it to check whether a large text
+value is compressed or stored separately from its row.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

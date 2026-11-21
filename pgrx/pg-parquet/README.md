@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Reads and writes Parquet files with
-PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure Blob
-Storage, Google Cloud Storage, and HTTP(S) endpoints.
+Reads and writes Parquet files with PostgreSQL's `COPY TO/FROM` commands.
+Use it to move data between database tables and files used by analytics tools.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -18,6 +17,9 @@ requirements below.
 ## Usage
 
 For more information, see the [upstream documentation](https://github.com/CrunchyData/pg_parquet).
+
+It supports local files, S3, Azure Blob Storage, Google Cloud Storage, and
+HTTP(S) endpoints.
 
 ### 1. Add the pg-parquet extension image to your Cluster
 

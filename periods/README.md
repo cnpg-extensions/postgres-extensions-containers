@@ -1,7 +1,8 @@
 # periods
 
 Adds SQL periods and system versioning to PostgreSQL so you can track
-changes to rows over time.
+changes to rows over time. Use it to look up earlier versions of records,
+such as their values before the last update.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

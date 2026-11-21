@@ -1,7 +1,8 @@
 # table_log
 
-Records changes to tables and lets you restore their contents to an
-earlier point in time.
+Records changes to tables and lets you restore their contents to an earlier
+point in time. Use it to see earlier versions of a table’s records, such as
+their contents before an accidental edit.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

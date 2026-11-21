@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Adds the jsquery language and GIN indexing support for searching jsonb
-values.
+values. Use it to find records by details inside JSON documents, such as
+products with a particular color.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

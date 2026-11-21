@@ -5,8 +5,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds HTTP client functions to PostgreSQL so SQL can call HTTP services
-through libcurl.
+Adds HTTP client functions to PostgreSQL so SQL can call HTTP services through
+libcurl. Use it to fetch information from a web service or notify one when
+database records change.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

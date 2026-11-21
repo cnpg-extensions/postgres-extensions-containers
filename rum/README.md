@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Adds the RUM index access method, including full-text search indexing and
-ordering support.
+ordering support. Use it to search documents for a phrase and show the best
+matches first.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

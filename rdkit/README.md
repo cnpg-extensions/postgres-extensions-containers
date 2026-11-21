@@ -1,7 +1,8 @@
 # RDKit PostgreSQL cartridge
 
-Provides cheminformatics types and functions in PostgreSQL, including
-SMILES parsing, molecule fingerprints and molecular descriptors.
+Provides cheminformatics types and functions in PostgreSQL, including SMILES
+parsing, molecule fingerprints and molecular descriptors. Use it to find
+molecules that resemble a known chemical or contain a particular structure.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

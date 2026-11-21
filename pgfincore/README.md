@@ -1,7 +1,8 @@
 # pgfincore
 
-Lets you inspect and manage PostgreSQL relation data in the operating
-system page cache.
+Lets you inspect and manage PostgreSQL relation data in the operating system
+page cache.
+Use it to load a table into memory before a large query needs it.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

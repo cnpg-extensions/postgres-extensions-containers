@@ -4,9 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Tracks aggregate per-plan call counts, execution times, plan IDs,
-and `EXPLAIN` plan text in PostgreSQL. It is useful for identifying plan
-regressions and comparing different plans chosen for the same query.
+Tracks aggregate per-plan call counts, execution times, plan IDs, and `EXPLAIN`
+plan text in PostgreSQL.
+Use it to investigate whether a query became slower because PostgreSQL chose a
+different way to run it.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

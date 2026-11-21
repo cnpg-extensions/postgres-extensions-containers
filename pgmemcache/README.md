@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides an interface to Memcached
-from within SQL. It allows PostgreSQL to get, set, delete, and manage keys in a
-Memcached server directly using SQL functions.
+Provides an interface to Memcached from within SQL.
+Use it to clear a cached value when the corresponding database record changes.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

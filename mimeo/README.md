@@ -5,7 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Replicates individual tables between PostgreSQL databases using snapshot,
-incremental, and DML-based methods.
+incremental, and DML-based methods. Use it to bring selected tables from
+several databases together for reporting.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -16,7 +17,7 @@ requirements below.
 
 ## Usage
 
-For more information, see the [upstream documentation](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html).
+For more information, see the [upstream documentation](https://github.com/omniti-labs/mimeo).
 
 ### 1. Add the mimeo extension image to your Cluster
 

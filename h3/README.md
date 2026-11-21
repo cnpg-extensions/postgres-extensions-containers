@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Binds the Uber H3 hierarchical hexagonal
-geospatial indexing system to PostgreSQL. It enables efficient geospatial
-analysis using H3 cell indexes.
+Binds the Uber H3 hierarchical hexagonal geospatial indexing system to
+PostgreSQL. Use it to group and count locations on a map, such as delivery
+stops in each area.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

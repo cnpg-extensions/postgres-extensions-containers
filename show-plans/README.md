@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Shows the query plans of currently running PostgreSQL statements.
-Plans can be returned as plain text, JSON, YAML, or XML.
+Shows the query plans of currently running PostgreSQL statements. Use it to
+investigate a slow query while it is still running.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

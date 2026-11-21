@@ -4,10 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides spherical geometry data types
-and operators for astronomical and geographical data. It supports types such as
-spherical points, circles, ellipses, lines, polygons, and boxes, along with
-indexing via GiST.
+Provides spherical geometry data types and operators for astronomical and
+geographical data. Use it to find points within an area on a sphere, such as
+stars in a chosen patch of sky.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

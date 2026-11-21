@@ -1,6 +1,7 @@
 # pgTAP
 
-Lets you write and run tests for database objects and behavior using SQL.
+Lets you write and run tests for database objects and behavior using SQL. Use
+it to check that a database change has not broken your tables or functions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

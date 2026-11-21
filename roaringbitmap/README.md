@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides compressed Roaring bitmap data structures and set
-operations for PostgreSQL.
+Provides compressed Roaring bitmap data structures and set operations for
+PostgreSQL. Use it to find or count values shared by large groups, such as
+records appearing in two different lists.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

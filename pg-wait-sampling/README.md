@@ -4,8 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Samples PostgreSQL wait events and exposes current,
-historical, and aggregated profile views in SQL.
+Samples PostgreSQL wait events and exposes current, historical, and aggregated
+profile views in SQL.
+Use it to find out whether slow queries are waiting for disk access or for
+other queries to finish.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

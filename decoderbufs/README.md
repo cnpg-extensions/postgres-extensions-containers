@@ -1,7 +1,8 @@
 # decoderbufs
 
-Serializes PostgreSQL change events as Protocol Buffers for logical
-replication clients.
+Serializes PostgreSQL change events as Protocol Buffers for logical replication
+clients. Use it with a compatible CDC (change-data capture) client to send
+record changes to another system.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

@@ -4,10 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds support for temporal and
-spatio-temporal data types. It enables moving object databases for tracking
-positions, trajectories, and other time-varying spatial attributes. MobilityDB
-extends PostGIS with temporal types for geographic data.
+Adds support for temporal and spatio-temporal data types. Use it to track
+where something was at a particular time, such as a vehicle along its route.
+MobilityDB extends PostGIS with temporal types for geographic data.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
