@@ -1,6 +1,6 @@
 # pgextwlist
 
-[pgextwlist](https://github.com/dimitri/pgextwlist) lets administrators allow non-superusers to install an approved
+Lets administrators allow non-superusers to install an approved
 selection of PostgreSQL extensions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

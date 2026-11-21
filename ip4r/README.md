@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[ip4r](https://github.com/RhodiumToad/ip4r) adds IPv4/IPv6 address and range types with operators and indexing support.
+Adds IPv4/IPv6 address and range types with operators and indexing support.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

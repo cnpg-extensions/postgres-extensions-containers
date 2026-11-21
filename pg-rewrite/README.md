@@ -1,6 +1,6 @@
 # pg_rewrite
 
-[pg_rewrite](https://github.com/cybertec-postgresql/pg_rewrite) lets you rewrite PostgreSQL tables with less locking.
+Lets you rewrite PostgreSQL tables with less locking.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

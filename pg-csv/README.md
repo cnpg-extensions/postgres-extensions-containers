@@ -1,6 +1,6 @@
 # pg_csv
 
-[pg_csv](https://github.com/PostgREST/pg_csv/) lets you parse and generate CSV data directly in PostgreSQL.
+Lets you parse and generate CSV data directly in PostgreSQL.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

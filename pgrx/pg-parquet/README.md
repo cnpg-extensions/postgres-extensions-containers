@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_parquet](https://github.com/CrunchyData/pg_parquet) is a PostgreSQL extension for reading and writing Parquet files with
+Reads and writes Parquet files with
 PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure Blob
 Storage, Google Cloud Storage, and HTTP(S) endpoints.
 

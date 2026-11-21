@@ -4,9 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[toastinfo](https://github.com/df7cb/toastinfo) describes how PostgreSQL stores variable-length values, including
-inline, compressed, and out-of-line TOAST values. It does not need to be
-preloaded.
+Describes how PostgreSQL stores variable-length values, including
+inline, compressed, and out-of-line TOAST values.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -20,6 +19,8 @@ requirements below.
 For more information, see the [upstream documentation](https://github.com/df7cb/toastinfo).
 
 ### 1. Add the toastinfo extension image to your Cluster
+
+The extension does not need to be preloaded.
 
 Add the image to a Cluster:
 

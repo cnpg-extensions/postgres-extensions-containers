@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgmp](https://github.com/dvarrazzo/pgmp) is a PostgreSQL extension that provides arbitrary precision integer and
+Provides arbitrary precision integer and
 rational arithmetic using the GNU Multiple Precision Arithmetic Library (GMP).
 It adds `mpz` (integer) and `mpq` (rational) data types with full arithmetic
 support.

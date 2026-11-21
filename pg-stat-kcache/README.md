@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_kcache](https://github.com/powa-team/pg_stat_kcache) collects per-query kernel statistics, including CPU time and
+Collects per-query kernel statistics, including CPU time and
 filesystem reads and writes. It uses the query identifiers supplied by the
 bundled pg_stat_statements extension.
 

@@ -1,6 +1,6 @@
 # plproxy
 
-[PL/Proxy](https://plproxy.github.io/) lets you route function calls to remote PostgreSQL databases for
+Lets you route function calls to remote PostgreSQL databases for
 partitioned workloads.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

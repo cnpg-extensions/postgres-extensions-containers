@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_rage_terminator](https://github.com/disco-stu/pg_rage_terminator) runs a background worker that can terminate random PostgreSQL
+Runs a background worker that can terminate random PostgreSQL
 sessions for chaos testing.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

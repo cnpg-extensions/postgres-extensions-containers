@@ -1,6 +1,6 @@
 # pg_permissions
 
-[pg_permissions](https://github.com/cybertec-postgresql/pg_permissions) lets you inspect database permissions through SQL views.
+Lets you inspect database permissions through SQL views.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

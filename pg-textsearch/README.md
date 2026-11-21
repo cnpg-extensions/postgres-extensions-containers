@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_textsearch](https://github.com/timescale/pg_textsearch) is a PostgreSQL extension for full-text search with BM25 relevance
+Provides full-text search with BM25 relevance
 ranking.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

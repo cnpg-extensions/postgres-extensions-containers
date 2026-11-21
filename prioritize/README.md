@@ -1,6 +1,6 @@
 # prioritize
 
-[prioritize](http://pgxn.org/dist/prioritize/) lets you inspect and change the operating system scheduling priority
+Lets you inspect and change the operating system scheduling priority
 of PostgreSQL backends.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

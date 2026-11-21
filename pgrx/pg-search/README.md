@@ -4,8 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_search](https://github.com/paradedb/paradedb) (also known as ParadeDB)
-provides a custom index for fast full-text and vector
+[ParadeDB](https://github.com/paradedb/paradedb) provides a custom index for fast full-text and vector
 search, BM25 scoring, filters, facets, aggregations, and joins. It keeps your
 application data and search engine in one database with standard SQL and ACID
 transactions.

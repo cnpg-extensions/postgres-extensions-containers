@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PL/Lua](https://pllua.github.io/pllua/) lets you write PostgreSQL functions in Lua. It provides trusted `pllua`,
+Lets you write PostgreSQL functions in Lua. It provides trusted `pllua`,
 untrusted `plluau`, and optional hstore transforms.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

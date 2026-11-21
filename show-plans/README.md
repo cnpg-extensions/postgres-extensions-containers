@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_show_plans](https://github.com/cybertec-postgresql/pg_show_plans) shows the query plans of currently running PostgreSQL statements.
+Shows the query plans of currently running PostgreSQL statements.
 Plans can be returned as plain text, JSON, YAML, or XML.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

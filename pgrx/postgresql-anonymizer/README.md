@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PostgreSQL Anonymizer](https://gitlab.com/dalibo/postgresql_anonymizer) lets you anonymize data and define masking rules through
+Lets you anonymize data and define masking rules through
 the `anon` SQL extension. It includes fake-data datasets for generating
 replacement values.
 

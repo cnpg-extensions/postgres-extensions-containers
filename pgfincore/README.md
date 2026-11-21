@@ -1,6 +1,6 @@
 # pgfincore
 
-[pgfincore](http://villemain.org/projects/pgfincore) lets you inspect and manage PostgreSQL relation data in the operating
+Lets you inspect and manage PostgreSQL relation data in the operating
 system page cache.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[numeral](https://github.com/df7cb/postgresql-numeral) provides a compact numeral data type with arithmetic, comparison and
+Provides a compact numeral data type with arithmetic, comparison and
 bitwise operators.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

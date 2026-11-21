@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[plpgsql_check](https://github.com/okbob/plpgsql_check) is a linter for PL/pgSQL. It checks embedded SQL and PL/pgSQL
+Lints PL/pgSQL. It checks embedded SQL and PL/pgSQL
 behavior that PostgreSQL's function validator cannot detect at function creation
 time.
 

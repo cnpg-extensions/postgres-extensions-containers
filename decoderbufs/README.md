@@ -1,6 +1,6 @@
 # decoderbufs
 
-[decoderbufs](https://github.com/debezium/postgres-decoderbufs) serializes PostgreSQL change events as Protocol Buffers for logical
+Serializes PostgreSQL change events as Protocol Buffers for logical
 replication clients.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

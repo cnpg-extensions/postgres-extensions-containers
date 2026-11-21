@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[tds_fdw](https://github.com/tds-fdw/tds_fdw) is a PostgreSQL Foreign Data Wrapper (FDW) that enables PostgreSQL to
+Enables PostgreSQL to
 query Microsoft SQL Server and Sybase databases using the TDS (Tabular Data
 Stream) protocol via FreeTDS.
 

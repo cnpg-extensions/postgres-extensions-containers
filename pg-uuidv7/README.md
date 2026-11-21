@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_uuidv7](https://github.com/fboulnois/pg_uuidv7) is a PostgreSQL extension that provides functions for generating and
+Provides functions for generating and
 working with UUID version 7 (UUIDv7) identifiers. UUIDv7 is a time-sortable UUID
 format that embeds a Unix timestamp, making it more suitable than UUID v4 for
 use as database primary keys.

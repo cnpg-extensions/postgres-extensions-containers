@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[db2fce](https://github.com/credativ/db2fce) provides DB2-compatible SQL functions and types, including date and time
+Provides DB2-compatible SQL functions and types, including date and time
 helpers in the `db2` schema.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

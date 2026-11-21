@@ -1,6 +1,6 @@
 # pg_similarity
 
-[pg_similarity](https://github.com/eulerto/pg_similarity) provides text similarity functions for comparing strings and
+Provides text similarity functions for comparing strings and
 finding approximate matches.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

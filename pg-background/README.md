@@ -4,10 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_background](https://github.com/vibhorkum/pg_background) runs SQL in PostgreSQL background workers and returns completion
-metadata to the calling session. It does not require `shared_preload_libraries`;
-preloading is only needed if you want to set its GUCs in server configuration
-before first use.
+Runs SQL in PostgreSQL background workers and returns completion
+metadata to the calling session.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -21,6 +19,9 @@ requirements below.
 For more information, see the [upstream documentation](https://github.com/vibhorkum/pg_background).
 
 ### 1. Add the pg-background extension image to your Cluster
+
+The extension does not require `shared_preload_libraries`; preloading is only
+needed if you want to set its GUCs in server configuration before first use.
 
 Add the extension image to a complete Cluster definition:
 

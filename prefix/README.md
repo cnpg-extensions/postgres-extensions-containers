@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[prefix](https://github.com/dimitri/prefix) provides prefix ranges over text values for prefix-based lookup and
+Provides prefix ranges over text values for prefix-based lookup and
 indexing.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

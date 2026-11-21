@@ -1,6 +1,6 @@
 # set_user
 
-[set_user](https://github.com/pgaudit/set_user) lets you switch database roles with additional control and audit
+Lets you switch database roles with additional control and audit
 logging.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

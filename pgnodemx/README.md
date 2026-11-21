@@ -1,6 +1,6 @@
 # pgnodemx
 
-[pgnodemx](https://github.com/pgnodemx/pgnodemx) exposes host and container operating system metrics through PostgreSQL
+Exposes host and container operating system metrics through PostgreSQL
 functions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

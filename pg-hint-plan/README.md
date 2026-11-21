@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_hint_plan](https://github.com/ossc-db/pg_hint_plan) adds optimizer hints to PostgreSQL. Hints are written in SQL
+Adds optimizer hints to PostgreSQL. Hints are written in SQL
 comments and can choose scan methods, join methods, and other planner behavior
 for individual queries.
 

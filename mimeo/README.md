@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[Mimeo](https://pgxn.org/dist/mimeo/1.5.1/doc/mimeo.html) replicates individual tables between PostgreSQL databases using snapshot,
+Replicates individual tables between PostgreSQL databases using snapshot,
 incremental, and DML-based methods.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

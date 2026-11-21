@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_cron](https://github.com/citusdata/pg_cron) is an open-source extension that provides a simple cron-based job
+Provides a simple cron-based job
 scheduler for PostgreSQL, allowing you to schedule PostgreSQL commands directly
 from the database.
 

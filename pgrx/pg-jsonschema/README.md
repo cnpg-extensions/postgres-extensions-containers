@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_jsonschema](https://github.com/supabase/pg_jsonschema) is a PostgreSQL extension that adds support for JSON Schema
+Adds support for JSON Schema
 validation on the `json` and `jsonb` data types. JSON Schema describes the
 expected structure and constraints of JSON documents, allowing the extension to
 validate values, check schemas, and report validation errors directly in SQL.

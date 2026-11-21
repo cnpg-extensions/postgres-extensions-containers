@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[debversion](https://salsa.debian.org/postgresql/postgresql-debversion) is a PostgreSQL extension that adds a native `debversion` data type
+Adds a native `debversion` data type
 for representing and sorting Debian package version strings according to the
 Debian versioning algorithm (as defined in Debian Policy).
 

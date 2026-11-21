@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgsentinel](https://github.com/pgsentinel/pgsentinel) samples active session history into an in-memory ring buffer and
+Samples active session history into an in-memory ring buffer and
 links session activity with pg_stat_statements.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

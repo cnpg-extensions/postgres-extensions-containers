@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[MobilityDB](https://mobilitydb.com/) is a PostgreSQL extension that adds support for temporal and
+Adds support for temporal and
 spatio-temporal data types. It enables moving object databases for tracking
 positions, trajectories, and other time-varying spatial attributes. MobilityDB
 extends PostGIS with temporal types for geographic data.

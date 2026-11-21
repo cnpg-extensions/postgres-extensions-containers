@@ -1,6 +1,6 @@
 # preprepare
 
-[preprepare](https://github.com/dimitri/preprepare) lets you define prepared SQL statements on the server for reuse by
+Lets you define prepared SQL statements on the server for reuse by
 database sessions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

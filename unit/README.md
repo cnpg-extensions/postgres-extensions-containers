@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[unit](https://github.com/df7cb/postgresql-unit) provides SI unit values, conversions and arithmetic.
+Provides SI unit values, conversions and arithmetic.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples

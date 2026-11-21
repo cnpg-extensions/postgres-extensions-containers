@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgmemcache](https://github.com/ohmu/pgmemcache) is a PostgreSQL extension that provides an interface to Memcached
+Provides an interface to Memcached
 from within SQL. It allows PostgreSQL to get, set, delete, and manage keys in a
 Memcached server directly using SQL functions.
 

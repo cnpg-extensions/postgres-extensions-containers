@@ -1,6 +1,6 @@
 # periods
 
-[periods](https://github.com/xocolatl/periods) adds SQL periods and system versioning to PostgreSQL so you can track
+Adds SQL periods and system versioning to PostgreSQL so you can track
 changes to rows over time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

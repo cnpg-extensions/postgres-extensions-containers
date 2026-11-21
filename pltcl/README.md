@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PL/Tcl](https://www.postgresql.org/docs/18/pltcl.html) lets you write PostgreSQL functions in Tcl. It provides the trusted
+Lets you write PostgreSQL functions in Tcl. It provides the trusted
 `pltcl` and untrusted `pltclu` language variants.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

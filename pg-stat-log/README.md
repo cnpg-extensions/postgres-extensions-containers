@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_log](https://github.com/fabriziomello/pg_stat_log) collects cumulative counts of server log messages grouped by
+Collects cumulative counts of server log messages grouped by
 backend, database, role, severity, and SQLSTATE, with optional grouping by query
-identifier. It must be preloaded.
+identifier.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog. These examples
@@ -21,7 +21,8 @@ For more information, see the [upstream documentation](https://github.com/fabriz
 
 ### 1. Add the pg-stat-log extension image to your Cluster
 
-Add the image and preload its statistics worker in a complete Cluster definition:
+The extension must be preloaded. Add the image and preload its statistics worker
+in a complete Cluster definition:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1

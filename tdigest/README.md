@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[tdigest](https://github.com/tvondra/tdigest) provides t-digest aggregates for approximate quantile and percentile
+Provides t-digest aggregates for approximate quantile and percentile
 calculations.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

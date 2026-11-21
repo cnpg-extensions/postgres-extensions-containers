@@ -1,6 +1,6 @@
 # table_log
 
-[table_log](https://github.com/df7cb/table_log) records changes to tables and lets you restore their contents to an
+Records changes to tables and lets you restore their contents to an
 earlier point in time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts

@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_partman](https://github.com/pgpartman/pg_partman) creates and maintains time-based and ID-based PostgreSQL partition
+Creates and maintains time-based and ID-based PostgreSQL partition
 sets. Its optional background worker can run partition maintenance
 automatically.
 
