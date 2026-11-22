@@ -9,6 +9,8 @@ values with Lua, such as calculating a total whenever a row is saved.
 
 This image includes four extensions you can enable separately.
 
+For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
+
 > [!CAUTION]
 > Use `pllua`, the trusted Lua language, for normal use. The untrusted `plluau`
 > language can access files, run programs, and use the network as PostgreSQL’s
@@ -18,8 +20,6 @@ This image includes four extensions you can enable separately.
 The optional `hstore_pllua` and `hstore_plluau` helpers let each language work
 with key/value pairs from `hstore`, which is included in the CNPG PostgreSQL
 base image and must also be enabled to use these helpers.
-
-For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
 
 ## Dependencies and conflicts
 

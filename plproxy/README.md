@@ -4,13 +4,13 @@ Lets you route function calls to remote PostgreSQL databases for partitioned
 workloads. Use it to look up records spread across several databases without
 having to choose the right database for each request.
 
+For more information, see the [upstream documentation](https://plproxy.github.io/).
+
 > [!CAUTION]
 > PL/Proxy is an untrusted language with no trusted variant. Only database
 > superusers can create its functions, which can connect to other databases
 > using credentials available to PostgreSQL. Reserve function creation for
 > administrators who control those connections.
-
-For more information, see the [upstream documentation](https://plproxy.github.io/).
 
 ### 1. Add the plproxy extension image to your Cluster
 

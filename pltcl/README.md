@@ -9,13 +9,13 @@ counter automatically with a small Tcl script.
 
 This image includes both `pltcl` and `pltclu`, which you can enable separately.
 
+For more information, see the [upstream documentation](https://www.postgresql.org/docs/18/pltcl.html).
+
 > [!CAUTION]
 > Use `pltcl`, the trusted Tcl language, for normal use. The untrusted `pltclu`
 > language can access files, run programs, and use the network as PostgreSQL’s
 > operating-system user; reserve it for exceptional cases requiring that level
 > of access.
-
-For more information, see the [upstream documentation](https://www.postgresql.org/docs/18/pltcl.html).
 
 ### 1. Add the pltcl extension image to your Cluster
 
