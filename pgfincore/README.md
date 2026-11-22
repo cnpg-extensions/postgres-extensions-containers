@@ -1,8 +1,8 @@
 # pgfincore
 
 Lets you inspect and manage PostgreSQL relation data in the operating system
-page cache.
-Use it to load a table into memory before a large query needs it.
+page cache. For example, load a table into memory before a large query needs
+it.
 
 For more information, see the [upstream documentation](http://villemain.org/projects/pgfincore).
 

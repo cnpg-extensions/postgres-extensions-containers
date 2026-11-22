@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Supports durable, fault-tolerant SQL workflows.
-Use it to run a multi-step data import that can resume after a database
-restart.
+Supports durable, fault-tolerant SQL workflows that can resume after a
+database restart. For example, a multi-step data import can continue from its
+last completed step.
 
 For more information, see the [upstream documentation](https://github.com/microsoft/pg_durable).
 

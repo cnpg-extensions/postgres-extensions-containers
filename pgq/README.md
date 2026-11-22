@@ -5,8 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides a transactional event queue in PostgreSQL for applications that
-process events asynchronously.
-Use it to queue work when data changes so another program can handle it later.
+process events asynchronously. For example, queue work when data changes so
+another program can handle it later.
 
 Run `pgqd` on a separate server and connect it to your CNPG primary to
 advance queues and perform maintenance. This image supplies only the

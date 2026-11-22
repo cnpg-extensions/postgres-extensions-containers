@@ -4,9 +4,10 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Collects cumulative counts of server log messages grouped by backend, database,
-role, severity, and SQLSTATE, with optional grouping by query identifier.
-Use it to see which databases or users are producing the most errors.
+Collects cumulative counts of server log messages grouped by backend,
+database, role, severity, and SQLSTATE, with optional grouping by query
+identifier. For example, see which databases or users are producing the most
+errors.
 
 For more information, see the [upstream documentation](https://github.com/fabriziomello/pg_stat_log).
 

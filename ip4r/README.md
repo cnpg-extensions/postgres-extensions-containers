@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds IPv4/IPv6 address and range types with operators and indexing support. Use
-it to find which network an IP address belongs to when analyzing access logs.
+Adds IPv4/IPv6 address and range types with operators and indexing support.
+For example, find which network an IP address belongs to when analyzing access
+logs.
 
 For more information, see the [upstream documentation](https://github.com/RhodiumToad/ip4r).
 

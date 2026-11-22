@@ -1,8 +1,8 @@
 # pg_rewrite
 
-Lets you rewrite PostgreSQL tables with less locking.
-Use it to change a large table’s column types while keeping the table available
-for most of the work.
+Lets you rewrite PostgreSQL tables with less locking. For example, change a
+large table’s column types while keeping the table available for most of the
+work.
 
 For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_rewrite).
 

@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Gathers statistics about predicates found in WHERE and JOIN clauses. Use it to
-see which columns people filter on most when deciding where an index might
-help.
+Gathers statistics about predicates found in WHERE and JOIN clauses. For
+example, see which columns people filter on most when deciding where an index
+might help.
 
 For more information, see the [upstream documentation](https://github.com/powa-team/pg_qualstats).
 

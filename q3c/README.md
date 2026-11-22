@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Indexes and queries sky survey data using spherical coordinate systems with
-Quad Tree Cube (Q3C). Use it to find nearby stars or match the same objects
+Quad Tree Cube (Q3C). For example, find nearby stars or match the same objects
 across two sky catalogs.
 
 For more information, see the [upstream documentation](https://github.com/segasai/q3c).

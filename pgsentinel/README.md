@@ -5,9 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Samples active session history into an in-memory ring buffer and links session
-activity with pg_stat_statements.
-Use it to look back at which queries were running or waiting during a recent
-slowdown.
+activity with pg_stat_statements. For example, look back at which queries were
+running or waiting during a recent slowdown.
 
 For more information, see the [upstream documentation](https://github.com/pgsentinel/pgsentinel).
 

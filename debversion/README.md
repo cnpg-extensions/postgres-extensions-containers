@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 Adds a native `debversion` data type for representing and sorting Debian
 package version strings according to the Debian versioning algorithm (as
-defined in Debian Policy). Use it to find the newest Debian package in a list,
-even when version numbers contain letters or punctuation.
+defined in Debian Policy). For example, find the newest Debian package in a
+list, even when version numbers contain letters or punctuation.
 
 For more information, see the [upstream documentation](https://salsa.debian.org/postgresql/postgresql-debversion).
 

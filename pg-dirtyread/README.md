@@ -1,8 +1,8 @@
 # pg_dirtyread
 
-Lets you inspect dead rows that have not yet been removed by VACUUM. Use it to
-inspect accidentally deleted records while their old contents are still on
-disk.
+Lets you inspect dead rows that have not yet been removed by VACUUM. For
+example, inspect accidentally deleted records while their old contents are
+still on disk.
 
 For more information, see the [upstream documentation](https://github.com/df7cb/pg_dirtyread).
 

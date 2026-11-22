@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides SI unit values, conversions and arithmetic. Use it to add measurements
-recorded in meters and feet without doing the conversions yourself.
+Provides SI unit values, conversions and arithmetic. For example, add
+measurements recorded in meters and feet without doing the conversions
+yourself.
 
 For more information, see the [upstream documentation](https://github.com/df7cb/postgresql-unit).
 

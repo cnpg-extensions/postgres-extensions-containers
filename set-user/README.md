@@ -1,7 +1,7 @@
 # set_user
 
-Lets you switch database roles with additional control and audit logging. Use
-it to let an administrator perform maintenance under another role while
+Lets you switch database roles with additional control and audit logging. For
+example, let an administrator perform maintenance under another role while
 recording the role change.
 
 For more information, see the [upstream documentation](https://github.com/pgaudit/set_user).

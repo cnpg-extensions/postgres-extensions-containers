@@ -1,7 +1,7 @@
 # credcheck
 
 Checks usernames and passwords against configurable policies when roles are
-created or credentials change. Use it to stop database users from choosing
+created or credentials change. For example, stop database users from choosing
 passwords that are too short or easy to guess.
 
 Password complexity checks require setting passwords through SQL with the
