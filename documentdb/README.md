@@ -18,6 +18,7 @@ the [upstream getting started guide](https://documentdb.io/docs/getting-started/
 > For **SQL-only use**, add DocumentDB from the CNPG extension catalog. You can
 > query it directly through PostgreSQL without installing a gateway.
 >
+> The gateway lets a MongoDB client such as `mongosh` connect to DocumentDB.
 > Deploying the gateway with this extension image is an advanced use case for
 > teams that want to manage the CNPG `Cluster` themselves, for example to run
 > DocumentDB alongside other PostgreSQL workloads.
