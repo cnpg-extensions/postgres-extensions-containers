@@ -9,20 +9,14 @@ role, severity, and SQLSTATE, with optional grouping by query identifier.
 Use it to see which databases or users are producing the most errors.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/fabriziomello/pg_stat_log).
 
 ### 1. Add the pg-stat-log extension image to your Cluster
 
-The extension must be preloaded. Add the image and preload its statistics worker
-in a complete Cluster definition:
+This extension requires `pg_stat_log` in `shared_preload_libraries`, as
+shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -57,14 +51,6 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_stat_log
-```
-
-You should see `pg_stat_log` listed with its installed SQL version.
-
 Inspect recent counts as a role with `pg_read_all_stats`:
 
 ~~~sql
@@ -72,8 +58,6 @@ SELECT database_name, user_name, elevel, sqlerrcode, count
 FROM pg_stat_log
 ORDER BY count DESC;
 ~~~
-
-Statistics persist across clean PostgreSQL restarts and are discarded after crash recovery. Reset counters and reclaim tracked slots with `SELECT pg_stat_log_reset();`. Capacity is bounded by `pg_stat_log.max_entries` (default 1024); increase it and restart if the `n_dropped` value returned by `pg_stat_log_info()` grows. The extension writes no external files.
 
 ## Licenses and Copyright
 

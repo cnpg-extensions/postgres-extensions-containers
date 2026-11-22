@@ -5,17 +5,15 @@ Use it to change a large table’s column types while keeping the table availabl
 for most of the work.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_rewrite).
 
 ### 1. Add the pg-rewrite extension image to your Cluster
+
+This extension requires `pg_rewrite` in `shared_preload_libraries`, as shown
+below. Table rewriting also needs `wal_level: logical` and `pg_rewrite` in
+`output_plugin_libraries`.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -53,17 +51,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_rewrite
+SELECT * FROM pg_rewrite_get_task_list();
 ```
-
-You should see `pg_rewrite` listed with its installed SQL version.
-
-## Operation and privileges
-
-Table rewriting needs logical WAL and a free replication slot. Ensure sufficient CNPG data-volume space for both table copies and retained WAL. Remove the old table with SQL after verification; inspect and remove any abandoned inactive replication slots after a failed operation.
 
 ## Licenses and Copyright
 

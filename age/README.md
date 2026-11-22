@@ -10,21 +10,13 @@ connections in your data, such as friends of friends. It is based on the
 openCypher graph query language.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://age.apache.org/).
 
 ### 1. Add the age extension image to your Cluster
 
-Define the `age` extension under the `postgresql.extensions` section of
-your `Cluster` resource. Note that `age` must be added to
-`shared_preload_libraries` for the extension to function. For example:
+This extension requires `age` in `shared_preload_libraries`, as shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -57,23 +49,15 @@ For extensions that normally require superuser privileges, platform teams can us
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
 administrator-approved selection of extensions.
 
+AGE installs its functions and types in `ag_catalog`. Use schema-qualified
+names such as `ag_catalog.cypher(...)` and `ag_catalog.agtype`, or add
+`ag_catalog` to your session's `search_path` to use unqualified names.
+
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx age
+SELECT ag_catalog.age_size('[1, 2, 3]'::ag_catalog.agtype);
 ```
-
-You should see `age` listed with its installed SQL version.
-
-## Known Caveats
-
-- **`shared_preload_libraries` required**: Apache AGE must be listed in
-  `shared_preload_libraries`. Without it, `CREATE EXTENSION age` will fail
-  with a "must be preloaded" error.
-- **Cypher support**: After installation, use `SET search_path = ag_catalog, "$user", public;`
-  to access AGE's graph functions and the `cypher()` function for graph queries.
 
 ## Licenses and Copyright
 

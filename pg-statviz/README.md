@@ -4,22 +4,17 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Captures PostgreSQL statistics in database tables for later SQL analysis.
-Use it to compare database activity before and during a slowdown.
+Saves snapshots of PostgreSQL activity for charts and reports.
+Use it to compare how your database was behaving before and during a slowdown.
+
+This image provides the database part of pg_statviz. Run its reporting tool
+on a separate server and connect it to your CNPG database to create charts
+and reports.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/vyruss/pg_statviz).
-
-The report generator and chart output are provided by a user-operated external
-client; this image adds no listener or web UI.
 
 ### 1. Add the pg-statviz extension image to your Cluster
 
@@ -56,22 +51,12 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_statviz
-```
-
-You should see `pg_statviz` listed with its installed SQL version.
-
 Create a snapshot and inspect its timestamp:
 
 ~~~sql
 SELECT pgstatviz.snapshot();
 SELECT * FROM pgstatviz.snapshots ORDER BY snapshot_tstamp DESC;
 ~~~
-
-Snapshots are stored in ordinary database tables and included in database backups. Define SQL-based retention for the expected snapshot volume. `SELECT pgstatviz.delete_snapshots();` truncates the snapshot tables and is the packaged cleanup operation; it removes all snapshots. The image does not write report files.
 
 ## Licenses and Copyright
 

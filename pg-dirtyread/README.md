@@ -5,13 +5,7 @@ inspect accidentally deleted records while their old contents are still on
 disk.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/df7cb/pg_dirtyread).
 
@@ -48,17 +42,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_dirtyread
+SELECT extversion FROM pg_extension WHERE extname = 'pg_dirtyread';
 ```
-
-You should see `pg_dirtyread` listed with its installed SQL version.
-
-## Operation and privileges
-
-Superuser-only inspection can recover dead tuples that PostgreSQL has not vacuumed. It does not replace backups and may reveal data deleted by application users.
 
 ## Licenses and Copyright
 

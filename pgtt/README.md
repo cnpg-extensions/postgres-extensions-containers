@@ -5,17 +5,14 @@ data. Use it to give each connection its own temporary workspace while
 sharing the same table definition.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/darold/pgtt/).
 
 ### 1. Add the pgtt extension image to your Cluster
+
+This example sets `session_preload_libraries: pgtt` to load the library for
+each connection.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -50,17 +47,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pgtt
+SELECT count(*) AS global_temp_tables FROM pgtt_schema.pg_global_temp_tables;
 ```
-
-You should see `pgtt` listed with its installed SQL version.
-
-## Operation and privileges
-
-Global temporary table definitions are shared, while rows are session-local. Load `pgtt` for each session with the declarative parameter above. Temporary rows live in PostgreSQL-managed temporary storage and are removed at session end; ON COMMIT controls transaction cleanup.
 
 ## Licenses and Copyright
 

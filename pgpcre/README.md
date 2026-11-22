@@ -10,13 +10,7 @@ PostgreSQL.
 Use it to pull matching pieces, such as reference numbers, out of stored text.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/petere/pgpcre).
 
@@ -52,18 +46,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pgpcre
-```
-
-You should see `pgpcre` listed with its installed SQL version.
-
-The PGDG package links to PCRE2. The supported CNPG base images provide these runtime libraries, so the extension adds no files under `/system`.
-
-### SQL example
 
 ```sql
 SELECT pcre_match('^([A-Z]+)-([0-9]+)$'::pcre, 'DB-42');

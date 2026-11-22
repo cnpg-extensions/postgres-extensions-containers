@@ -4,13 +4,7 @@ Lets you write and run tests for database objects and behavior using SQL. Use
 it to check that a database change has not broken your tables or functions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://pgtap.org/).
 
@@ -47,17 +41,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pgtap
+SELECT pgtap_version();
 ```
-
-You should see `pgtap` listed with its installed SQL version.
-
-## Operation and privileges
-
-The server-side TAP assertion functions return text through SQL. Test runners remain separate clients connected to the CNPG-managed endpoint; they own report files and retention.
 
 ## Licenses and Copyright
 

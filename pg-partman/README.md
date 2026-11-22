@@ -9,21 +9,16 @@ it to split growing data into manageable tables and retire old data, such as
 keeping only recent months of records.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/pgpartman/pg_partman).
 
 ### 1. Add the pg-partman extension image to your Cluster
 
-Its optional background worker can run partition maintenance automatically.
-
-Add the image to a Cluster and preload the background worker:
+To enable the optional maintenance worker, add `pg_partman_bgw` to
+`shared_preload_libraries`. Set `pg_partman_bgw.dbname` and
+`pg_partman_bgw.role` to the database and maintenance role (`app` below);
+grant that role the privileges described in the upstream documentation.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -33,6 +28,9 @@ metadata:
 spec:
   imageCatalogRef: ...
   postgresql:
+    parameters:
+      pg_partman_bgw.dbname: app
+      pg_partman_bgw.role: app
     shared_preload_libraries:
     - pg_partman_bgw
     extensions:
@@ -56,22 +54,13 @@ For extensions that normally require superuser privileges, platform teams can us
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
 administrator-approved selection of extensions.
 
-For `pg_partman`, create the `partman` schema first and use
-`CREATE EXTENSION pg_partman SCHEMA partman;`, or set `schema: partman` in the
-declarative extension entry.
-
 ### 3. Verify installation
 
 Once the database is ready, connect to it with `psql` and run:
 
 ```sql
-\dx pg_partman
+SELECT extversion FROM pg_extension WHERE extname = 'pg_partman';
 ```
-
-You should see `pg_partman` listed with its installed SQL version.
-
-See the [pg_partman documentation](https://github.com/pgpartman/pg_partman/tree/development/doc)
-for partition-set configuration examples.
 
 ## Licenses and Copyright
 

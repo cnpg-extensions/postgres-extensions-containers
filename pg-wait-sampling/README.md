@@ -10,19 +10,14 @@ Use it to find out whether slow queries are waiting for disk access or for
 other queries to finish.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/postgrespro/pg_wait_sampling).
 
 ### 1. Add the pg-wait-sampling extension image to your Cluster
 
-Add the extension image and preload its worker in a complete Cluster definition:
+This extension requires `pg_wait_sampling` in `shared_preload_libraries`, as
+shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -56,14 +51,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_wait_sampling
-```
-
-You should see `pg_wait_sampling` listed with its installed SQL version.
 
 After the library is preloaded and the extension is installed, inspect sampled waits:
 

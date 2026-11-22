@@ -5,13 +5,7 @@ changed over time.
 Use it to check whether a changed database setting coincided with a slowdown.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/components/stats_extensions/pg_track_settings.html).
 
@@ -48,17 +42,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_track_settings
+SELECT * FROM pg_track_settings() LIMIT 5;
 ```
-
-You should see `pg_track_settings` listed with its installed SQL version.
-
-## Operation and privileges
-
-Snapshots and history are ordinary database tables. Schedule `pg_track_settings_snapshot()` through a SQL scheduler. `pg_track_settings_reset()` clears stored history; archive needed rows and set an explicit retention schedule before running it.
 
 ## Licenses and Copyright
 

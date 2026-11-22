@@ -8,14 +8,18 @@ Binds the Uber H3 hierarchical hexagonal geospatial indexing system to
 PostgreSQL. Use it to group and count locations on a map, such as delivery
 stops in each area.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+This image includes `h3` for working with map cells and the optional
+`h3_postgis` extension for using those cells with PostGIS shapes and raster
+data. Enable `h3_postgis` only if needed, after enabling `h3`, `postgis`, and
+`postgis_raster`.
 
-## Usage
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
+
+## Dependencies and conflicts
+
+The optional `h3_postgis` extension requires `h3`, `postgis`, and
+`postgis_raster` in the same database.
 
 For more information, see the [upstream documentation](https://github.com/zachasme/h3-pg).
 
@@ -33,16 +37,18 @@ spec:
   imageCatalogRef: ...
   postgresql:
     extensions:
+    - name: postgis
     - name: h3
 ```
 
 ### 2. Enable the extension in a database
 
-Once the extension's files are available in the cluster, you can install it in a
-database in either of two ways:
-
-- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-- **Through SQL**, by running `CREATE EXTENSION h3;` in the target database.
+```sql
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS postgis_raster;
+CREATE EXTENSION h3;
+CREATE EXTENSION h3_postgis;
+```
 
 Platform teams may make extension containers available across their clusters
 without installing every extension in every database. Install only the extensions
@@ -55,19 +61,10 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx h3
+SELECT h3_get_extension_version();
+SELECT h3_lat_lng_to_cell(ST_SetSRID(ST_Point(0, 0), 4326), 1);
 ```
-
-You should see `h3` listed with its installed SQL version.
-
-## Known Caveats
-
-- **Runtime library dependency**: This extension requires `libh3-1` at runtime.
-  The library is bundled in the image under `/system/`. The `ld_library_path`
-  is configured to include this directory automatically.
 
 ## Licenses and Copyright
 

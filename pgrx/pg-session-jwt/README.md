@@ -8,19 +8,9 @@ Manages authenticated sessions through JSON Web Tokens (JWTs).
 Use it to identify the signed-in user when deciding which rows they may see.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/neondatabase/pg_session_jwt).
-
-With a JSON Web Key (JWK), it verifies JWT authenticity and exposes the
-validated claims to SQL. Without a JWK, it can use PostgREST-compatible JWT
-claims for identifying the current user.
 
 ### 1. Add the pg-session-jwt extension image to your Cluster
 
@@ -58,22 +48,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_session_jwt
+SELECT auth.jwt();
 ```
-
-You should see `pg_session_jwt` listed with its installed SQL version.
-
-## Known Caveats
-
-- When using JWK validation, set `pg_session_jwt.jwk` before creating the
-  connection. It can be configured at postmaster startup, in the PostgreSQL
-  configuration file, or through the `PGOPTIONS` connection environment.
-- Without JWK validation, `request.jwt.claims` is a regular PostgreSQL
-  parameter that database users may be able to modify. Use this mode only when
-  the claims are set by a trusted integration such as PostgREST.
 
 ## Licenses and Copyright
 

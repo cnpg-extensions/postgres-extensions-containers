@@ -5,17 +5,14 @@ it to let an administrator perform maintenance under another role while
 recording the role change.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/pgaudit/set_user).
 
 ### 1. Add the set-user extension image to your Cluster
+
+This extension requires `set_user` in `shared_preload_libraries`, as shown
+below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -50,17 +47,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx set_user
+SELECT extversion FROM pg_extension WHERE extname = 'set_user';
 ```
-
-You should see `set_user` listed with its installed SQL version.
-
-## Operation and privileges
-
-Role switching is audited through normal PostgreSQL logging. Restrict EXECUTE on elevation functions and configure allowed roles. Logs follow the CNPG logging pipeline; retain and rotate them in the cluster logging backend. This image does not create separate log files.
 
 ## Licenses and Copyright
 

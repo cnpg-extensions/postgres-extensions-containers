@@ -9,19 +9,14 @@ extension. Use it to replace sensitive data with fake values for testing,
 such as names and contact details.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://gitlab.com/dalibo/postgresql_anonymizer).
 
 ### 1. Add the postgresql-anonymizer extension image to your Cluster
 
-Add the extension image to your CloudNativePG Cluster and preload `anon`:
+This extension requires `anon` in `shared_preload_libraries`, as shown
+below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -42,13 +37,11 @@ Connect as a superuser to the target database and enable the extension:
 ```sql
 CREATE EXTENSION anon;
 SELECT anon.init('/extensions/postgresql-anonymizer/share/extension/anon');
-SELECT anon.fake_first_name();
 ```
 
 Use the explicit mounted data path: upstream's argument-free `anon.init()`
 looks in PostgreSQL's built-in share directory, while CloudNativePG mounts
-extension images separately. Keep the Cluster extension name
-`postgresql-anonymizer` to use the path above; adjust it if you rename the mount.
+extension images separately.
 Initialization loads the datasets needed by the legacy `fake_*` functions.
 Upstream `dummy_*` functions generate data without this initialization.
 
@@ -71,17 +64,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx anon
+SELECT anon.fake_first_name();
 ```
-
-You should see `anon` listed with its installed SQL version.
-
-Dataset initialization remains a separate superuser step. For masking rules,
-permissions, and transparent dynamic masking, follow the
-[upstream documentation](https://postgresql-anonymizer.readthedocs.io/).
 
 ## Licenses and Copyright
 

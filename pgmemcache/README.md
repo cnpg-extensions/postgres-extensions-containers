@@ -7,23 +7,19 @@ SPDX-License-Identifier: Apache-2.0
 Provides an interface to Memcached from within SQL.
 Use it to clear a cached value when the corresponding database record changes.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+Run Memcached separately and make it reachable from your CNPG database.
+This image supplies the PostgreSQL extension, not the Memcached server.
 
-## Usage
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/ohmu/pgmemcache).
 
 ### 1. Add the pgmemcache extension image to your Cluster
 
-Define the `pgmemcache` extension under the `postgresql.extensions` section of
-your `Cluster` resource. Note that `pgmemcache` must be added to
-`shared_preload_libraries` to configure the Memcached connection at startup.
-For example:
+For the startup configuration shown below, add `pgmemcache` to
+`shared_preload_libraries` and set `pgmemcache.default_servers` to your
+Memcached endpoint.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -60,25 +56,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pgmemcache
+SELECT extversion FROM pg_extension WHERE extname = 'pgmemcache';
 ```
-
-You should see `pgmemcache` listed with its installed SQL version.
-
-## Known Caveats
-
-- **Requires a running Memcached server**: This extension connects to a
-  Memcached server at startup (via `pgmemcache.default_servers`). Without a
-  reachable Memcached server, PostgreSQL will log warnings but continue to
-  start. Functions that access Memcached will fail if no server is configured.
-- **`shared_preload_libraries` required**: `pgmemcache` must be in
-  `shared_preload_libraries` to establish Memcached connections at PostgreSQL
-  startup.
-- **Runtime library dependency**: This extension requires `libmemcached11` at
-  runtime. The library is bundled in the image under `/system/`.
 
 ## Licenses and Copyright
 

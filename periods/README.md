@@ -5,13 +5,11 @@ changes to rows over time. Use it to look up earlier versions of records,
 such as their values before the last update.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+## Dependencies and conflicts
+
+Requires `btree_gist` in the same database.
 
 For more information, see the [upstream documentation](https://github.com/xocolatl/periods).
 
@@ -31,11 +29,10 @@ spec:
 
 ### 2. Enable the extension in a database
 
-Once the extension's files are available in the cluster, you can install it in a
-database in either of two ways:
-
-- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-- **Through SQL**, by running `CREATE EXTENSION periods;` in the target database.
+```sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE EXTENSION periods;
+```
 
 Platform teams may make extension containers available across their clusters
 without installing every extension in every database. Install only the extensions
@@ -46,21 +43,11 @@ For extensions that normally require superuser privileges, platform teams can us
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
 administrator-approved selection of extensions.
 
-Install `btree_gist`, then `periods` in that order.
-
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx periods
+SELECT * FROM periods.periods;
 ```
-
-You should see `periods` listed with its installed SQL version.
-
-## Operation and privileges
-
-Temporal history uses ordinary PostgreSQL tables on the CNPG data volume. To retire history, suspend system versioning with `periods.drop_system_versioning`, delete expired history rows using SQL, then re-enable versioning. Define your retention interval and execute maintenance through an external SQL scheduler.
 
 ## Licenses and Copyright
 

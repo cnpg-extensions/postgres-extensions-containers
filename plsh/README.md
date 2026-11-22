@@ -3,14 +3,14 @@
 Lets you write PostgreSQL functions as shell scripts. Use it to call an
 existing shell script from SQL and read back its output.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+PL/sh is an untrusted language with no trusted variant. Its functions can
+access files, run programs, and use the network as PostgreSQL’s operating-system
+user; reserve it for exceptional cases requiring that level of access. Shell
+functions use the shell interpreter and command-line tools included in the
+CNPG PostgreSQL base image.
 
-## Usage
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/petere/plsh).
 
@@ -47,17 +47,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx plsh
+SELECT extversion FROM pg_extension WHERE extname = 'plsh';
 ```
-
-You should see `plsh` listed with its installed SQL version.
-
-## Operation and privileges
-
-PL/sh is an untrusted language: only superusers can create its functions. Commands run as the PostgreSQL OS user and inherit its filesystem and network access. This image supports the `/bin/sh` already supplied by the matching CNPG minimal image, with shell built-ins only. It does not add arbitrary external commands or support file-producing functions. Restrict function EXECUTE grants to trusted administrators.
 
 ## Licenses and Copyright
 

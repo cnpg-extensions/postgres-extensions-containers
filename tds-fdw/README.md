@@ -9,13 +9,7 @@ TDS (Tabular Data Stream) protocol via FreeTDS. Use it to combine PostgreSQL
 records with data that still lives in a SQL Server database.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/tds-fdw/tds_fdw).
 
@@ -55,21 +49,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx tds_fdw
+SELECT tds_fdw_validator(ARRAY[]::text[], 'pg_foreign_server'::regclass);
 ```
-
-You should see `tds_fdw` listed with its installed SQL version.
-
-## Known Caveats
-
-- **External database required**: Foreign table queries require a running
-  TDS-compatible database server and `CREATE SERVER` / `CREATE USER MAPPING`
-  configuration.
-- **Runtime library dependency**: The FreeTDS library (`libsybdb5`) is bundled
-  in the image under `/system/`.
 
 ## Licenses and Copyright
 

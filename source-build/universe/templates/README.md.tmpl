@@ -10,7 +10,12 @@ Describe what the extension does and what it is useful for.
 Start with a verb describing its user-facing functionality (for example,
 "Provides ..."); do not repeat the extension name from the heading.
 Follow with one short, plain-language sentence giving a practical use case.
-Keep configuration details in Usage.
+Optionally add a short second paragraph for CNPG/Kubernetes or image-specific notes.
+If the image bundles multiple extensions, name them and briefly explain their
+roles in that second paragraph.
+Include all bundled extensions in steps 2 and 3, except untrusted procedural
+languages and their helpers.
+Keep configuration details in the installation steps.
 Keep supported-target lists and build, packaging, and test-history details out
 of this README.
 -->
@@ -19,13 +24,11 @@ Provides [describe what the extension does].
 Use it to [give one simple, concrete example of how it helps a user].
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+<!-- Optional: add "## Dependencies and conflicts" here. Name required extensions,
+optional integrations, and tested conflicts with versions and symptoms.
+Keep it brief; omit if none. -->
 
 For more information, see the [upstream documentation](https://example.com).
 
@@ -43,6 +46,15 @@ from initial installation examples. Preserve extension-specific setup steps.
 Define the `{{ .Name }}` extension under the `postgresql.extensions` section of
 your `Cluster` resource. For example:
 
+<!--
+If preloads or PostgreSQL parameters are required, add a short, separate
+paragraph immediately before this YAML and show the same settings in it.
+Distinguish optional settings from requirements. Keep required settings here,
+not under caveats or verification; refer to upstream documentation for tuning.
+Omit this paragraph when no settings are needed; do not state that preloading
+is unnecessary.
+-->
+
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -57,6 +69,16 @@ spec:
 ```
 
 ### 2. Enable the extension in a database
+
+<!--
+If this extension has prerequisite extensions, name them here. When installation
+order must be controlled, replace the two installation options below with a SQL
+example that installs the prerequisites first, then this extension, in the same
+database. Use IF NOT EXISTS for prerequisites that may already be installed.
+CNPG does not automatically resolve extension dependencies. Keep dependency
+installation order here; section 1 should include any required extension images
+in the Cluster YAML. Prerequisites supplied by the base image need no extra image.
+-->
 
 Once the extension's files are available in the cluster, you can install it in a
 database in either of two ways:
@@ -75,13 +97,13 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
+<!-- Use one or two simple SQL statements calling an extension function or view;
+a version function is fine. Avoid setup sequences. Cover each enabled bundled
+extension. Use the catalog query below only when no suitable standalone call exists. Omit redundant \dx checks. -->
 
 ```sql
-\dx {{ replaceAll .Name "-" "_" }}
+SELECT extversion FROM pg_extension WHERE extname = '{{ .Name }}';
 ```
-
-You should see `{{ replaceAll .Name "-" "_" }}` listed with its installed SQL version.
 
 ## Licenses and Copyright
 

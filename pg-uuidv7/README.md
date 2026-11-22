@@ -10,13 +10,7 @@ Use it to give new records unique IDs that sort roughly in the order they were
 created.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/fboulnois/pg_uuidv7).
 
@@ -55,15 +49,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_uuidv7
-```
-
-You should see `pg_uuidv7` listed with its installed SQL version. You can then
-generate a UUIDv7 with:
 
 ```sql
 SELECT uuid_generate_v7();

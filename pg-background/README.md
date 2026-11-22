@@ -9,20 +9,11 @@ the calling session. Use it to launch a long-running database task while your
 session continues with other work.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/vibhorkum/pg_background).
 
 ### 1. Add the pg-background extension image to your Cluster
-
-The extension does not require `shared_preload_libraries`; preloading is only
-needed if you want to set its GUCs in server configuration before first use.
 
 Add the extension image to a complete Cluster definition:
 
@@ -57,23 +48,11 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_background
-```
-
-You should see `pg_background` listed with its installed SQL version.
-
 A superuser can run SQL in a background worker and inspect its completion metadata:
 
 ~~~sql
 SELECT * FROM pg_background_run('SELECT count(*) FROM pg_class');
 ~~~
-
-Use the function in `FROM` so it executes once. Expanding
-`(pg_background_run(...)).*` in the select list can execute it once per output
-column. The command runs in a separate worker. Grant only the privileges needed by the SQL being run; background execution does not bypass PostgreSQL authorization.
 
 ## Licenses and Copyright
 
