@@ -38,7 +38,10 @@ administrator-approved selection of extensions.
 ### 3. Verify installation
 
 ```sql
-SELECT extversion FROM pg_extension WHERE extname = 'pre_prepare';
+CREATE TABLE public.preprepare_example AS
+  SELECT 'get_answer' AS name, 'PREPARE get_answer AS SELECT 42' AS statement;
+SELECT prepare_all('public.preprepare_example');
+EXECUTE get_answer; -- returns 42
 ```
 
 ## Licenses and Copyright
