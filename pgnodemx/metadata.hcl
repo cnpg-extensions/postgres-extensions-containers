@@ -6,7 +6,7 @@ metadata = {
   image_name                 = "pgnodemx"
   licenses                   = ["PostgreSQL", "Apache-2.0"]
   shared_preload_libraries   = ["pgnodemx"]
-  postgresql_parameters      = {"pgnodemx.kdapi_enabled" = "off"}
+  postgresql_parameters      = {}
   extension_control_path     = []
   dynamic_library_path       = []
   ld_library_path            = []

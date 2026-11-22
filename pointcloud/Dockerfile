@@ -25,6 +25,6 @@ COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/pointcloud-1.2.so /lib/
 COPY --from=builder /usr/lib/postgresql/${PG_MAJOR}/lib/bitcode/ /lib/bitcode/
 
 # Share
-COPY --from=builder /usr/share/postgresql/${PG_MAJOR}/extension/pointcloud.control /usr/share/postgresql/${PG_MAJOR}/extension/pointcloud--*.sql /share/extension/
+COPY --from=builder /usr/share/postgresql/${PG_MAJOR}/extension/pointcloud* /share/extension/
 
 USER 65532:65532
