@@ -4,17 +4,12 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[numeral](https://github.com/df7cb/postgresql-numeral) provides a compact numeral data type with arithmetic, comparison and
-bitwise operators.
+Provides numeric types that read and write numbers as English or German words
+or Roman numerals. Use it to calculate with values written as words, such as
+adding "thirty" and "twelve" to get "forty-two".
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/df7cb/postgresql-numeral).
 
@@ -50,14 +45,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx numeral
-```
-
-You should see `numeral` listed with its installed SQL version.
 
 A SQL check that exercises the installed extension is:
 

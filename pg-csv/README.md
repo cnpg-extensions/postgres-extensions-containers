@@ -1,15 +1,10 @@
 # pg_csv
 
-[pg_csv](https://github.com/PostgREST/pg_csv/) lets you parse and generate CSV data directly in PostgreSQL.
+Lets you parse and generate CSV data directly in PostgreSQL. Use it to turn
+query results into CSV text that a spreadsheet can read.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/PostgREST/pg_csv/).
 
@@ -46,17 +41,10 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_csv
+SELECT csv_agg(sample)
+FROM (VALUES (1, 'hello'), (2, 'world')) AS sample(id, label);
 ```
-
-You should see `pg_csv` listed with its installed SQL version.
-
-## Operation and privileges
-
-CSV is returned as SQL text; this image supports no server-side CSV file export. Clients own storage and retention of exported results.
 
 ## Licenses and Copyright
 

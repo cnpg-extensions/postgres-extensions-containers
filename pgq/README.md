@@ -4,17 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PgQ](https://github.com/pgq/pgq) provides a transactional event queue in PostgreSQL for applications that
+Provides a transactional event queue in PostgreSQL for applications that
 process events asynchronously.
+Use it to queue work when data changes so another program can handle it later.
+
+Run `pgqd` on a separate server and connect it to your CNPG primary to
+advance queues and perform maintenance. This image supplies only the
+database extension.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/pgq/pgq).
 
@@ -51,20 +50,10 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pgq
-```
-
-You should see `pgq` listed with its installed SQL version.
-
 ~~~sql
 SELECT pgq.create_queue('order_events');
 SELECT pgq.insert_event('order_events', 'order_created', 'order_id=42');
 ~~~
-
-A separate `pgqd` daemon advances ticks and handles queue maintenance. The server image does not start or supervise daemon processes.
 
 ## Licenses and Copyright
 

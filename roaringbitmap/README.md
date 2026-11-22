@@ -4,17 +4,12 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[roaringbitmap](https://github.com/ChenHuajun/pg_roaringbitmap) provides compressed Roaring bitmap data structures and set
-operations for PostgreSQL.
+Provides compressed Roaring bitmap data structures and set operations for
+PostgreSQL. Use it to find or count values shared by large groups, such as
+records appearing in two different lists.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/ChenHuajun/pg_roaringbitmap).
 
@@ -50,14 +45,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx roaringbitmap
-```
-
-You should see `roaringbitmap` listed with its installed SQL version.
 
 A SQL check that exercises the installed extension is:
 

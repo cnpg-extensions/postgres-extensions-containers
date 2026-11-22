@@ -1,22 +1,18 @@
 # decoderbufs
 
-[decoderbufs](https://github.com/debezium/postgres-decoderbufs) serializes PostgreSQL change events as Protocol Buffers for logical
-replication clients.
+Serializes PostgreSQL change events as Protocol Buffers for logical replication
+clients. Use it with a compatible CDC (change-data capture) client to send
+record changes to another system.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/debezium/postgres-decoderbufs).
 
 ### 1. Add the decoderbufs extension image to your Cluster
 
-Use this declarative Cluster setup:
+Logical decoding requires `wal_level: logical` and `decoderbufs` in
+`output_plugin_libraries`, as shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -33,11 +29,10 @@ spec:
     - name: decoderbufs
 ```
 
-`decoderbufs` is an output plugin. Although the package contains a control file,
-there is no SQL installation script: do not request `CREATE EXTENSION decoderbufs`
-or list it in a Database resource's SQL extensions.
-
 ### 2. Verify installation
+
+`decoderbufs` does not appear in the database's installed-extension list
+(`\dx` in `psql`).
 
 Clients connect through the CNPG-managed PostgreSQL Service, using a replication
 role and approved authentication. Create a slot using the replication protocol

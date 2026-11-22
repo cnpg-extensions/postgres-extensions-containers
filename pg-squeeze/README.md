@@ -4,23 +4,21 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_squeeze](https://github.com/cybertec-postgresql/pg_squeeze) reclaims unused table space and can sort rows according to an index
-while allowing normal reads and writes for most of the operation.
+Reclaims unused table space and can sort rows according to an index while
+allowing normal reads and writes for most of the operation.
+Use it to automatically shrink tables that have grown wasteful after many
+updates and deletions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_squeeze).
 
 ### 1. Add the pg-squeeze extension image to your Cluster
 
-Add the image to a Cluster and enable logical decoding for this extension:
+This extension requires `pg_squeeze` in `shared_preload_libraries`, as shown
+below. Also set `wal_level: logical` and include `pg_squeeze` in
+`output_plugin_libraries`.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -31,7 +29,6 @@ spec:
   imageCatalogRef: ...
   postgresql:
     parameters:
-      max_replication_slots: '1'
       output_plugin_libraries: pg_squeeze
       wal_level: logical
     shared_preload_libraries:
@@ -58,14 +55,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_squeeze
-```
-
-You should see `pg_squeeze` listed with its installed SQL version.
 
 The extension stores its configuration and logs in the squeeze schema. A
 table can be registered for maintenance after it has an identity index. Replace

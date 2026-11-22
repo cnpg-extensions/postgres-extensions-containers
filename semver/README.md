@@ -4,19 +4,14 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[semver](https://pgxn.org/dist/semver/doc/semver.html) provides a semantic-version data type with comparison and ordering
-operators.
+Provides a semantic-version data type with comparison and ordering operators.
+Use it to sort software releases correctly, so version 1.10.0 comes after
+1.9.0.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
-
-For more information, see the [upstream documentation](https://pgxn.org/dist/semver/doc/semver.html).
+For more information, see the [upstream documentation](https://github.com/theory/pg-semver).
 
 ### 1. Add the semver extension image to your Cluster
 
@@ -50,14 +45,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx semver
-```
-
-You should see `semver` listed with its installed SQL version.
 
 A SQL check that exercises the installed extension is:
 

@@ -1,16 +1,11 @@
 # pgfincore
 
-[pgfincore](http://villemain.org/projects/pgfincore) lets you inspect and manage PostgreSQL relation data in the operating
-system page cache.
+Lets you inspect and manage PostgreSQL relation data in the operating system
+page cache.
+Use it to load a table into memory before a large query needs it.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](http://villemain.org/projects/pgfincore).
 
@@ -47,17 +42,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pgfincore
+SELECT * FROM pgsysconf();
 ```
-
-You should see `pgfincore` listed with its installed SQL version.
-
-## Operation and privileges
-
-Administrative functions inspect or advise the operating-system page cache for relation files. Calls are limited by PostgreSQL and container permissions. Optional filesystem export/import features are not supported; use the SQL-returning inspection and cache-advice functions.
 
 ## Licenses and Copyright
 

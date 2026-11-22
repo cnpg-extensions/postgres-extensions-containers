@@ -4,19 +4,13 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pgmp](https://github.com/dvarrazzo/pgmp) is a PostgreSQL extension that provides arbitrary precision integer and
-rational arithmetic using the GNU Multiple Precision Arithmetic Library (GMP).
-It adds `mpz` (integer) and `mpq` (rational) data types with full arithmetic
-support.
+Provides arbitrary precision integer and rational arithmetic using the GNU
+Multiple Precision Arithmetic Library (GMP).
+Use it to calculate with very large whole numbers and exact fractions without
+rounding them.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/dvarrazzo/pgmp).
 
@@ -56,21 +50,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pgmp
+SELECT '12345678901234567890'::mpz + '1'::mpz;
 ```
-
-You should see `pgmp` listed with its installed SQL version.
-
-## Known Caveats
-
-- **Non-standard SQL directory**: The `pgmp.control` file specifies
-  `directory = 'pgmp'`, so SQL migration scripts are installed in
-  `/usr/share/postgresql/<version>/pgmp/` rather than the standard `extension/`
-  subdirectory. The Dockerfile handles this with an additional `COPY` for the
-  `pgmp/` directory.
 
 ## Licenses and Copyright
 

@@ -4,24 +4,25 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_textsearch](https://github.com/timescale/pg_textsearch) is a PostgreSQL extension for full-text search with BM25 relevance
-ranking.
+Provides full-text search with BM25 relevance ranking. Use it to search
+stored text and show the most relevant matches first, such as matching
+articles or descriptions.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+## Dependencies and conflicts
+
+Background compaction requires `pg_durable` 0.2.8 or later in the same database.
 
 For more information, see the [upstream documentation](https://github.com/timescale/pg_textsearch).
 
 ### 1. Add the pg-textsearch extension image to your Cluster
 
-Define the `pg-textsearch` extension under the `postgresql.extensions` section of
-your `Cluster` resource. For example:
+This example uses [pg_durable](../pgrx/pg-durable/README.md) for background
+index compaction in the `app` database. Both extensions must be preloaded.
+CNPG manages `workflow_runner`, the login that owns the example index and
+runs its compaction workflows. HTTP activities are disabled.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -30,114 +31,53 @@ metadata:
   name: cluster-pg-textsearch
 spec:
   imageCatalogRef: ...
+  managed:
+    roles:
+    - name: workflow_runner
+      login: true
   postgresql:
-    shared_preload_libraries:
-    - pg_textsearch
     parameters:
-      hot_standby_feedback: "on"
+      pg_durable.database: app
+      pg_durable.http_security: disabled
+    pg_ident:
+    - local postgres workflow_runner
+    shared_preload_libraries:
+    - pg_durable
+    - pg_textsearch
     extensions:
+    - name: pg-durable
     - name: pg-textsearch
 ```
 
 ### 2. Enable the extension in a database
 
-Once the extension's files are available in the cluster, you can install it in a
-database in either of two ways:
+As an administrator in `app`, install both extensions and prepare a schema
+owned by the workflow runner:
 
-- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-- **Through SQL**, by running `CREATE EXTENSION pg_textsearch;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
-
-For extensions that normally require superuser privileges, platform teams can use
-[pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
-administrator-approved selection of extensions.
-
-For declarative installation, use:
-
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: cluster-pg-textsearch-app
-spec:
-  name: app
-  owner: app
-  cluster:
-    name: cluster-pg-textsearch
-  extensions:
-  - name: pg_textsearch
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_durable;
+CREATE EXTENSION pg_textsearch;
+SELECT df.grant_usage('workflow_runner');
+CREATE SCHEMA search AUTHORIZATION workflow_runner;
 ```
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
+As `workflow_runner` in `app`, create and query an index with background
+compaction enabled:
 
 ```sql
-\dx pg_textsearch
-```
-
-You should see `pg_textsearch` listed with its installed SQL version. The extension must be
-included in `shared_preload_libraries`; the Cluster example above supplies this
-setting explicitly because preloads are not inherited from the catalog.
-
-### 4. Create and query an index
-
-```sql
+SET search_path TO search, public;
 CREATE TABLE documents (id bigint PRIMARY KEY, content text);
 INSERT INTO documents VALUES
   (1, 'PostgreSQL database search'),
   (2, 'BM25 relevance ranking');
 CREATE INDEX documents_bm25 ON documents USING bm25(content)
-  WITH (text_config = 'english');
+  WITH (text_config = 'english', compaction = 'background');
 SELECT id, content FROM documents
 ORDER BY content <@> 'database search'
 LIMIT 5;
 ```
-
-Lower (negative) scores rank first. Inspect the plan with `EXPLAIN`; PostgreSQL
-may choose a sequential scan for small tables.
-
-## Optional managed background compaction
-
-This image does not bundle pg_durable. The default `inline` compaction mode does
-not require it. Managed `background` mode is an upstream preview feature and
-requires pg_durable 0.2.8 or later in the same database.
-
-To use our separate [pg-durable image](../pgrx/pg-durable/README.md), add
-`pg-durable` to `postgresql.extensions`, add `pg_durable` to
-`shared_preload_libraries`, and set `pg_durable.database` in
-`postgresql.parameters` to the target database (for example, `app`). Install
-both extensions there. The index owner must have `LOGIN` and pg_durable usage
-privileges, granted by an administrator with `SELECT df.grant_usage('app');`
-when the owner is `app`. Superuser-owned workflows require an additional
-pg_durable setting; this example uses a non-superuser owner.
-
-Configure authentication for pg_durable's management and index-owner connections
-before enabling background mode; see its [authentication caveats](../pgrx/pg-durable/README.md#known-caveats).
-As the index owner, enable it on an existing index with:
-
-```sql
-ALTER INDEX documents_bm25 SET (compaction = 'background');
-```
-
-Return to explicit maintenance with `compaction = 'manual'`, or to foreground
-compaction with `compaction = 'inline'`. See the
-[upstream background-compaction documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#background-compaction)
-for scheduling and workflow lifecycle details.
-
-## Replication and recovery
-
-Keep `hot_standby_feedback = on` when replicas serve search queries. Upstream
-requires this so active replica snapshots delay index page reuse on the primary.
-The Cluster example supplies it explicitly. The index is WAL-logged; its
-shared-memory cache is rebuilt from persisted index data.
-See the [versioned upstream documentation](https://github.com/timescale/pg_textsearch/blob/v1.5.1/README.md#compaction).
-
-Clients must reconnect when CNPG closes connections during a role change.
 
 ## Licenses and Copyright
 

@@ -4,26 +4,25 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_parquet](https://github.com/CrunchyData/pg_parquet) is a PostgreSQL extension for reading and writing Parquet files with
-PostgreSQL's `COPY TO/FROM` commands. It supports local files, S3, Azure Blob
-Storage, Google Cloud Storage, and HTTP(S) endpoints.
+Reads and writes Parquet files with PostgreSQL's `COPY TO/FROM` commands.
+Use it to move data between database tables and files used by analytics tools.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+## Dependencies and conflicts
+
+Avoid using pg_parquet and [pg_duckdb](../../universe/pg-duckdb/README.md) in
+the same cluster. Light testing with pg_duckdb 1.2.0 and pg_parquet 0.5.1
+found that DuckDB can intercept Parquet `COPY FROM` intended for pg_parquet.
+Other issues may remain undiscovered.
 
 For more information, see the [upstream documentation](https://github.com/CrunchyData/pg_parquet).
 
 ### 1. Add the pg-parquet extension image to your Cluster
 
-Define the `pg-parquet` extension under the `postgresql.extensions` section of
-your `Cluster` resource. The extension must also be added to
-`shared_preload_libraries`. For example:
+This extension requires `pg_parquet` in `shared_preload_libraries`, as shown
+below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -58,29 +57,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_parquet
+SELECT extversion FROM pg_extension WHERE extname = 'pg_parquet';
 ```
-
-You should see `pg_parquet` listed with its installed SQL version.
-
-## Known Caveats
-
-- `pg_parquet` must be loaded through `shared_preload_libraries`; the Cluster
-  configuration above supplies this setting.
-- When also preloading `pg_duckdb`, place `pg_parquet` after it for the
-  [COPY hook ordering](../../universe/pg-duckdb/README.md#known-caveats).
-- Local `COPY TO` paths must be writable by PostgreSQL. Use a path under the
-  writable PostgreSQL data volume rather than `/tmp` on CNPG's read-only root
-  filesystem.
-- To read from or write to an object store, grant the corresponding
-  `parquet_object_store_read` or `parquet_object_store_write` role to the
-  PostgreSQL user. Configure credentials using the methods described in the
-  [upstream documentation](https://github.com/CrunchyData/pg_parquet#object-store-support).
-- The `pg_parquet.enable_copy_hooks` parameter can be set to `off` to disable
-  the extension's COPY hooks for a session or role.
 
 ## Licenses and Copyright
 

@@ -1,15 +1,10 @@
 # pg_permissions
 
-[pg_permissions](https://github.com/cybertec-postgresql/pg_permissions) lets you inspect database permissions through SQL views.
+Lets you inspect database permissions through SQL views. Use it to check who
+can read or change a table and spot access that should not be allowed.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/cybertec-postgresql/pg_permissions).
 
@@ -46,17 +41,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_permissions
+SELECT * FROM table_permissions LIMIT 5;
 ```
-
-You should see `pg_permissions` listed with its installed SQL version.
-
-## Operation and privileges
-
-Permissions are exposed through SQL views in the extension installation schema. Restrict access to administrative roles when object or role names are sensitive.
 
 ## Licenses and Copyright
 

@@ -1,20 +1,25 @@
 # credcheck
 
-[credcheck](https://github.com/MigOpsRepos/credcheck) checks usernames and passwords against configurable policies when
-roles are created or credentials change.
+Checks usernames and passwords against configurable policies when roles are
+created or credentials change. Use it to stop database users from choosing
+passwords that are too short or easy to guess.
+
+Password complexity checks require setting passwords through SQL with the
+plaintext password available to the database. This is incompatible with
+`psql`'s `\password` command and CNPG declarative password management, which
+submit precomputed hashes that credcheck rejects by default. Consider the
+security implications of transmitting passwords to the database rather than
+precomputed hashes, including how the connection is protected.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/MigOpsRepos/credcheck).
 
 ### 1. Add the credcheck extension image to your Cluster
+
+This extension requires `credcheck` in `shared_preload_libraries`, as shown
+below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -24,8 +29,6 @@ metadata:
 spec:
   imageCatalogRef: ...
   postgresql:
-    parameters:
-      credcheck.encrypted_password_allowed: 'on'
     shared_preload_libraries:
     - credcheck
     extensions:
@@ -51,19 +54,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx credcheck
+SELECT count(*) AS banned_roles FROM pg_banned_role;
 ```
-
-You should see `credcheck` listed with its installed SQL version.
-
-## Operation and privileges
-
-CNPG reconciles role credentials using precomputed SCRAM verifiers. Set `credcheck.encrypted_password_allowed: "on"` so those updates succeed. Plaintext password policy cannot inspect precomputed verifiers; enforce equivalent policy where Kubernetes password Secrets are generated. SQL role changes using plaintext passwords remain checked.
-
-Credential checks apply to role creation and password changes. Configure policy settings in `postgresql.parameters`; only administrators should change them.
 
 ## Licenses and Copyright
 

@@ -4,25 +4,21 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_cron](https://github.com/citusdata/pg_cron) is an open-source extension that provides a simple cron-based job
-scheduler for PostgreSQL, allowing you to schedule PostgreSQL commands directly
-from the database.
+Provides a simple cron-based job scheduler for PostgreSQL, allowing you to
+schedule PostgreSQL commands directly from the database. Use it to delete old
+records every night or refresh a report every hour.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/citusdata/pg_cron).
 
 ### 1. Add the pg-cron extension image to your Cluster
 
-Define the `pg-cron` extension under the `postgresql.extensions` section of
-your `Cluster` resource. For example:
+This extension requires `pg_cron` in `shared_preload_libraries`, as shown
+below. Set `cron.database_name` to the database where you install the
+extension (`app` below). This example also enables
+`cron.use_background_workers` to run jobs as background workers.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -60,13 +56,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx pg_cron
+SELECT jobid, schedule, command FROM cron.job;
 ```
-
-You should see `pg_cron` listed with its installed SQL version.
 
 ## Licenses and Copyright
 

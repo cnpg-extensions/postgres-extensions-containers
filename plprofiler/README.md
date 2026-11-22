@@ -4,19 +4,11 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[plprofiler](https://github.com/bigsql/plprofiler) is a PostgreSQL extension that provides execution profiling for
-PL/pgSQL functions and procedures. It collects per-statement call counts, total
-execution time, and self-time, helping you identify performance bottlenecks in
-stored procedure code.
+Provides execution profiling for PL/pgSQL functions and procedures. Use it to
+find which line of a database function is taking the most time.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/bigsql/plprofiler).
 
@@ -56,13 +48,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx plprofiler
+SELECT pl_profiler_versionstr();
 ```
-
-You should see `plprofiler` listed with its installed SQL version.
 
 ## Licenses and Copyright
 

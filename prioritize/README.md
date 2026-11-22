@@ -1,18 +1,20 @@
 # prioritize
 
-[prioritize](http://pgxn.org/dist/prioritize/) lets you inspect and change the operating system scheduling priority
-of PostgreSQL backends.
+Lets you inspect and change the operating system scheduling priority of
+PostgreSQL backends. Use it to give a long report less CPU priority so more
+urgent queries can take precedence.
+
+> [!CAUTION]
+> Lowering a backend’s CPU priority can delay other backends
+> waiting for locks it holds, including internal spinlocks. Spinlock waits do
+> not automatically raise the lock holder’s priority; exercise care and test
+> under CPU contention before changing priorities in production. See the
+> [PostgreSQL spinlock implementation](https://github.com/postgres/postgres/blob/master/src/backend/storage/lmgr/s_lock.c).
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
-
-For more information, see the [upstream documentation](http://pgxn.org/dist/prioritize/).
+For more information, see the [upstream documentation](https://github.com/schmiddy/pg_prioritize).
 
 ### 1. Add the prioritize extension image to your Cluster
 
@@ -47,17 +49,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx prioritize
+SELECT get_backend_priority(pg_backend_pid());
 ```
-
-You should see `prioritize` listed with its installed SQL version.
-
-## Operation and privileges
-
-Backend priority functions require database privileges and are subject to OS permissions. An unprivileged CNPG process can lower its scheduling priority by increasing the nice value; raising priority normally requires CAP_SYS_NICE and is not supported. No extra capability is requested.
 
 ## Licenses and Copyright
 

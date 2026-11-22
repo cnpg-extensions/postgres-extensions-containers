@@ -4,24 +4,16 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_tcpinfo](https://github.com/jakubwartakEDB/pg_stat_tcpinfo) exposes live Linux TCP socket statistics through SQL so you can
-inspect PostgreSQL connections.
+Exposes live Linux TCP socket statistics through SQL so you can inspect
+PostgreSQL connections.
+Use it to check whether network delays explain a slow database connection.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
 
 ### 1. Add the pg-stat-tcpinfo extension image to your Cluster
-
-Define `pg-stat-tcpinfo` under `postgresql.extensions`.
-No shared preload configuration is needed.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -54,24 +46,6 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_stat_tcpinfo
-```
-
-You should see `pg_stat_tcpinfo` listed with its installed SQL version.
-
-## Query TCP statistics
-
-As an administrator, grant monitoring access to the application role:
-
-```sql
-GRANT pg_monitor TO app;
-```
-
-Connect over TCP as that role, then query:
-
 ```sql
 SELECT pid, src_addr, src_port, dst_addr, dst_port, state,
        tcpinfo->>'rtt' AS rtt
@@ -79,16 +53,6 @@ FROM pg_stat_tcpinfo
 WHERE state = 'ESTABLISHED'
 ORDER BY pid;
 ```
-
-The extension reports sockets owned by PostgreSQL's OS user within the pod's
-network namespace. It requires Linux procfs and netlink socket diagnostics;
-restricted sandbox policies can prevent collection. UNIX-domain connections do
-not appear as TCP sockets; use a TCP connection when verifying the view.
-
-Access is restricted to `pg_read_all_stats` (also inherited by `pg_monitor`),
-not PUBLIC. These monitoring roles expose additional database statistics;
-grant them only to appropriate users. No persistent files or maintenance daemon
-are needed.
 
 ## Licenses and Copyright
 

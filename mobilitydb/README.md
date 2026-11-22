@@ -4,27 +4,28 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[MobilityDB](https://mobilitydb.com/) is a PostgreSQL extension that adds support for temporal and
-spatio-temporal data types. It enables moving object databases for tracking
-positions, trajectories, and other time-varying spatial attributes. MobilityDB
-extends PostGIS with temporal types for geographic data.
+Adds support for temporal and spatio-temporal data types. Use it to track
+where something was at a particular time, such as a vehicle along its route.
+MobilityDB extends PostGIS with temporal types for geographic data.
+
+This image includes `mobilitydb` for working with data that changes over time
+and the optional `mobilitydb_datagen` extension for creating random test data.
+Enable `mobilitydb_datagen` only if needed, after enabling `mobilitydb`.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+## Dependencies and conflicts
+
+Requires `postgis`. The optional `mobilitydb_datagen` extension requires
+`mobilitydb` in the same database.
 
 For more information, see the [upstream documentation](https://mobilitydb.com/).
 
 ### 1. Add the mobilitydb extension image to your Cluster
 
-Define the `mobilitydb` extension under the `postgresql.extensions` section of
-your `Cluster` resource. MobilityDB **requires PostGIS** to be loaded first.
-For example:
+Include both the `postgis` and `mobilitydb` extension images in your Cluster,
+as shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -41,11 +42,11 @@ spec:
 
 ### 2. Enable the extension in a database
 
-Once the extension's files are available in the cluster, you can install it in a
-database in either of two ways:
-
-- **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
-- **Through SQL**, by running `CREATE EXTENSION mobilitydb;` in the target database.
+```sql
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION mobilitydb;
+CREATE EXTENSION mobilitydb_datagen;
+```
 
 Platform teams may make extension containers available across their clusters
 without installing every extension in every database. Install only the extensions
@@ -56,26 +57,12 @@ For extensions that normally require superuser privileges, platform teams can us
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
 administrator-approved selection of extensions.
 
-Install `postgis`, then `mobilitydb` in that order.
-
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx mobilitydb
+SELECT mobilitydb_version();
+SELECT random_int(1, 10);
 ```
-
-You should see `mobilitydb` listed with its installed SQL version.
-
-## Known Caveats
-
-- **Requires PostGIS**: MobilityDB depends on PostGIS. You must include the
-  PostGIS extension image in your cluster and create the `postgis` extension
-  before creating `mobilitydb`. The `required_extensions` field in the metadata
-  enforces this ordering.
-- **Runtime library dependency**: This extension requires GEOS and other spatial
-  libraries at runtime. These are bundled in the image under `/system/`.
 
 ## Licenses and Copyright
 

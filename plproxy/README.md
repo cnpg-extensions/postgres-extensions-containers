@@ -1,16 +1,16 @@
 # plproxy
 
-[PL/Proxy](https://plproxy.github.io/) lets you route function calls to remote PostgreSQL databases for
-partitioned workloads.
+Lets you route function calls to remote PostgreSQL databases for partitioned
+workloads. Use it to look up records spread across several databases without
+having to choose the right database for each request.
+
+PL/Proxy is an untrusted language with no trusted variant. Only database
+superusers can create its functions, which can connect to other databases
+using credentials available to PostgreSQL. Reserve function creation for
+administrators who control those connections.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://plproxy.github.io/).
 
@@ -47,17 +47,9 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
 ```sql
-\dx plproxy
+SELECT extversion FROM pg_extension WHERE extname = 'plproxy';
 ```
-
-You should see `plproxy` listed with its installed SQL version.
-
-## Operation and privileges
-
-PL/Proxy forwards SQL through PostgreSQL connections. Its dynamically linked libpq and transitive libraries are supplied by the matching CNPG minimal base (which includes psql); no runtime installation is needed. Configure connection strings and credentials through SQL and Kubernetes Secrets, and allow only required outbound destinations.
 
 ## Licenses and Copyright
 

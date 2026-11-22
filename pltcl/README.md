@@ -4,17 +4,17 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PL/Tcl](https://www.postgresql.org/docs/18/pltcl.html) lets you write PostgreSQL functions in Tcl. It provides the trusted
-`pltcl` and untrusted `pltclu` language variants.
+Lets you write PostgreSQL functions in Tcl. Use it to update a row’s change
+counter automatically with a small Tcl script.
+
+This image includes both `pltcl` and `pltclu`, which you can enable separately.
+Use `pltcl`, the trusted Tcl language, for normal use. The untrusted `pltclu`
+language can access files, run programs, and use the network as PostgreSQL’s
+operating-system user; reserve it for exceptional cases requiring that level
+of access.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://www.postgresql.org/docs/18/pltcl.html).
 
@@ -53,14 +53,6 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pltcl
-```
-
-You should see `pltcl` listed with its installed SQL version.
-
 A trusted Tcl function can perform simple computation:
 
 ```sql
@@ -68,10 +60,6 @@ CREATE FUNCTION tcl_add(a integer, b integer) RETURNS integer
 AS $$ return [expr {$1 + $2}] $$ LANGUAGE pltcl;
 SELECT tcl_add(19, 23); -- 42
 ```
-
-`pltcl` uses Tcl's safe interpreter, which omits commands such as `exec` and `open`; it cannot access the host filesystem or launch processes directly. To install the untrusted variant, a superuser runs `CREATE EXTENSION pltclu;`. Only superusers can create `pltclu` functions. Those functions run as the PostgreSQL operating-system user with its available filesystem, process and network access. Review untrusted function code and privileges carefully. The included examples perform SQL-only work.  Before enabling `pltclu` functions that produce persistent files, declaratively provide a volume with suitable ownership/access, retention, and cleanup; the image does not define an application data-storage lifecycle.
-
-The extension configuration adds the image's `/system` directory to the loader path, sets `TCL_LIBRARY` to the packaged Tcl 8.6 scripts, and sets `TCL8_6_TM_PATH` to its modules, including `msgcat` used by date functions. Users need no package installation or filesystem changes in the database container.
 
 ## Licenses and Copyright
 

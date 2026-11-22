@@ -1,19 +1,13 @@
 # pg-gvm
 
-[pg-gvm](https://github.com/greenbone/pg-gvm) adds Greenbone helper functions to PostgreSQL, including host-list
-matching, regular-expression matching and iCalendar schedule calculations. It
-supplies the SQL library only; it does not install or operate Greenbone
-Vulnerability Manager services.
+Provides database helper functions for Greenbone vulnerability management.
+Use it to support a Greenbone manager that stores scan results in PostgreSQL.
+
+Run the Greenbone manager and scanners on a separate server. The manager
+connects to your CNPG database; this image supplies only the database extension.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/greenbone/pg-gvm).
 
@@ -50,21 +44,11 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg-gvm
-```
-
-You should see `pg-gvm` listed with its installed SQL version.
-
-The image installs the pg-gvm SQL extension but not a GVM manager or scanner. A standalone expression check is:
+Run a simple check of a helper function:
 
 ~~~sql
 SELECT regexp('host.example', '^host');
 ~~~
-
-The package also includes host-list and iCalendar helpers used by Greenbone SQL workflows. `hosts_contains()` reads Greenbone's `meta` table, so it is exercised only in a database with that application schema installed.
 
 ## Licenses and Copyright
 

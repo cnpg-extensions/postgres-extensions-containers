@@ -4,24 +4,20 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_stat_plans](https://github.com/pganalyze/pg_stat_plans) tracks aggregate per-plan call counts, execution times, plan IDs,
-and `EXPLAIN` plan text in PostgreSQL. It is useful for identifying plan
-regressions and comparing different plans chosen for the same query.
+Tracks aggregate per-plan call counts, execution times, plan IDs, and `EXPLAIN`
+plan text in PostgreSQL.
+Use it to investigate whether a query became slower because PostgreSQL chose a
+different way to run it.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/pganalyze/pg_stat_plans).
 
 ### 1. Add the pg-stat-plans extension image to your Cluster
 
-Add the image to a Cluster and preload pg_stat_plans:
+This extension requires `pg_stat_plans` in `shared_preload_libraries`, as
+shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -55,14 +51,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_stat_plans
-```
-
-You should see `pg_stat_plans` listed with its installed SQL version.
 
 Inspect the collected plan statistics:
 

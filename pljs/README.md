@@ -4,17 +4,11 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[PL/JS](https://github.com/plv8/pljs) lets you write PostgreSQL functions in JavaScript using the QuickJS
-engine.
+Lets you write PostgreSQL functions in JavaScript using the QuickJS engine. Use
+it to turn database values into JSON with JavaScript code you already know.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/plv8/pljs).
 
@@ -53,14 +47,6 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pljs
-```
-
-You should see `pljs` listed with its installed SQL version.
-
 A function exercises the JavaScript runtime:
 
 ```sql
@@ -68,8 +54,6 @@ CREATE FUNCTION js_double(a integer) RETURNS integer
 LANGUAGE pljs AS $$ return a * 2; $$;
 SELECT js_double(21); -- 42
 ```
-
-The language is trusted, but the extension itself must be installed by a database superuser. Continue to apply PostgreSQL's normal function and schema privileges to JavaScript functions. The included example performs SQL-only work.  If application functions are extended to write files through other installed interfaces, declaratively provide a volume with suitable ownership/access, retention, and cleanup before enabling that workflow.
 
 ## Licenses and Copyright
 

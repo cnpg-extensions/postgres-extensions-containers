@@ -4,18 +4,12 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[toastinfo](https://github.com/df7cb/toastinfo) describes how PostgreSQL stores variable-length values, including
-inline, compressed, and out-of-line TOAST values. It does not need to be
-preloaded.
+Describes how PostgreSQL stores variable-length values, including inline,
+compressed, and out-of-line TOAST values. Use it to check whether a large text
+value is compressed or stored separately from its row.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/df7cb/toastinfo).
 
@@ -53,14 +47,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx toastinfo
-```
-
-You should see `toastinfo` listed with its installed SQL version.
 
 Use `pg_toastinfo` and `pg_toastpointer` to inspect a value. Replace
 `my_table` and `value` with your table and a variable-length column:

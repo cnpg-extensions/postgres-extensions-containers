@@ -4,23 +4,29 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_duckdb](https://github.com/duckdb/pg_duckdb) integrates DuckDB's analytical query engine with PostgreSQL. It
-supports analytical queries over PostgreSQL tables and external data.
+Integrates DuckDB's analytical query engine with PostgreSQL. Use it to
+summarize large datasets with SQL, such as calculating totals across
+millions of records.
 
 Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
+first, then use the CronJob to install and refresh the catalog.
 
-## Usage
+## Dependencies and conflicts
+
+Avoid using pg_duckdb and [pg_parquet](../../pgrx/pg-parquet/README.md) in the
+same cluster. Light testing with pg_duckdb 1.2.0 and pg_parquet 0.5.1
+found that DuckDB can intercept Parquet `COPY FROM` intended for pg_parquet.
+Other issues may remain undiscovered.
+
+PL/pgSQL: DuckDB execution inside functions is disabled by default because
+it can cause crashes; see the [upstream limitation](https://github.com/duckdb/pg_duckdb/blob/v1.2.0/docs/settings.md#duckdbunsafe_allow_execution_inside_functions).
 
 For more information, see the [upstream documentation](https://github.com/duckdb/pg_duckdb).
 
 ### 1. Add the pg-duckdb extension image to your Cluster
 
-Define the extension under `postgresql.extensions` and preload `pg_duckdb`:
+This extension requires `pg_duckdb` in `shared_preload_libraries`, as shown
+below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -58,34 +64,8 @@ administrator-approved selection of extensions.
 Connect to the database with `psql` and run:
 
 ```sql
-\dx pg_duckdb
+SELECT * FROM duckdb.query('SELECT version()');
 ```
-
-You should see `pg_duckdb` listed with its installed SQL version. See the
-[upstream documentation](https://github.com/duckdb/pg_duckdb/tree/v1.2.0/docs)
-for querying with DuckDB and accessing external data.
-
-## Known Caveats
-
-- `pg_duckdb` requires `shared_preload_libraries`; adding it to an existing
-  cluster requires PostgreSQL to restart. The catalog supplies `ld_library_path: [system]` so the
-  extension can load its bundled DuckDB shared library.
-- DuckDB execution defaults to superusers. Review upstream's role and secret
-  access settings before granting access through `duckdb.allowed_role`.
-- Temporary files and downloaded extensions use `$PGDATA/pg_duckdb/temp` and
-  `$PGDATA/pg_duckdb/extensions`. The PostgreSQL user needs write access to these
-  directories. Superusers can configure `duckdb.temporary_directory` and
-  `duckdb.extension_directory`.
-- The image includes DuckDB's json and icu extensions. Other loadable
-  extensions, such as httpfs, are downloaded separately at runtime.
-
-- When combining pg_duckdb 1.2.0 with pg_parquet 0.5.1, put `pg_parquet`
-  after `pg_duckdb` in `shared_preload_libraries` so DuckDB does not intercept
-  Parquet `COPY FROM` into PostgreSQL tables and reject it as unsupported.
-- Use top-level `EXPLAIN (FORMAT JSON)` for forced DuckDB queries. Dynamic
-  execution inside PL/pgSQL can raise
-  `INTERNAL Error: Attempted to access index 1 within vector of size 1`
-  from `PGDuckDB/Duckdb_ExplainCustomScan_Cpp`.
 
 ## Licenses and Copyright
 

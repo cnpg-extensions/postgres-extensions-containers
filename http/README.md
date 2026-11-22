@@ -5,17 +5,12 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[http](https://github.com/pramsey/pgsql-http) adds HTTP client functions to PostgreSQL so SQL can call HTTP services
-through libcurl.
+Adds HTTP client functions to PostgreSQL so SQL can call HTTP services.
+Use it to fetch information from a web service or notify one when
+database records change.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/pramsey/pgsql-http).
 
@@ -52,20 +47,10 @@ administrator-approved selection of extensions.
 
 ### 3. Verify installation
 
-Once the database is ready, connect to it with `psql` and run:
+Fetch a test page and inspect the HTTP status and response body:
 
 ```sql
-\dx http
-```
-
-You should see `http` listed with its installed SQL version.
-
-The PGDG package links to libcurl. The image includes the required non-core shared libraries under `/system`; no HTTP client daemon is included.
-
-### SQL example
-
-```sql
-SELECT status, content FROM http_get('https://example.org/');
+SELECT status, content FROM http_get('https://example.com/');
 ```
 
 ## Licenses and Copyright

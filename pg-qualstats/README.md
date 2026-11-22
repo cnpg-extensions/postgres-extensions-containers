@@ -4,24 +4,19 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-[pg_qualstats](https://github.com/powa-team/pg_qualstats) gathers statistics about predicates found in WHERE and JOIN
-clauses. The statistics help identify frequently used predicates and potentially
-missing indexes.
+Gathers statistics about predicates found in WHERE and JOIN clauses. Use it to
+see which columns people filter on most when deciding where an index might
+help.
 
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog. These examples
-inherit image references and runtime settings from the catalog. The Cluster YAML
-is an excerpt: replace `imageCatalogRef: ...` with your catalog reference and
-keep your instance and storage settings, following any extension-specific
-requirements below.
-
-## Usage
+first, then use the CronJob to install and refresh the catalog.
 
 For more information, see the [upstream documentation](https://github.com/powa-team/pg_qualstats).
 
 ### 1. Add the pg-qualstats extension image to your Cluster
 
-Add the image to a Cluster and preload pg_qualstats:
+This extension requires `pg_qualstats` in `shared_preload_libraries`, as
+shown below.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -55,14 +50,6 @@ For extensions that normally require superuser privileges, platform teams can us
 administrator-approved selection of extensions.
 
 ### 3. Verify installation
-
-Once the database is ready, connect to it with `psql` and run:
-
-```sql
-\dx pg_qualstats
-```
-
-You should see `pg_qualstats` listed with its installed SQL version.
 
 Inspect the gathered predicate statistics with:
 
