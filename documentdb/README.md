@@ -18,14 +18,14 @@ the [upstream getting started guide](https://documentdb.io/docs/getting-started/
 > For **SQL-only use**, add DocumentDB from the CNPG extension catalog. You can
 > query it directly through PostgreSQL without installing a gateway.
 >
+> Deploying the gateway with this extension image is an advanced use case for
+> teams that want to manage the CNPG `Cluster` themselves, for example to run
+> DocumentDB alongside other PostgreSQL workloads.
+>
 > For most users who want a **MongoDB-compatible service** on Kubernetes, the
 > simplest path is the [DocumentDB Kubernetes Operator](https://documentdb.io/docs/kubernetes-operator/).
 > You define a `DocumentDB` resource, and the operator provisions a dedicated
 > CNPG cluster for it and configures the gateway.
->
-> Deploying the gateway with this extension image is an advanced use case for
-> teams that want to manage the CNPG `Cluster` themselves, for example to run
-> DocumentDB alongside other PostgreSQL workloads.
 
 ## Dependencies and conflicts
 
