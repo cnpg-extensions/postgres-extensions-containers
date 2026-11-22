@@ -232,6 +232,19 @@
       ]
     },
     {
+      "description": "Require manual review of the DocumentDB planner schema workaround",
+      "matchDatasources": [
+        "deb"
+      ],
+      "matchPackageNames": [
+        "postgresql-*-documentdb"
+      ],
+      "automerge": false,
+      "prBodyNotes": [
+        "Before merging or promoting this DocumentDB update, check whether the upstream package still needs the planner schema grants in documentdb/Dockerfile. Run the ordinary-login probes listed in WORKAROUNDS.md against the unpatched package. If they pass, remove the workaround and its register entry. Otherwise, verify the patch on both fresh installs and upgrades."
+      ]
+    },
+    {
       "description": "Require manual merging for major updates",
       "matchUpdateTypes": [
         "major"

@@ -16,6 +16,15 @@ the [upstream getting started guide](https://documentdb.io/docs/getting-started/
 
 ## Dependencies and conflicts
 
+For standalone SQL-only use, specify just `- name: documentdb` for the DocumentDB
+entry in `spec.postgresql.extensions`. Omit the image pin and `ld_library_path`.
+CNPG gets both from the catalog and picks up new image versions automatically
+when the catalog is refreshed.
+
+For a gateway deployment, first choose the exact upstream DocumentDB release.
+Identify the extension and gateway builds for that release and pin both images
+by digest in the Cluster manifest.
+
 DocumentDB requires `pg_cron`, `vector`, `postgis`, `tsm_system_rows`, and
 `documentdb_core`. The PostgreSQL base image supplies `tsm_system_rows`.
 The example also enables RUM and the bundled extended-RUM access method.
@@ -25,20 +34,18 @@ The example also enables RUM and the bundled extended-RUM access method.
 Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
 first, then use the CronJob to install and refresh the catalog.
 
-The gateway sidecar requires the DocumentDB CNPG-I sidecar injector. Install it
-before enabling the plugin in your Cluster. See the upstream
-[sidecar injector guide](https://github.com/documentdb/documentdb-kubernetes-operator/blob/1.2.0/docs/developer-guides/sidecar-injector-plugin-configuration.md)
-and [TLS guide](https://github.com/documentdb/documentdb-kubernetes-operator/blob/1.2.0/docs/operator-public-documentation/v1/configuration/tls.md).
-
-Prefer a gateway from the same DocumentDB release as the extension when available.
-The example was tested with SQL extension `1.2-0` and gateway image `1.0.1`.
-Replace `DOCUMENTDB_DIGEST` with the extension image's SHA-256 digest without
-the `sha256:` prefix. PostgreSQL and the prerequisites use the Trixie catalog.
-
+For SQL-only use, omit `pg_hba` and `plugins`.
 The gateway connects to the `postgres` database. The loopback rules below allow
 any process in the pod to connect there as `documentdb` or a member of
-`documentdb_socket_users` without a password. For SQL-only use, omit `pg_hba`
-and `plugins` and set `cron.database_name` to your database (here, `app`).
+`documentdb_socket_users` without a password.
+
+For a gateway deployment, install the DocumentDB CNPG-I sidecar injector as a
+separate Deployment in the CNPG operator’s namespace before enabling it in the
+Cluster’s `spec.plugins`.
+CNPG then asks the injector to add the gateway container to each PostgreSQL pod.
+See the upstream
+[sidecar injector guide](https://github.com/documentdb/documentdb-kubernetes-operator/blob/1.2.0/docs/developer-guides/sidecar-injector-plugin-configuration.md)
+and [TLS guide](https://github.com/documentdb/documentdb-kubernetes-operator/blob/1.2.0/docs/operator-public-documentation/v1/configuration/tls.md).
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -66,6 +73,7 @@ spec:
     - name: postgis
     - name: rum
     - name: documentdb
+      ld_library_path: [lib]
       image:
         reference: ghcr.io/cnpg-extensions/documentdb:1.2-18-trixie@sha256:DOCUMENTDB_DIGEST
     shared_preload_libraries:

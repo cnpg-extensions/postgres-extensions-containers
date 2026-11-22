@@ -13,6 +13,22 @@ instead of implying that a fix is scheduled.
 Generator-specific dependency and license-reporting adaptations are maintained
 in the [SBOM generator repository](https://github.com/cnpg-extensions/cnpg-sbom-generator/blob/main/WORKAROUNDS.md).
 
+## DocumentDB planner schema permissions
+
+- **Upstream:** [DocumentDB 1.2-0 planner](https://github.com/documentdb/documentdb/blob/v1.2-0/pg_documentdb/src/planner/documents_planner.c#L1241-L1337). No upstream issue is currently linked.
+- **Problem:** ordinary SQL logins can receive a schema permission error even for
+  `SELECT 1 = 1`. The planner resolves DocumentDB types, functions and operators
+  when inspecting unrelated SQL.
+- **Workaround:** the [Dockerfile](documentdb/Dockerfile) verifies the packaged migration’s
+  checksum and appends a grant giving `PUBLIC` schema `USAGE` on `documentdb_core`, `documentdb_api_catalog`,
+  `documentdb_api_internal` and `documentdb_api`. All roles in the database can
+  resolve objects in those schemas and exercise their existing object privileges.
+  Replacing the image alone does not rerun this migration in existing 1.2-0 databases.
+- **Review when:** the PGDG install or upgrade path, planner hooks or default
+  schema selection change. Remove the patch once an ordinary login can run the
+  shared catalog check, `SELECT 1 = 1`, `SELECT lower('A')` and
+  `SELECT * FROM generate_series(1, 2)` on an unpatched installation.
+
 ## unit: mounted data-file paths
 
 - **Upstream:** [postgresql-unit](https://github.com/df7cb/postgresql-unit) and its
