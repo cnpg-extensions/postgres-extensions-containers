@@ -4,12 +4,12 @@ Serializes PostgreSQL change events as Protocol Buffers for logical replication
 clients. Use it with a compatible CDC (change-data capture) client to send
 record changes to another system.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/debezium/postgres-decoderbufs).
 
 ### 1. Add the decoderbufs extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Logical decoding requires `wal_level: logical` and `decoderbufs` in
 `output_plugin_libraries`, as shown below.

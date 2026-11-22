@@ -14,17 +14,17 @@ This image includes `pointcloud` for storing point clouds and the optional
 `pointcloud_postgis` after enabling both `postgis` and `pointcloud`, as shown
 below.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/pgpointcloud/pointcloud).
 
 ## Dependencies and conflicts
 
 The optional `pointcloud_postgis` extension requires `pointcloud` and
 `postgis` in the same database.
 
-For more information, see the [upstream documentation](https://github.com/pgpointcloud/pointcloud).
-
 ### 1. Add the pointcloud extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This example uses both the `postgis` and `pointcloud` extension images.
 
@@ -50,11 +50,6 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION pointcloud;
 CREATE EXTENSION pointcloud_postgis;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

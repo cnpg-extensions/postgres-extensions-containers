@@ -4,12 +4,12 @@ Lets you inspect dead rows that have not yet been removed by VACUUM. Use it to
 inspect accidentally deleted records while their old contents are still on
 disk.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/df7cb/pg_dirtyread).
 
 ### 1. Add the pg-dirtyread extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -30,11 +30,6 @@ database in either of two ways:
 
 - **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 - **Through SQL**, by running `CREATE EXTENSION pg_dirtyread;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

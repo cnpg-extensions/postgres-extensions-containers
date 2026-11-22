@@ -8,16 +8,16 @@ Replicates individual tables between PostgreSQL databases using snapshot,
 incremental, and DML-based methods. Use it to bring selected tables from
 several databases together for reporting.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/omniti-labs/mimeo).
 
 ## Dependencies and conflicts
 
 Requires `dblink` in the same database.
 
-For more information, see the [upstream documentation](https://github.com/omniti-labs/mimeo).
-
 ### 1. Add the mimeo extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -37,11 +37,6 @@ spec:
 CREATE EXTENSION IF NOT EXISTS dblink;
 CREATE EXTENSION mimeo;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

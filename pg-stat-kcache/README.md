@@ -9,16 +9,16 @@ and writes.
 Use it to find which queries use the most processor time or read the most data
 from disk.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/powa-team/pg_stat_kcache).
 
 ## Dependencies and conflicts
 
 Requires `pg_stat_statements` in the same database.
 
-For more information, see the [upstream documentation](https://github.com/powa-team/pg_stat_kcache).
-
 ### 1. Add the pg-stat-kcache extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pg_stat_statements` and `pg_stat_kcache` in
 `shared_preload_libraries`, as shown below.
@@ -44,11 +44,6 @@ spec:
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 CREATE EXTENSION pg_stat_kcache;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

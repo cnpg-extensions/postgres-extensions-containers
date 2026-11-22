@@ -15,17 +15,17 @@ optional `hstore_pllua` and `hstore_plluau` helpers let each language work with
 key/value pairs from `hstore`, which is included in the CNPG PostgreSQL base
 image and must also be enabled to use these helpers.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
 
 ## Dependencies and conflicts
 
 The optional `hstore_pllua` and `hstore_plluau` extensions require `hstore`
 and their matching Lua language in the same database.
 
-For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
-
 ### 1. Add the pllua extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Mount the image into your Cluster:
 
@@ -48,11 +48,6 @@ CREATE EXTENSION IF NOT EXISTS hstore;
 CREATE EXTENSION pllua;
 CREATE EXTENSION hstore_pllua;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

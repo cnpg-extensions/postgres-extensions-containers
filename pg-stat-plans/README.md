@@ -9,12 +9,12 @@ plan text in PostgreSQL.
 Use it to investigate whether a query became slower because PostgreSQL chose a
 different way to run it.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/pganalyze/pg_stat_plans).
 
 ### 1. Add the pg-stat-plans extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pg_stat_plans` in `shared_preload_libraries`, as
 shown below.
@@ -40,11 +40,6 @@ database in either of two ways:
 
 - **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 - **Through SQL**, by running `CREATE EXTENSION pg_stat_plans;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

@@ -11,17 +11,17 @@ This image includes `pgnodemx` for reading system metrics and an optional
 `pgnodemx`. In Kubernetes, these metrics describe the PostgreSQL container
 and the resources visible to it, not necessarily the whole host.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/pgnodemx/pgnodemx).
 
 ## Dependencies and conflicts
 
 The optional `pg_proctab` compatibility extension requires `pgnodemx`
 in the same database.
 
-For more information, see the [upstream documentation](https://github.com/pgnodemx/pgnodemx).
-
 ### 1. Add the pgnodemx extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pgnodemx` in `shared_preload_libraries`, as shown
 below.
@@ -46,11 +46,6 @@ spec:
 CREATE EXTENSION pgnodemx;
 CREATE EXTENSION pg_proctab VERSION '0.0.10-compat';
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

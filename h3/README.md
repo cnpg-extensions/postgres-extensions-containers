@@ -13,17 +13,17 @@ This image includes `h3` for working with map cells and the optional
 data. Enable `h3_postgis` only if needed, after enabling `h3`, `postgis`, and
 `postgis_raster`.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/zachasme/h3-pg).
 
 ## Dependencies and conflicts
 
 The optional `h3_postgis` extension requires `h3`, `postgis`, and
 `postgis_raster` in the same database.
 
-For more information, see the [upstream documentation](https://github.com/zachasme/h3-pg).
-
 ### 1. Add the h3 extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Define the `h3` extension under the `postgresql.extensions` section of
 your `Cluster` resource. For example:
@@ -49,11 +49,6 @@ CREATE EXTENSION IF NOT EXISTS postgis_raster;
 CREATE EXTENSION h3;
 CREATE EXTENSION h3_postgis;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

@@ -12,17 +12,17 @@ This image includes `mobilitydb` for working with data that changes over time
 and the optional `mobilitydb_datagen` extension for creating random test data.
 Enable `mobilitydb_datagen` only if needed, after enabling `mobilitydb`.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://mobilitydb.com/).
 
 ## Dependencies and conflicts
 
 Requires `postgis`. The optional `mobilitydb_datagen` extension requires
 `mobilitydb` in the same database.
 
-For more information, see the [upstream documentation](https://mobilitydb.com/).
-
 ### 1. Add the mobilitydb extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Include both the `postgis` and `mobilitydb` extension images in your Cluster,
 as shown below.
@@ -47,11 +47,6 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION mobilitydb;
 CREATE EXTENSION mobilitydb_datagen;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an
