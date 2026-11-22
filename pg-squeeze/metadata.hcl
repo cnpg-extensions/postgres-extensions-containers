@@ -7,7 +7,6 @@ metadata = {
   licenses                 = ["PostgreSQL"]
   shared_preload_libraries = ["pg_squeeze"]
   postgresql_parameters    = {
-    max_replication_slots    = "1"
     output_plugin_libraries  = "pg_squeeze"
     wal_level                = "logical"
   }
