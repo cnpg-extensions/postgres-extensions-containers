@@ -91,7 +91,7 @@ sample for the existing build, security, and integration checks:
 - `pg-cron`: native library and shared preload.
 - `powa`: extensions supplied by the PostgreSQL base image.
 - `mobilitydb`: upstream PostGIS dependency.
-- `ogr-fdw`: bundled OS libraries, data files, and environment paths.
+- `pltcl`: bundled OS libraries, data files, and environment paths.
 - `pg-durable` (PGRX): standard Rust packaging and background-worker extension.
 - `pg-session-jwt` (PGRX): Rust install path and guarded upstream lockfile correction.
 

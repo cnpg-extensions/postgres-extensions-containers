@@ -167,7 +167,7 @@ jobs:
           SELECTION_REF: ${{ steps.pr.outputs.sha || github.ref }}
           VALID_TARGETS: ${{ steps.get-targets.outputs.output }}
           # SQL-only, native/preload, base-image dependencies, upstream PostGIS, OS libraries/data.
-          INFRASTRUCTURE_SAMPLE: '["pgtap", "pg-cron", "powa", "mobilitydb", "ogr-fdw"]'
+          INFRASTRUCTURE_SAMPLE: '["pgtap", "pg-cron", "powa", "mobilitydb", "pltcl"]'
         run: |
           if [[ "${EVENT_NAME}" == 'workflow_dispatch' ]]; then
             if [[ "$INPUT_EXTENSION_NAME" == all ]]; then
