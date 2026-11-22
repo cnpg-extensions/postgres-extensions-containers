@@ -11,12 +11,12 @@ The server image provides the PostgreSQL extension library and SQL objects. The
 `pg_repack` client is run separately and must match the server's PostgreSQL
 major and extension version.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/reorg/pg_repack).
 
 ### 1. Add the pg-repack extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Add the server image to a complete Cluster definition:
 
@@ -40,11 +40,6 @@ database in either of two ways:
 
 - **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 - **Through SQL**, by running `CREATE EXTENSION pg_repack;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

@@ -8,8 +8,7 @@ Integrates DuckDB's analytical query engine with PostgreSQL. Use it to
 summarize large datasets with SQL, such as calculating totals across
 millions of records.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/duckdb/pg_duckdb).
 
 ## Dependencies and conflicts
 
@@ -21,9 +20,10 @@ Other issues may remain undiscovered.
 PL/pgSQL: DuckDB execution inside functions is disabled by default because
 it can cause crashes; see the [upstream limitation](https://github.com/duckdb/pg_duckdb/blob/v1.2.0/docs/settings.md#duckdbunsafe_allow_execution_inside_functions).
 
-For more information, see the [upstream documentation](https://github.com/duckdb/pg_duckdb).
-
 ### 1. Add the pg-duckdb extension image to your Cluster
+
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pg_duckdb` in `shared_preload_libraries`, as shown
 below.
@@ -49,11 +49,6 @@ database in either of two ways:
 
 - **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 - **Through SQL**, by running `CREATE EXTENSION pg_duckdb;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../../pgextwlist/README.md) to allow non-superusers to install an

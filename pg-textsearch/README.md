@@ -8,16 +8,16 @@ Provides full-text search with BM25 relevance ranking. Use it to search
 stored text and show the most relevant matches first, such as matching
 articles or descriptions.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/timescale/pg_textsearch).
 
 ## Dependencies and conflicts
 
 Background compaction requires `pg_durable` 0.2.8 or later in the same database.
 
-For more information, see the [upstream documentation](https://github.com/timescale/pg_textsearch).
-
 ### 1. Add the pg-textsearch extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This example uses [pg_durable](../pgrx/pg-durable/README.md) for background
 index compaction in the `app` database. Both extensions must be preloaded.

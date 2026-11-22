@@ -8,12 +8,12 @@ Provides hypothetical indexes for PostgreSQL. Use it to check whether
 PostgreSQL would choose a proposed index before spending time and disk space
 building it.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/HypoPG/hypopg).
 
 ### 1. Add the hypopg extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 Add the image to a Cluster:
 
@@ -36,11 +36,6 @@ database in either of two ways:
 
 - **Declaratively**, using a [CloudNativePG `Database` resource](https://cloudnative-pg.io/docs/1.30/declarative_database_management/#managing-extensions-in-a-database).
 - **Through SQL**, by running `CREATE EXTENSION hypopg;` in the target database.
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

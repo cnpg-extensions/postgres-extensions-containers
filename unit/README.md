@@ -7,16 +7,16 @@ SPDX-License-Identifier: Apache-2.0
 Provides SI unit values, conversions and arithmetic. Use it to add measurements
 recorded in meters and feet without doing the conversions yourself.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
+For more information, see the [upstream documentation](https://github.com/df7cb/postgresql-unit).
 
 ## Dependencies and conflicts
 
 Requires `plpgsql`, which is normally enabled by default.
 
-For more information, see the [upstream documentation](https://github.com/df7cb/postgresql-unit).
-
 ### 1. Add the unit extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
@@ -36,11 +36,6 @@ spec:
 CREATE EXTENSION IF NOT EXISTS plpgsql;
 CREATE EXTENSION unit;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

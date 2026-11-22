@@ -8,12 +8,12 @@ Supports durable, fault-tolerant SQL workflows.
 Use it to run a multi-step data import that can resume after a database
 restart.
 
-Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/microsoft/pg_durable).
 
 ### 1. Add the pg-durable extension image to your Cluster
+
+Follow the [quick start](../../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This example runs SQL workflows for one application in the `app` database.
 The application keeps its database owner separate from `workflow_runner`, a

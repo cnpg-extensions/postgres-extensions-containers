@@ -8,12 +8,12 @@ This image includes `pglogical` for replication and `pglogical_origin`, an
 empty compatibility extension for upgrades from PostgreSQL 9.4. Only `pglogical`
 is needed for new installations; the example below enables both bundled extensions.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/2ndQuadrant/pglogical).
 
 ### 1. Add the pglogical extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pglogical` in `shared_preload_libraries`, as shown
 below. Logical replication also needs `wal_level: logical` and
@@ -42,11 +42,6 @@ spec:
 CREATE EXTENSION pglogical;
 CREATE EXTENSION pglogical_origin;
 ```
-
-Platform teams may make extension containers available across their clusters
-without installing every extension in every database. Install only the extensions
-a database uses; letting users enable them through SQL alongside the rest of their
-DDL schema management code can be a convenient approach.
 
 For extensions that normally require superuser privileges, platform teams can use
 [pgextwlist](../pgextwlist/README.md) to allow non-superusers to install an

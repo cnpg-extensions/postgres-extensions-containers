@@ -8,12 +8,12 @@ full control of the server.
 This image loads through `shared_preload_libraries`; it does not appear in
 the database’s installed-extension list (`\dx` in `psql`).
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/dimitri/pgextwlist).
 
 ### 1. Add the pgextwlist extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pgextwlist` in `shared_preload_libraries`, as shown
 below. Set `extwlist.extensions` to the extensions users may install; this

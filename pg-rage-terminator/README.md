@@ -11,12 +11,12 @@ recovers when database connections suddenly disappear.
 `pg_rage_terminator` is a background worker with no SQL extension object;
 no `CREATE EXTENSION` command is needed.
 
-Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
-first, then use the CronJob to install and refresh the catalog.
-
 For more information, see the [upstream documentation](https://github.com/disco-stu/pg_rage_terminator).
 
 ### 1. Add the pg-rage-terminator extension image to your Cluster
+
+Follow the [quick start](../README.md#quick-start) to set up extension-update email alerts
+first, then use the CronJob to install and refresh the catalog.
 
 This extension requires `pg_rage_terminator` in `shared_preload_libraries`,
 as shown below. Keep `pg_rage_terminator.chance: "0"` for this installation
