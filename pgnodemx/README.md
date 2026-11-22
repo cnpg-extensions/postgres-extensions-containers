@@ -1,9 +1,8 @@
 # pgnodemx
 
 Exposes host and container operating system metrics through PostgreSQL
-functions.
-Use it to check the database container’s memory use and limits without logging
-into its host.
+functions. For example, check the database container’s memory use and limits
+without logging into its host.
 
 This image includes `pgnodemx` for reading system metrics and an optional
 `pg_proctab` compatibility extension for tools such as `pg_top`. Enable

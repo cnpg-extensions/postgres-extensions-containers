@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides a semantic-version data type with comparison and ordering operators.
-Use it to sort software releases correctly, so version 1.10.0 comes after
+For example, sort software releases correctly, so version 1.10.0 comes after
 1.9.0.
 
 For more information, see the [upstream documentation](https://github.com/theory/pg-semver).

@@ -1,8 +1,8 @@
 # pg_track_settings
 
 Records PostgreSQL configuration changes so you can review how settings have
-changed over time.
-Use it to check whether a changed database setting coincided with a slowdown.
+changed over time. For example, check whether a changed database setting
+coincided with a slowdown.
 
 For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/components/stats_extensions/pg_track_settings.html).
 

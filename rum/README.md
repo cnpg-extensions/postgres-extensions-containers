@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Adds the RUM index access method, including full-text search indexing and
-ordering support. Use it to search documents for a phrase and show the best
+ordering support. For example, search documents for a phrase and show the best
 matches first.
 
 For more information, see the [upstream documentation](https://github.com/postgrespro/rum).

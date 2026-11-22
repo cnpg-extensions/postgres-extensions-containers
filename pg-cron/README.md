@@ -5,8 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Provides a simple cron-based job scheduler for PostgreSQL, allowing you to
-schedule PostgreSQL commands directly from the database. Use it to delete old
-records every night or refresh a report every hour.
+schedule PostgreSQL commands directly from the database. For example, delete
+old records every night or refresh a report every hour.
 
 For more information, see the [upstream documentation](https://github.com/citusdata/pg_cron).
 

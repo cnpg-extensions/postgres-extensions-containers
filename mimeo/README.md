@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Replicates individual tables between PostgreSQL databases using snapshot,
-incremental, and DML-based methods. Use it to bring selected tables from
+incremental, and DML-based methods. For example, bring selected tables from
 several databases together for reporting.
 
 For more information, see the [upstream documentation](https://github.com/omniti-labs/mimeo).

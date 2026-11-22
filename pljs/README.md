@@ -4,8 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lets you write PostgreSQL functions in JavaScript using the QuickJS engine. Use
-it to turn database values into JSON with JavaScript code you already know.
+Lets you write PostgreSQL functions in JavaScript using the QuickJS engine.
+For example, turn database values into JSON with JavaScript code you already
+know.
 
 For more information, see the [upstream documentation](https://github.com/plv8/pljs).
 

@@ -1,7 +1,7 @@
 # prioritize
 
 Lets you inspect and change the operating system scheduling priority of
-PostgreSQL backends. Use it to give a long report less CPU priority so more
+PostgreSQL backends. For example, give a long report less CPU priority so more
 urgent queries can take precedence.
 
 > [!CAUTION]

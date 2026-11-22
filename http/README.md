@@ -5,9 +5,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Adds HTTP client functions to PostgreSQL so SQL can call HTTP services.
-Use it to fetch information from a web service or notify one when
-database records change.
+Adds HTTP client functions to PostgreSQL so SQL can call HTTP services. For
+example, fetch information from a web service or notify one when database
+records change.
 
 For more information, see the [upstream documentation](https://github.com/pramsey/pgsql-http).
 

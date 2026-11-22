@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Manages authenticated sessions through JSON Web Tokens (JWTs).
-Use it to identify the signed-in user when deciding which rows they may see.
+Manages authenticated sessions through JSON Web Tokens (JWTs). For example,
+identify the signed-in user when deciding which rows they may see.
 
 For more information, see the [upstream documentation](https://github.com/neondatabase/pg_session_jwt).
 

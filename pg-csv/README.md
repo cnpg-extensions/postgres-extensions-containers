@@ -1,6 +1,6 @@
 # pg_csv
 
-Lets you parse and generate CSV data directly in PostgreSQL. Use it to turn
+Lets you parse and generate CSV data directly in PostgreSQL. For example, turn
 query results into CSV text that a spreadsheet can read.
 
 For more information, see the [upstream documentation](https://github.com/PostgREST/pg_csv/).

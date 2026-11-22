@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Lets you write PostgreSQL functions in Tcl. Use it to update a row’s change
+Lets you write PostgreSQL functions in Tcl. For example, update a row’s change
 counter automatically with a small Tcl script.
 
 This image includes both `pltcl` and `pltclu`, which you can enable separately.

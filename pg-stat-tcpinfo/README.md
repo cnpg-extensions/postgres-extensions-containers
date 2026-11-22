@@ -5,8 +5,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Exposes live Linux TCP socket statistics through SQL so you can inspect
-PostgreSQL connections.
-Use it to check whether network delays explain a slow database connection.
+PostgreSQL connections. For example, check whether network delays explain a
+slow database connection.
 
 For more information, see the [upstream documentation](https://github.com/jakubwartakEDB/pg_stat_tcpinfo).
 

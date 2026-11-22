@@ -5,7 +5,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 Records PostgreSQL workload statistics and snapshots so you can analyze
-database activity over time. Use it to look back at which queries made your
+database activity over time. For example, look back at which queries made your
 database busy during a slowdown.
 
 For more information, see the [upstream documentation](https://powa.readthedocs.io/en/stable/).

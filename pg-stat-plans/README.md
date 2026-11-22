@@ -6,8 +6,8 @@ SPDX-License-Identifier: Apache-2.0
 
 Tracks aggregate per-plan call counts, execution times, plan IDs, and `EXPLAIN`
 plan text in PostgreSQL.
-Use it to investigate whether a query became slower because PostgreSQL chose a
-different way to run it.
+For example, investigate whether a query became slower because PostgreSQL
+chose a different way to run it.
 
 For more information, see the [upstream documentation](https://github.com/pganalyze/pg_stat_plans).
 

@@ -4,9 +4,9 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides a server-side debugger for PL/pgSQL functions and procedures. Use it
-with pgAdmin to pause a misbehaving function and inspect its values one step at
-a time.
+Provides a server-side debugger for PL/pgSQL functions and procedures. For
+example, use pgAdmin to pause a misbehaving function and inspect its values
+one step at a time.
 
 For more information, see the [upstream documentation](https://github.com/EnterpriseDB/pldebugger).
 

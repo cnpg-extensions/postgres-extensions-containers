@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Provides an interface to Memcached from within SQL.
-Use it to clear a cached value when the corresponding database record changes.
+Provides an interface to Memcached from within SQL. For example, clear a
+cached value when the corresponding database record changes.
 
 Run Memcached separately and make it reachable from your CNPG database.
 This image supplies the PostgreSQL extension, not the Memcached server.

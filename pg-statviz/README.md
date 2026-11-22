@@ -4,8 +4,8 @@ SPDX-FileCopyrightText: Copyright © contributors to CNPG Extensions.
 SPDX-License-Identifier: Apache-2.0
 -->
 
-Saves snapshots of PostgreSQL activity for charts and reports.
-Use it to compare how your database was behaving before and during a slowdown.
+Saves snapshots of PostgreSQL activity for charts and reports. For example,
+compare how your database was behaving before and during a slowdown.
 
 This image provides the database part of pg_statviz. Run its reporting tool
 on a separate server and connect it to your CNPG database to create charts
