@@ -3,6 +3,9 @@
 Lets you write PostgreSQL functions as shell scripts. Use it to call an
 existing shell script from SQL and read back its output.
 
+Shell functions use the shell interpreter and command-line tools included in the
+CNPG PostgreSQL base image.
+
 For more information, see the [upstream documentation](https://github.com/petere/plsh).
 
 > [!CAUTION]
@@ -10,9 +13,6 @@ For more information, see the [upstream documentation](https://github.com/petere
 > access files, run programs, and use the network as PostgreSQL’s
 > operating-system user; reserve it for exceptional cases requiring that level
 > of access.
-
-Shell functions use the shell interpreter and command-line tools included in the
-CNPG PostgreSQL base image.
 
 ### 1. Add the plsh extension image to your Cluster
 

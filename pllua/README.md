@@ -9,22 +9,22 @@ values with Lua, such as calculating a total whenever a row is saved.
 
 This image includes four extensions you can enable separately.
 
+The optional `hstore_pllua` and `hstore_plluau` helpers let each language work
+with key/value pairs from `hstore`, which is included in the CNPG PostgreSQL
+base image and must also be enabled to use these helpers.
+
 For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
+
+## Dependencies and conflicts
+
+The optional `hstore_pllua` and `hstore_plluau` extensions require `hstore`
+and their matching Lua language in the same database.
 
 > [!CAUTION]
 > Use `pllua`, the trusted Lua language, for normal use. The untrusted `plluau`
 > language can access files, run programs, and use the network as PostgreSQL’s
 > operating-system user; reserve it for exceptional cases requiring that level
 > of access.
-
-The optional `hstore_pllua` and `hstore_plluau` helpers let each language work
-with key/value pairs from `hstore`, which is included in the CNPG PostgreSQL
-base image and must also be enabled to use these helpers.
-
-## Dependencies and conflicts
-
-The optional `hstore_pllua` and `hstore_plluau` extensions require `hstore`
-and their matching Lua language in the same database.
 
 ### 1. Add the pllua extension image to your Cluster
 
