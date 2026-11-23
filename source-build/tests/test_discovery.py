@@ -38,10 +38,10 @@ class DiscoveryTest(unittest.TestCase):
         for family in ('pgrx', 'universe'):
             with self.subTest(family=family):
                 inputs = {'extension_name': 'example', 'build_family': family}
-                versions = {'bookworm': {'19': {}}, 'trixie': {'18': {}, '19': {}}}
+                versions = {'bookworm': {'20': {}}, 'trixie': {'18': {}, '19': {}}}
                 inventory = {'example': {'build_family': family, 'versions': versions}}
                 self.assertEqual(select(inputs, inventory), ['linux/amd64', 'linux/arm64'])
-                versions['trixie']['20'] = {}
+                versions['trixie']['19.0'] = {}
                 with self.assertRaisesRegex(ValueError, 'unsupported distribution/PG target'):
                     select(inputs, inventory)
 
