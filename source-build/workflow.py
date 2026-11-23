@@ -4,6 +4,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +52,7 @@ def select(inputs, inventory):
         raise ValueError(f"extension {extension!r} is not in the {family} recipe root")
     versions = inventory[extension].get("versions", {})
     if not versions or any(d not in ("bookworm", "trixie") or not majors
-                           or any(pg != "18" for pg in majors)
+                           or any(not re.fullmatch(r"[1-9][0-9]*", pg) for pg in majors)
                            for d, majors in versions.items()):
         raise ValueError("source recipe declares an unsupported distribution/PG target")
     return ["linux/amd64", "linux/arm64"]
