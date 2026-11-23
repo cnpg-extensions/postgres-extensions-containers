@@ -4,14 +4,14 @@ Lets you inspect and change the operating system scheduling priority of
 PostgreSQL backends. For example, give a long report less CPU priority so more
 urgent queries can take precedence.
 
+For more information, see the [upstream documentation](https://github.com/schmiddy/pg_prioritize).
+
 > [!CAUTION]
 > Lowering a backend’s CPU priority can delay other backends
 > waiting for locks it holds, including internal spinlocks. Spinlock waits do
 > not automatically raise the lock holder’s priority; exercise care and test
 > under CPU contention before changing priorities in production. See the
 > [PostgreSQL spinlock implementation](https://github.com/postgres/postgres/blob/master/src/backend/storage/lmgr/s_lock.c).
-
-For more information, see the [upstream documentation](https://github.com/schmiddy/pg_prioritize).
 
 ### 1. Add the prioritize extension image to your Cluster
 

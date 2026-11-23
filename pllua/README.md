@@ -15,16 +15,16 @@ base image and must also be enabled to use these helpers.
 
 For more information, see the [upstream documentation](https://pllua.github.io/pllua/).
 
-## Dependencies and conflicts
-
-The optional `hstore_pllua` and `hstore_plluau` extensions require `hstore`
-and their matching Lua language in the same database.
-
 > [!CAUTION]
 > Use `pllua`, the trusted Lua language, for normal use. The untrusted `plluau`
 > language can access files, run programs, and use the network as PostgreSQL’s
 > operating-system user; reserve it for exceptional cases requiring that level
 > of access.
+
+## Dependencies and conflicts
+
+The optional `hstore_pllua` and `hstore_plluau` extensions require `hstore`
+and their matching Lua language in the same database.
 
 ### 1. Add the pllua extension image to your Cluster
 
