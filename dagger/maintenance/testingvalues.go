@@ -22,6 +22,7 @@ type TestingValues struct {
 	SharedPreloadLibraries []string                  `yaml:"shared_preload_libraries"`
 	PostgresqlParameters   map[string]string         `yaml:"postgresql_parameters"`
 	PgImage                string                    `yaml:"pg_image"`
+	PgMajor                int                       `yaml:"pg_major"`
 	Version                string                    `yaml:"version"`
 	CreateExtension        bool                      `yaml:"create_extension"`
 	Extensions             []*ExtensionConfiguration `yaml:"extensions"`
