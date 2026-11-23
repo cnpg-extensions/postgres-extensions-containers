@@ -51,7 +51,7 @@ def select(inputs, inventory):
         raise ValueError(f"extension {extension!r} is not in the {family} recipe root")
     versions = inventory[extension].get("versions", {})
     if not versions or any(d not in ("bookworm", "trixie") or not majors
-                           or any(pg != "18" for pg in majors)
+                           or any(pg not in ("18", "19") for pg in majors)
                            for d, majors in versions.items()):
         raise ValueError("source recipe declares an unsupported distribution/PG target")
     return ["linux/amd64", "linux/arm64"]

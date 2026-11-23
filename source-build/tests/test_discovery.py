@@ -34,6 +34,17 @@ class DiscoveryTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'not in the pgrx'):
                 select({'extension_name': 'native'}, inventory)
 
+    def test_source_recipe_postgres_targets(self):
+        for family in ('pgrx', 'universe'):
+            with self.subTest(family=family):
+                inputs = {'extension_name': 'example', 'build_family': family}
+                versions = {'bookworm': {'19': {}}, 'trixie': {'18': {}, '19': {}}}
+                inventory = {'example': {'build_family': family, 'versions': versions}}
+                self.assertEqual(select(inputs, inventory), ['linux/amd64', 'linux/arm64'])
+                versions['trixie']['20'] = {}
+                with self.assertRaisesRegex(ValueError, 'unsupported distribution/PG target'):
+                    select(inputs, inventory)
+
     def test_duplicate_names_fail_before_family_selection(self):
         with tempfile.TemporaryDirectory() as temp, patch('workflow.metadata', side_effect=lambda p: json.loads(p.read_text())):
             root = Path(temp)
