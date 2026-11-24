@@ -2,6 +2,7 @@
 
 Downstream `origin/main` at `f8a7cbca3f69140d0bacc683dcbbfab33a3b444a`. CloudNativePG `main` at `582dc0e4def3c227dbfe51062f90b1ff5bfbf6de`.
 Previous recorded upstream tip and merge base: `019e7c20e8feb930a61e4799c108462c3b63485b`.
+Downstream merge commit: `6729ca44916296438670cd49202f5a1c09d8b694` (second parent is the upstream tip above).
 
 ## Dependency updates
 
@@ -88,3 +89,8 @@ The following checks ran during initial preparation on downstream base
   with the appropriate source overlay. All 86 discovered Debian targets and
   all nine source recipes passed. These were BuildKit checks, not builds of
   extension binaries.
+
+After rebasing onto f8a7cbc, verified both merge parents, reviewed the five
+first-parent changed paths and confirmed that the Taskfile, build guide and two
+signing workflows are byte-identical to the previously validated sync. Taskfile
+parsing, 21 source-build tests and the first-parent whitespace check passed.
