@@ -471,7 +471,7 @@ tasks:
       METADATA_FILE: "{{ .RECIPE_PATH }}/bake-metadata.json"
       KUBECONFIG_PATH: "./kubeconfig"
       DISTRO: '{{ .DISTRO | default "trixie" }}'
-      PG_MAJOR: '{{ .PG_MAJOR | default "18" }}'
+      PG_MAJOR: '{{ .PG_MAJOR | default "19" }}'
       REGISTRY_HOST: '{{ .REGISTRY_HOST | default "" }}'
       REGISTRY_USERNAME: '{{ .REGISTRY_USERNAME | default "" }}'
       CNPG_RELEASE: '{{ .CNPG_RELEASE | default .CNPG_RELEASE_DEFAULT }}'

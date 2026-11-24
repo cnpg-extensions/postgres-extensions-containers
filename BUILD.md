@@ -199,7 +199,7 @@ execution:
 task e2e:test:full TARGET="<extension>"
 ```
 
-The task tests PostgreSQL 18 on trixie by default. Set `PG_MAJOR` and
+The task tests PostgreSQL 19 on trixie by default. Set `PG_MAJOR` and
 `DISTRO` to select another combination supported by the recipe.
 
 For source recipes, also supply `BUILDER=<name>` and export `sbom_generator`
@@ -208,7 +208,7 @@ as described above.
 Example for testing the `pg-cron` extension:
 
 ```bash
-task e2e:test:full TARGET="pg-cron"
+task e2e:test:full TARGET="pg-cron" PG_MAJOR=18
 ```
 
 **When to use the step-by-step guide:** If the automated test fails during

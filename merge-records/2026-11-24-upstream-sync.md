@@ -94,3 +94,7 @@ After rebasing onto f8a7cbc, verified both merge parents, reviewed the five
 first-parent changed paths and confirmed that the Taskfile, build guide and two
 signing workflows are byte-identical to the previously validated sync. Taskfile
 parsing, 21 source-build tests and the first-parent whitespace check passed.
+
+Follow-up on 2026-11-24: aligned the local full E2E task with the upstream
+PG19 default. Recipes that only build PG18 require an explicit PG_MAJOR=18
+when invoking this task. Hosted smoke tests select each built image directly.
