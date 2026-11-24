@@ -14,7 +14,7 @@ available. The recorded client was Linux x86-64 mongosh 2.14.3.
 ## Shared smoke suite
 
 ```bash
-task e2e:test:full TARGET=documentdb PG_MAJOR=18
+task e2e:test:full TARGET=documentdb
 ```
 
 ## Gateway on CNPG Playground

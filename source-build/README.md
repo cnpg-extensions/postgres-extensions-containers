@@ -335,7 +335,7 @@ task bake TARGET=pg-duckdb BUILDER=<native-builder>
 For the full local build and smoke-test flow:
 
 ```sh
-task e2e:test:full TARGET=pg-duckdb PG_MAJOR=18 BUILDER=<native-builder>
+task e2e:test:full TARGET=pg-duckdb BUILDER=<native-builder>
 ```
 
 The full flow sets up the local registry and Kind/CloudNativePG environment,

@@ -208,7 +208,7 @@ as described above.
 Example for testing the `pg-cron` extension:
 
 ```bash
-task e2e:test:full TARGET="pg-cron" PG_MAJOR=18
+task e2e:test:full TARGET="pg-cron"
 ```
 
 **When to use the step-by-step guide:** If the automated test fails during
