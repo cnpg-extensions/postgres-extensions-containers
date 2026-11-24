@@ -24,9 +24,19 @@ metadata = {
         package = "3.3.2"
         sql     = "3.3.2"
       }
+      "19" = {
+        # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver
+        package = "3.3.2"
+        sql     = "3.3.2"
+      }
     }
     trixie = {
       "18" = {
+        # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver
+        package = "3.3.2"
+        sql     = "3.3.2"
+      }
+      "19" = {
         # renovate: datasource=gitlab-tags depName=dalibo/postgresql_anonymizer versioning=semver
         package = "3.3.2"
         sql     = "3.3.2"

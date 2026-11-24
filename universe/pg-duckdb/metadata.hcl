@@ -24,9 +24,19 @@ metadata = {
         package = "v1.2.2"
         sql     = "1.2.2"
       }
+      "19" = {
+        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver
+        package = "v1.2.2"
+        sql     = "1.2.2"
+      }
     }
     trixie = {
       "18" = {
+        # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver
+        package = "v1.2.2"
+        sql     = "1.2.2"
+      }
+      "19" = {
         # renovate: datasource=github-releases depName=duckdb/pg_duckdb versioning=semver
         package = "v1.2.2"
         sql     = "1.2.2"

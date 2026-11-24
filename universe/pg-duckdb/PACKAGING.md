@@ -11,6 +11,11 @@ Clang for DuckDB and GCC for pg_duckdb; each Debian suite supplies Clang. The fi
 extension image contains the extension payload rather than a complete PostgreSQL
 server.
 
+The PostgreSQL 18 and 19 images both build pg_duckdb 1.2.2.
+For PG19 the build uses the selected distribution's `postgresql-server-dev-19`
+headers. Upstream also ships PG19 release packages for this version. See the
+[1.2.2 release notes](https://github.com/duckdb/pg_duckdb/blob/v1.2.2/CHANGELOG.md#122-2026-11-23).
+
 ## SBOM contents
 
 The recipe follows Debian DuckDB's package boundaries: one `libduckdb2.0`
@@ -38,12 +43,12 @@ SHA256 values. The copyright files are checked in verbatim and copied to
 helper's directory layout. The copyright source version is provenance for the
 notice document, **not** the version reported for our compiled library.
 
-The compiled versions below describe the inspected pg_duckdb 1.2.0 build;
-they are detected from source on subsequent builds, not pinned by this table.
+The table records the compiled versions from the pg_duckdb 1.2.2 PG19 build.
+The hook detects them from source on each build.
 
 | Package / checked-in copyright | Compiled version in SBOM | Copyright source package |
 |---|---|---|
-| [libduckdb2.0](licenses/libduckdb2.0/copyright) | 2.0.0 | [duckdb 2.0.0+dfsg2-1](https://deb.debian.org/debian/pool/main/d/duckdb/duckdb_2.0.0+dfsg2-1.debian.tar.xz) |
+| [libduckdb2.0](licenses/libduckdb2.0/copyright) | 2.0.1 | [duckdb 2.0.0+dfsg2-1](https://deb.debian.org/debian/pool/main/d/duckdb/duckdb_2.0.0+dfsg2-1.debian.tar.xz) |
 | [libbrotli1](licenses/libbrotli1/copyright) | 1.1.0 | [brotli 1.2.0-4.1](https://deb.debian.org/debian/pool/main/b/brotli/brotli_1.2.0-4.1.debian.tar.xz) |
 | [liblz4-1](licenses/liblz4-1/copyright) | 1.9.4 | [lz4 1.10.0-10](https://deb.debian.org/debian/pool/main/l/lz4/lz4_1.10.0-10.debian.tar.xz) |
 | [libmbedcrypto16](licenses/libmbedcrypto16/copyright) | 3.6.7 | [mbedtls 3.6.7-3](https://deb.debian.org/debian/pool/main/m/mbedtls/mbedtls_3.6.7-3.debian.tar.xz) |
@@ -127,6 +132,23 @@ expected aggregate, as did a direct `duckdb.query` over a DuckDB range. The 42
 shared tooling tests also passed in the pinned SBOM generator image. These
 checks do not cover native ARM64, CNPG/Chainsaw integration, security scanning,
 or hosted signing/SLSA acceptance.
+
+For PostgreSQL 19, fresh native AMD64 compilations on Bookworm and Trixie
+supplied the builder stages for the final images. Both images passed the
+shared catalog-backed Chainsaw test with CloudNativePG 1.30.2. Each attached
+SPDX document covered all 17 shipped notice files. Their checksums matched
+the files extracted from the final image. The notice texts matched the
+upstream LICENSE and NOTICE, the checked-in snapshots and the corresponding
+distribution's common license texts.
+
+On 2026-11-24 Grype reported CVE-2026-111497 as Critical for bundled Brotli
+1.1.0 on both distributions, through its Debian unstable source-package
+mapping. The PG19 build uses DuckDB 2.0.1 at `8d78114e`. Its complete
+`third_party/brotli` tree matches the tree in DuckDB’s
+[upstream decoder fix for this CVE](https://github.com/duckdb/duckdb/commit/46fc9a0fc653cfcb794ec86229c8b683071f175a).
+The vendored fix retains the 1.1.0 version reported in SPDX. Grant also read
+both SPDX documents. Native ARM64 compilation and hosted signing/SLSA remain unverified
+for these PG19 targets.
 
 ## Release updates
 
