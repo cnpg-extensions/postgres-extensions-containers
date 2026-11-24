@@ -24,12 +24,24 @@ metadata = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-plpgsql-check extractVersion=^(?<version>\d+\.\d+)
         sql     = "2.10"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-plpgsql-check
+        package = "2.10.16-1.pgdg12+2"
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-plpgsql-check extractVersion=^(?<version>\d+\.\d+)
+        sql     = "2.10"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-plpgsql-check
         package = "2.10.16-1.pgdg13+2"
         // renovate: suite=trixie-pgdg depName=postgresql-18-plpgsql-check extractVersion=^(?<version>\d+\.\d+)
+        sql     = "2.10"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-19-plpgsql-check
+        package = "2.10.16-1.pgdg13+2"
+        // renovate: suite=trixie-pgdg depName=postgresql-19-plpgsql-check extractVersion=^(?<version>\d+\.\d+)
         sql     = "2.10"
       }
     }

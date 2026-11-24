@@ -24,10 +24,22 @@ metadata = {
         // SQL catalog version is read from the packaged control file; review separately from package updates.
         sql = "0.6.1"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-tablelog
+        package = "0.6.4-4.pgdg12+3"
+        // SQL catalog version is read from the packaged control file; review separately from package updates.
+        sql = "0.6.1"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-tablelog
+        package = "0.6.4-4.pgdg13+3"
+        // SQL catalog version is read from the packaged control file; review separately from package updates.
+        sql = "0.6.1"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-19-tablelog
         package = "0.6.4-4.pgdg13+3"
         // SQL catalog version is read from the packaged control file; review separately from package updates.
         sql = "0.6.1"

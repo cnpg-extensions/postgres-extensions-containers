@@ -35,7 +35,7 @@ in the [SBOM generator repository](https://github.com/cnpg-extensions/cnpg-sbom-
   PGDG package. No upstream issue or pull request is currently linked. This is a
   CNPG packaging adaptation rather than a confirmed upstream defect.
 - **Problem:** packaged installation and upgrade SQL hard-codes Debian's
-  `/usr/share/postgresql/18/extension` data-file paths, while CNPG mounts this
+  `/usr/share/postgresql/<major>/extension` data-file paths, while CNPG mounts this
   extension image below `/extensions/unit`.
 - **Workaround:** [unit/Dockerfile](unit/Dockerfile) applies
   [the SQL path patch](unit/patches/0001-use-cnpg-mounted-data-files.patch) to all

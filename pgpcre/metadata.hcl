@@ -24,10 +24,22 @@ metadata = {
         // The PGDG release version is date-based and independent of the fixed SQL catalog version.
         sql     = "1"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-pgpcre
+        package = "0.20190509-9.pgdg12+2"
+        // The PGDG release version is date-based and independent of the fixed SQL catalog version.
+        sql     = "1"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pgpcre
+        package = "0.20190509-9.pgdg13+2"
+        // The PGDG release version is date-based and independent of the fixed SQL catalog version.
+        sql     = "1"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-19-pgpcre
         package = "0.20190509-9.pgdg13+2"
         // The PGDG release version is date-based and independent of the fixed SQL catalog version.
         sql     = "1"

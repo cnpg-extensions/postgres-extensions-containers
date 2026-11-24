@@ -27,12 +27,24 @@ metadata = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-cron extractVersion=^(?<version>\d+\.\d+)
         sql     = "1.6"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-cron
+        package = "1.6.8-1.pgdg12+3"
+        // renovate: suite=bookworm-pgdg depName=postgresql-19-cron extractVersion=^(?<version>\d+\.\d+)
+        sql     = "1.6"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-cron
         package = "1.6.8-1.pgdg13+3"
         // renovate: suite=trixie-pgdg depName=postgresql-18-cron extractVersion=^(?<version>\d+\.\d+)
+        sql     = "1.6"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-19-cron
+        package = "1.6.8-1.pgdg13+3"
+        // renovate: suite=trixie-pgdg depName=postgresql-19-cron extractVersion=^(?<version>\d+\.\d+)
         sql     = "1.6"
       }
     }

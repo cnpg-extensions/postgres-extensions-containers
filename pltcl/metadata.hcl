@@ -27,11 +27,23 @@ metadata = {
         // SQL version is independent of the package version; inspect control files before merging.
         sql     = "1.0"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=postgresql-pltcl-19
+        package = "19.0-2.pgdg12+1"
+        // SQL version is independent of the package version; inspect control files before merging.
+        sql     = "1.0"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-pltcl-18
         package = "18.7-1.pgdg13+5"
+        // SQL version is independent of the package version; inspect control files before merging.
+        sql     = "1.0"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-pltcl-19
+        package = "19.0-2.pgdg13+1"
         // SQL version is independent of the package version; inspect control files before merging.
         sql     = "1.0"
       }

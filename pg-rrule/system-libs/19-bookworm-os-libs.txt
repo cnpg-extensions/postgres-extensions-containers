@@ -1,0 +1,2 @@
+libglib2.0-0_2.74.6-2+deb12u9_amd64.deb MD5Sum:0285a2e88f28faa17284d92e3ba6f166
+libical3_3.0.16-1+b1_amd64.deb MD5Sum:46e2ac0099cacdc4249afa6438f89103
