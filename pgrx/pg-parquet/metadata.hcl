@@ -24,9 +24,19 @@ metadata = {
         package = "v0.6.1"
         sql     = "0.6.1"
       }
+      "19" = {
+        # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
+        package = "v0.6.1"
+        sql     = "0.6.1"
+      }
     }
     trixie = {
       "18" = {
+        # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
+        package = "v0.6.1"
+        sql     = "0.6.1"
+      }
+      "19" = {
         # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
         package = "v0.6.1"
         sql     = "0.6.1"

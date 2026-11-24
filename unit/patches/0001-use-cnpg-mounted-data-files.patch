@@ -1,56 +1,56 @@
 --- a/unit--2--3.sql
 +++ b/unit--2--3.sql
 @@ -17 +17 @@
--COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY unit_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -29 +29 @@
--COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY unit_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--3.sql
 +++ b/unit--3.sql
 @@ -48 +48 @@
--COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY unit_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -60 +60 @@
--COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY unit_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--4.sql
 +++ b/unit--4.sql
 @@ -48 +48 @@
--COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY unit_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -60 +60 @@
--COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY unit_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--5--6.sql
 +++ b/unit--5--6.sql
 @@ -9 +9 @@
--COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -17 +17 @@
--COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY tmp_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--5.sql
 +++ b/unit--5.sql
 @@ -48 +48 @@
--COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY unit_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY unit_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -60 +60 @@
--COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY unit_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY unit_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--6.sql
 +++ b/unit--6.sql
 @@ -66 +66 @@
--COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -74 +74 @@
--COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY tmp_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';
 --- a/unit--7.sql
 +++ b/unit--7.sql
 @@ -78 +78 @@
--COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_prefixes.data';
+-COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_prefixes.data';
 +COPY tmp_prefixes (prefix, factor, definition, dump) FROM '/extensions/unit/share/extension/unit_prefixes.data';
 @@ -86 +86 @@
--COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/18/extension/unit_units.data';
+-COPY tmp_units (name, unit, shift, definition, dump) FROM '/usr/share/postgresql/@PG_MAJOR@/extension/unit_units.data';
 +COPY tmp_units (name, unit, shift, definition, dump) FROM '/extensions/unit/share/extension/unit_units.data';

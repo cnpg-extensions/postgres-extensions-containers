@@ -23,10 +23,18 @@ metadata = {
         // renovate: suite=bookworm-pgdg depName=pg-rage-terminator-18
         package = "0.1.7-12.pgdg12+2"
       }
+      "19" = {
+        // renovate: suite=bookworm-pgdg depName=pg-rage-terminator-19
+        package = "0.1.7-12.pgdg12+2"
+      }
     }
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=pg-rage-terminator-18
+        package = "0.1.7-12.pgdg13+2"
+      }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=pg-rage-terminator-19
         package = "0.1.7-12.pgdg13+2"
       }
     }

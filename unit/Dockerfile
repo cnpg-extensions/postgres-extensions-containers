@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # PGDG's SQL files hard-code the package's Debian share directory. In a CNPG
 # extension image, the data files are mounted below /extensions/unit instead.
 COPY unit/patches/0001-use-cnpg-mounted-data-files.patch /tmp/
-RUN patch --batch --forward -p1 \
+RUN sed -i "s/@PG_MAJOR@/${PG_MAJOR}/g" /tmp/0001-use-cnpg-mounted-data-files.patch && \
+    patch --batch --forward -p1 \
     -d "/usr/share/postgresql/${PG_MAJOR}/extension" \
     < /tmp/0001-use-cnpg-mounted-data-files.patch
 

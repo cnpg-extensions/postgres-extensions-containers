@@ -25,6 +25,13 @@ metadata = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-gvm extractVersion=^(?<version>\d+\.\d+)
         sql     = "22.6"
       }
+      "19" = {
+        // renovate: suite=trixie-pgdg depName=postgresql-19-pg-gvm
+        package = "22.6.18-1.pgdg13+2"
+        // The PGDG package version is patch-level; SQL control version is 22.6.
+        // renovate: suite=trixie-pgdg depName=postgresql-19-pg-gvm extractVersion=^(?<version>\d+\.\d+)
+        sql     = "22.6"
+      }
     }
   }
 }
