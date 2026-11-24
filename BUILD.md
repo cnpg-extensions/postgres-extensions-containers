@@ -199,6 +199,9 @@ execution:
 task e2e:test:full TARGET="<extension>"
 ```
 
+The task tests PostgreSQL 18 on trixie by default. Set `PG_MAJOR` and
+`DISTRO` to select another combination supported by the recipe.
+
 For source recipes, also supply `BUILDER=<name>` and export `sbom_generator`
 as described above.
 

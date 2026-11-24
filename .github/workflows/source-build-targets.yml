@@ -163,7 +163,7 @@ jobs:
         BUILD_METADATA: ${{ steps.images.outputs.metadata }}
       run: |
         jq -r '.[] | (."image.name" | split(",")[0] | split(":")[0]) + "@" + ."containerimage.digest"' <<< "$BUILD_METADATA" | \
-          sort -u | xargs cosign sign --yes --new-bundle-format=false --use-signing-config=false
+          sort -u | xargs cosign sign --recursive --yes --new-bundle-format=false --use-signing-config=false
   # The shared SLSA generator attests each assembled testing index. Its success
   # is required for promotion; the destination gets its own attestation afterward.
   provenance:

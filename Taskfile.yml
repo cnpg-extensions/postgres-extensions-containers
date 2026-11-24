@@ -471,6 +471,7 @@ tasks:
       METADATA_FILE: "{{ .RECIPE_PATH }}/bake-metadata.json"
       KUBECONFIG_PATH: "./kubeconfig"
       DISTRO: '{{ .DISTRO | default "trixie" }}'
+      PG_MAJOR: '{{ .PG_MAJOR | default "18" }}'
       REGISTRY_HOST: '{{ .REGISTRY_HOST | default "" }}'
       REGISTRY_USERNAME: '{{ .REGISTRY_USERNAME | default "" }}'
       CNPG_RELEASE: '{{ .CNPG_RELEASE | default .CNPG_RELEASE_DEFAULT }}'
@@ -492,8 +493,8 @@ tasks:
           REGISTRY_USERNAME: '{{ .REGISTRY_USERNAME }}'
           EXTENSION_IMAGE:
             sh: >
-              jq -r --arg distro "{{ .DISTRO }}"
-              'to_entries | .[] | select(.key | endswith("-" + $distro)) | .value["image.name"] | split(",")[0]'
+              jq -er --arg suffix "-{{ .PG_MAJOR }}-{{ .DISTRO }}"
+              'to_entries | .[] | select(.key | endswith($suffix)) | .value["image.name"] | split(",")[0]'
               "{{ .METADATA_FILE }}"
       - defer: rm -f "{{ .RECIPE_PATH }}/values.yaml"
       - task: e2e:export-kubeconfig
