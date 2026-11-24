@@ -22,15 +22,15 @@ metadata = {
     bookworm = {
       "18" = {
         # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver
-        package = "v0.26.8"
-        sql     = "0.26.8"
+        package = "v0.27.0"
+        sql     = "0.27.0"
       }
     }
     trixie = {
       "18" = {
         # renovate: datasource=github-tags depName=paradedb/paradedb versioning=semver
-        package = "v0.26.8"
-        sql     = "0.26.8"
+        package = "v0.27.0"
+        sql     = "0.27.0"
       }
     }
   }
