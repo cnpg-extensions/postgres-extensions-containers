@@ -26,9 +26,9 @@ metadata = {
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-19-partman
-        package = "5.5.0-1.pgdg12+2"
+        package = "5.5.1-1.pgdg12+1"
         // renovate: suite=bookworm-pgdg depName=postgresql-19-partman extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "5.5.0"
+        sql     = "5.5.1"
       }
     }
     trixie = {
@@ -40,9 +40,9 @@ metadata = {
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=postgresql-19-partman
-        package = "5.5.0-1.pgdg13+2"
+        package = "5.5.1-1.pgdg13+1"
         // renovate: suite=trixie-pgdg depName=postgresql-19-partman extractVersion=^(?<version>\d+\.\d+\.\d+)
-        sql     = "5.5.0"
+        sql     = "5.5.1"
       }
     }
   }
