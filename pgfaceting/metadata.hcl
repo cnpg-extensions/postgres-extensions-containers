@@ -26,7 +26,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-19-pgfaceting
-        package = "0.2.0-6.pgdg12+1"
+        package = "0.2.0-6.pgdg12+2"
         // renovate: suite=bookworm-pgdg depName=postgresql-19-pgfaceting extractVersion=^(?<version>\d+\.\d+\.\d+)-
         sql     = "0.2.0"
       }
@@ -40,7 +40,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=postgresql-19-pgfaceting
-        package = "0.2.0-6.pgdg13+1"
+        package = "0.2.0-6.pgdg13+2"
         // renovate: suite=trixie-pgdg depName=postgresql-19-pgfaceting extractVersion=^(?<version>\d+\.\d+\.\d+)-
         sql     = "0.2.0"
       }
