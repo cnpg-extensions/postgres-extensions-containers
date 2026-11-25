@@ -20,9 +20,9 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-permissions
-        package = "1.4.1-1.pgdg12+2"
+        package = "1.6-1.pgdg12+2"
         // renovate: suite=bookworm-pgdg depName=postgresql-18-pg-permissions extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-        sql = "1.4"
+        sql = "1.6"
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-19-pg-permissions
@@ -34,9 +34,9 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-permissions
-        package = "1.4.1-1.pgdg13+2"
+        package = "1.6-1.pgdg13+2"
         // renovate: suite=trixie-pgdg depName=postgresql-18-pg-permissions extractVersion=^(?:[0-9]+:)?(?<version>[0-9]+[.][0-9]+)
-        sql = "1.4"
+        sql = "1.6"
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=postgresql-19-pg-permissions
