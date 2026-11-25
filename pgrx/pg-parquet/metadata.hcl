@@ -21,25 +21,25 @@ metadata = {
     bookworm = {
       "18" = {
         # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
-        package = "v0.6.1"
-        sql     = "0.6.1"
+        package = "v0.6.2"
+        sql     = "0.6.2"
       }
       "19" = {
         # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
-        package = "v0.6.1"
-        sql     = "0.6.1"
+        package = "v0.6.2"
+        sql     = "0.6.2"
       }
     }
     trixie = {
       "18" = {
         # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
-        package = "v0.6.1"
-        sql     = "0.6.1"
+        package = "v0.6.2"
+        sql     = "0.6.2"
       }
       "19" = {
         # renovate: datasource=github-tags depName=CrunchyData/pg_parquet versioning=semver
-        package = "v0.6.1"
-        sql     = "0.6.1"
+        package = "v0.6.2"
+        sql     = "0.6.2"
       }
     }
   }
