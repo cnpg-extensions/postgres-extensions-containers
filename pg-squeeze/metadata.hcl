@@ -29,7 +29,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-19-squeeze
-        package = "1.9.4-2.pgdg12+3"
+        package = "1.9.6-1.pgdg12+1"
         // renovate: suite=bookworm-pgdg depName=postgresql-19-squeeze extractVersion=^(?<version>\d+\.\d+)
         sql     = "1.9"
       }
@@ -43,7 +43,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=postgresql-19-squeeze
-        package = "1.9.4-2.pgdg13+3"
+        package = "1.9.6-1.pgdg13+1"
         // renovate: suite=trixie-pgdg depName=postgresql-19-squeeze extractVersion=^(?<version>\d+\.\d+)
         sql     = "1.9"
       }
