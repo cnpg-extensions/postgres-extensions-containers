@@ -26,7 +26,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=postgresql-19-orafce
-        package = "4.17.1-1.pgdg12+2"
+        package = "4.17.2-1.pgdg12+1"
         // renovate: suite=bookworm-pgdg depName=postgresql-19-orafce extractVersion=^(?<version>\d+\.\d+)
         sql     = "4.17"
       }
@@ -40,7 +40,7 @@ metadata = {
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=postgresql-19-orafce
-        package = "4.17.1-1.pgdg13+2"
+        package = "4.17.2-1.pgdg13+1"
         // renovate: suite=trixie-pgdg depName=postgresql-19-orafce extractVersion=^(?<version>\d+\.\d+)
         sql     = "4.17"
       }
