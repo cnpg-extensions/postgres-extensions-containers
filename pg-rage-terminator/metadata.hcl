@@ -21,7 +21,7 @@ metadata = {
     bookworm = {
       "18" = {
         // renovate: suite=bookworm-pgdg depName=pg-rage-terminator-18
-        package = "0.1.7-12.pgdg12+2"
+        package = "0.1.7-13.pgdg12+1"
       }
       "19" = {
         // renovate: suite=bookworm-pgdg depName=pg-rage-terminator-19
@@ -31,7 +31,7 @@ metadata = {
     trixie = {
       "18" = {
         // renovate: suite=trixie-pgdg depName=pg-rage-terminator-18
-        package = "0.1.7-12.pgdg13+2"
+        package = "0.1.7-13.pgdg13+1"
       }
       "19" = {
         // renovate: suite=trixie-pgdg depName=pg-rage-terminator-19
